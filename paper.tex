@@ -1,0 +1,261 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage[UKenglish]{isodate}
+\usepackage{fullpage}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage[capitalise]{cleveref}
+\usepackage{bm}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\Crefname{property}{Property}{Properties}
+\DeclareMathOperator{\WMC}{WMC}
+\DeclareMathOperator{\nWMC}{nWMC}
+\DeclareMathOperator{\id}{id}
+
+\title{Statistical Relational Models as Polyadic Measure Algebras}
+\author{Paulius Dilkas}
+
+\begin{document}
+\maketitle
+
+%\section{Introduction}
+
+%Contributions
+%\begin{itemize}
+%\item Equip polyadic algebras with a measure.
+%\item Show that it is equivalent to WMC.
+%\end{itemize}
+
+\section{Propositional Logic and Boolean Algebras}
+
+\subsection{Preliminaries}
+
+\begin{definition}
+  A \emph{Boolean algebra} is a tuple $(\mathbf{B}, \land, \lor, \neg, 0, 1)$ of
+  a set $\mathbf{B}$ with operations $\land, \lor, \neg$ and elements $0, 1 \in
+  \mathbf{B}$ such that the following axioms hold for all $a, b, \in
+  \mathbf{B}$:
+  \begin{itemize}
+  \item both $\land$ and $\lor$ are associative and commutative;
+  \item $a \lor (a \land b) = a$, and $a \land (a \lor b) = a$;
+  \item $0$ is the identity of $\lor$, and $1$ is the identity of $\land$;
+  \item $\lor$ distributes over $\land$ and vice versa;
+  \item $a \lor \neg a = 1$, and $a \land \neg a = 0$.
+  \end{itemize}
+
+  Let $a, b \in \mathbf{B}$ be arbitrary. Let $\le$ be a partial order on
+  $\mathbf{B}$ defined by $a \le b$ if $a = b \land a$ (or, equivalently, $a
+  \lor b = b$), and let $a < b$ denote $a \le b$ and $a \ne b$.
+\end{definition}
+
+\begin{definition}[\cite{DBLP:books/daglib/0090259}]
+  An element $a \ne 0$ of a Boolean algebra $\mathbf{B}$ is an \emph{atom} if
+  there is no $x \in \mathbf{B}$ such that $0 < x < a$. A Boolean algebra is
+  \emph{atomic} if for every $a \in \mathbf{B} \setminus \{ 0 \}$, there is an
+  atom $x$ such that $x \le a$.
+\end{definition}
+
+\begin{lemma}[\cite{ganesh2006introduction}]
+  For any two distinct atoms $a$, $b$ in a Boolean algebra, $a \land b = 0$.
+\end{lemma}
+
+\begin{lemma}[\cite{givant2008introduction}]
+  All finite Boolean algebras are atomic.
+\end{lemma}
+
+\begin{theorem}[\cite{ganesh2006introduction}] \label{thm:representation}
+  Let $\mathbf{B}$ be a finite Boolean algebra. Then every $a \in \mathbf{B}
+  \setminus \{ 0 \}$ can be uniquely expressed as $a = \bigvee_{i \in I} m_i$
+  for some set of atoms $\{m_i\}_{i \in I}$.
+\end{theorem}
+
+\begin{definition}[\cite{gaifman1964concerning}] \label{def:measure}
+  A \emph{(strictly positive) measure} on a Boolean algebra $\mathbf{B}$ is a
+  function $m : \mathbf{B} \to [0, 1]$ such that:
+  \begin{enumerate}
+  \item $m(1) = 1$, and $m(x) > 0$ for $x \ne
+    0$; \label[property]{property:values}
+  \item $m(x \lor y) = m(x) + m(y)$ for all $x, y \in \mathbf{B}$ whenever $x
+    \land y = 0$. \label[property]{property:additive}
+  \end{enumerate}
+\end{definition}
+
+\subsection{New Results}
+
+\begin{definition}
+  Let $\mathbf{B}$ be a finite Boolean algebra, let $L$ be a subset of
+  $\mathbf{B}$ such that every atom $m$ can be uniquely expressed as $m =
+  \bigwedge_{i \in I} l_i$ for some $\{ l_i \}_{i \in I} \subseteq L$, and let
+  $w : L \to \mathbb{R}_{>0}$ be arbitrary. The \emph{weighted model count}
+  $\WMC : \mathbf{B} \to \mathbb{R}_{\ge 0}$ is defined as
+  \[
+    \WMC(a) = \begin{cases}
+      0 & \text{if } a = 0 \\
+      \prod_{i \in I} w(l_i) & \text{if } M \ni a = \bigwedge_{i \in I} l_i \\
+      \sum_{i \in I} \WMC(m_i) & \text{if } \mathbf{B} \setminus (M \cup \{ 0
+      \}) \ni a = \bigvee_{i \in I} m_i
+    \end{cases}
+  \]
+  for any $a \in \mathbf{B}$. Furthermore, we define the \emph{normalised
+    weighted model count} $\nWMC : \mathbf{B} \to [0, 1]$ as $\nWMC(a) =
+  \frac{\WMC(a)}{\WMC(1)}$ for all $a \in \mathbf{B}$.
+\end{definition}
+
+\begin{proposition}
+  $\nWMC$ is a measure for any finite Boolean algebra $\mathbf{B}$.
+\end{proposition}
+\begin{proof}
+  First, note that \cref{property:values} of \cref{def:measure} is satisfied by
+  the definition of $\nWMC$. Next, in order to prove \cref{property:additive},
+  let $x, y \in \mathbf{B}$ be such that $x \land y = 0$. We want to show that
+  \[
+    \nWMC(x \lor y) = \nWMC(x) + \nWMC(y)
+  \]
+  which is equivalent to
+  \begin{equation} \label{eq:additivity_proof}
+    \WMC(x \lor y) = \WMC(x) + \WMC(y).
+  \end{equation}
+  If, say, $x = 0$, then \cref{eq:additivity_proof} becomes
+  \[
+    \WMC(y) = \WMC(0) + \WMC(y) = \WMC(y)
+  \]
+  (and likewise for $y = 0$). Thus we can assume that $x \ne 0 \ne y$ and use
+  \cref{thm:representation} to write
+  \[
+    x = \bigvee_{i \in I} x_i \quad \text{and} \quad y = \bigvee_{j \in J} y_j
+  \]
+  for some sequences of atoms $(x_i)_{i \in I}$ and $(y_j)_{j \in J}$. If
+  $x_{i'} = y_{j'}$ for some $i' \in I$ and $j' \in J$, then
+  \[
+    x \land y = \bigvee_{i \in I} \bigvee_{j \in J} x_i \land y_j = x_{i'} \land
+    y_{j'} \ne 0,
+  \]
+  contradicting the assumption. This is enough to show that
+  \begin{align*}
+    \WMC(x \lor y) &= \WMC\left( \left( \bigvee_{i \in I} x_i \right) \lor \left(\bigvee_{j \in J} y_j \right) \right) = \sum_{i \in I} \WMC(x_i) + \sum_{j \in J} \WMC(y_j) \\
+                   &= \WMC(x) + \WMC(y),
+  \end{align*}
+  finishing the proof.
+\end{proof}
+
+\section{First-Order Logic and Polyadic Algebras}
+
+\subsection{Preliminaries}
+
+What follows is a summary of \cite{halmos2016algebraic}.
+
+% Generic stuff
+Let $\mathbf{B}$ be a Boolean algebra (of propositions). Let $X$ be the
+(non-empty) domain of discourse. Let $I$ be an index set, elements of which can
+be interpreted as variables. The elements of $X^I$ are functions from $I$ to
+$X$. For any $x \in X^I$ and $i \in I$, we write $x_i$ to represent $x(i) \in
+X$. Let $\mathbf{A^*}$ be the set of all functions $X^I \to \mathbf{B}$, and
+note that it forms a Boolean algebra with operations defined pointwise.
+
+% Defining S
+Let $T$ be the semigroup of all $I \to I$ transformations. For any $\tau \in
+T$, let $\tau_* : X^I \to X^I$ be defined by
+\[
+  (\tau_* x)_i = x_{\tau i}
+\]
+for all $x \in X^I$ and $i \in I$. We can then define $\mathbf{S}$ to be a map
+from $T$ to Boolean endomorphisms of $\mathbf{A^*}$ defined by
+\[
+  \mathbf{S}(\tau)p(x) = p(\tau_* x)
+\]
+for all $x \in X^I$ and $p \in \mathbf{A^*}$.
+
+% Defining E
+For any $J \subseteq I$, let $J_*$ be the relation on $X_I$ defined by
+\[
+  xJ_*y \quad \iff \quad x_i = y_i \quad \text{for all } i \in I \setminus J
+\]
+for all $x, y \in X^I$. For any $J \subseteq I$, we then define $\bm\exists(J)$
+to be a transformation $\mathbf{A^*} \to \mathbf{A^*}$ defined by
+\[
+  \bm\exists(J)p(x) = \bigvee_{\substack{y \in X^I,\\ xJ_*y}} p(y)
+\]
+for all $p \in \mathbf{A^*}$, provided this supremum exists for all $x \in
+X^I$\footnote{The universal quantifier $\bm\forall(J)$ is then defined as
+  $\bm\forall(J)p = \neg(\bm\exists(J)\neg p)$ for all $p \in \mathbf{A^*}$.}.
+
+Finally, a \emph{functional polyadic (Boolean) algebra}\footnote{To be more
+  explicit, a $\mathbf{B}$-valued functional polyadic algebra with domain $X$
+  and variables $I$.} is a subalgebra
+$\mathbf{A}$ of $\mathbf{A^*}$ such that:
+\begin{itemize}
+\item $\mathbf{S}(\tau)p \in \mathbf{A}$ for all $p \in \mathbf{A}$ and $\tau
+  \in T$;
+\item $\bm\exists(J)p \in \mathbf{A}$ for all $p \in \mathbf{A}$ and $J
+  \subseteq I$.
+\end{itemize}
+
+\begin{definition}
+  Similarly to $\bm\exists$, a \emph{constant} $c$ is a mapping from
+  $\mathcal{P}(I)$ to Boolean endomorphisms of $\mathbf{A}$ such that:
+  \begin{itemize}
+  \item $c(\emptyset) = \id_{\mathbf{A}}$;
+  \item $c(J \cup K) = c(J)c(K)$;
+  \item $c(J)\bm\exists(K) = \bm\exists(K)c(J \setminus K)$;
+  \item $\bm\exists(J)c(K) = c(K)\bm\exists(J \setminus K)$;
+  \item $c(J)\mathbf{S}(\tau) = \mathbf{S}(\tau)c(\tau^{-1}J)$
+  \end{itemize}
+  for all $J, K \in \mathcal{P}(I)$ and $\tau \in T$. If $J$ is a singleton
+  set $\{ i \}$, we will simply write $c(i)$ instead of $c(J)$.
+\end{definition}
+
+\subsection{New Results}
+
+\begin{proposition}
+  Let $\mathbf{B}$ be a finite Boolean algebra with a measure $m :
+  \mathbf{B} \to [0, 1]$. Let $\mathbf{A}$ be a $\mathbf{B}$-valued functional
+  polyadic algebra with domain $X$ and variables $I$. For any $p \in
+  \mathbf{A}$, let $\sup(p) = \bigvee_{x \in X^I} p(x)$. Let $m^* : \mathbf{A}
+  \to [0, 1]$ be defined by
+  \[
+    m^*(p) = \sum_{\substack{\text{atom } y \in \mathbf{B}:\\ y \le \sup(p)}}
+    m(y)
+  \]
+  for all $p \in \mathbf{A}$. Then $m^*$ is a measure on $\mathbf{A}$.
+\end{proposition}
+
+\begin{remark}
+  While defining $m^*$ as $m^*(p) = m(\sup(p))$ might look tempting, this
+  definition is not additive.
+\end{remark}
+
+\begin{proof} % TODO: update the proof
+  First, since $1 \in \mathbf{A}$ is a function $1 : X^I \to \mathbf{B}$ defined
+  as $1(x) = 1$, we have that $m^*(1) = m(1) = 1$. If $m^*(p) = 0$ for some $p
+  \in \mathbf{A}$, then it must be the case that
+  \[
+    \bigvee_{x \in X^I} p(x) = 0
+  \]
+  which means that for all $x \in X^I$, $p(x) = 0$, which is equivalent to
+  saying that $p = 0$. Thus, $m^*(p) > 0$ for $p \in \mathbf{A} \setminus \{ 0
+  \}$.
+\end{proof}
+
+% TODO: how to interpret first-order sentences in this algebra
+% TODO: define WMC: connect my definition of WMC with the original one
+% TODO: condition for a measurable BA to be representable as WMC
+% TODO: can I show that WMC is the only possible probability measure?
+% TODO: abstraction refinements as homomorphisms.
+% TODO: definition of a measure-preserving homomorphism from Thomas Jech
+% TODO: a Boolean algebra is approximable if its Stone space is approximable
+
+\bibliographystyle{plain}
+\bibliography{paper}
+
+\end{document}

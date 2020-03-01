@@ -1,1 +1,0 @@
-# polyadic-measure-algebras
