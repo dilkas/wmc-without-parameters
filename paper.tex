@@ -41,7 +41,7 @@
 
 \subsection{Preliminaries}
 
-\begin{definition}
+\begin{definition} \label{def:ba}
   A \emph{Boolean algebra} is a tuple $(\mathbf{B}, \land, \lor, \neg, 0, 1)$ of
   a set $\mathbf{B}$ with operations $\land, \lor, \neg$ and elements $0, 1 \in
   \mathbf{B}$ such that the following axioms hold for all $a, b, \in
@@ -59,11 +59,13 @@
   \lor b = b$), and let $a < b$ denote $a \le b$ and $a \ne b$.
 \end{definition}
 
-\begin{definition}[\cite{DBLP:books/daglib/0090259}]
+% TODO: Which definition do I actually need?
+\begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
   An element $a \ne 0$ of a Boolean algebra $\mathbf{B}$ is an \emph{atom} if
-  there is no $x \in \mathbf{B}$ such that $0 < x < a$. A Boolean algebra is
-  \emph{atomic} if for every $a \in \mathbf{B} \setminus \{ 0 \}$, there is an
-  atom $x$ such that $x \le a$.
+  there is no $x \in \mathbf{B}$ such that $0 < x < a$. Equivalently, $a \ne 0$
+  is an atom if, for all $x \in \mathbf{B}$, either $x \land a = a$ or $x \land
+  a = 0$. A Boolean algebra is \emph{atomic} if for every $a \in \mathbf{B}
+  \setminus \{0 \}$, there is an atom $x$ such that $x \le a$.
 \end{definition}
 
 \begin{lemma}[\cite{ganesh2006introduction}]
@@ -177,7 +179,7 @@ from $T$ to Boolean endomorphisms of $\mathbf{A^*}$ defined by
 for all $x \in X^I$ and $p \in \mathbf{A^*}$.
 
 % Defining E
-For any $J \subseteq I$, let $J_*$ be the relation on $X_I$ defined by
+For any $J \subseteq I$, let $J_*$ be the relation on $X^I$ defined by
 \[
   xJ_*y \quad \iff \quad x_i = y_i \quad \text{for all } i \in I \setminus J
 \]
@@ -220,37 +222,82 @@ $\mathbf{A}$ of $\mathbf{A^*}$ such that:
 \begin{proposition}
   Let $\mathbf{B}$ be a finite Boolean algebra with a measure $m :
   \mathbf{B} \to [0, 1]$. Let $\mathbf{A}$ be a $\mathbf{B}$-valued functional
-  polyadic algebra with domain $X$ and variables $I$. For any $p \in
-  \mathbf{A}$, let $\sup(p) = \bigvee_{x \in X^I} p(x)$. Let $m^* : \mathbf{A}
-  \to [0, 1]$ be defined by
+  polyadic algebra with domain $X$ and variables $I$. Let $m^* : \mathbf{A} \to
+  \mathbb{R}_{\ge 0}$ be defined by
   \[
-    m^*(p) = \sum_{\substack{\text{atom } y \in \mathbf{B}:\\ y \le \sup(p)}}
-    m(y)
+    m^*(p) = \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le p(x)}} m(y)
   \]
   for all $p \in \mathbf{A}$. Then $m^*$ is a measure on $\mathbf{A}$.
 \end{proposition}
 
 \begin{remark}
-  While defining $m^*$ as $m^*(p) = m(\sup(p))$ might look tempting, this
-  definition is not additive.
+  While definitions of $m^*$ such as
+  \[
+    m^*(p) = m \left( \bigvee_{x \in X^I} p(x) \right)
+  \]
+  might look tempting, they are not additive.
 \end{remark}
 
 \begin{proof} % TODO: update the proof
-  First, since $1 \in \mathbf{A}$ is a function $1 : X^I \to \mathbf{B}$ defined
-  as $1(x) = 1$, we have that $m^*(1) = m(1) = 1$. If $m^*(p) = 0$ for some $p
-  \in \mathbf{A}$, then it must be the case that
+  First, we can show that $m^*(1) = 1$ by observing that
   \[
-    \bigvee_{x \in X^I} p(x) = 0
+    m^*(1) = \sum_{\text{atoms } y \in \mathbf{B}} m(y) = m \left(
+      \bigvee_{\text{atoms } y \in \mathbf{B}} y \right) = m(1) = 1,
   \]
-  which means that for all $x \in X^I$, $p(x) = 0$, which is equivalent to
-  saying that $p = 0$. Thus, $m^*(p) > 0$ for $p \in \mathbf{A} \setminus \{ 0
-  \}$.
+  where we use \cref{thm:representation} and express $1 \in \mathbf{B}$ as the
+  supremum of all atoms in $\mathbf{B}$ \cite{ganesh2006introduction}. Clearly
+  $m^*(p) \ge 0$ for all $p \in \mathbf{A}$, so we can restrict the codomain of
+  $m^*$ to $[0, 1]$.
+
+  Next, we want to show that $m^*(p) > 0$ for all $p \in \mathbf{A} \setminus \{
+  0 \}$. If $p \ne 0$, then there must be some $x' \in X^I$ such that $p(x') \ne
+  0$. But then, since finite Boolean algebras are atomic, there must also be an
+  atom $y \in \mathbf{B}$ such that $y \le p(x')$. Therefore, $m^*(p) \ge m(y) >
+  0$, finishing this part of the proof.
+
+  Let $p, q \in \mathbf{A}$ be such that $p \land q = 0$. We want to show
+  that $m^*(p \lor q) = m^*(p) \lor m^*(q)$. First, note that
+  \[
+    y \le (p \lor q)(x) = p(x) \lor q(x)
+  \]
+  if and only if
+  \[
+    y = (p(x) \lor q(x)) \land y = (p(x) \land y) \lor (q(x) \land y)
+  \]
+  by \cref{def:ba}. Also note that
+  \[
+    (p(x) \land y) \land (q(x) \land y) = p(x) \land q(x) \land y = (p \land
+    q)(x) \land y = 0 \land y = 0,
+  \]
+  so
+  \[
+    m(y) = m((p(x) \land y) \lor (q(x) \land y)) = m(p(x) \land y) + m(q(x) \land y)
+  \]
+  by \cref{def:measure} which then leads to
+  \begin{align*}
+    m^*(p \lor q) &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(y) = \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(p(x) \land y) + m(q(x) \land y) \\
+                  &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(p(x) \land y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(q(x) \land y).
+  \end{align*}
+  Since $y$ is an atom,
+  \[
+    p(x) \land y  = \begin{cases}
+      y & \text{if } y \le p(x) \\
+      0 & \text{otherwise,}
+    \end{cases}
+  \]
+  so
+  \begin{align*}
+    m^*(p \lor q) &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x) \text{ and } y \le p(x)}} m(p(x) \land y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x) \text{ and } y \le q(x)}} m(q(x) \land y) \\
+                  &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le p(x)}} m(p(x) \land y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{s.t.}\\ \exists x \in X^I:\, y \le q(x)}} m(q(x) \land y) \\
+                  &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le p(x)}} m(y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{s.t.}\\ \exists x \in X^I:\, y \le q(x)}} m(y) = m^*(p) + m^*(q),
+  \end{align*}
+  finishing the proof that $m^*$ is a measure.
 \end{proof}
 
 % TODO: how to interpret first-order sentences in this algebra
 % TODO: define WMC: connect my definition of WMC with the original one
 % TODO: condition for a measurable BA to be representable as WMC
-% TODO: can I show that WMC is the only possible probability measure?
+% TODO: can I show that a generalisation of WMC is the only possible probability measure (when it exists)?
 % TODO: abstraction refinements as homomorphisms.
 % TODO: definition of a measure-preserving homomorphism from Thomas Jech
 % TODO: a Boolean algebra is approximable if its Stone space is approximable
