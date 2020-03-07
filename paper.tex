@@ -10,6 +10,7 @@
 \usepackage[capitalise]{cleveref}
 \usepackage{bm}
 \usepackage{booktabs}
+\usepackage[backgroundcolor=lightgray]{todonotes}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -25,7 +26,7 @@
 \DeclareMathOperator{\id}{id}
 \DeclareMathOperator{\End}{End}
 
-\title{Statistical Relational Models as Polyadic Measure Algebras}
+\title{Weighted Model Counting as a Special Case of Polyadic Measure Algebras}
 \author{Paulius Dilkas}
 
 \begin{document}
@@ -61,7 +62,7 @@
   \lor b = b$), and let $a < b$ denote $a \le b$ and $a \ne b$.
 \end{definition}
 
-% TODO: Which definition do I actually need?
+\todo[inline]{Which definition do I actually need?}
 \begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
   An element $a \ne 0$ of a Boolean algebra $\mathbf{B}$ is an \emph{atom} if
   there is no $x \in \mathbf{B}$ such that $0 < x < a$. Equivalently, $a \ne 0$
@@ -74,17 +75,23 @@
   For any two distinct atoms $a$, $b$ in a Boolean algebra, $a \land b = 0$.
 \end{lemma}
 
-\begin{lemma}[\cite{givant2008introduction}]
+\begin{lemma}[\cite{givant2008introduction}] \label{lemma:atomic}
   All finite Boolean algebras are atomic.
 \end{lemma}
 
-\begin{theorem}[\cite{ganesh2006introduction}] \label{thm:representation}
+\begin{theorem} \label{thm:representation}
   Let $\mathbf{B}$ be a finite Boolean algebra. Then every $a \in \mathbf{B}
-  \setminus \{ 0 \}$ can be uniquely expressed as $a = \bigvee_{i \in I} m_i$
-  for some set of atoms $\{m_i\}_{i \in I}$.
+  \setminus \{ 0 \}$ can be uniquely expressed as $a = \bigvee_{i \in I} a_i$,
+  where $\{ a_i \}_{i \in I}$ is the set of atoms in $\mathbf{B}$ such that $a_i
+  \le a$ for all $i \in I$.
 \end{theorem}
+\begin{proof}
+  A simple consequence of the theorem that every finite Boolean algebra is
+  isomorphic to a field of subsets of a set, where the cardinality of the set is
+  equal to the number of atoms in the Boolean algebra.
+\end{proof}
 
-% TODO: remove the requirement for being strictly positive
+\todo[inline]{Remove the requirement for being strictly positive}
 \begin{definition}[\cite{gaifman1964concerning}] \label{def:measure}
   A \emph{(strictly positive) measure} on a Boolean algebra $\mathbf{B}$ is a
   function $m : \mathbf{B} \to [0, 1]$ such that:
@@ -98,13 +105,14 @@
 
 \subsection{New Results}
 
-% TODO: weight can be zero
+\todo[inline]{Allow weight to be zero}
 \begin{definition}
-  Let $\mathbf{B}$ be a finite Boolean algebra, let $L$ be a subset of
-  $\mathbf{B}$ such that every atom $m$ can be uniquely expressed as $m =
-  \bigwedge_{i \in I} l_i$ for some $\{ l_i \}_{i \in I} \subseteq L$, and let
-  $w : L \to \mathbb{R}_{>0}$ be arbitrary. The \emph{weighted model count}
-  $\WMC : \mathbf{B} \to \mathbb{R}_{\ge 0}$ is defined as
+  Let $\mathbf{B}$ be a finite Boolean algebra, and let $M \subseteq \mathbf{B}$
+  be its set of atoms. Let $L \subseteq \mathbf{B}$ be such that every atom $m
+  \in M$ can be uniquely expressed as $m = \bigwedge_{i \in I} l_i$ for some $\{
+  l_i \}_{i \in I} \subseteq L$, and let $w : L \to \mathbb{R}_{>0}$ be
+  arbitrary. The \emph{weighted model count} $\WMC : \mathbf{B} \to
+  \mathbb{R}_{\ge 0}$ is defined as
   \[
     \WMC(a) = \begin{cases}
       0 & \text{if } a = 0 \\
@@ -225,7 +233,7 @@ $\mathbf{A}$ of $\mathbf{A^*}$ such that:
 
 \subsection{New Results}
 
-\begin{proposition}
+\begin{proposition} \label{prop:polyadic_measure}
   Let $\mathbf{B}$ be a finite Boolean algebra with a measure $m :
   \mathbf{B} \to [0, 1]$. Let $\mathbf{A}$ be a $\mathbf{B}$-valued functional
   polyadic algebra with domain $X$ and variables $I$. Let $m^* : \mathbf{A} \to
@@ -244,7 +252,7 @@ $\mathbf{A}$ of $\mathbf{A^*}$ such that:
   might look tempting, they are not additive.
 \end{remark}
 
-\begin{proof} % TODO: update the proof
+\begin{proof}\todo[inline]{Update the proof w.r.t. definitions}
   First, we can show that $m^*(1) = 1$ by observing that
   \[
     m^*(1) = \sum_{\text{atoms } y \in \mathbf{B}} m(y) = m \left(
@@ -300,6 +308,32 @@ $\mathbf{A}$ of $\mathbf{A^*}$ such that:
   finishing the proof that $m^*$ is a measure.
 \end{proof}
 
+\begin{lemma} \label{lemma:simple_measure}
+  Given the setup of \cref{prop:polyadic_measure} and $p \in \mathbf{A}$, if
+  $p(x) = p(y)$ for all $x, y \in X^I$ (i.e., $p$ has no free variables), then
+  \[
+    m^*(p) = m(p(x))
+  \]
+  (for some $x \in X^I$) is an alternative (i.e., equivalent and simpler)
+  definition of $m^*$.
+\end{lemma}
+\begin{proof}
+  Fix some $x \in X^I$. Then
+  \[
+    m(p(x)) = m \left( \bigvee_{\substack{\text{atoms } y \in \mathbf{B} \text{
+            s.t.}\\
+          y \le p(x)}} y \right) = \sum_{\substack{\text{atoms } y \in \mathbf{B}
+        \text{ s.t.}\\
+        y \le p(x)}} m(y) =\sum_{\substack{\text{atoms } y \in \mathbf{B}
+        \text{ s.t.}\\
+        \exists x' \in X^I : y \le p(x')}} m(y) = m^*(p),
+  \]
+  where we use \cref{thm:representation} for the first step,
+  \cref{def:measure} and \cref{lemma:atomic} for the second step, the
+  assumptions of \cref{lemma:simple_measure} for the third step, and the
+  definition of $m^*$ for the fourth one.
+\end{proof}
+
 \section{From First-Order Logic to Polyadic Algebras}
 
 \subsection{Preliminaries}
@@ -342,7 +376,7 @@ ideal generated by a set of atoms.
   `additive' part of the corresponding Boolean ring).
 \end{definition}
 
-\subsection{New Results}
+\subsection{New Results (an Example)}
 
 In order to make the example algebras easily describable, our example programs
 will have to be tiny. Consider the following ProbLog
@@ -406,15 +440,74 @@ X$. See \cref{tbl:examples} for example elements of $\mathbf{A}$ which consists
 of a single predicate function $p$ and operators $\bm\exists, \mathbf{S}, a, b,
 \neg, \land, \lor$, the last three of which are defined pointwise.
 
-% TODO: 1-2 examples of how a probability is calculated
-% TODO: condition for a measurable BA to be representable as WMC
-% TODO: can I show that a generalisation of WMC is the only possible probability measure (when it exists)?
-% TODO: abstraction refinements as homomorphisms.
-% TODO: definition of a measure-preserving homomorphism from Thomas Jech
-% TODO: a Boolean algebra is approximable if its Stone space is approximable
-% TODO: maybe the measure on BA should not be normalised?
-% TODO: how do measures transfer to quotient algebras? Naturally!
-% TODO: extension to infinite atomic Boolean algebras
+\begin{table}
+  \centering
+  \caption{Step-by-step derivation of how a more complex element of
+    $\mathbf{A}$ acts on elements of $X^I$}
+  \label{tbl:derivation}
+  \begin{tabular}{ll}
+    \toprule
+    Element of $\mathbf{A}$ & Action on $X^I$ \\
+    \midrule
+    $p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, x_2)$ \\
+    $b(2)p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, b)$ \\
+    $\neg b(2)p$ & $(x_1, x_2) \mapsto \neg\mathsf{p}(x_1, b)$ \\
+    $\bm\exists(1)\neg b(2)p$ & $(x_1, x_2) \mapsto \neg\mathsf{p}(a, b) \lor \neg\mathsf{p}(b, b) = \neg(\mathsf{p}(a, b) \land \mathsf{p}(b, b))$ \\
+    $\bm\forall(1)b(2)p = \neg\bm\exists(1)\neg b(2)p$ & $(x_1, x_2) \mapsto \neg\neg(\mathsf{p}(a, b) \land \mathsf{p}(b, b)) = \mathsf{p}(a, b) \land \mathsf{p}(b, b)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{Atoms $y \in \mathbf{B}$ (and their measures) such that $y \le
+    \mathsf{p}(a, b) \land \mathsf{p}(b, b)$}
+  \label{tbl:atoms}
+  \begin{tabular}{lc}
+    \toprule
+    Atom $y \in \mathbf{B}$ & $m(y)$ \\
+    \midrule
+    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \mathsf{p}(a, a) \land \mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 0 = 0$ \\
+    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \neg\mathsf{p}(a, a) \land \mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 0 = 0$ \\
+    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \mathsf{p}(a, a) \land \neg\mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 1 = 0.25$ \\
+    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \neg\mathsf{p}(a, a) \land \neg\mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 1 = 0.25$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Let us calculate the probability $\Pr(\forall x_1 \in X, \mathsf{p}(x_1, b))$.
+The same expression can be translated into the notation for our polyadic algebra
+$\mathbf{A}$ as $m^*(\bm\forall(1)b(2)p)$. Recall that $\bm\forall(1)b(2)p =
+\neg\bm\exists(1)\neg b(2)p$. The effect of this function on an arbitrary
+element of $X^I$ is derived step-by-step in \cref{tbl:derivation}. Since the
+resulting function is constant (i.e., the logical formula has no free
+variables), \cref{lemma:simple_measure} tells us that
+\[
+  m^*(\bm\forall(1)b(2)p) = m(\mathsf{p}(a, b) \land \mathsf{p}(b, b)) = m
+  \left( \bigvee_{\substack{\text{atoms } y \in \mathbf{B} \text{ s.t.}\\
+        y \le \mathsf{p}(a, b) \land \mathsf{p}(b, b)}} y \right) = \sum
+  _{\substack{\text{atoms } y \in \mathbf{B} \text{ s.t.}\\
+      y \le \mathsf{p}(a, b) \land \mathsf{p}(b, b)}} m(y).
+\]
+The resulting sum is over four atoms; these atoms and their probabilities are
+listed in \cref{tbl:atoms}. Thus, we get that
+\[
+  m^*(\bm\forall(1)b(2)p) = 0 + 0 + 0.25 + 0.25 = 0.5.
+\]
+
+\todo[inline,caption={}]{The big TODO list
+  \begin{itemize}
+  \item Condition for a measurable Boolean algebra to be representable as WMC.
+    Note: if all atoms are in $L$, then WMC can define any distribution.
+  \item Extension to infinite (atomic?) Boolean algebras.
+  \item How many extra variable do you need to add to make any probability
+    distribution representable using WMC?
+  \item Abstraction refinements as homomorphisms.
+  \item Definition of a measure-preserving homomorphism from Jech's set theory
+    book.
+  \item A Boolean algebra is approximable if its Stone space is approximable.
+  \end{itemize}
+}
 
 \section{Homomorphisms}
 
