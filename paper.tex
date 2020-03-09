@@ -21,6 +21,9 @@
 \newtheorem*{remark}{Remark}
 
 \Crefname{property}{Property}{Properties}
+\Crefname{condition}{Condition}{Conditions}
+\creflabelformat{condition}{#2(#1)#3}
+
 \DeclareMathOperator{\WMC}{WMC}
 \DeclareMathOperator{\nWMC}{nWMC}
 \DeclareMathOperator{\id}{id}
@@ -39,6 +42,10 @@
 %\item Equip polyadic algebras with a measure.
 %\item Show that it is equivalent to WMC.
 %\end{itemize}
+
+% Big advantage: using algebras we can represent an incomplete state of
+% knowledge, e.g., we know m(a \/ b), but not m(a) or m(b). In infinite BAs, one
+% can have measure undefined for some elements.
 
 \section{Propositional Logic and Boolean Algebras}
 
@@ -79,11 +86,14 @@
   All finite Boolean algebras are atomic.
 \end{lemma}
 
+% TODO: we don't have to treat 0 as an exception we state that \/ of an empty set is 0 (and /\ of an empty set is 1).
+% TODO: use bigvee and bigwedge directly with sets.
 \begin{theorem} \label{thm:representation}
-  Let $\mathbf{B}$ be a finite Boolean algebra. Then every $a \in \mathbf{B}
-  \setminus \{ 0 \}$ can be uniquely expressed as $a = \bigvee_{i \in I} a_i$,
-  where $\{ a_i \}_{i \in I}$ is the set of atoms in $\mathbf{B}$ such that $a_i
-  \le a$ for all $i \in I$.
+  Let $\mathbf{B}$ be a finite Boolean algebra. Then every $x \in \mathbf{B}
+  \setminus \{ 0 \}$ can be uniquely expressed as
+  \[
+  x = \bigvee_{\text{atoms } a \le x} a.
+  \]
 \end{theorem}
 \begin{proof}
   A simple consequence of the theorem that every finite Boolean algebra is
@@ -106,7 +116,7 @@
 \subsection{New Results}
 
 \todo[inline]{Allow weight to be zero}
-\begin{definition}
+\begin{definition} \label{def:wmc}
   Let $\mathbf{B}$ be a finite Boolean algebra, and let $M \subseteq \mathbf{B}$
   be its set of atoms. Let $L \subseteq \mathbf{B}$ be such that every atom $m
   \in M$ can be uniquely expressed as $m = \bigwedge_{i \in I} l_i$ for some $\{
@@ -495,10 +505,72 @@ listed in \cref{tbl:atoms}. Thus, we get that
   m^*(\bm\forall(1)b(2)p) = 0 + 0 + 0.25 + 0.25 = 0.5.
 \]
 
+% TODO: maybe I should gives this kind of a BA a name? A synonym of 'complete',
+% perhaps.
+% TODO: a special case for weight=0.
+\begin{proposition}
+  Let $\mathbf{B}$ be a finite measure algebra with measure $m : \mathbf{B} \to
+  \mathbb{R}_{\ge 0}$. Let $L \subset \mathbf{B}$ be defined as
+  \[
+  L = \{ l_i \mid i \in [n] \} \cup \{ \neg l_i \mid i \in [n] \}
+  \]
+  for some $n \in \mathbb{N}$. Finally, assume that $\mathbf{B}$ has $2^n$
+  atoms, where each atom $a \in \mathbf{B}$ is an infimum
+  \[
+    a = \bigwedge_{i=1}^n a_i
+  \]
+  such that $a_i \in \{ l_i, \neg l_i \}$ for $i \in [n]$. Then there exists a
+  weight function $w : L \to \mathbb{R}_{>0}$ that makes $m$ a WMC measure if
+  and only if
+  \begin{equation} \label{eq:wmccondition}
+  m(l \land l') = m(l)m(l')
+  \end{equation}
+  for all distinct $l, l' \in L$ such that $l \ne \neg l'$.
+\end{proposition}
+
+\begin{remark}
+  Note that if $n = 1$, then \cref{eq:wmccondition} is vacuously satisfied and
+  so any valid measure can be expressed as WMC.
+\end{remark}
+
+\begin{proof}
+  Let us begin with the `if' part of the statement. Let $w : L \to
+  \mathbb{R}_{>0}$ be defined by
+  \begin{equation} \label{eq:assumption}
+    w(l) = m(l)
+  \end{equation}
+  for all $l \in L$. We are going
+  to show that $\nWMC = m$. First, note that $\nWMC(0) = 0 = m(0)$ by the
+  definitions of both $\nWMC$ and $m$. Second, let
+  \begin{equation} \label{eq:def_of_a}
+    a = \bigwedge_{i=1}^n a_i
+  \end{equation}
+  be an atom in $\mathbf{B}$ such that $a_i \in \{ l_i, \neg l_i \}$ for all $i
+  \in [n]$. Then
+  \[
+    \nWMC(a) = \frac{\WMC(a)}{\WMC(1)} = \frac{1}{\WMC(1)} \prod_{i=1}^n w(a_i)
+    = \frac{1}{\WMC(1)} \prod_{i=1}^n m(a_i) = \frac{1}{\WMC(1)} m \left(
+      \bigwedge_{i=1}^n a_i \right) = \frac{m(a)}{\WMC(1)}
+  \]
+  by \cref{def:wmc,eq:assumption,eq:wmccondition,eq:def_of_a}. Now we just need
+  to show that $\WMC(1) = 1$. Indeed,
+  \begin{align*}
+    \WMC(1) &= \sum_{\text{atoms } a \in \mathbf{B}} \WMC(a) = \sum_{\text{atoms
+      } a \in \mathbf{B}} \prod_{i=1}^n w(a_i) = \sum_{\text{atoms } a \in
+      \mathbf{B}} \prod_{i=1}^n m(a_i) \\
+    &= \sum_{\text{atoms } a \in
+      \mathbf{B}} m \left( \bigwedge_{i=1}^n a_i \right) = \sum_{\text{atoms } a
+      \in \mathbf{B}} m(a) = m \left( \bigvee_{\text{atoms } a \in \mathbf{B}}
+    \right) = m(1) = 1.
+  \end{align*}
+  Finally, note that if $\nWMC$ and $m$ agree on all atoms, then they must also
+  agree on all other non-zero elements of the Boolean algebra.
+
+  % TODO: the other direction
+\end{proof}
+
 \todo[inline,caption={}]{The big TODO list
   \begin{itemize}
-  \item Condition for a measurable Boolean algebra to be representable as WMC.
-    Note: if all atoms are in $L$, then WMC can define any distribution.
   \item Extension to infinite (atomic?) Boolean algebras.
   \item How many extra variable do you need to add to make any probability
     distribution representable using WMC?
