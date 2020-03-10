@@ -566,7 +566,98 @@ listed in \cref{tbl:atoms}. Thus, we get that
   Finally, note that if $\nWMC$ and $m$ agree on all atoms, then they must also
   agree on all other non-zero elements of the Boolean algebra.
 
-  % TODO: the other direction
+  For the other direction, we are given a weight function $w : L \to
+  \mathbb{R}_{>0}$ that induces a measure $m = \nWMC : \mathbf{B} \to
+  \mathbb{R}_{\ge 0}$, and we want to show that \cref{eq:wmccondition} is
+  satisfied. Let $k_i, k_j \in L$ be such that $k_i \in \{ l_i, \neg l_i \}$,
+  $k_j \in \{ l_j, \neg l_j \}$, and $i \ne j$. We will first prove an auxiliary
+  result that
+  \begin{equation} \label{eq:to_prove}
+    m(k_i \land k_j) = m(k_i)m(k_j)
+  \end{equation}
+  is equivalent to
+  \begin{equation} \label{eq:to_prove2}
+    m(k_i \land k_j) \cdot m(\neg k_i \land \neg k_j) = m(k_i \land \neg k_j)
+    \cdot m(\neg k_i \land k_j).
+  \end{equation}
+  First, note that $k_i$ can be expressed as
+  \[
+    k_i = (k_i \land k_j) \lor (k_i \land \neg k_j)
+  \]
+  with the condition that
+  \[
+    (k_i \land k_j) \land (k_i \land \neg k_j) = 0,
+  \]
+  so, by properties of a measure,
+  \begin{equation} \label{eq:temp}
+    m(k_i) = m(k_i \land k_j) + m(k_i \land \neg k_j).
+  \end{equation}
+  Applying \cref{eq:temp} and the equivalent expression for $m(k_j)$ allows us
+  to rewrite \cref{eq:to_prove} as
+  \begin{align*}
+    m(k_i \land k_j) &= [m(k_i \land k_j) + m(k_i \land \neg k_j)] \cdot [m(k_i \land k_j) + m(\neg k_i \land k_j)] \\
+                     &= m(k_i \land k_j)^2 + m(k_i \land k_j)[m(k_i \land \neg k_j) + m(\neg k_i \land k_j)] + m(k_i \land \neg k_j)m(\neg k_i \land k_j)
+  \end{align*}
+  Dividing both sides by $m(k_i \land k_j)$ gives
+  \begin{equation} \label{eq:temp2}
+    1 = m(k_i \land k_j) + m(k_i \land \neg k_j) + m(\neg k_i \land k_j) +
+    \frac{m(k_i \land \neg k_j)m(\neg k_i \land k_j)}{m(k_i \land k_j)}.
+  \end{equation}
+  Since $k_i \land k_j \land k_i \land \neg k_j = 0$, and
+  \[
+    (k_i \land k_j) \lor (k_i \land \neg k_j) = k_i \land (k_j \lor \neg k_j) =
+    k_i \land 1 = k_i,
+  \]
+  we have that
+  \[
+    m(k_i \land k_j) + m(k_i \land \neg k_j) = m(k_i).
+  \]
+  Similarly, $k_i \land \neg k_i \land k_j = 0$, and
+  \[
+    k_i \lor (\neg k_i \land k_j) = (k_i \lor \neg k_i) \land (k_i \lor k_j) =
+    k_i \lor k_j,
+  \]
+  so
+  \[
+    m(k_i) + m(\neg k_i \land k_j) = m(k_i \lor k_j).
+  \]
+  Finally, note that
+  \[
+    (k_i \lor k_j) \land \neg(k_i \lor k_j) = 0,
+  \]
+  and
+  \[
+    (k_i \lor k_j) \lor \neg(k_i \lor k_j) = 1,
+  \]
+  so
+  \[
+    m(k_i \lor k_j) + m(\neg(k_i \lor k_j)) = m(1) = 1.
+  \]
+  This allows us to rewrite \cref{eq:temp2} as
+  \[
+    \frac{m(k_i \land \neg k_j)m(\neg k_i \land k_j)}{m(k_i \land k_j)} = 1 -
+    m(k_i \lor k_j) = m(\neg(k_i \lor k_j)) = m(\neg k_i \land \neg k_j)
+  \]
+  which immediately gives us \cref{eq:to_prove2}.
+
+  Now recall that $m = \nWMC$ and note that \cref{eq:to_prove2} can be
+  multiplied by $\WMC(1)^2$ to turn the equation into one for $\WMC$ instead of
+  $\nWMC$. Then
+  \begin{align*}
+    \WMC(k_i \land k_j) &= \sum_{\text{atoms } a \le k_i \land k_j} \WMC(a) = \sum_{\text{atoms } a \le k_i \land k_j} \prod_{m \in [n]} w(a_m) \\
+                        &= \sum_{\text{atoms } a \le k_i \land k_j} w(a_i)w(a_j) \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) = \sum_{\text{atoms } a \le k_i \land k_j} w(k_i)w(k_j) \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) \\
+    &= w(k_i)w(k_j) \sum_{\text{atoms } a \le k_i \land k_j} \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) = w(k_i)w(k_j)C,
+  \end{align*}
+  where $C$ denotes the part of $\WMC(k_i \land k_j)$ that will be the same for
+  $\WMC(\neg k_i \land k_j)$, $\WMC(k_i \land \neg k_j)$, and $\WMC(\neg k_i
+  \land \neg k_j)$ as well. But then \cref{eq:to_prove2} becomes
+  \[
+    w(k_i)w(k_j)w(\neg k_i)w(\neg k_j)C^2 = w(k_i)w(\neg k_j)w(\neg k_i)w(k_j)C^2
+  \]
+  which is trivially true. By showing that WMC satisfies \cref{eq:to_prove2}, we
+  also showed that it satisfies \cref{eq:to_prove}, finishing the second part of
+  the proof.
+  \todo[inline]{Adapt the proof to zero measure events}
 \end{proof}
 
 \todo[inline,caption={}]{The big TODO list
