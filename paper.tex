@@ -42,37 +42,72 @@
   }
 }
 
-\title{On the Limitations of Weighted Model Counting}
+%\title{On the Limitations of Weighted Model Counting}
+\title{Weighted Model Counting/Integration from the Perspective of Boolean Algebras}
+%\title{What Boolean Algebras Can Teach Us About Weighted Model Counting/Integration?}
 \author{Paulius Dilkas}
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
-% TODO: use \colon instead of :
-
 % Feedback: What are the main claims, what are the main takeaways, intuitive
 % [???] of theorems to follow. To do this, we appeal to algebraic constructions
 % to define the main concepts for introducing measures on Boolean algebras.
 
-%Contributions
-%\begin{itemize}
-%\item Equip polyadic algebras with a measure.
-%\item Show that it is equivalent to WMC.
-%\end{itemize}
+% Contributions:
+% 1. A generalisation of WMC adapted to Boolean algebras.
+% 2. We show that it is a valid measure.
+% 3. We show that WMC assumes independence, i.e., cannot represent all measures.
+% 4. We show how the BA can be extended with new 'literals' to represent any measure.
+% 5. (Maybe) we establish a lower bound on the number of new literals, if we
+% make no assumptions about independence.
+% 6. (I guess I could) show how evidence = quotiening by a filter, and how
+% quotiening by an ideal works
+% 7. (WMI) If all weights are 1, we extend Boolean variables to discrete
+% variables, and continuous variables are arbitrary subsets (in the
+% sigma-algebra), then the WMI process calculates the probability of any event
+% and doesn't require going down to the level of models (assuming a suitable
+% probability measure).
+% 8. If the weight of a literal (and its negation) is 1, then we don't need to
+% look at its models--the probability can be calculated at any level. This
+% extends to any number of variables.
+% 9. How WMI transforms to our algebras. The boring version and what's wrong
+% with it.
 
-% Big advantage: using algebras we can represent an incomplete state of
-% knowledge, e.g., we know m(a \/ b), but not m(a) or m(b). In infinite BAs, one
-% can have measure undefined for some elements.
+Previous/related work:
+\begin{itemize}
+\item Hailperin's approach to probability logic
+  \cite{DBLP:journals/ndjfl/Hailperin84}
+\item Nilsson's (somewhat successful) probabilistic logic
+  \cite{DBLP:journals/ai/Nilsson86}
+\item Semiring programming \cite{DBLP:journals/corr/BelleR16}
+\item WMC with functions \cite{DBLP:conf/uai/Belle17}
+\item WMI \cite{DBLP:conf/ijcai/BellePB15}
+\item Measures on Boolean algebras: overview articles (from most cited to least
+  cited)
+  \begin{itemize}
+  \item Horn and Tarski \cite{horn1948measures}
+  \item Concerning measures on Boolean algebras \cite{gaifman1964concerning}
+  \item Jech -- Measures on Boolean algebras (arXiv) \cite{jech2017measures}
+  \end{itemize}
+\item Measures on Boolean algebras: more specific articles
+  \begin{itemize}
+  \item On possibility and probability measures in finite Boolean algebras
+    \cite{DBLP:journals/soco/CastineiraCT02}
+  \item Representation of conditional probability measures
+    \cite{krauss1968representation}
+  \end{itemize}
+\end{itemize}
 
 \section{WMC as a Measure}
 
 \subsection{Preliminaries}
 
 \begin{definition} \label{def:ba}
-  A \emph{Boolean algebra} is a tuple $(\mathbf{B}, \land, \lor, \neg, 0, 1)$ of
-  a set $\mathbf{B}$ with operations $\land, \lor, \neg$ and elements $0, 1 \in
-  \mathbf{B}$ such that the following axioms hold for all $a, b, \in
+  A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
+  1)$ of a set $\mathbf{B}$ with operations $\land, \lor, \neg$ and elements $0,
+  1 \in \mathbf{B}$ such that the following axioms hold for all $a, b, \in
   \mathbf{B}$:
   \begin{itemize}
   \item both $\land$ and $\lor$ are associative and commutative;
@@ -82,27 +117,31 @@
   \item $a \lor \neg a = 1$, and $a \land \neg a = 0$.
   \end{itemize}
 
-  Let $a, b \in \mathbf{B}$ be arbitrary. Let $\le$ be a partial order on
-  $\mathbf{B}$ defined by $a \le b$ if $a = b \land a$ (or, equivalently, $a
-  \lor b = b$), and let $a < b$ denote $a \le b$ and $a \ne b$.
+  We can also define a partial order $\le$ on $\mathbf{B}$ as $a \le b$ if $a =
+  b \land a$ (or, equivalently, $a \lor b = b$) for $a, b \in \mathbf{B}$.
+  Furthermore, let $a < b$ denote $a \le b$ and $a \ne b$.
 \end{definition}
 
-\todo[inline]{Which definition do I actually need?}
+For the rest of this paper, let $\mathbf{B}$ refer to the BA $(\mathbf{B},
+\land, \lor, \neg, 0, 1)$.
+
 \begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
-  An element $a \ne 0$ of a Boolean algebra $\mathbf{B}$ is an \emph{atom} if
-  there is no $x \in \mathbf{B}$ such that $0 < x < a$. Equivalently, $a \ne 0$
-  is an atom if, for all $x \in \mathbf{B}$, either $x \land a = a$ or $x \land
-  a = 0$. A Boolean algebra is \emph{atomic} if for every $a \in \mathbf{B}
-  \setminus \{0 \}$, there is an atom $x$ such that $x \le a$.
+  An element $a \ne 0$ of $\mathbf{B}$ is an \emph{atom} if, for all $x \in
+  \mathbf{B}$, either $x \land a = a$ or $x \land a = 0$. Equivalently, $a \ne
+  0$ is an atom if there is no $x \in \mathbf{B}$ such that $0 < x < a$. A BA
+  $\mathbf{B}$ is \emph{atomic} if for every $a \in \mathbf{B} \setminus \{0
+  \}$, there is an atom $x$ such that $x \le a$.
 \end{definition}
 
 \begin{lemma}[\cite{ganesh2006introduction}]
-  For any two distinct atoms $a$, $b$ in a Boolean algebra, $a \land b = 0$.
+  For any two distinct atoms $a$, $b \in \mathbf{B}$, $a \land b = 0$.
 \end{lemma}
 
 \begin{lemma}[\cite{givant2008introduction}] \label{lemma:atomic}
-  All finite Boolean algebras are atomic.
+  All finite BAs are atomic.
 \end{lemma}
+
+% TODO: all finite Boolean algebras are isomorphic to fields of sets
 
 % TODO: we don't have to treat 0 as an exception we state that \/ of an empty
 % set is 0 (and /\ of an empty set is 1).
@@ -123,7 +162,7 @@
 \todo[inline]{Remove the requirement for being strictly positive}
 \begin{definition}[\cite{gaifman1964concerning}] \label{def:measure}
   A \emph{(strictly positive) measure} on a Boolean algebra $\mathbf{B}$ is a
-  function $m : \mathbf{B} \to [0, 1]$ such that:
+  function $m\colon \mathbf{B} \to [0, 1]$ such that:
   \begin{enumerate}
   \item $m(1) = 1$, and $m(x) > 0$ for $x \ne
     0$; \label[property]{property:values}
@@ -137,6 +176,7 @@
 % 0.3 p; 0.2 q => M = <p, qbar> has weight o3 * (1-0.2)
 % then it corresponds to an atom in an algebra defined over the language defined
 % over propositions p and q.
+% TODO:  Mention Lindenbaum-Tarski algebra somewhere
 
 \subsection{New Results}
 
@@ -145,8 +185,8 @@
   Let $\mathbf{B}$ be a finite Boolean algebra, and let $M \subseteq \mathbf{B}$
   be its set of atoms. Let $L \subseteq \mathbf{B}$ be such that every atom $m
   \in M$ can be uniquely expressed as $m = \bigwedge_{i \in I} l_i$ for some $\{
-  l_i \}_{i \in I} \subseteq L$, and let $w : L \to \mathbb{R}_{>0}$ be
-  arbitrary. The \emph{weighted model count} $\WMC : \mathbf{B} \to
+  l_i \}_{i \in I} \subseteq L$, and let $w\colon L \to \mathbb{R}_{>0}$ be
+  arbitrary. The \emph{weighted model count} $\WMC\colon \mathbf{B} \to
   \mathbb{R}_{\ge 0}$ is defined as
   \[
     \WMC(a) = \begin{cases}
@@ -157,7 +197,7 @@
     \end{cases}
   \]
   for any $a \in \mathbf{B}$. Furthermore, we define the \emph{normalised
-    weighted model count} $\nWMC : \mathbf{B} \to [0, 1]$ as $\nWMC(a) =
+    weighted model count} $\nWMC\colon \mathbf{B} \to [0, 1]$ as $\nWMC(a) =
   \frac{\WMC(a)}{\WMC(1)}$ for all $a \in \mathbf{B}$.
 \end{definition}
 % TODO: Feedback: maybe NWMC or WMC^*, as nWMC looks like a typo. Also clarify
@@ -220,7 +260,7 @@
 % TODO: a special case for weight=0.
 
 \begin{proposition}
-  Let $\mathbf{B}$ be a finite measure algebra with measure $m : \mathbf{B} \to
+  Let $\mathbf{B}$ be a finite measure algebra with measure $m\colon \mathbf{B} \to
   \mathbb{R}_{\ge 0}$. Let $L \subset \mathbf{B}$ be defined as
   \[
   L = \{ l_i \mid i \in [n] \} \cup \{ \neg l_i \mid i \in [n] \}
@@ -231,7 +271,7 @@
     a = \bigwedge_{i=1}^n a_i
   \]
   such that $a_i \in \{ l_i, \neg l_i \}$ for $i \in [n]$. Then there exists a
-  weight function $w : L \to \mathbb{R}_{>0}$ that makes $m$ a WMC measure if
+  weight function $w\colon L \to \mathbb{R}_{>0}$ that makes $m$ a WMC measure if
   and only if
   \begin{equation} \label{eq:wmccondition}
   m(l \land l') = m(l)m(l')
@@ -245,7 +285,7 @@
 \end{remark}
 
 \begin{proof}
-  Let us begin with the `if' part of the statement. Let $w : L \to
+  Let us begin with the `if' part of the statement. Let $w\colon L \to
   \mathbb{R}_{>0}$ be defined by
   \begin{equation} \label{eq:assumption}
     w(l) = m(l)
@@ -277,8 +317,8 @@
   Finally, note that if $\nWMC$ and $m$ agree on all atoms, then they must also
   agree on all other non-zero elements of the Boolean algebra.
 
-  For the other direction, we are given a weight function $w : L \to
-  \mathbb{R}_{>0}$ that induces a measure $m = \nWMC : \mathbf{B} \to
+  For the other direction, we are given a weight function $w\colon L \to
+  \mathbb{R}_{>0}$ that induces a measure $m = \nWMC\colon \mathbf{B} \to
   \mathbb{R}_{\ge 0}$, and we want to show that \cref{eq:wmccondition} is
   satisfied. Let $k_i, k_j \in L$ be such that $k_i \in \{ l_i, \neg l_i \}$,
   $k_j \in \{ l_j, \neg l_j \}$, and $i \ne j$. We will first prove an auxiliary
@@ -373,41 +413,14 @@
 
 \subsection{Extending the Algebra}
 
-\subsubsection{Preliminaries}
-
-\begin{definition}[\cite{givant2008introduction}]
-  Let $\mathbf{A}$ and $\mathbf{B}$ be Boolean algebras. A \emph{Boolean
-    homomorphism} from $\mathbf{A}$ to $\mathbf{B}$ is a map $f : \mathbf{A} \to
-  \mathbf{B}$ such that:
-  \begin{itemize}
-  \item $f(x \land y) = f(x) \land f(y)$,
-  \item $f(x \lor y) = f(x) \lor f(y)$,
-  \item $f(\neg x) = \neg f(x)$
-  \end{itemize}
-  for all $x, y \in \mathbf{A}$.
-\end{definition}
-
-\begin{definition}[\cite{halmos2016algebraic}]
-  Given two polyadic algebras $\mathbf{A}$ and $\mathbf{B}$, a \emph{polyadic
-    homomorphism} from $\mathbf{A}$ to $\mathbf{B}$ is a Boolean homomorphism $f
-  : \mathbf{A} \to \mathbf{B}$ such that
-  \begin{itemize}
-  \item $f\mathbf{S}(\tau)p = \mathbf{S}(\tau)fp$,
-  \item $f\bm\exists(J)p = \bm\exists(J)fp$
-  \end{itemize}
-  for all $\tau \in T$, $p \in \mathbf{A}$, and $J \subseteq I$.
-\end{definition}
-
-\subsubsection{New Results}
-
 A well-known way to overcome this limitation of independence is by adding more
 literals \cite{DBLP:journals/ai/ChaviraD08}, i.e., extending the set $L$ covered
-by the WMC weight function $w : L \to \mathbb{R}_{>0}$. Let us translate this
+by the WMC weight function $w\colon L \to \mathbb{R}_{>0}$. Let us translate this
 idea to the language of Boolean algebras.
 
 \begin{theorem} \label{thm:extension} % TODO: cite the fact about atoms
   Let $\mathbf{B}$ be a finite Boolean algebra freely generated by some set of
-  `literals' $L$, and let $m : \mathbf{B} \to \mathbb{R}_{\ge 0}$ be an
+  `literals' $L$, and let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be an
   arbitrary measure. We know that $\mathbf{B}$ has $n = 2^{|L|}$ atoms. Let
   $(a_i)_{i=1}^n$ denote those atoms in some arbitrary order. Let $L' = L \cup
   \{ \phi_i \mid i \in [n] \} \cup \{ \neg \phi_i \mid i \in [n] \}$ be the set
@@ -417,8 +430,8 @@ idea to the language of Boolean algebras.
     \{ \phi_i \land a_i \mid i \in [n] \} \cup \{ \neg \phi_i \land a_i \mid i
     \in [n] \}
   \]
-  as its set of atoms. Let $\iota : \mathbf{B} \to \mathbf{B'}$ be the inclusion
-  homomorphism (i.e., $\iota(a) = a$ for all $a \in \mathbf{B}$). Let $w : L'
+  as its set of atoms. Let $\iota\colon \mathbf{B} \to \mathbf{B'}$ be the inclusion
+  homomorphism (i.e., $\iota(a) = a$ for all $a \in \mathbf{B}$). Let $w\colon L'
   \to \mathbb{R}_{> 0}$ be defined by
   \[
     w(l) = \begin{cases}
@@ -427,7 +440,7 @@ idea to the language of Boolean algebras.
       1 & \text{otherwise}
     \end{cases}
   \]
-  for all $l \in L'$, and note that this defines a WMC measure $m' : \mathbf{B'}
+  for all $l \in L'$, and note that this defines a WMC measure $m'\colon \mathbf{B'}
   \to \mathbb{R}_{\ge 0}$. Then
   \[
     m(a) = (m' \circ \iota)(a)
@@ -498,7 +511,7 @@ Now we can show that the construction in \cref{thm:extension} is smallest
 possible.
 
 \begin{conjecture}
-  Let $\mathbf{B}$ and $\mathbf{B'}$ be Boolean algebras, and $\iota :
+  Let $\mathbf{B}$ and $\mathbf{B'}$ be Boolean algebras, and $\iota\colon
   \mathbf{B} \to \mathbf{B'}$ be the inclusion map such that $\mathbf{B}$ is
   freely generated by $L$, all atoms of $\mathbf{B'}$ can be expressed as
   meets of elements of $L'$, and the following subset relations are satisfied:
@@ -508,9 +521,9 @@ possible.
       L \arrow[Subset]{u}{} \arrow[Subset]{r}{} & L' \arrow[Subset]{u}{}
     \end{tikzcd}
   \]
-  If, for any measure $m : \mathbf{B} \to \mathbb{R}_{\ge 0}$, one can
-  construct a weight function $w : L' \to \mathbb{R}_{>0}$ such that the WMC
-  measure $\WMC : \mathbf{B'} \to \mathbb{R}_{\ge 0}$ with respect to $w$
+  If, for any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$, one can
+  construct a weight function $w\colon L' \to \mathbb{R}_{>0}$ such that the WMC
+  measure $\WMC\colon \mathbf{B'} \to \mathbb{R}_{\ge 0}$ with respect to $w$
   satisfies
   \[
     m = \WMC \circ \iota,
@@ -570,16 +583,10 @@ variables, while for the encoding by Sang et al. \cite{sang2005solving},
 \]
 variables would suffice.
 
-\todo[inline,caption={}]{The big TODO list
-  \begin{itemize}
-  \item Extension to infinite (atomic?) Boolean algebras.
-  \item Compare my polyadic measures with first-order WMC.
-  \item Abstraction refinements as homomorphisms.
-  \item Definition of a measure-preserving homomorphism from Jech's set theory
-    book.
-  \item A Boolean algebra is approximable if its Stone space is approximable.
-  \end{itemize}
-}
+% TODO: a section on WMI: 3 results
+% TODO: introducing evidence can be done by taking a quotient w.r.t. the ideal
+% that contradicts the evidence (equivalently, the filter generated by the
+% evidence).
 
 \bibliographystyle{plain}
 \bibliography{paper}
