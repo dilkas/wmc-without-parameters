@@ -68,8 +68,7 @@
 % 4. We show how the BA can be extended with new 'literals' to represent any measure.
 % 5. (Maybe) we establish a lower bound on the number of new literals, if we
 % make no assumptions about independence.
-% 6. (I guess I could) show how evidence = quotiening by a filter, and how
-% quotiening by an ideal works
+% 6. show how evidence = quotiening by a filter, and how quotiening by an ideal works
 % 7. (WMI) If all weights are 1, we extend Boolean variables to discrete
 % variables, and continuous variables are arbitrary subsets (in the
 % sigma-algebra), then the WMI process calculates the probability of any event
@@ -181,28 +180,57 @@ $\bigvee \emptyset = 0$.
   for all $x \ne 0$, then $m$ is \emph{strictly positive}.
 \end{definition}
 
-\begin{definition}[\cite{givant2008introduction}] \label{def:filter}
-  A \emph{(Boolean) filter} is a non-empty subset $F \subseteq \mathbf{B}$ such
-  that
+%\begin{definition}[\cite{givant2008introduction}] \label{def:filter}
+%  A \emph{(Boolean) filter} is a non-empty subset $F \subseteq \mathbf{B}$ such
+%  that
+%  \begin{itemize}
+%  \item $f \land g \in F$ for all $f, g \in F$,
+%  \item $f \lor a \in F$ for all $f \in F$ and $a \in \mathbf{B}$.
+%  \end{itemize}
+%  For any $p \in \mathbf{B}$, the \emph{principal filter of $p$} is the
+%  intersection $I$ of all filters that contain $p$. It also has the property
+%  that $p \le a$ for all $a \in I$.
+%\end{definition}
+%\begin{definition}[\cite{sikorski1969boolean}] \label{def:quotient}
+%  Let $F \subseteq \mathbf{B}$ be a filter. The \emph{quotient} $\mathbf{B}/F$
+%  is a BA of equivalence classes of elements of $\mathbf{B}$ with respect to the
+%  equivalence relation
+%  \[
+%    a \sim b \qquad \iff \qquad a \to b \in F \quad \text{and} \quad b \to a \in F
+%  \]
+%  for all $a, b \in \mathbf{B}$. Elements of $\mathbf{B}/F$ are usually denoted
+%  by $a/F$ (for some $a \in \mathbf{B}$) with the understanding that if $b \sim
+%  a$ (for some $b \in \mathbf{B}$), then $b/F = a/F$.
+%\end{definition}
+
+\begin{definition}[\cite{givant2008introduction}] \label{def:ideal}
+  An \emph{ideal} is a non-empty subset $I \subseteq \mathbf{B}$ such that
   \begin{itemize}
-  \item $f \land g \in F$ for all $f, g \in F$,
-  \item $f \lor a \in F$ for all $f \in F$ and $a \in \mathbf{B}$.
+  \item $i \lor j \in I$ for all $i, j \in I$;
+  \item $i \land a \in I$ for all $i \in I$ and $a \in \mathbf{B}$.
   \end{itemize}
-  For any $p \in \mathbf{B}$, the \emph{principal filter of $p$} is the
-  intersection $I$ of all filters that contain $p$. It also has the property
-  that $p \le a$ for all $a \in I$.
+  For any $p \in \mathbf{B}$, the \emph{principal ideal of $p$}---denoted by
+  $(p)$---is the smallest ideal that contains $p$. It can also be expressed as
+  $(p) = \{ a \in \mathbf{B} \mid a \le p \}$.
 \end{definition}
 
-\begin{definition}[\cite{sikorski1969boolean}] \label{def:quotient}
-  Let $F \subseteq \mathbf{B}$ be a filter. The \emph{quotient} $\mathbf{B}/F$
-  is a BA of equivalence classes of elements of $\mathbf{B}$ with respect to the
+\begin{definition}[\cite{givant2008introduction}]
+  Let $I$ be an ideal in $\mathbf{B}$. The \emph{quotient algebra of
+    $\mathbf{B}$ modulo the ideal $I$} $\mathbf{B}/I$ is a BA
+  of equivalence classes of elements of $\mathbf{B}$ with respect to the
   equivalence relation
   \[
-    a \sim b \qquad \iff \qquad a \to b \in F \quad \text{and} \quad b \to a \in F
+    a \sim b \quad \iff \quad a + b \in I
   \]
-  for all $a, b \in \mathbf{B}$. Elements of $\mathbf{B}/F$ are usually denoted
-  by $a/F$ (for some $a \in \mathbf{B}$) with the understanding that if $b \sim
-  a$ (for some $b \in \mathbf{B}$), then $b/F = a/F$.
+  for all $a, b \in \mathbf{B}$. Elements of $\mathbf{B}/I$ are usually denoted
+  by $a/I$ (for some $a \in \mathbf{B}$) with the understanding that if $b \sim
+  a$ (for some $b \in \mathbf{B}$), then $b/I = a/I$. The three algebraic
+  operations on $\mathbf{B}/I$ are defined as
+  \begin{align*}
+    a/I \land b/I &= a \land b / I, \\
+    a/I \lor b/I &= a \lor b / I, \\
+    \neg(a/I) &= (\neg a)/I.
+  \end{align*}
 \end{definition}
 
 \section{WMC as a Measure}
@@ -391,11 +419,32 @@ In our algebraic formulation, this can be computed in two different ways:
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
 \begin{lemma}
-  Let $\mathbf{B}$ be a BA, and let $F$ be the principal filter of $p \in
-  \mathbf{B}$. Then, for any $a, b \in \mathbf{B}$, if $a/F = b/F$, then $a
-  \land p = b \land p$.
+  For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
+  \in \mathbf{B}$,
+  \[
+    m(a \lor b) = m(a) + m(b) - m(a \land b).
+  \]
 \end{lemma}
 \begin{proof}
+  By \cref{def:measure},
+  \begin{align*}
+    m(a) &= m(a \land b) + m(a \land \neg b), \\
+    m(b) &= m(a \land b) + m(\neg a \land b), \\
+    m(a \lor b) &= m(a \land b) + m(a \land \neg b) + m(\neg a \land b),
+  \end{align*}
+  so
+  \[
+    m(a) + m(b) - m(a \land b) = m(a \land b) + m(a \land \neg b) + m(\neg a
+    \land b) = m(a \lor b)
+  \]
+  as required.
+\end{proof}
+
+\begin{lemma} \label{lemma:well-defined}
+  For any $a, b \in \mathbf{B}$ and any principal ideal $(p)$, if $a/(p) =
+  b/(p)$, then $a \lor p = b \lor p$.
+\end{lemma}
+\begin{proof} % TODO: update
   If $a/F = b/F$, then $a \to b \in F$ by \cref{def:quotient}. Then $p \le a \to
   b$ by \cref{def:filter}, and $(a \to b) \land p = p$ by the definition of
   $\le$. Then
@@ -417,15 +466,24 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 \end{proof}
 
 \begin{proposition}[Measures on quotients] \label{def:measures_on_quotients}
-  Let $\mathbf{B}$ be a BA with a measure $m : \mathbf{B} \to \mathbb{R}_{\ge
-    0}$, and let $F$ be the principal filter of $p \in \mathbf{B}$. Let us
-  define $m^*\colon \mathbf{B}/F \to \mathbb{R}_{\ge 0}$ as
+  Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, and let $(p)$ be
+  a principal ideal. Let $m^*\colon \mathbf{B}/(p) \to \mathbb{R}_{\ge 0}$ be
+  defined as
   \[
-    m^*(a/F) = m(a \land p)
+    m^*(a/(p)) = m(a \lor p)
   \]
   for any $a \in \mathbf{B}$. The function $m^*$ is well-defined. Furthermore,
-  if $m$ is a WMC measure, then so is $m^*$.
+  it is a measure on $\mathbf{B}/(p)$ if and only if $m(p) = 0$. Moreover, if it
+  is a measure, then the following properties transfer from $m$ to $m^*$:
+  \begin{itemize}
+  \item if $m$ is a probability measure, then so is $m^*$;
+  \item if $m$ is strictly positive, then so is $m^*$;
+  \item if $m$ is a WMC measure, then so is $m^*$.
+  \end{itemize}
 \end{proposition}
+\begin{proof} % TODO: prove this
+  \Cref{lemma:well-defined} proves that the function is well-defined.
+\end{proof}
 
 % TODO: prove that the two ways to compute the probability give the same answer.
 
@@ -771,9 +829,6 @@ variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
 variables would suffice.
 
 % TODO: a section on WMI: 3 results
-% TODO: introducing evidence can be done by taking a quotient w.r.t. the ideal
-% that contradicts the evidence (equivalently, the filter generated by the
-% evidence).
 
 \bibliographystyle{plain}
 \bibliography{paper}
