@@ -17,6 +17,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
 \newtheorem{conjecture}{Conjecture}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -48,8 +49,8 @@
   }
 }
 
-%\title{On the Limitations of Weighted Model Counting}
-\title{Weighted Model Counting/Integration from the Perspective of Boolean Algebras}
+\title{On the Limitations of Weighted Model Counting}
+%\title{Weighted Model Counting/Integration from the Perspective of Boolean Algebras}
 %\title{What Boolean Algebras Can Teach Us About Weighted Model Counting/Integration?}
 \author{Paulius Dilkas}
 
@@ -88,15 +89,11 @@ Previous/related work:
   \cite{DBLP:journals/ndjfl/Hailperin84}
 \item Nilsson's (somewhat successful) probabilistic logic
   \cite{DBLP:journals/ai/Nilsson86}
+\item Logical induction: a huge paper with a good overview of previous attempts
+  to assign probabilities to logical sentences in a way that makes sense
+  \cite{DBLP:journals/eccc/GarrabrantBCST16}.
 \item Semiring programming \cite{DBLP:journals/corr/BelleR16}
 \item WMI \cite{DBLP:conf/ijcai/BellePB15}
-\item Measures on Boolean algebras: overview articles (from most cited to least
-  cited)
-  \begin{itemize}
-  \item Horn and Tarski \cite{horn1948measures}
-  \item Concerning measures on Boolean algebras \cite{gaifman1964concerning}
-  \item Jech -- Measures on Boolean algebras (arXiv) \cite{jech2017measures}
-  \end{itemize}
 \item Measures on Boolean algebras: more specific articles
   \begin{itemize}
   \item On possibility and probability measures in finite Boolean algebras
@@ -143,8 +140,8 @@ $\bigvee \emptyset = 0$.
 \begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
   An element $a \ne 0$ of $\mathbf{B}$ is an \emph{atom} if, for all $x \in
   \mathbf{B}$, either $x \land a = a$ or $x \land a = 0$. Equivalently, $a \ne
-  0$ is an atom if there is no $x \in \mathbf{B}$ such that $0 < x < a$. The BA
-  $\mathbf{B}$ is \emph{atomic} if for every $a \in \mathbf{B} \setminus \{0
+  0$ is an atom if there is no $x \in \mathbf{B}$ such that $0 < x < a$. We say
+  that $\mathbf{B}$ is \emph{atomic} if for every $a \in \mathbf{B} \setminus \{0
   \}$, there is an atom $x$ such that $x \le a$.
 \end{definition}
 
@@ -173,12 +170,17 @@ $\bigvee \emptyset = 0$.
   \mathbf{B} \to \mathbb{R}_{\ge 0}$ such that:
   \begin{itemize}
   \item $m(0) = 0$;
-  \item $m(x \lor y) = m(x) + m(y)$ for all $x, y \in \mathbf{B}$ whenever $x
-    \land y = 0$.
+  \item $m(a \lor b) = m(a) + m(b)$ for all $a, b \in \mathbf{B}$ whenever $a
+    \land b = 0$.
   \end{itemize}
   If $m(1) = 1$, we call $m$ a \emph{probability measure}. Also, if $m(x) > 0$
   for all $x \ne 0$, then $m$ is \emph{strictly positive}.
 \end{definition}
+
+\begin{lemma}[\cite{horn1948measures}] \label{lemma:m_and_order}
+  Let $m: \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure. For any $a, b \in
+  \mathbf{B}$, if $a \le b$, then $m(a) \le m(b)$.
+\end{lemma}
 
 %\begin{definition}[\cite{givant2008introduction}] \label{def:filter}
 %  A \emph{(Boolean) filter} is a non-empty subset $F \subseteq \mathbf{B}$ such
@@ -214,7 +216,7 @@ $\bigvee \emptyset = 0$.
   $(p) = \{ a \in \mathbf{B} \mid a \le p \}$.
 \end{definition}
 
-\begin{definition}[\cite{givant2008introduction}]
+\begin{definition}[\cite{givant2008introduction}] \label{def:quotient}
   Let $I$ be an ideal in $\mathbf{B}$. The \emph{quotient algebra of
     $\mathbf{B}$ modulo the ideal $I$} $\mathbf{B}/I$ is a BA
   of equivalence classes of elements of $\mathbf{B}$ with respect to the
@@ -232,6 +234,38 @@ $\bigvee \emptyset = 0$.
     \neg(a/I) &= (\neg a)/I.
   \end{align*}
 \end{definition}
+
+\begin{definition}[\cite{givant2008introduction}]
+  Let $\mathbf{A}$ and $\mathbf{B}$ be BAs. A \emph{(Boolean) homomorphism} from
+  $\mathbf{A}$ to $\mathbf{B}$ is a map $f\colon \mathbf{A} \to \mathbf{B}$ such
+  that:
+  \begin{itemize}
+  \item $f(x \land y) = f(x) \land f(y)$,
+  \item $f(x \lor y) = f(x) \lor f(y)$,
+  \item $f(\neg x) = \neg f(x)$
+  \end{itemize}
+  for all $x, y \in \mathbf{A}$.
+\end{definition}
+
+\begin{lemma}[\cite{givant2008introduction}] \label{lemma:canonical_homomorphism}
+  Let $I \subseteq \mathbf{B}$ be an ideal. The map $f\colon \mathbf{B} \to
+  \mathbf{B}/I$ defined by $f(x) = x/I$ is a homomorphism.
+\end{lemma}
+
+\begin{lemma}[Homomorphisms preserve order
+  \cite{givant2008introduction}] \label{lemma:homomorphisms_and_order}
+  Let $f\colon \mathbf{A} \to \mathbf{B}$ be a homomorphism between two BAs
+  $\mathbf{A}$ and $\mathbf{B}$. Then, for any $x, y \in \mathbf{A}$, if $x \le
+  y$, then $f(x) \le f(y)$.
+\end{lemma}
+
+\begin{lemma}[\cite{sikorski1969boolean}] \label{lemma:order}
+  For any $a, b \in \mathbf{B}$, $a \le b$ if and only if $a \land \neg b = 0$.
+\end{lemma}
+
+% TODO: make up my mind about a,b vs x,y and stick to it (maybe x,y?)
+% TODO: perhaps reorder things into paragraphs, i.e., a paragraph for order, for
+% homomorphisms, for ideals and quotients. This would take up less space.
 
 \section{WMC as a Measure}
 
@@ -370,7 +404,14 @@ $\bigvee \emptyset = 0$.
   \frac{\WMC_w(x)}{\WMC_w(1)}$ for all $x \in \mathbf{B}$. For both $\WMC_w$ and
   $\nWMC_w$, we will drop the subscript when doing so results in no potential
   confusion.
+%  Finally, we say that a measure $m\colon \mathbf{B} \to
+%  \mathbb{R}_{\ge 0}$ is a \emph{WMC measure} (or is \emph{WMC-computable}) if
+%  there exists a subset $L \subset \mathbf{B}$ and a weight function $w\colon L
+%  \to \mathbb{R}_{\ge 0}$ such that $m = \WMC_w$.
 \end{definition}
+% TODO: mention that the definition can be reduced to a single formula (i.e.,
+% without cases)
+% TODO: any measure is a WMC measure if all atoms are in L
 
 \begin{proposition}
   $\WMC$ is a measure, and $\nWMC$ is a probability measure.
@@ -418,7 +459,7 @@ In our algebraic formulation, this can be computed in two different ways:
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
-\begin{lemma}
+\begin{lemma} \label{lemma:sum}
   For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
   \in \mathbf{B}$,
   \[
@@ -444,25 +485,35 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   For any $a, b \in \mathbf{B}$ and any principal ideal $(p)$, if $a/(p) =
   b/(p)$, then $a \lor p = b \lor p$.
 \end{lemma}
-\begin{proof} % TODO: update
-  If $a/F = b/F$, then $a \to b \in F$ by \cref{def:quotient}. Then $p \le a \to
-  b$ by \cref{def:filter}, and $(a \to b) \land p = p$ by the definition of
-  $\le$. Then
+\begin{proof}
+  Note that
   \[
-    1 = p \lor \neg p = ((a \to b) \lor \neg p) \land (p \lor \neg p) = \neg a
-    \lor b \lor \neg p = \neg (a \land p) \lor b.
+    a/(p) = b/(p) \quad \iff \quad a+b \in (p) \quad \iff \quad a+b \le p \quad
+    \iff \quad (a+b) \lor p = p
   \]
-  So
+  by \cref{def:quotient,def:ideal}, and the definition of $\le$. So $p = (a
+  \land \neg b) \lor (\neg a \land b) \lor p$, and thus
   \[
-    \neg b = (\neg(a \land p) \land \neg b) \lor (b \land \neg b) = \neg((a
-    \land p) \lor b),
+    0 = p \land \neg p = (a \land \neg b \land \neg p) \lor (\neg a \land b
+    \land \neg p) \lor (p \land \neg p) = (a \land \neg (b \lor p)) \lor (b
+    \land \neg (a \lor p)).
   \]
-  and thus $b = (a \land p) \lor b$, and
+  It follows that
   \[
-    b \land p = (a \land p) \lor (b \land p) = (a \lor b) \land p.
+    a \land \neg (b \lor p) = 0 \quad \text{and} \quad b \land \neg (a \lor p) =
+    0.
   \]
-  Similarly, $a \land p = (a \lor b) \land p$ which proves that $a \land p = b
-  \land p$.
+  Focusing on the first equation,
+  \[
+    \neg a = (\neg a \lor a) \land [\neg a \lor \neg (b \lor p)] = \neg [a \land
+    (b \lor p)],
+  \]
+  and so $a = a \land (b \lor p)$, and
+  \[
+    a \lor p = (a \lor p) \land (b \lor p) = (a \land b) \lor p.
+  \]
+  By similar arguments, $b \lor p = (a \land b) \lor p$ as well which shows that
+  $a \lor p = b \lor p$ as required.
 \end{proof}
 
 \begin{proposition}[Measures on quotients] \label{def:measures_on_quotients}
@@ -476,16 +527,153 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   it is a measure on $\mathbf{B}/(p)$ if and only if $m(p) = 0$. Moreover, if it
   is a measure, then the following properties transfer from $m$ to $m^*$:
   \begin{itemize}
-  \item if $m$ is a probability measure, then so is $m^*$;
-  \item if $m$ is strictly positive, then so is $m^*$;
-  \item if $m$ is a WMC measure, then so is $m^*$.
+  \item if $m$ is a \emph{probability measure}, then so is $m^*$;
+  \item if $m$ is \emph{strictly positive}, then so is $m^*$.
   \end{itemize}
 \end{proposition}
-\begin{proof} % TODO: prove this
-  \Cref{lemma:well-defined} proves that the function is well-defined.
+\begin{proof}
+  \Cref{lemma:well-defined} proves that the function is well-defined. Next,
+  note that
+  \[
+    m^*(0/(p)) = m(0 \lor p) = m(p),
+  \]
+  so $m^*(0/(p)) = 0$ if and only if $m(p) = 0$. For the second part of
+  \cref{def:measure}, let $a/(p), b/(p) \in \mathbf{B}/(p)$ be such that
+  \[
+    a/(p) \land b/(p) = a \land b / (p) = 0 / (p).
+  \]
+  This condition is equivalent to $a \land b \in (p)$ and $(a \land b) \lor p =
+  p$ by well-known properties of quotients and ideals
+  \cite{givant2008introduction}, \cref{def:ideal}, and the definition of $\le$,
+  respectively. Now
+  \begin{align*}
+    m^*(a/(p) \lor b/(p)) &= m^*(a \lor b / (p)) = m(a \lor b \lor p) = m((a \lor p) \lor (b \lor p)) \\
+                          &= m(a \lor p) + m(b \lor p) - m((a \lor p) \land (b \lor p)) \\
+                          &= m^*(a/(p)) + m^*(b/(p)) - m((a \lor p) \land (b \lor p))
+  \end{align*}
+  by \cref{lemma:sum}. However
+  \[
+    (a \lor p) \land (b \lor p) = (a \land b) \lor p = p,
+  \]
+  so $m^*(a/(p) \lor b/(p)) = m^*(a/(p)) + m^*(b/(p))$ if and only if $m(p) = 0$.
+
+  The two remaining properties are easy to prove:
+  \begin{itemize}
+  \item If $m(1) = 1$, then $m^*(1/(p)) = m(1 \lor p) = m (1) = 1$.
+  \item Suppose that $m$ is strictly positive, and let $a/(p) \in
+    \mathbf{B}/(p)$ be such that $a/(p) \ne 0/(p)$. Then
+    \[
+      m^*(a/(p)) = m(a \lor p) \ge m(a) > 0,
+    \]
+    where the first inequality comes from an elementary property of $\le$ that
+    $x \le x \lor y$ for any $x, y \in \mathbf{B}$ \cite{sikorski1969boolean}
+    and \cref{lemma:m_and_order}; and the second inequality follows because
+    $a/(p) \ne 0/(p)$ implies that $a \ne 0$, and $m$ is assumed to be strictly
+    positive.
+  \end{itemize}
+\end{proof}
+% TODO: add parentheses around quotients (e.g., (a+b)/I).
+% TODO: I think I need to cite something for: a/I = 0/I <=> a \in I
+
+\subsection{Lots of Lemmas}
+
+% TODO: maybe 'unite' this with the result about a \/ p, i.e., a ~ a \/ p ~ a /\
+% ~p.
+% TODO: maybe I should state that A,B are assumed to be BAs with no additional
+% properties unless stated otherwise.
+\begin{lemma} \label{lemma:elements_in_quotients}
+  Let $(p)$ be a principal ideal. Then for any $a \in \mathbf{B}$, $(a \land
+  \neg p)/(p) = a/(p)$.
+\end{lemma}
+\begin{proof}
+  Note that
+  \[
+    (a \land \neg p)/(p) = a/(p) \quad \iff \quad (a \land \neg p) + a \in (p)
+    \quad \iff \quad (a \land \neg p) + a \le p.
+  \]
+  We also have that
+  \[
+    (a \land \neg p) + a = (a \land \neg p \land \neg a) \lor (\neg(a \land \neg
+    p) \land a) = (\neg a \lor p) \land a = (\neg a \land a) \lor (p \land a) =
+    p \land a.
+  \]
+  And, since $p \land a \le p$, we have that $(a \land \neg p) + a \le p$ as
+  required.
+\end{proof} % TODO: why? (the last bit) It's elementary
+
+% TODO: maybe I can rephrase this into a stronger result specifically about
+% a /\ ~p. Do I even want to do that?
+\begin{lemma}
+  Let $(p)$ be a principal ideal. For any $a, b \in \mathbf{B}$, $a/(p) \le
+  b/(p)$ if and only if there exist $a', b' \in \mathbf{B}$ such that $a'/(p) =
+  a/(p)$, $b'/(p) = b/(p)$, and $a' \le b'$.
+\end{lemma}
+\begin{proof}
+  Let us begin with the `only of' direction, and let $f\colon \mathbf{B} \to
+  \mathbf{B}/(p)$ be defined as $f(x) = x/(p)$. If $a' \le b'$, then $f(a') \le
+  f(b')$ by \cref{lemma:canonical_homomorphism,lemma:homomorphisms_and_order}.
+  Thus $a'/(p) \le b'/(p)$, and $a/(p) \le b/(p)$ as required.
+
+  For the other direction, let $a, b \in \mathbf{B}$ be such that $a/(p) \le
+  b/(p)$. Then, by \cref{lemma:order},
+  \[
+    [a/(p)] \land \neg [b/(p)] = (a \land \neg b)/(p) = 0/(p),
+  \]
+  i.e.,
+  \[
+    a \land \neg b \in (p) \quad \iff \quad a \land \neg b \le p \quad \iff
+    \quad a \land \neg b \land \neg p = 0
+  \]
+  by \cref{def:ideal,lemma:order}. Let us pick $a' = a \land \neg p$ and $b' = b
+  \land \neg p$ since they satisfy $a'/(p) = a/(p)$ and $b'/(p) = b/(p)$ by
+  \cref{lemma:elements_in_quotients}. It remains to show that $a \land \neg p
+  \le b \land \neg p$. By \cref{lemma:order}, this is equivalent to $a \land
+  \neg p \land \neg(b \land \neg p) = 0$. But
+  \[
+    a \land \neg p \land \neg(b \land \neg p) = a \land \neg p \land (\neg b
+    \lor p) = (a \land \neg p \land \neg b) \lor (a \land \neg p \land p) = a
+    \land \neg p \land \neg b,
+  \]
+  and we already have that $a \land \neg p \land \neg b = 0$ by assumption.
 \end{proof}
 
-% TODO: prove that the two ways to compute the probability give the same answer.
+\begin{corollary}
+  Let $I \subseteq \mathbf{B}$ be an ideal. If $\mathbf{B}$ is atomic, then so
+  is $\mathbf{B}/I$.
+\end{corollary}
+
+\begin{lemma}
+  Let $(p)$ be a principal ideal. For any $a \in \mathbf{B}$, if $a/(p)$ is an
+  atom in $\mathbf{B}/(p)$, then $a \land \neg p$ is an atom in $\mathbf{B}$
+  such that $(a \land \neg p)/I = a/I$, and $m^*(a/(p)) = m(a \land \neg p)$.
+\end{lemma}
+
+\begin{theorem}[Using the previous three results]
+  Let $L \subset \mathbf{B}$ and $w\colon L \to \mathbb{R}_{\ge 0}$ be such that
+  $\WMC_w\colon \mathbf{B} \to \mathbb{R}_{\ge0}$ is a WMC measure. Let $p \in
+  \mathbf{B}$ be such that $\WMC(p) = 0$, and let $g\colon \mathbf{B}/(p) \to
+  \mathbf{B}$ be defined as $g(a/(p)) = a \land \neg p$. Then $\WMC \circ g$
+  is a WMC measure on $\mathbf{B}/(p)$ with respect to the same $L$ and $w$
+  such that
+  \[
+    \begin{tikzcd}
+      \mathbf{B} \arrow{d}[swap]{\WMC} & \mathbf{B}/(p) \arrow{l}[swap]{g}
+      \arrow{dl}{\WMC \circ g} \\
+      \mathbb{R}_{\ge 0}
+    \end{tikzcd}
+  \]
+  commutes.
+\end{theorem}
+
+% TODO: how can WMC compute something in the quotient algebra?
+% 1) The highlighted lemma from my notes.
+% 2) the results about <=
+% TODO: prove that the two ways to compute the probability give the same answer,
+% i.e., how B(Delta) = B(L)/(not Delta).
+% TODO: need an example of how we can compute probabilities in the quotient
+% algebra.
+% TODO: we can then move through the quotient BA using representatives we get
+% from mapping true things to 1 and false things to 0.
 
 % TODO: Feedback: Can you say something here about factorized vs non-factorized
 % weight function definitions? That is, factorized is when w maps literals to
