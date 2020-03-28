@@ -135,7 +135,8 @@ paper, let $\mathbf{B}$ refer to the BA $(\mathbf{B}, \land, \lor, \neg, 0, 1)$.
 For any $S \subseteq \mathbf{B}$, we write $\bigvee S$ for $\bigvee_{x \in S} x$
 and call it the \emph{supremum} of $S$. Similarly, $\bigwedge S = \bigwedge_{x
   \in S} x$ is the \emph{infimum}. By convention, $\bigwedge \emptyset = 1$ and
-$\bigvee \emptyset = 0$.
+$\bigvee \emptyset = 0$. For any $a, b \in \mathbf{B}$, we say that $a$ and $b$
+are \emph{disjoint} if $a \land b = 0$.
 
 \begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
   An element $a \ne 0$ of $\mathbf{B}$ is an \emph{atom} if, for all $x \in
@@ -261,6 +262,11 @@ $\bigvee \emptyset = 0$.
 
 \begin{lemma}[\cite{sikorski1969boolean}] \label{lemma:order}
   For any $a, b \in \mathbf{B}$, $a \le b$ if and only if $a \land \neg b = 0$.
+\end{lemma}
+
+\begin{lemma}[\cite{givant2008introduction}] \label{lemma:measure_and_order}
+  Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure. Then for all $a,
+  b \in \mathbf{B}$, if $a \le b$, then $m(a) \le m(b)$.
 \end{lemma}
 
 % TODO: make up my mind about a,b vs x,y and stick to it (maybe x,y?)
@@ -637,18 +643,68 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   and we already have that $a \land \neg p \land \neg b = 0$ by assumption.
 \end{proof}
 
-\begin{corollary}
-  Let $I \subseteq \mathbf{B}$ be an ideal. If $\mathbf{B}$ is atomic, then so
-  is $\mathbf{B}/I$.
-\end{corollary}
+% TODO: do I need this?
+%\begin{corollary}
+%  Let $I \subseteq \mathbf{B}$ be an ideal. If $\mathbf{B}$ is atomic, then so
+%  is $\mathbf{B}/I$.
+%\end{corollary}
 
 \begin{lemma}
-  Let $(p)$ be a principal ideal. For any $a \in \mathbf{B}$, if $a/(p)$ is an
-  atom in $\mathbf{B}/(p)$, then $a \land \neg p$ is an atom in $\mathbf{B}$
-  such that $(a \land \neg p)/I = a/I$, and $m^*(a/(p)) = m(a \land \neg p)$.
+  Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, let $p \in
+  \mathbf{B}$ be such that $m(p) = 0$, and let $m^*\colon \mathbf{B}/(p) \to
+  \mathbb{R}_{\ge 0}$ be a measure defined by $m^*(a/(p)) = m(a \lor p)$. Then
+  for any $a \in \mathbf{B}$, if $a/(p)$ is an atom in $\mathbf{B}/(p)$, then $a
+  \land \neg p$ is an atom in $\mathbf{B}$ such that $m^*(a/(p)) = m(a \land
+  \neg p)$.
 \end{lemma}
+\begin{proof} % TODO: This proof is a mess and needs more citations.
+  First, we want to show that if $a/(p)$ is an atom, then $a \land \neg p$ is an
+  atom. We can instead prove the contrapositive statement, i.e., if there exists
+  a $b \in \mathbf{B}$ such that $0 < b < a \land \neg p$, then there exists a
+  $b' \in \mathbf{B}$ such that $0/(p) < b'/(p) < a/(p)$. We will show that, in
+  fact, we set $b' = b$.
+  \Cref{lemma:canonical_homomorphism,lemma:homomorphisms_and_order} already tell
+  us that $b/(p) \le a/(p)$, so we only need to show that $0/(p) < b/(p) \ne
+  a/(p)$. For the first part, note that
+  \[
+    0/(p) < b/(p) \quad \iff \quad b/(p) \ne 0/(p) \quad \iff \quad b \not\in
+    (p) \quad \iff \quad b \not\le p \quad \iff \quad b \land \neg p \ne 0
+  \]
+  by \cref{lemma:order}. But if $b \land \neg p = 0$, then $b \land a \land \neg
+  p = 0$. This contradicts either that $b \le a \land \neg p$ (i.e., $b \land a
+  \land \neg p = b$) or that $b \ne 0$. For the second part, i.e., $b/(p) \ne
+  a/(p)$, we will show that if $b/(p) = a/(p)$, and $b \le a \land \neg p$, then
+  $b = a \land \neg p$. Indeed,
+  \[
+    b/(p) = a/(p) \quad \iff \quad a + b \in (p) \quad \iff \quad a+b \le p
+    \quad \iff \quad (a+b) \land \neg p = 0,
+  \]
+  and
+  \[
+    (a+b) \land \neg p = [(a \land \neg b) \lor (\neg a \land b)] \land \neg p =
+    (a \land \neg b \land \neg p) \lor (\neg a \land b \land \neg p),
+  \]
+  so $(a+b) \land \neg p = 0$ implies that $a \land \neg b \land \neg p = 0$
+  which is equivalent to $a \land \neg p \le b$. Therefore we have that $a \land
+  \neg p \le b \le a \land \neg p$, so $b = a \land \neg p$ which, by
+  contradiction, shows that $b/(p) \ne a/(p)$ and finishes the proof that $0/(p)
+  < b/(p) < a/(p)$.
 
-\begin{theorem}[Using the previous three results]
+  In order to show that $m^*(a/(p)) = m(a \land \neg p)$, note that $a \land p$,
+  $a \land \neg p$, and $\neg a \land p$ are pairwise disjoint and their
+  supremum is $a \lor p$, so we have that
+  \[
+    m^*(a/(p)) = m(a \lor p) =  m(a \land p) + m(a \land \neg p) + m(\neg a
+    \land p).
+  \]
+  Furthermore, since $a \land p \le p$, $m(a \land p) \le m(p) = 0$. Similarly,
+  $m(\neg a \land p) = 0$, so $m^*(a/(p)) = m(a \land \neg p)$ as required.
+\end{proof}
+% TODO: the undergraduate book vaguely mentions that, when taking a quotient
+% w.r.t. an ideal of elements with measure zero, all elements in an equivalence
+% class will have the same measure.
+
+\begin{theorem}[Using the previous results]
   Let $L \subset \mathbf{B}$ and $w\colon L \to \mathbb{R}_{\ge 0}$ be such that
   $\WMC_w\colon \mathbf{B} \to \mathbb{R}_{\ge0}$ is a WMC measure. Let $p \in
   \mathbf{B}$ be such that $\WMC(p) = 0$, and let $g\colon \mathbf{B}/(p) \to
