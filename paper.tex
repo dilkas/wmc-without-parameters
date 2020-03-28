@@ -607,18 +607,19 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   required.
 \end{proof} % TODO: why? (the last bit) It's elementary
 
-% TODO: maybe I can rephrase this into a stronger result specifically about
-% a /\ ~p. Do I even want to do that?
 \begin{lemma}
   Let $(p)$ be a principal ideal. For any $a, b \in \mathbf{B}$, $a/(p) \le
-  b/(p)$ if and only if there exist $a', b' \in \mathbf{B}$ such that $a'/(p) =
-  a/(p)$, $b'/(p) = b/(p)$, and $a' \le b'$.
+  b/(p)$ if and only if $a \land \neg p \le b \land \neg p$.
 \end{lemma}
 \begin{proof}
-  Let us begin with the `only of' direction, and let $f\colon \mathbf{B} \to
-  \mathbf{B}/(p)$ be defined as $f(x) = x/(p)$. If $a' \le b'$, then $f(a') \le
-  f(b')$ by \cref{lemma:canonical_homomorphism,lemma:homomorphisms_and_order}.
-  Thus $a'/(p) \le b'/(p)$, and $a/(p) \le b/(p)$ as required.
+  Let us begin with the `only of' direction. \Cref{lemma:elements_in_quotients}
+  tells us that $(a \land \neg p)/(p) = a/(p)$. Combining this with
+  \cref{lemma:canonical_homomorphism,lemma:homomorphisms_and_order} shows that
+  \[
+    a \land \neg p \le b \land \neg p \quad \implies \quad (a \land \neg p)/(p)
+    \le (b \land \neg p)/(p) \quad \iff \quad a/(p) \le b/(p)
+  \]
+  as required.
 
   For the other direction, let $a, b \in \mathbf{B}$ be such that $a/(p) \le
   b/(p)$. Then, by \cref{lemma:order},
@@ -630,11 +631,9 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
     a \land \neg b \in (p) \quad \iff \quad a \land \neg b \le p \quad \iff
     \quad a \land \neg b \land \neg p = 0
   \]
-  by \cref{def:ideal,lemma:order}. Let us pick $a' = a \land \neg p$ and $b' = b
-  \land \neg p$ since they satisfy $a'/(p) = a/(p)$ and $b'/(p) = b/(p)$ by
-  \cref{lemma:elements_in_quotients}. It remains to show that $a \land \neg p
-  \le b \land \neg p$. By \cref{lemma:order}, this is equivalent to $a \land
-  \neg p \land \neg(b \land \neg p) = 0$. But
+  by \cref{def:ideal,lemma:order}. We need to show that $a \land \neg p \le b
+  \land \neg p$. By \cref{lemma:order}, this is equivalent to $a \land \neg p
+  \land \neg(b \land \neg p) = 0$. But
   \[
     a \land \neg p \land \neg(b \land \neg p) = a \land \neg p \land (\neg b
     \lor p) = (a \land \neg p \land \neg b) \lor (a \land \neg p \land p) = a
@@ -642,12 +641,6 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   \]
   and we already have that $a \land \neg p \land \neg b = 0$ by assumption.
 \end{proof}
-
-% TODO: do I need this?
-%\begin{corollary}
-%  Let $I \subseteq \mathbf{B}$ be an ideal. If $\mathbf{B}$ is atomic, then so
-%  is $\mathbf{B}/I$.
-%\end{corollary}
 
 \begin{lemma}
   Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, let $p \in
@@ -722,8 +715,6 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 \end{theorem}
 
 % TODO: how can WMC compute something in the quotient algebra?
-% 1) The highlighted lemma from my notes.
-% 2) the results about <=
 % TODO: prove that the two ways to compute the probability give the same answer,
 % i.e., how B(Delta) = B(L)/(not Delta).
 % TODO: need an example of how we can compute probabilities in the quotient
