@@ -581,7 +581,7 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 % TODO: add parentheses around quotients (e.g., (a+b)/I).
 % TODO: I think I need to cite something for: a/I = 0/I <=> a \in I
 
-\subsection{Lots of Lemmas}
+\subsection{Lemma Galore}
 
 % TODO: maybe 'unite' this with the result about a \/ p, i.e., a ~ a \/ p ~ a /\
 % ~p.
@@ -606,8 +606,9 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   And, since $p \land a \le p$, we have that $(a \land \neg p) + a \le p$ as
   required.
 \end{proof} % TODO: why? (the last bit) It's elementary
+% TODO: remove all those 'let (p) be a principal ideal'.
 
-\begin{lemma}
+\begin{lemma} \label{lemma:min_element_and_order}
   Let $(p)$ be a principal ideal. For any $a, b \in \mathbf{B}$, $a/(p) \le
   b/(p)$ if and only if $a \land \neg p \le b \land \neg p$.
 \end{lemma}
@@ -642,7 +643,7 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   and we already have that $a \land \neg p \land \neg b = 0$ by assumption.
 \end{proof}
 
-\begin{lemma}
+\begin{lemma} \label{lemma:measure_of_atom}
   Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, let $p \in
   \mathbf{B}$ be such that $m(p) = 0$, and let $m^*\colon \mathbf{B}/(p) \to
   \mathbb{R}_{\ge 0}$ be a measure defined by $m^*(a/(p)) = m(a \lor p)$. Then
@@ -696,6 +697,36 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 % TODO: the undergraduate book vaguely mentions that, when taking a quotient
 % w.r.t. an ideal of elements with measure zero, all elements in an equivalence
 % class will have the same measure.
+
+\begin{lemma} \label{lemma:minimal_in_quotient} % TODO: define completeness
+  Let $\mathbf{B}$ be a complete BA. For any $a, b \in \mathbf{B}$, if $a/(p) =
+  b/(p)$, then $a \land \neg p = b \land \neg p$. As a consequence, $a \land
+  \neg p \le b$.
+\end{lemma}
+\begin{proof} % TODO: rename b to something else
+  As in the proof of \cref{lemma:measure_of_atom}, $a/(p) = b/(p)$ implies that
+  $a \land \neg p \le b$. Since $\mathbf{B}$ is complete, let $b = \bigwedge \{
+  c \in \mathbf{B} \mid c/(p) = a/(p) \}$; then we still have that $b/(p) =
+  a/(p)$. But then $b \le a \land \neg p \le b$, so $a \land \neg p = b$. This
+  defines $a \land \neg p$ independently of $a$ as the least element in $\{c \in
+  \mathbf{B} \mid c/(p) = a/(p) \}$.
+\end{proof}
+
+\begin{corollary}
+  For any complete BA $\mathbf{B}$, if $a \in \mathbf{B}$ is an atom, then
+  $a/(p)$ is either an atom or $0/(p)$. In the former case, $a = a \land \neg
+  p$.
+\end{corollary}
+\begin{proof}
+  Since \cref{lemma:minimal_in_quotient} tells us that for all $b \in
+  \mathbf{B}$, if $b/(p) = a/(p)$, then $b \ge a \land \neg p$, if there is an
+  atom $b \in \mathbf{B}$ such that $b/(p) = a/(p)$, then it must be $a \land
+  \neg p$. If $a$ is an atom, then $a \land \neg p \le a$ implies that either $a
+  = a \land \neg p$ or $a \land \neg p = 0$. The latter is equivalent to $a/(p)
+  = 0/(p)$ by \cref{lemma:order}. The former, combined with the assumption that
+  $a$ is an atom and \cref{lemma:min_element_and_order}, implies that $a/(p)$ is
+  an atom.
+\end{proof}
 
 \begin{theorem}[Using the previous results]
   Let $L \subset \mathbf{B}$ and $w\colon L \to \mathbb{R}_{\ge 0}$ be such that
