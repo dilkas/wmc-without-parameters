@@ -1120,6 +1120,43 @@ variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
 \]
 variables would suffice.
 
+\section{Implications for Lifted Inference}
+
+\begin{definition}
+  Given a BA $\mathbf{A}$, a \emph{subalgebra} is a subset $\mathbf{B} \subseteq
+  \mathbf{A}$ that, together with the operations, zero, and one of $\mathbf{A}$,
+  is a BA.
+\end{definition}
+
+\begin{definition}
+  Let $\mathbf{A},$ $\mathbf{B}$, and $\mathbf{C}$ be BAs such that $\mathbf{B}$
+  is a subalgebra of $\mathbf{A}$. Let $f\colon \mathbf{A} \to \mathbf{C}$ and
+  $g\colon \mathbf{B} \to \mathbf{C}$ be homomorphisms. Then $f$ is an
+  \emph{extension} of $g$ if $f(x) = g(x)$ for all $x \in \mathbf{B}$. If $f$ is
+  an extension of each member of a family $\{ g_i \}_{i \in I}$ of
+  homomorphisms, then $f$ is called a \emph{common extension} of $\{ g_i \}_{i
+    \in I}$.
+\end{definition}
+
+\begin{definition}
+  Let $\{ \mathbf{A}_i \}_{i \in I}$ be a family of subalgebras of a BA
+  $\mathbf{A}$ with a family of inclusion maps $\{ \iota_i\colon \mathbf{A}_i
+  \to \mathbf{A} \}_{i \in I}$. If for any BA $\mathbf{B}$ with a family of
+  homomorphisms $\{ f_i\colon \mathbf{A} \to \mathbf{B} \}_{i \in I}$ there
+  exists a unique common extension of $\{ f_i\colon \mathbf{A} \to \mathbf{B}
+  \}_{i \in I}$ ($f\colon \mathbf{A} \to \mathbf{B}$ in the diagram),
+  \[
+    \begin{tikzcd}
+      \mathbf{A}_i \arrow{r}{\iota_i} \arrow{rd}[swap]{f_i} & \mathbf{A} \arrow[d,dashed,"f"] \\
+      & \mathbf{B}
+    \end{tikzcd}
+  \]
+  then $\mathbf{A}$ is the \emph{internal sum}\footnote{It is also known as the
+    \emph{free product} and as the coproduct in the category of BAs.} of $\{
+  \mathbf{A}_i \}_{i \in I}$. We will denote it as $\bigoplus_{i \in I}
+  \mathbf{A}_i$.
+\end{definition}
+
 \section{Polyadic Measure Algebras}
 
 Potential directions to explore:
