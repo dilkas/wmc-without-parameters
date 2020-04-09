@@ -49,7 +49,8 @@
   }
 }
 
-\title{On the Limitations of Weighted Model Counting}
+\title{Generalising Weighted Model Counting to Boolean Algebras}
+%\title{On the Limitations of Weighted Model Counting}
 %\title{Weighted Model Counting/Integration from the Perspective of Boolean Algebras}
 %\title{What Boolean Algebras Can Teach Us About Weighted Model Counting/Integration?}
 \author{Paulius Dilkas}
@@ -62,8 +63,23 @@
 % [???] of theorems to follow. To do this, we appeal to algebraic constructions
 % to define the main concepts for introducing measures on Boolean algebras.
 
+% Feedback 2: WMC-Computable -> WMC-Definable
+
+% Feedback 2: The paper at this stage is very technical - the danger is that
+% WMC/SRL people may not be able to follow it and so would be hard to get
+% accepted. Without clear target audience, [???] get work accepted. My main high
+% level suggestion is that let us tease apart what you have and see if a story
+% emerges. That is, let us attempt to write a paper *with examples* and see
+% whether with significant motivation, we have a story emerging. Below, sample
+% text needed to adequately motivate [???] for WMC/SRL community.
+
 % Contributions:
-% 1. A generalisation of WMC adapted to Boolean algebras.
+% 1. A generalisation of WMC to Boolean algebras. We show how WMC makes
+% independence assumptions and how we can make some but not all literals
+% independent.
+% 1.5. We show how the lifted inference techniques stem from the underlying
+% algebraic structure.
+% 1.6. Do we add more inference rules?
 % 2. We show that it is a valid measure.
 % 3. We show that WMC assumes independence, i.e., cannot represent all measures.
 % 4. We show how the BA can be extended with new 'literals' to represent any measure.
@@ -86,6 +102,8 @@
 Potential directions to explore (no good ones, really):
 \begin{itemize}
 \item Infinite BAs.
+  % TODO: Feedback 2: understanding this is the key for formulating the
+  % relevance/significance of this work
   \begin{itemize}
   \item For example, the BA of finite and cofinite sets could be interesting.
   \item OUWMC requires infinite logics to be compact (whatever that means). My
@@ -119,6 +137,8 @@ Previous/related work:
 \end{itemize}
 
 \section{Preliminaries}
+
+% TODO: Feedback 2: Explain with examples: models = elements [atoms] of algebra
 
 \begin{definition} \label{def:ba}
   A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
@@ -192,11 +212,6 @@ are \emph{disjoint} if $a \land b = 0$.
   If $m(1) = 1$, we call $m$ a \emph{probability measure}. Also, if $m(x) > 0$
   for all $x \ne 0$, then $m$ is \emph{strictly positive}.
 \end{definition}
-
-\begin{lemma}[\cite{horn1948measures}] \label{lemma:m_and_order}
-  Let $m: \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure. For any $a, b \in
-  \mathbf{B}$, if $a \le b$, then $m(a) \le m(b)$.
-\end{lemma}
 
 %\begin{definition}[\cite{givant2008introduction}] \label{def:filter}
 %  A \emph{(Boolean) filter} is a non-empty subset $F \subseteq \mathbf{B}$ such
@@ -288,7 +303,15 @@ are \emph{disjoint} if $a \land b = 0$.
 % TODO: perhaps reorder things into paragraphs, i.e., a paragraph for order, for
 % homomorphisms, for ideals and quotients. This would take up less space.
 
+% TODO: Feedback 2: I did a high level read to get the big picture but found
+% this discussion on ideals distracting. Specifically, w.r.t. the main claims
+% when do these things get used?
+
 \section{WMC as a Measure}
+
+% TODO: Feedback 2: Result #1: What are the conditions under which WMC defines a
+% measure as introduced above? [Non-negativity should be enough so this is not a
+% result.]
 
 \begin{definition} \label{def:algebra_from_logic}
   Let $\mathcal{L}$ be a propositional (or first-order) logic, and let
@@ -407,6 +430,8 @@ are \emph{disjoint} if $a \land b = 0$.
 % TODO: clarify what B(L) means. And whether B(Delta) is even necessary.
 % TODO: reference for the set/subset thing.
 
+% TODO: Feedback 2: You need to explain what precisely these mean in logic and
+% models and weight functions are usually defined and understood.
 \todo[inline]{This should be replaced with inner sums (a.k.a. free products)}
 \begin{definition} \label{def:wmc}
   Let $\mathbf{B}$ be an atomic BA, and let $M \subset \mathbf{B}$ be its set of
@@ -435,9 +460,11 @@ are \emph{disjoint} if $a \land b = 0$.
 % without cases)
 % TODO: any measure is a WMC measure if all atoms are in L
 
-\begin{proposition}
+\begin{theorem}
   $\WMC$ is a measure, and $\nWMC$ is a probability measure.
-\end{proposition}
+\end{theorem}
+% TODO: Feedback 2: Need to explain how WMC and NWMC connects to standard
+% definitions of WMC and Pr(phi|e) = WMC(phi /\ e)/WMC(e).
 \begin{proof}
   First, note that $\WMC$ is non-negative and $\WMC(0) = 0$ by definition. Next,
   let $x, y \in \mathbf{B}$ be such that $x \land y = 0$. We want to show that
@@ -480,6 +507,10 @@ In our algebraic formulation, this can be computed in two different ways:
 \item and as $\nWMC_w([q])$ in $B(\Delta)$.
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
+
+% TODO: Feedback 2: I look the significance of the below results. Proving
+% properties that don't [???] the "roadmap" means (AI) readers will lose
+% interest. [This applies until the beginning of the next section.]
 
 \begin{lemma} \label{lemma:sum}
   For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
@@ -538,6 +569,7 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   $a \lor p = b \lor p$ as required.
 \end{proof}
 
+% TODO: Feedback 2: Where is this helping?
 \todo[inline]{Outdated. $m(a \land \neg p)$ is better than $m (a \lor p)$.}
 \begin{proposition}[Measures on quotients] \label{def:measures_on_quotients}
   Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, and let $(p)$ be
@@ -590,9 +622,9 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
     \]
     where the first inequality comes from an elementary property of $\le$ that
     $x \le x \lor y$ for any $x, y \in \mathbf{B}$ \cite{sikorski1969boolean}
-    and \cref{lemma:m_and_order}; and the second inequality follows because
-    $a/(p) \ne 0/(p)$ implies that $a \ne 0$, and $m$ is assumed to be strictly
-    positive.
+    and \cref{lemma:measure_and_order}; and the second inequality follows
+    because $a/(p) \ne 0/(p)$ implies that $a \ne 0$, and $m$ is assumed to be
+    strictly positive.
   \end{itemize}
 \end{proof}
 % TODO: add parentheses around quotients (e.g., (a+b)/I).
@@ -790,13 +822,18 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 \todo[inline]{Proofs need to be updated and propositions could be phrased in a
   better way, but the gist should be the same.}
 
+% TODO: Feedback 2: Result #2: WMC c measures. That is, WMC wight weights on
+% literals is less expressive than (a) WMC with weights on models is less
+% expressive than (b) measures on Boolean algebras?  Results only link at (a).
+% Is (c) true? Proof? [It could cover (some sort of) infinite cases...]
+
 \subsection{WMC Requires Independent Literals}
 
 % TODO: maybe I should gives this kind of a BA a name? A synonym of 'complete',
 % perhaps.
 % TODO: a special case for weight=0.
 
-\begin{proposition}
+\begin{theorem}
   Let $\mathbf{B}$ be a finite measure algebra with measure $m\colon \mathbf{B} \to
   \mathbb{R}_{\ge 0}$. Let $L \subset \mathbf{B}$ be defined as
   \[
@@ -814,7 +851,7 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   m(l \land l') = m(l)m(l')
   \end{equation}
   for all distinct $l, l' \in L$ such that $l \ne \neg l'$.
-\end{proposition}
+\end{theorem}
 
 \begin{remark}
   Note that if $n = 1$, then \cref{eq:wmccondition} is vacuously satisfied and
@@ -946,9 +983,14 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   also showed that it satisfies \cref{eq:to_prove}, finishing the second part of
   the proof.
 \end{proof}
-% TODO: the auxiliary result should be a 'claim' in-between the theorem and the proof.
+% TODO: the auxiliary result should be a 'claim' in-between the theorem and the
+% proof.
 
 \subsection{Extending the Algebra}
+
+% TODO: Feedback 2: If you prove (b) above, you could motivate why weights on
+% literals is attractive and whether there is a way to augment the expressivity
+% of WMC while still maintaining literal level weights. Hence this action.
 
 A well-known way to overcome this limitation of independence is by adding more
 literals \cite{DBLP:journals/ai/ChaviraD08}, i.e., extending the set $L$ covered
@@ -1120,7 +1162,13 @@ variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
 \]
 variables would suffice.
 
+% TODO: Feedback 2: You need to explain the significance of this result. Result
+% #3: Augmented approach recovers the expressivity of (b). [This is a result,
+% although not a big one.]
+
 \section{Implications for Lifted Inference}
+
+\subsection{Preliminaries}
 
 \begin{definition}
   Given a BA $\mathbf{A}$, a \emph{subalgebra} is a subset $\mathbf{B} \subseteq
@@ -1128,7 +1176,7 @@ variables would suffice.
   is a BA.
 \end{definition}
 
-\begin{definition}
+\begin{definition}[\cite{givant2008introduction}]
   Let $\mathbf{A},$ $\mathbf{B}$, and $\mathbf{C}$ be BAs such that $\mathbf{B}$
   is a subalgebra of $\mathbf{A}$. Let $f\colon \mathbf{A} \to \mathbf{C}$ and
   $g\colon \mathbf{B} \to \mathbf{C}$ be homomorphisms. Then $f$ is an
@@ -1138,7 +1186,7 @@ variables would suffice.
     \in I}$.
 \end{definition}
 
-\begin{definition}
+\begin{definition}[\cite{givant2008introduction}]
   Let $\{ \mathbf{A}_i \}_{i \in I}$ be a family of subalgebras of a BA
   $\mathbf{A}$ with a family of inclusion maps $\{ \iota_i\colon \mathbf{A}_i
   \to \mathbf{A} \}_{i \in I}$. If for any BA $\mathbf{B}$ with a family of
@@ -1151,395 +1199,27 @@ variables would suffice.
       & \mathbf{B}
     \end{tikzcd}
   \]
-  then $\mathbf{A}$ is the \emph{internal sum}\footnote{It is also known as the
-    \emph{free product} and as the coproduct in the category of BAs.} of $\{
-  \mathbf{A}_i \}_{i \in I}$. We will denote it as $\bigoplus_{i \in I}
+  then $\mathbf{A}$ is the \emph{internal sum}\footnote{A slightly more general
+    version of this definition is also known as the free product, the Boolean
+    product, and the coproduct in the category of BAs
+    \cite{givant2008introduction,koppelberg1989handbook,sikorski1969boolean}.}
+  of $\{\mathbf{A}_i \}_{i \in I}$. We will denote it as $\bigoplus_{i \in I}
   \mathbf{A}_i$.
 \end{definition}
 
-\section{Polyadic Measure Algebras}
-
-Potential directions to explore:
-\begin{itemize}
-\item Representing independence and exchangeability. This seems important.
-\item (More detail below.) Inequalities as bounds for probabilities. This seems
-  to be somewhat explored with other setups.
-\item Implementation in SageMath. I would need to define prenex normal forms,
-  equality, and lots of other things.
-\item Alternative compact ways to define a probability distribution over $N$
-  models without assuming that everything is independent. Declaring a measure on
-  a FO formula defines a linear equation over the probabilities of models, so
-  using this method by itself would require $N-1$ equations, but maybe combining
-  this with information about independence and exchangeability can help.
-\end{itemize}
-
-\todo[inline]{I'm not sure if it's wise to develop this idea further}
-
-We show how the measure on the models of a FO theory can be extended to a
-measure over FO formulas. Two outcomes:
-\begin{itemize}
-\item For any $p, q \in \mathbf{A}$, if $p \land q = 0$, then $m^*(p \lor q) =
-  m^*(p) + m^*(q)$.
-\item If $p \le q$, then $m^*(p) \le m^*(q)$. This can be useful in two
-  situations:
-  \begin{itemize}
-  \item If $m^*(q) = 0$ or $m^*(p) = 1$, then this immediately tells us the
-    measure on the other sentence.
-  \item If we want to find $m^*(p)$, finding $q, r \in \mathbf{A}$ such that $r
-    \le p \le q$ bounds the answer.
-  \end{itemize}
-\end{itemize}
-
-\begin{definition}[\cite{halmos2016algebraic}]
-  Given two polyadic algebras $\mathbf{A}$ and $\mathbf{B}$, a \emph{polyadic
-    homomorphism} from $\mathbf{A}$ to $\mathbf{B}$ is a Boolean homomorphism
-  $f\colon \mathbf{A} \to \mathbf{B}$ such that
-  \begin{itemize}
-  \item $f\mathbf{S}(\tau)p = \mathbf{S}(\tau)fp$,
-  \item $f\bm\exists(J)p = \bm\exists(J)fp$
-  \end{itemize}
-  for all $\tau \in T$, $p \in \mathbf{A}$, and $J \subseteq I$.
-\end{definition}
-
-% by considering several X's, we can have several domains
-% I needs to be infinite in order to support arbitrarily complex sentences
-
-\subsection{The Set-Up}
-
-% TODO: Feedback: My general remark here is that this section looks very [???]
-% for SRL/WMC/PRM readers. The first-order [???] may not be justified if we are
-% only doing essentially propositional models. If we also consider full FoL,
-% i.e., infinite domains, and make this a separate paper for KR-type audience.
-% That is, let us do the WMC/WMI bit separately and do FO-version in another
-% paper for KR track. Title for second paper: "Measures on first-order
-% structures via WMC" (or similar...).
-
-\subsubsection{Preliminaries}
-
-What follows is a summary of \cite{halmos2016algebraic}.
-
-% Generic stuff
-Let $\mathbf{B}$ be a Boolean algebra (of propositions). Let $X$ be the
-(non-empty) domain of discourse. Let $I$ be an index set, elements of which can
-be interpreted as variables. The elements of $X^I$ are functions from $I$ to
-$X$. For any $x \in X^I$ and $i \in I$, we write $x_i$ to represent $x(i) \in
-X$. Let $\mathbf{A^*}$ be the set of all functions $X^I \to \mathbf{B}$, and
-note that it forms a Boolean algebra with operations defined pointwise.
-
-% Defining S
-Let $T$ be the semigroup of all $I \to I$ transformations. For any $\tau \in
-T$, let $\tau_* : X^I \to X^I$ be defined by
-\[
-  (\tau_* x)_i = x_{\tau i}
-\]
-for all $x \in X^I$ and $i \in I$. For any (Boolean/polyadic) algebra
-$\mathbf{C}$, let $\End(\mathbf{C})$ denote the set of all its endomorphisms. We
-can then define $\mathbf{S}$ to be a map $\mathbf{S} : T \to \End(\mathbf{A^*})$
-defined by
-\[
-  \mathbf{S}(\tau)p(x) = p(\tau_* x)
-\]
-for all $x \in X^I$ and $p \in \mathbf{A^*}$.
-
-% Defining E
-For any $J \subseteq I$, let $J_*$ be the relation on $X^I$ defined by
-\[
-  xJ_*y \quad \iff \quad x_i = y_i \quad \text{for all } i \in I \setminus J
-\]
-for all $x, y \in X^I$. For any $J \subseteq I$, we then define $\bm\exists(J)$
-to be a transformation $\mathbf{A^*} \to \mathbf{A^*}$ defined by
-\[
-  \bm\exists(J)p(x) = \bigvee_{\substack{y \in X^I,\\ xJ_*y}} p(y)
-\]
-for all $p \in \mathbf{A^*}$, provided this supremum exists for all $x \in
-X^I$\footnote{The universal quantifier $\bm\forall(J)$ is then defined as
-  $\bm\forall(J)p = \neg(\bm\exists(J)\neg p)$ for all $p \in \mathbf{A^*}$.}.
-
-Finally, a \emph{functional polyadic (Boolean) algebra}\footnote{To be more
-  explicit, a $\mathbf{B}$-valued functional polyadic algebra with domain $X$
-  and variables $I$.} is a subalgebra
-$\mathbf{A}$ of $\mathbf{A^*}$ such that:
-\begin{itemize}
-\item $\mathbf{S}(\tau)p \in \mathbf{A}$ for all $p \in \mathbf{A}$ and $\tau
-  \in T$;
-\item $\bm\exists(J)p \in \mathbf{A}$ for all $p \in \mathbf{A}$ and $J
-  \subseteq I$.
-\end{itemize}
-
-\begin{proposition}
-  For all finite $J, K \subseteq I$, finite $\sigma, \tau \in T$, and all $p \in
-  \mathbf{A}$,
-  \begin{itemize}
-  \item $\bm\exists(\emptyset)p = p$;
-  \item $\bm\exists(J)\bm\exists(K) = \bm\exists(J \cup K)$;
-  \item $\mathbf{S}(\id)p = p$;
-  \item $(\sigma\tau)p = \sigma(\tau p)$;
-  \item if $\sigma_{|I \setminus J} = \tau_{|I \setminus J}$, then $\sigma
-    \bm\exists(J) = \tau \bm\exists(J)$;
-  \item if $\tau$ is injective on $\tau^{-1}J$, then $\bm\exists(J)\tau = \tau
-    \bm\exists(\tau^{-1}J)$;
-  \item for every $p \in \mathbf{A}$, there exists a finite $J \subseteq I$ such
-    that $\bm\exists(i)p = p$ whenever $i \not\in J$.
-  \end{itemize}
+\begin{proposition}[\cite{sikorski1969boolean}]
+  Let $\mathbf{A}$ be the internal sum of a family of BAs $\{ \mathbf{A}_i \}_{i
+    \in I}$, and let $\{m_i\colon \mathbf{A}_i \to \mathbb{R}_{\ge 0} \}_{i \in
+    I}$ be a family of measures. Then there exists a unique measure $m\colon
+  \mathbf{A} \to \mathbb{R}_{\ge 0}$ such that, for any finite subset $J
+  \subseteq I$ and family of elements $\{ x_j \in \mathbf{A}_j \}_{j \in J}$,
+  \[
+    m \left( \bigwedge_{j \in J} x_j \right) = \prod_{j \in J} m_j(x_j).
+  \]
 \end{proposition}
+% TODO: this suggest a new rule for lifted inference.
 
-\begin{definition}
-  Similarly to $\bm\exists$, a \emph{constant} $c$ is a map $c: \mathcal{P}(I)
-  \to \End(\mathbf{A})$ such that:
-  \begin{itemize}
-  \item $c(\emptyset) = \id_{\mathbf{A}}$;
-  \item $c(J \cup K) = c(J)c(K)$;
-  \item $c(J)\bm\exists(K) = \bm\exists(K)c(J \setminus K)$;
-  \item $\bm\exists(J)c(K) = c(K)\bm\exists(J \setminus K)$;
-  \item $c(J)\mathbf{S}(\tau) = \mathbf{S}(\tau)c(\tau^{-1}J)$
-  \end{itemize}
-  for all $J, K \in \mathcal{P}(I)$ and $\tau \in T$. If $J$ is a singleton
-  set $\{ i \}$, we will simply write $c(i)$ instead of $c(J)$.
-\end{definition}
-
-\subsubsection{New Results}
-
-\begin{proposition} \label{prop:polyadic_measure}
-  Let $\mathbf{B}$ be a finite Boolean algebra with a measure $m :
-  \mathbf{B} \to [0, 1]$. Let $\mathbf{A}$ be a $\mathbf{B}$-valued functional
-  polyadic algebra with domain $X$ and variables $I$. Let $m^* : \mathbf{A} \to
-  \mathbb{R}_{\ge 0}$ be defined by
-  \[
-    m^*(p) = \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le p(x)}} m(y)
-  \]
-  for all $p \in \mathbf{A}$. Then $m^*$ is a measure on $\mathbf{A}$.
-\end{proposition}
-
-\begin{remark}
-  While definitions of $m^*$ such as
-  \[
-    m^*(p) = m \left( \bigvee_{x \in X^I} p(x) \right)
-  \]
-  might look tempting, they are not additive.
-\end{remark}
-
-\begin{proof} % TODO: Update the proof w.r.t. definitions
-  First, we can show that $m^*(1) = 1$ by observing that
-  \[
-    m^*(1) = \sum_{\text{atoms } y \in \mathbf{B}} m(y) = m \left(
-      \bigvee_{\text{atoms } y \in \mathbf{B}} y \right) = m(1) = 1,
-  \]
-  where we use \cref{thm:representation} and express $1 \in \mathbf{B}$ as the
-  supremum of all atoms in $\mathbf{B}$ \cite{ganesh2006introduction}. Clearly
-  $m^*(p) \ge 0$ for all $p \in \mathbf{A}$, so we can restrict the codomain of
-  $m^*$ to $[0, 1]$.
-
-  Next, we want to show that $m^*(p) > 0$ for all $p \in \mathbf{A} \setminus \{
-  0 \}$. If $p \ne 0$, then there must be some $x' \in X^I$ such that $p(x') \ne
-  0$. But then, since finite Boolean algebras are atomic, there must also be an
-  atom $y \in \mathbf{B}$ such that $y \le p(x')$. Therefore, $m^*(p) \ge m(y) >
-  0$, finishing this part of the proof.
-
-  Let $p, q \in \mathbf{A}$ be such that $p \land q = 0$. We want to show
-  that $m^*(p \lor q) = m^*(p) \lor m^*(q)$. First, note that
-  \[
-    y \le (p \lor q)(x) = p(x) \lor q(x)
-  \]
-  if and only if
-  \[
-    y = (p(x) \lor q(x)) \land y = (p(x) \land y) \lor (q(x) \land y)
-  \]
-  by \cref{def:ba}. Also note that
-  \[
-    (p(x) \land y) \land (q(x) \land y) = p(x) \land q(x) \land y = (p \land
-    q)(x) \land y = 0 \land y = 0,
-  \]
-  so
-  \[
-    m(y) = m((p(x) \land y) \lor (q(x) \land y)) = m(p(x) \land y) + m(q(x) \land y)
-  \]
-  by \cref{def:measure} which then leads to
-  \begin{align*}
-    m^*(p \lor q) &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(y) = \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(p(x) \land y) + m(q(x) \land y) \\
-                  &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(p(x) \land y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x)}} m(q(x) \land y).
-  \end{align*}
-  Since $y$ is an atom,
-  \[
-    p(x) \land y  = \begin{cases}
-      y & \text{if } y \le p(x) \\
-      0 & \text{otherwise,}
-    \end{cases}
-  \]
-  so
-  \begin{align*}
-    m^*(p \lor q) &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x) \text{ and } y \le p(x)}} m(p(x) \land y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{s.t.}\\ \exists x \in X^I:\, y \le (p \lor q)(x) \text{ and } y \le q(x)}} m(q(x) \land y) \\
-                  &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le p(x)}} m(p(x) \land y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{s.t.}\\ \exists x \in X^I:\, y \le q(x)}} m(q(x) \land y) \\
-                  &= \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{ s.t.}\\ \exists x \in X^I:\, y \le p(x)}} m(y) + \sum_{\substack{\text{atoms }y \in \mathbf{B} \text{s.t.}\\ \exists x \in X^I:\, y \le q(x)}} m(y) = m^*(p) + m^*(q),
-  \end{align*}
-  finishing the proof that $m^*$ is a measure.
-\end{proof}
-
-\begin{lemma} \label{lemma:simple_measure}
-  Given the setup of \cref{prop:polyadic_measure} and $p \in \mathbf{A}$, if
-  $p(x) = p(y)$ for all $x, y \in X^I$ (i.e., $p$ has no free variables), then
-  \[
-    m^*(p) = m(p(x))
-  \]
-  (for some $x \in X^I$) is an alternative (i.e., equivalent and simpler)
-  definition of $m^*$.
-\end{lemma}
-\begin{proof}
-  Fix some $x \in X^I$. Then
-  \[
-    m(p(x)) = m \left( \bigvee_{\substack{\text{atoms } y \in \mathbf{B} \text{
-            s.t.}\\
-          y \le p(x)}} y \right) = \sum_{\substack{\text{atoms } y \in \mathbf{B}
-        \text{ s.t.}\\
-        y \le p(x)}} m(y) =\sum_{\substack{\text{atoms } y \in \mathbf{B}
-        \text{ s.t.}\\
-        \exists x' \in X^I : y \le p(x')}} m(y) = m^*(p),
-  \]
-  where we use \cref{thm:representation} for the first step,
-  \cref{def:measure} and \cref{lemma:atomic} for the second step, the
-  assumptions of \cref{lemma:simple_measure} for the third step, and the
-  definition of $m^*$ for the fourth one.
-\end{proof}
-
-\begin{proposition}
-  The following identities are true for any $p \in \mathbf{A}$, $J \subseteq I$,
-  $\tau \in T$, and constant $c : \mathcal{P}(I) \to \End(A)$:
-  \begin{itemize}
-  \item $c \neg = \neg c$ (i.e., constants commute with negation);
-  \item $\mathbf{S}(\tau) \neg = \neg \mathbf{S}(\tau)$;
-  \item $\bm\forall(J)p \le c(J)p \le \bm\exists(J)p$;
-  \end{itemize}
-\end{proposition}
-\begin{proof}
-  \begin{itemize}
-  \item Obvious.
-  \item Ditto.
-  \item The first part can be derived from $p \le q \implies \neg q \le \neg p$.
-    The second part comes from the definition of $\bm\exists$.
-  \end{itemize}
-\end{proof}
-
-\subsection{How Probabilities Are Computed}
-
-In order to make the example algebras easily describable, our example programs
-will have to be tiny. Consider the following ProbLog
-\cite{DBLP:conf/ijcai/RaedtKT07} program:
-\begin{align*}
-  1.0 &\dblcolon \mathsf{p}(a, b).\\
-  0.5 &\dblcolon \mathsf{p}(X, X) \coloneq \mathsf{p}(X, Y);\, \mathsf{p}(Y, X).
-\end{align*}
-Let $L = \{ \mathsf{p}(a, a), \mathsf{p}(a, b), \mathsf{p}(b, a), \mathsf{p}(b,
-b) \}$ be the set of all possible ground atoms. Let $\mathbf{B}$ be the
-Boolean algebra freely generated by $L$ (see, e.g.,
-\cite{givant2008introduction} for more on free Boolean algebras). Then
-$\mathbf{B}$ will have sixteen atoms ranging from $\mathsf{p}(a, a) \land
-\mathsf{p}(a, b) \land \mathsf{p}(b, a) \land \mathsf{p}(b, b)$ to
-$\neg\mathsf{p}(a, a) \land \neg\mathsf{p}(a, b) \land \neg\mathsf{p}(b, a)
-\land \neg\mathsf{p}(b, b)$. The weight function $w : L \to \mathbb{R}_{\ge 0}$
-defined by
-\[
-  w(l) = \begin{cases}
-    1 & \text{if } l = \mathsf{p}(a, b) \\
-    0.5 & \text{if } l \in \{ \mathsf{p}(a, a), \mathsf{p}(b, b) \} \\
-    0 & \text{if } l = \mathsf{p}(b, a) \\
-    1-w(l') & \text{if } l = \neg l'
-  \end{cases}
-\]
-for all $l \in L$ defines a WMC measure over $\mathbf{B}$. Note that while we
-could define an ideal generated by $\{ \mathsf{p}(b, a), \neg\mathsf{p}(a, b)
-\}$ and take the quotient of $\mathbf{B}$ by that ideal to get a Boolean algebra
-with a strictly positive measure, this would put zero-probability queries
-outside of our algebras, i.e., we would not be able to ask a question whose
-answer is zero.
-
-\begin{table}
-  \centering
-  \caption{Example elements of $\mathbf{A}$ as maps $X^I \to \mathbf{B}$, with
-    $a : \mathcal{P}(I) \to \End(\mathbf{A})$ as one of two possible constants.}
-  \label{tbl:examples}
-  \begin{tabular}{ll}
-    \toprule
-    Element of $\mathbf{A}$ & Action on $X^I$ \\
-    \midrule
-    $p = \mathbf{S}(\id)p = \bm\exists(\emptyset)p = a(\emptyset)p = b(\emptyset)p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, x_2)$ \\
-    $\bm\exists(1)p$ & $(x_1, x_2) \mapsto \mathsf{p}(a, x_2) \lor \mathsf{p}(b, x_2)$ \\
-    $\bm\exists(2)p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, a) \lor \mathsf{p}(x_1, b)$ \\
-    $\bm\exists(I)p$ & $(x_1, x_2) \mapsto \mathsf{p}(a, a) \lor \mathsf{p}(a, b) \lor \mathsf{p}(b, a) \lor \mathsf{p}(b, b)$ \\
-    $\mathbf{S}(\{ 1 \mapsto 1, 2 \mapsto 1 \})p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, x_1)$ \\
-    $\mathbf{S}(\{ 1 \mapsto 2, 2 \mapsto 1 \})p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_2, x_1)$ \\
-    $\mathbf{S}(\{ 1 \mapsto 2, 2 \mapsto 2 \})p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_2, x_2)$ \\
-    $a(1)p$ & $(x_1, x_2) \mapsto \mathsf{p}(a, x_2)$ \\
-    $a(2)p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, a)$ \\
-    $a(I)p$ & $(x_1, x_2) \mapsto \mathsf{p}(a, a)$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Finally, let $\mathbf{A}$ be the functional polyadic algebra $X^I \to
-\mathbf{B}$ for $I = \{1, 2\}$ and $X = \{ a, b \}$\footnote{$X$ cannot (or
-  should not) have constants that do not occur in $\mathbf{B}$.}. The elements
-of $X^I$ can then be represented as tuples $(x_1, x_2)$ for some $x_1, x_2 \in
-X$. See \cref{tbl:examples} for example elements of $\mathbf{A}$ which consists
-of a single predicate function $p$ and operators $\bm\exists, \mathbf{S}, a, b,
-\neg, \land, \lor$, the last three of which are defined pointwise.
-
-\begin{table}
-  \centering
-  \caption{Step-by-step derivation of how a more complex element of
-    $\mathbf{A}$ acts on elements of $X^I$}
-  \label{tbl:derivation}
-  \begin{tabular}{ll}
-    \toprule
-    Element of $\mathbf{A}$ & Action on $X^I$ \\
-    \midrule
-    $p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, x_2)$ \\
-    $b(2)p$ & $(x_1, x_2) \mapsto \mathsf{p}(x_1, b)$ \\
-    $\neg b(2)p$ & $(x_1, x_2) \mapsto \neg\mathsf{p}(x_1, b)$ \\
-    $\bm\exists(1)\neg b(2)p$ & $(x_1, x_2) \mapsto \neg\mathsf{p}(a, b) \lor \neg\mathsf{p}(b, b) = \neg(\mathsf{p}(a, b) \land \mathsf{p}(b, b))$ \\
-    $\bm\forall(1)b(2)p = \neg\bm\exists(1)\neg b(2)p$ & $(x_1, x_2) \mapsto \neg\neg(\mathsf{p}(a, b) \land \mathsf{p}(b, b)) = \mathsf{p}(a, b) \land \mathsf{p}(b, b)$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\begin{table}
-  \centering
-  \caption{Atoms $y \in \mathbf{B}$ (and their measures) such that $y \le
-    \mathsf{p}(a, b) \land \mathsf{p}(b, b)$}
-  \label{tbl:atoms}
-  \begin{tabular}{lc}
-    \toprule
-    Atom $y \in \mathbf{B}$ & $m(y)$ \\
-    \midrule
-    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \mathsf{p}(a, a) \land \mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 0 = 0$ \\
-    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \neg\mathsf{p}(a, a) \land \mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 0 = 0$ \\
-    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \mathsf{p}(a, a) \land \neg\mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 1 = 0.25$ \\
-    $\mathsf{p}(a, b) \land \mathsf{p}(b, b) \land \neg\mathsf{p}(a, a) \land \neg\mathsf{p}(b, a)$ & $1 \times 0.5 \times 0.5 \times 1 = 0.25$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Let us calculate the probability $\Pr(\forall x_1 \in X, \mathsf{p}(x_1, b))$.
-The same expression can be translated into the notation for our polyadic algebra
-$\mathbf{A}$ as $m^*(\bm\forall(1)b(2)p)$. Recall that $\bm\forall(1)b(2)p =
-\neg\bm\exists(1)\neg b(2)p$. The effect of this function on an arbitrary
-element of $X^I$ is derived step-by-step in \cref{tbl:derivation}. Since the
-resulting function is constant (i.e., the logical formula has no free
-variables), \cref{lemma:simple_measure} tells us that
-\[
-  m^*(\bm\forall(1)b(2)p) = m(\mathsf{p}(a, b) \land \mathsf{p}(b, b)) = m
-  \left( \bigvee_{\substack{\text{atoms } y \in \mathbf{B} \text{ s.t.}\\
-        y \le \mathsf{p}(a, b) \land \mathsf{p}(b, b)}} y \right) = \sum
-  _{\substack{\text{atoms } y \in \mathbf{B} \text{ s.t.}\\
-      y \le \mathsf{p}(a, b) \land \mathsf{p}(b, b)}} m(y).
-\]
-The resulting sum is over four atoms; these atoms and their probabilities are
-listed in \cref{tbl:atoms}. Thus, we get that
-\[
-  m^*(\bm\forall(1)b(2)p) = 0 + 0 + 0.25 + 0.25 = 0.5.
-\]
-
-% TODO: use I^I for transformations
-% TODO: extra notation for transformations: (i/j) sends j to i, (i, j)
-% interchanges i and j.
+\subsection{New Results}
 
 \bibliographystyle{plain}
 \bibliography{paper}
