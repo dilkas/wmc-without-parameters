@@ -1166,9 +1166,9 @@ variables would suffice.
 % #3: Augmented approach recovers the expressivity of (b). [This is a result,
 % although not a big one.]
 
-\section{Implications for Lifted Inference}
+\section{Representing Independence and Conditional Independence}
 
-\subsection{Preliminaries}
+\subsection{Independence (all known results)}
 
 \begin{definition}
   Given a BA $\mathbf{A}$, a \emph{subalgebra} is a subset $\mathbf{B} \subseteq
@@ -1188,14 +1188,14 @@ variables would suffice.
 
 \begin{definition}[\cite{givant2008introduction}]
   Let $\{ \mathbf{A}_i \}_{i \in I}$ be a family of subalgebras of a BA
-  $\mathbf{A}$ with a family of inclusion maps $\{ \iota_i\colon \mathbf{A}_i
-  \to \mathbf{A} \}_{i \in I}$. If for any BA $\mathbf{B}$ with a family of
-  homomorphisms $\{ f_i\colon \mathbf{A} \to \mathbf{B} \}_{i \in I}$ there
-  exists a unique common extension of $\{ f_i\colon \mathbf{A} \to \mathbf{B}
-  \}_{i \in I}$ ($f\colon \mathbf{A} \to \mathbf{B}$ in the diagram),
+  $\mathbf{A}$. If for any BA $\mathbf{B}$ with a family of homomorphisms $\{
+  f_i\colon \mathbf{A}_i \to \mathbf{B} \}_{i \in I}$ there exists a unique
+  common extension of $\{ f_i\colon \mathbf{A}_i \to \mathbf{B} \}_{i \in I}$
+  ($f\colon \mathbf{A} \to \mathbf{B}$ in the diagram),
   \[
     \begin{tikzcd}
-      \mathbf{A}_i \arrow{r}{\iota_i} \arrow{rd}[swap]{f_i} & \mathbf{A} \arrow[d,dashed,"f"] \\
+      \mathbf{A}_i \ar[r,hookrightarrow] \arrow{rd}[swap]{f_i} & \mathbf{A}
+      \arrow[d,dashed,"f"] \\
       & \mathbf{B}
     \end{tikzcd}
   \]
@@ -1217,11 +1217,52 @@ variables would suffice.
     m \left( \bigwedge_{j \in J} x_j \right) = \prod_{j \in J} m_j(x_j).
   \]
 \end{proposition}
-% TODO: this suggest a new rule for lifted inference.
 
-\subsection{New Results}
+\subsection{Conditional Independence}
+
+\begin{definition}[\cite{koppelberg1989handbook}]
+  Let $\mathbf{A}$ be a BA. Let $\mathbf{B}$ be a subalgebra of $\mathbf{A}$,
+  and let $(\mathbf{A}_i)_{i \in I}$ be a family of subalgebras of $\mathbf{A}$
+  such that $\mathbf{A}_i \cap \mathbf{A}_j = \mathbf{B}$ for all $i \ne j$ in
+  $I$. Let $\{ \iota_i \colon \mathbf{B} \to \mathbf{A}_i \}$ be a family of
+  inclusion homomorphisms. Then $\mathbf{A}$ is the \emph{amalgamated free
+    product\footnote{Also known as a (wide) pushout in the category of BAs.} of
+    $\{\mathbf{A}_{i} \}_{i \in I}$ over $\mathbf{B}$} if, for any Boolean
+  algebra $\mathbf{C}$ with a family of homomorphisms $\{ f_i\colon \mathbf{A}_i
+  \to \mathbf{C} \}_{i \in I}$ such that $f_i \circ \iota_i = f_j \circ \iota_j$
+  for all $i, j \in I$, there is a unique homomorphism $f\colon \mathbf{A} \to
+  \mathbf{C}$ such that the triangle in
+  \[
+    \begin{tikzcd}
+      \mathbf{B} \ar[r,hookrightarrow,"\iota_i"] & \mathbf{A}_i
+      \ar[r,hookrightarrow] \ar[d,swap,"f_i"] & \mathbf{A} \ar[ld,dashed,"f"] \\
+      & \mathbf{C}
+    \end{tikzcd}
+  \]
+  commutes for all $i \in I$. We will denote this product as
+  \[
+    \mathbf{A} = \bigoplus_{\substack{\mathbf{B}\\ i \in I}} \mathbf{A}_i.
+  \]
+\end{definition}
+
+\subsubsection{New Results}
+
+\begin{theorem}
+  Let $\{ \mathbf{A}_i \}_{i \in I}$ be a family of BAs with measures $\{
+  m_i\colon \mathbf{A}_i \to \mathbb{R}_{\ge 0} \}_{i \in I}$, let $\mathbf{B}$
+  be a BA, and let $\mathbf{A}$ be the amalgamated free product of $\{
+  \mathbf{A}_i \}_{i \in I}$ over $\mathbf{B}$. Then there is a unique measure
+  $m\colon \mathbf{A} \to \mathbb{R}_{\ge 0}$ such that, for any element $b \in
+  \mathbf{B}$, finite subset $J \subseteq I$, and elements $\{ a_j \in
+  \mathbf{A}_j \}_{j \in J}$,
+  \[
+    m \left(b \land \bigwedge_{j \in J} a_j \right) = \prod_{j \in J} m_j(b
+    \land a_j).
+  \]
+\end{theorem}
 
 \bibliographystyle{plain}
 \bibliography{paper}
+% TODO: curly brackets or parentheses for families? Maybe curly brackets
 
 \end{document}
