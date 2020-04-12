@@ -49,7 +49,8 @@
   }
 }
 
-\title{Generalising Weighted Model Counting to Boolean Algebras}
+\title{What Boolean Algebras Can Teach Us About Weighted Model Counting}
+%\title{Generalising Weighted Model Counting to Boolean Algebras}
 %\title{On the Limitations of Weighted Model Counting}
 %\title{Weighted Model Counting/Integration from the Perspective of Boolean Algebras}
 %\title{What Boolean Algebras Can Teach Us About Weighted Model Counting/Integration?}
@@ -63,6 +64,14 @@
 % [???] of theorems to follow. To do this, we appeal to algebraic constructions
 % to define the main concepts for introducing measures on Boolean algebras.
 
+% Feedback: Can you say something here about factorized vs non-factorized
+% weight function definitions? That is, factorized is when w maps literals to
+% R_>=0, non-factorized is when w maps models to R_>=0 and show:
+% a) come up with nice example when non-factorized weights are intuitive
+% b) what if weight functions are negative/complex?
+% c) clarify that the factorized definition have is w.r.t. models, in case some
+% one gets confused [It doesn't have to be, if the BA is not free -- P.]
+
 % Feedback 2: WMC-Computable -> WMC-Definable
 
 % Feedback 2: The paper at this stage is very technical - the danger is that
@@ -73,50 +82,41 @@
 % whether with significant motivation, we have a story emerging. Below, sample
 % text needed to adequately motivate [???] for WMC/SRL community.
 
-% Contributions:
-% 1. A generalisation of WMC to Boolean algebras. We show how WMC makes
-% independence assumptions and how we can make some but not all literals
-% independent.
-% 1.5. We show how the lifted inference techniques stem from the underlying
-% algebraic structure.
-% 1.6. Do we add more inference rules?
-% 2. We show that it is a valid measure.
-% 3. We show that WMC assumes independence, i.e., cannot represent all measures.
-% 4. We show how the BA can be extended with new 'literals' to represent any measure.
-% 5. (Maybe) we establish a lower bound on the number of new literals, if we
-% make no assumptions about independence.
-% 6. show how evidence = quotiening by a filter, and how quotiening by an ideal works
-% 7. (WMI) If all weights are 1, we extend Boolean variables to discrete
-% variables, and continuous variables are arbitrary subsets (in the
-% sigma-algebra), then the WMI process calculates the probability of any event
-% and doesn't require going down to the level of models (assuming a suitable
-% probability measure).
-% 8. If the weight of a literal (and its negation) is 1, then we don't need to
-% look at its models--the probability can be calculated at any level. This
-% extends to any number of variables.
-% 9. How WMI transforms to our algebras. The boring version and what's wrong
-% with it.
-% 10. Show how to transfer the measure to a quotient algebra and that the answer
-% match with each other and with the original definition of WMC.
+% Feedback 2: I did a high level read to get the big picture but found
+% this discussion on ideals distracting. Specifically, w.r.t. the main claims
+% when do these things get used?
 
-Potential directions to explore (no good ones, really):
+% TODO:
+% 1) theorem: a pushout of free algebras is a free algebra. Same for
+% coproducts. This extends to coproducts because they are a special case of
+% pushouts.
+% TODO for later:
+% 2) curly brackets or parentheses for families? Maybe curly brackets
+% 3) make up my mind about a,b vs x,y and stick to it (maybe x,y?)
+% 4) add parentheses around quotients (e.g., (a+b)/I).
+% 5) perhaps reorder the section of preliminaries into paragraphs, i.e., a
+% paragraph for order, for homomorphisms, for ideals and quotients. This would
+% take up less space.
+
+\paragraph{Contributions.}
 \begin{itemize}
-\item Infinite BAs.
-  % TODO: Feedback 2: understanding this is the key for formulating the
-  % relevance/significance of this work
-  \begin{itemize}
-  \item For example, the BA of finite and cofinite sets could be interesting.
-  \item OUWMC requires infinite logics to be compact (whatever that means). My
-    algebraic angle suggests that completeness should be enough. Topologically,
-    compactness implies completeness, but I have no idea how this translates to
-    logics and algebras.
-  \end{itemize}
-\item WMI
-\item Measures with something other than $\mathbb{R}_{\ge 0}$ as the codomain
-  (doesn't look promising).
+\item WMC defines a measure over a BA.
+\item WMC with weights on literals imposes an independence assumption. (Measures
+  are `slightly' more expressive than WMC with weights on models because they
+  apply to non-atomic BAs.)
+\item A BA can be augmented with new literals in order to support any measure.
+\item (Maybe) a lower bound on the number of new literals needed in order to
+  support any measure.
+\item Alternatively, one can use coproducts and pushouts to define a BA with
+  precisely the right independence and conditional independence conditions.
+  (This requires a relaxed version of WMC.)
+\item This results in a smaller problem for WMC algorithms (w.r.t. both the
+  number of literals and the length of the theory) and is optimal for, e.g.,
+  Bayesian networks.
+\item (Maybe) this results in faster inference (?)
 \end{itemize}
 
-Previous/related work:
+\paragraph{Notable previous/related work.}
 \begin{itemize}
 \item Hailperin's approach to probability logic
   \cite{DBLP:journals/ndjfl/Hailperin84}
@@ -125,8 +125,6 @@ Previous/related work:
 \item Logical induction: a big paper with a good overview of previous attempts
   to assign probabilities to logical sentences in a sensible way
   \cite{DBLP:journals/eccc/GarrabrantBCST16}
-\item Semiring programming \cite{DBLP:journals/corr/BelleR16}
-\item WMI \cite{DBLP:conf/ijcai/BellePB15}
 \item Measures on Boolean algebras
   \begin{itemize}
   \item On possibility and probability measures in finite Boolean algebras
@@ -189,10 +187,7 @@ are \emph{disjoint} if $a \land b = 0$.
   The following are equivalent:
   \begin{itemize}
   \item $\mathbf{B}$ is atomic.
-  \item For any $x \in \mathbf{B}$,
-    \[
-      x = \bigvee_{\text{atoms } a \le x} a.
-    \]
+  \item For any $x \in \mathbf{B}$, $x = \bigvee_{\text{atoms } a \le x} a$.
   \item $1$ is the supremum of all atoms.
   \end{itemize}
 \end{lemma}
@@ -299,19 +294,7 @@ are \emph{disjoint} if $a \land b = 0$.
   b \in \mathbf{B}$, if $a \le b$, then $m(a) \le m(b)$.
 \end{lemma}
 
-% TODO: make up my mind about a,b vs x,y and stick to it (maybe x,y?)
-% TODO: perhaps reorder things into paragraphs, i.e., a paragraph for order, for
-% homomorphisms, for ideals and quotients. This would take up less space.
-
-% TODO: Feedback 2: I did a high level read to get the big picture but found
-% this discussion on ideals distracting. Specifically, w.r.t. the main claims
-% when do these things get used?
-
 \section{WMC as a Measure}
-
-% TODO: Feedback 2: Result #1: What are the conditions under which WMC defines a
-% measure as introduced above? [Non-negativity should be enough so this is not a
-% result.]
 
 \begin{definition} \label{def:algebra_from_logic}
   Let $\mathcal{L}$ be a propositional (or first-order) logic, and let
@@ -432,7 +415,7 @@ are \emph{disjoint} if $a \land b = 0$.
 
 % TODO: Feedback 2: You need to explain what precisely these mean in logic and
 % models and weight functions are usually defined and understood.
-\todo[inline]{This should be replaced with inner sums (a.k.a. free products)}
+% TODO: This should be replaced with inner sums (a.k.a. free products)
 \begin{definition} \label{def:wmc}
   Let $\mathbf{B}$ be an atomic BA, and let $M \subset \mathbf{B}$ be its set of
   atoms. Let $L \subset \mathbf{B}$ be such that every atom $m \in M$ can be
@@ -508,7 +491,7 @@ In our algebraic formulation, this can be computed in two different ways:
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
-% TODO: Feedback 2: I look the significance of the below results. Proving
+% TODO: Feedback 2: I [???] the significance of the below results. Proving
 % properties that don't [???] the "roadmap" means (AI) readers will lose
 % interest. [This applies until the beginning of the next section.]
 
@@ -627,7 +610,6 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
     strictly positive.
   \end{itemize}
 \end{proof}
-% TODO: add parentheses around quotients (e.g., (a+b)/I).
 % TODO: I think I need to cite something for: a/I = 0/I <=> a \in I
 
 \subsection{Lemma Galore}
@@ -779,7 +761,9 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   an atom.
 \end{proof}
 
-% TODO: start here
+% we can then move through the quotient BA using representatives we get
+% from mapping true things to 1 and false things to 0.
+
 %\[
 %  \begin{tikzcd}
 %    \mathbf{B}/(p) \arrow[rr, shift left, "x/(p) \mapsto x \lor p"] \arrow[rr,
@@ -804,28 +788,10 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 %  commutes.
 %\end{theorem}
 
-% TODO: how can WMC compute something in the quotient algebra? Add an example.
-% TODO: we can then move through the quotient BA using representatives we get
-% from mapping true things to 1 and false things to 0.
-
-% TODO: Feedback: Can you say something here about factorized vs non-factorized
-% weight function definitions? That is, factorized is when w maps literals to
-% R_>=0, non-factorized is when w maps models to R_>=0 and show:
-% a) come up with nice example when non-factorized weights are intuitive
-% b) what if weight functions are negative/complex?
-% c) clarify that the factorized definition have is w.r.t. models, in case some
-% one gets confused [It doesn't have to be, if the BA is not free -- P.]
-% d) can you say something about WMI
-
 \section{What Measures Are WMC-Computable?}
 
-\todo[inline]{Proofs need to be updated and propositions could be phrased in a
-  better way, but the gist should be the same.}
-
-% TODO: Feedback 2: Result #2: WMC c measures. That is, WMC wight weights on
-% literals is less expressive than (a) WMC with weights on models is less
-% expressive than (b) measures on Boolean algebras?  Results only link at (a).
-% Is (c) true? Proof? [It could cover (some sort of) infinite cases...]
+% TODO: Proofs need to be updated and propositions could be phrased in a better
+% way, but the gist should be the same.
 
 \subsection{WMC Requires Independent Literals}
 
@@ -1032,10 +998,10 @@ algebra with more literals. More precisely, we are given the red part in
 \[
   \begin{tikzcd}
     \textcolor{red}{\mathbb{R}_{\ge 0}} & & \\
-    \textcolor{red}{\mathbf{B}} \arrow[red]{u}{m} \arrow{r}{\iota} &
-    \mathbf{B'} \arrow{lu}[swap]{m'} & \\
-    \textcolor{red}{L} \arrow[Subset,red]{u}{} \arrow[Subset]{r}{} & L'
-    \arrow[Subset]{u}{} \arrow{r}{w} & \mathbb{R}_{\ge 0}
+    \textcolor{red}{\mathbf{B}} \arrow[red]{u}{m} \ar[r,hookrightarrow,"\iota"]
+    & \mathbf{B'} \arrow{lu}[swap]{m'} & \\
+    \textcolor{red}{L} \ar[u,red,hookrightarrow] \ar[r,hookrightarrow] & L'
+    \ar[u,hookrightarrow] \arrow{r}{w} & \mathbb{R}_{\ge 0}
   \end{tikzcd}
 \]
 and construct the black part in such a way that the triangle commutes.
@@ -1162,9 +1128,7 @@ variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
 \]
 variables would suffice.
 
-% TODO: Feedback 2: You need to explain the significance of this result. Result
-% #3: Augmented approach recovers the expressivity of (b). [This is a result,
-% although not a big one.]
+% TODO: Feedback 2: You need to explain the significance of this result.
 
 \section{Representing Independence and Conditional Independence}
 
@@ -1261,8 +1225,49 @@ variables would suffice.
   \]
 \end{theorem}
 
+\begin{theorem}
+  The number of weights needed to encode a Bayesian network using
+  coproducts and pushouts is equal to the number of entries in the tables of the
+  network (and the resulting theory is shorter).
+\end{theorem}
+
+% TODO: make sure that the definition of 'free' is sufficient
+\begin{theorem}[Pushouts of free BAs are free]
+  Let
+  \[
+    \mathbf{A} = \bigoplus_{\substack{\mathbf{B}\\ i \in I}} \mathbf{A}_i
+  \]
+  be an amalgamated free product such that $\{ \mathbf{A}_{i} \}_{i \in I}$ are
+  free BAs with $\{ S_i \}_{i \in I}$ as their respective sets of generators.
+  Let $S = \bigcup_{i \in I} S_i$. Then $\mathbf{A}$ is a free BA with
+  generating set $S$.
+\end{theorem}
+\begin{proof}
+  Suppose we have a map from $S$ to an arbitrary BA $\mathbf{C}$, as in
+  \[
+    \begin{tikzcd}
+      S_i \ar[r,hookrightarrow] \ar[d,hookrightarrow] & S \ar[d,hookrightarrow]
+      \ar[ddr,bend left] & \\
+      \mathbf{A}_i \ar[r,hookrightarrow] \ar[rrd,dashed,bend right] & \mathbf{A}
+      \ar[rd,dashed]& \\
+      & & \mathbf{C}.
+    \end{tikzcd}
+  \]
+  We want to show that there exists a unique homomorphism $\mathbf{A} \to
+  \mathbf{C}$. For $i \in I$, from $S_i \hookrightarrow S$ and $S \to
+  \mathbf{C}$ we get a map $S_i \to \mathbf{C}$, so---by the definition of a
+  free BA---there is a unique homomorphism $\mathbf{A}_i \to \mathbf{C}$.
+  Furthermore, a family of homomorphisms $\{ \mathbf{A}_i \to \mathbf{C} \}_{i
+    \in I}$ uniquely determine a homomorphism $\mathbf{A} \to \mathbf{C}$ by the
+  universal mapping property of a (wide) pushout. Thus $\mathbf{A}$ is a free BA
+  with generating set $S$.
+\end{proof}
+
+\begin{corollary}
+  Similarly, coproducts of free BAs are free.
+\end{corollary}
+
 \bibliographystyle{plain}
 \bibliography{paper}
-% TODO: curly brackets or parentheses for families? Maybe curly brackets
 
 \end{document}
