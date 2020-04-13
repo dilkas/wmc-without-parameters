@@ -15,20 +15,15 @@
 \usepackage[backgroundcolor=lightgray]{todonotes}
 
 \newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{proposition}{Proposition}
-\newtheorem{corollary}{Corollary}
-\newtheorem{conjecture}{Conjecture}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}
-\newtheorem{example}{Example}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
-
-\definecolor{color1}{HTML}{fbb4ae}
-\definecolor{color2}{HTML}{b3cde3}
-\definecolor{color3}{HTML}{ccebc5}
-\definecolor{color4}{HTML}{decbe4}
 
 \Crefname{property}{Property}{Properties}
 \Crefname{condition}{Condition}{Conditions}
@@ -68,11 +63,8 @@
 % weight function definitions? That is, factorized is when w maps literals to
 % R_>=0, non-factorized is when w maps models to R_>=0 and show:
 % a) come up with nice example when non-factorized weights are intuitive
-% b) what if weight functions are negative/complex?
 % c) clarify that the factorized definition have is w.r.t. models, in case some
 % one gets confused [It doesn't have to be, if the BA is not free -- P.]
-
-% Feedback 2: WMC-Computable -> WMC-Definable
 
 % Feedback 2: The paper at this stage is very technical - the danger is that
 % WMC/SRL people may not be able to follow it and so would be hard to get
@@ -82,21 +74,8 @@
 % whether with significant motivation, we have a story emerging. Below, sample
 % text needed to adequately motivate [???] for WMC/SRL community.
 
-% Feedback 2: I did a high level read to get the big picture but found
-% this discussion on ideals distracting. Specifically, w.r.t. the main claims
-% when do these things get used?
-
-% TODO:
-% 1) theorem: a pushout of free algebras is a free algebra. Same for
-% coproducts. This extends to coproducts because they are a special case of
-% pushouts.
 % TODO for later:
-% 2) curly brackets or parentheses for families? Maybe curly brackets
-% 3) make up my mind about a,b vs x,y and stick to it (maybe x,y?)
-% 4) add parentheses around quotients (e.g., (a+b)/I).
-% 5) perhaps reorder the section of preliminaries into paragraphs, i.e., a
-% paragraph for order, for homomorphisms, for ideals and quotients. This would
-% take up less space.
+% 1) make up my mind about a,b vs x,y and stick to it (maybe x,y?)
 
 \paragraph{Contributions.}
 \begin{itemize}
@@ -136,7 +115,11 @@
 
 \section{Preliminaries}
 
-% TODO: Feedback 2: Explain with examples: models = elements [atoms] of algebra
+% TODO
+% 1) Feedback 2: Explain with examples: models = elements [atoms] of algebra
+% 2) Perhaps reorder the section of preliminaries into paragraphs, i.e., a
+% paragraph for order, for homomorphisms, etc. This would take up less space.
+% 3) how to compute the number of elements in the algebra.
 
 \begin{definition} \label{def:ba}
   A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
@@ -162,7 +145,7 @@ that can be defined using the original three\footnote{We use $+$ to denote
   a + b &= (a \land \neg b) \lor (\neg a \land b).
 \end{align*}
 We can also define a partial order $\le$ on $\mathbf{B}$ as $a \le b$ if $a = b
-\land a$ (or, equivalently, $a \lor b = b$) for $a, b \in \mathbf{B}$.
+\land a$ (or, equivalently, $a \lor b = b$) for all $a, b \in \mathbf{B}$.
 Furthermore, let $a < b$ denote $a \le b$ and $a \ne b$. For the rest of this
 paper, let $\mathbf{B}$ refer to the BA $(\mathbf{B}, \land, \lor, \neg, 0, 1)$.
 For any $S \subseteq \mathbf{B}$, we write $\bigvee S$ for $\bigvee_{x \in S} x$
@@ -208,59 +191,6 @@ are \emph{disjoint} if $a \land b = 0$.
   for all $x \ne 0$, then $m$ is \emph{strictly positive}.
 \end{definition}
 
-%\begin{definition}[\cite{givant2008introduction}] \label{def:filter}
-%  A \emph{(Boolean) filter} is a non-empty subset $F \subseteq \mathbf{B}$ such
-%  that
-%  \begin{itemize}
-%  \item $f \land g \in F$ for all $f, g \in F$,
-%  \item $f \lor a \in F$ for all $f \in F$ and $a \in \mathbf{B}$.
-%  \end{itemize}
-%  For any $p \in \mathbf{B}$, the \emph{principal filter of $p$} is the
-%  intersection $I$ of all filters that contain $p$. It also has the property
-%  that $p \le a$ for all $a \in I$.
-%\end{definition}
-%\begin{definition}[\cite{sikorski1969boolean}] \label{def:quotient}
-%  Let $F \subseteq \mathbf{B}$ be a filter. The \emph{quotient} $\mathbf{B}/F$
-%  is a BA of equivalence classes of elements of $\mathbf{B}$ with respect to the
-%  equivalence relation
-%  \[
-%    a \sim b \qquad \iff \qquad a \to b \in F \quad \text{and} \quad b \to a \in F
-%  \]
-%  for all $a, b \in \mathbf{B}$. Elements of $\mathbf{B}/F$ are usually denoted
-%  by $a/F$ (for some $a \in \mathbf{B}$) with the understanding that if $b \sim
-%  a$ (for some $b \in \mathbf{B}$), then $b/F = a/F$.
-%\end{definition}
-
-\begin{definition}[\cite{givant2008introduction}] \label{def:ideal}
-  An \emph{ideal} is a non-empty subset $I \subseteq \mathbf{B}$ such that
-  \begin{itemize}
-  \item $i \lor j \in I$ for all $i, j \in I$;
-  \item $i \land a \in I$ for all $i \in I$ and $a \in \mathbf{B}$.
-  \end{itemize}
-  For any $p \in \mathbf{B}$, the \emph{principal ideal of $p$}---denoted by
-  $(p)$---is the smallest ideal that contains $p$. It can also be expressed as
-  $(p) = \{ a \in \mathbf{B} \mid a \le p \}$.
-\end{definition}
-
-\begin{definition}[\cite{givant2008introduction}] \label{def:quotient}
-  Let $I$ be an ideal in $\mathbf{B}$. The \emph{quotient algebra of
-    $\mathbf{B}$ modulo the ideal $I$} $\mathbf{B}/I$ is a BA
-  of equivalence classes of elements of $\mathbf{B}$ with respect to the
-  equivalence relation
-  \[
-    a \sim b \quad \iff \quad a + b \in I
-  \]
-  for all $a, b \in \mathbf{B}$. Elements of $\mathbf{B}/I$ are usually denoted
-  by $a/I$ (for some $a \in \mathbf{B}$) with the understanding that if $b \sim
-  a$ (for some $b \in \mathbf{B}$), then $b/I = a/I$. The three algebraic
-  operations on $\mathbf{B}/I$ are defined as
-  \begin{align*}
-    a/I \land b/I &= a \land b / I, \\
-    a/I \lor b/I &= a \lor b / I, \\
-    \neg(a/I) &= (\neg a)/I.
-  \end{align*}
-\end{definition}
-
 \begin{definition}[\cite{givant2008introduction}]
   Let $\mathbf{A}$ and $\mathbf{B}$ be BAs. A \emph{(Boolean) homomorphism} from
   $\mathbf{A}$ to $\mathbf{B}$ is a map $f\colon \mathbf{A} \to \mathbf{B}$ such
@@ -272,11 +202,6 @@ are \emph{disjoint} if $a \land b = 0$.
   \end{itemize}
   for all $x, y \in \mathbf{A}$.
 \end{definition}
-
-\begin{lemma}[\cite{givant2008introduction}] \label{lemma:canonical_homomorphism}
-  Let $I \subseteq \mathbf{B}$ be an ideal. The map $f\colon \mathbf{B} \to
-  \mathbf{B}/I$ defined by $f(x) = x/I$ is a homomorphism.
-\end{lemma}
 
 \begin{lemma}[Homomorphisms preserve order
   \cite{givant2008introduction}] \label{lemma:homomorphisms_and_order}
@@ -295,6 +220,8 @@ are \emph{disjoint} if $a \land b = 0$.
 \end{lemma}
 
 \section{WMC as a Measure}
+% TODO: Feedback 2: Need to explain how WMC and NWMC connects to standard
+% definitions of WMC and Pr(phi|e) = WMC(phi /\ e)/WMC(e).
 
 \begin{definition} \label{def:algebra_from_logic}
   Let $\mathcal{L}$ be a propositional (or first-order) logic, and let
@@ -320,51 +247,6 @@ are \emph{disjoint} if $a \land b = 0$.
   \cite{koppelberg1989handbook,tarski1983logic}.
 \end{definition}
 
-\begin{figure}
-  \[
-    \begin{tikzcd}
-      & & & & & \colorbox{color3}{$1$} \ar[dlll,dash,gray] \ar[dl,dash,gray]
-      \ar[dr,dash,gray] \ar[drrr,dash,gray] & & & \\
-      & & \colorbox{color3}{$p \lor q$} & & \colorbox{color3}{$q \to p$} & &
-      \colorbox{color2}{$p \to q$} & & \colorbox{color4}{$\neg p \lor \neg q$}
-      \\
-      \colorbox{color3}{$p$} \ar[urr,dash,gray] \ar[urrrr,dash,gray] & &
-      \colorbox{color2}{$q$} \ar[u,dash,gray] \ar[urrrr,dash,gray] & &
-      \colorbox{color2}{$p \leftrightarrow q$} \ar[u,dash,gray]
-      \ar[urr,dash,gray] & & \colorbox{color4}{$p + q$} \ar[ullll,dash,gray]
-      \ar[urr,dash,gray] & & \colorbox{color4}{$\neg q$} \ar[ullll,dash,gray]
-      \ar[u,dash,gray] & & \colorbox{color1}{$\neg p$} \ar[ullll,dash,gray]
-      \ar[ull,dash,gray] \\
-      & & \fcolorbox{black}{color2}{$p \land q$} \ar[ull,dash,gray]
-      \ar[u,dash,gray] \ar[urr,dash,gray] & & \fcolorbox{black}{color4}{$p \land
-        \neg q$} \ar[ullll,dash,gray] \ar[urr,dash,gray] \ar[urrrr,dash,gray] &
-      & \fcolorbox{black}{color1}{$\neg p \land q$} \ar[ullll,dash,gray]
-      \ar[u,dash,gray] \ar[urrrr,dash,gray] & & \fcolorbox{black}{color1}{$\neg
-        p \land \neg q$} \ar[ullll,dash,gray] \ar[u,dash,gray]
-      \ar[urr,dash,gray] \\
-      & & & & & \colorbox{color1}{$0$} \ar[ulll,dash,gray] \ar[ul,dash,gray]
-      \ar[ur,dash,gray] \ar[urrr,dash,gray] & & &
-    \end{tikzcd}
-  \]
-  \[
-    \begin{tikzcd}
-      & \colorbox{color3}{$\left[1\right]$} \ar[dl,dash,gray] \ar[dr,dash,gray]
-      & \\
-      \fcolorbox{black}{color2}{$\left[q\right]$} & &
-      \fcolorbox{black}{color4}{$\left[\neg q\right]$} \\
-      & \colorbox{color1}{$\left[0\right]$} \ar[ul,dash,gray] \ar[ur,dash,gray]
-      &
-    \end{tikzcd}
-  \]
-  \caption{Two BAs from \cref{example:construction}: $B(\mathcal{L})$ at the top
-    and $B(\Delta)$ at the bottom. An edge between elements $a$ and $b$ (with
-    $a$ positioned lower than $b$) means that $a < b$. Each element of
-    $B(\Delta)$ is an equivalence class of elements of $B(\mathcal{L})$, and the
-    colours show which elements of $B(\mathcal{L})$ belong to which class. In
-    both algebras, atoms have borders around them.}
-  \label{fig:example}
-\end{figure}
-
 \begin{example} \label{example:construction}
   Let $\mathcal{L}$ be a propositional logic with $p$ and $q$ as its only atoms.
   Then $L = \{ p, q, \neg p, \neg q \}$ is its set of literals. Let $w : L \to
@@ -384,15 +266,14 @@ are \emph{disjoint} if $a \land b = 0$.
     w(p)w(q) + w(p)w(\neg q) = 0.3.
   \]
 
+  % TODO: be careful about mentioning ideals, filters, and quotients
   The corresponding BA $B(\Delta)$ can then be constructed using
   \cref{def:algebra_from_logic}. Alternatively, one can first construct the free
-  BA generated by the set $\{ p, q \}$---this corresponds to $B(\mathcal{L})$ in
-  \cref{fig:example}---and then take a quotient with respect to either the
-  filter generated by $p$ or the ideal\footnote{More details on these concepts
-    can be found in many books on BAs
+  BA generated by the set $\{ p, q \}$ and then take a quotient with respect to
+  either the filter generated by $p$ or the ideal\footnote{More details on these
+    concepts can be found in many books on BAs
     \cite{givant2008introduction,koppelberg1989handbook}.} generated by $\neg
-  p$. In any case, the resulting BA is pictured at the bottom of
-  \cref{fig:example}.
+  p$.
 
   Each element of $B(\mathcal{L})$ can also be seen as a subset of the set of
   all models of $\mathcal{L}$, with $0$ representing $\emptyset$, $1$
@@ -409,7 +290,6 @@ are \emph{disjoint} if $a \land b = 0$.
   \end{enumerate}
   This motivates the following definition of WMC generalised to BAs.
 \end{example}
-% TODO: how to compute the number of elements in the algebra.
 % TODO: clarify what B(L) means. And whether B(Delta) is even necessary.
 % TODO: reference for the set/subset thing.
 
@@ -433,11 +313,10 @@ are \emph{disjoint} if $a \land b = 0$.
     weighted model count} $\nWMC_w\colon \mathbf{B} \to [0, 1]$ as $\nWMC_w(x) =
   \frac{\WMC_w(x)}{\WMC_w(1)}$ for all $x \in \mathbf{B}$. For both $\WMC_w$ and
   $\nWMC_w$, we will drop the subscript when doing so results in no potential
-  confusion.
-%  Finally, we say that a measure $m\colon \mathbf{B} \to
-%  \mathbb{R}_{\ge 0}$ is a \emph{WMC measure} (or is \emph{WMC-computable}) if
-%  there exists a subset $L \subset \mathbf{B}$ and a weight function $w\colon L
-%  \to \mathbb{R}_{\ge 0}$ such that $m = \WMC_w$.
+  confusion. Finally, we say that a measure $m\colon \mathbf{B} \to
+  \mathbb{R}_{\ge 0}$ is a \emph{WMC measure} (or is \emph{WMC-definable}) if
+  there exists a subset $L \subset \mathbf{B}$ and a weight function $w\colon L
+  \to \mathbb{R}_{\ge 0}$ such that $m = \WMC_w$.
 \end{definition}
 % TODO: mention that the definition can be reduced to a single formula (i.e.,
 % without cases)
@@ -446,8 +325,6 @@ are \emph{disjoint} if $a \land b = 0$.
 \begin{theorem}
   $\WMC$ is a measure, and $\nWMC$ is a probability measure.
 \end{theorem}
-% TODO: Feedback 2: Need to explain how WMC and NWMC connects to standard
-% definitions of WMC and Pr(phi|e) = WMC(phi /\ e)/WMC(e).
 \begin{proof}
   First, note that $\WMC$ is non-negative and $\WMC(0) = 0$ by definition. Next,
   let $x, y \in \mathbf{B}$ be such that $x \land y = 0$. We want to show that
@@ -491,328 +368,59 @@ In our algebraic formulation, this can be computed in two different ways:
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
-% TODO: Feedback 2: I [???] the significance of the below results. Proving
-% properties that don't [???] the "roadmap" means (AI) readers will lose
-% interest. [This applies until the beginning of the next section.]
-
-\begin{lemma} \label{lemma:sum}
-  For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
-  \in \mathbf{B}$,
-  \[
-    m(a \lor b) = m(a) + m(b) - m(a \land b).
-  \]
-\end{lemma}
-\begin{proof}
-  By \cref{def:measure},
-  \begin{align*}
-    m(a) &= m(a \land b) + m(a \land \neg b), \\
-    m(b) &= m(a \land b) + m(\neg a \land b), \\
-    m(a \lor b) &= m(a \land b) + m(a \land \neg b) + m(\neg a \land b),
-  \end{align*}
-  so
-  \[
-    m(a) + m(b) - m(a \land b) = m(a \land b) + m(a \land \neg b) + m(\neg a
-    \land b) = m(a \lor b)
-  \]
-  as required.
-\end{proof}
-
-\begin{lemma} \label{lemma:well-defined}
-  For any $a, b \in \mathbf{B}$ and any principal ideal $(p)$, if $a/(p) =
-  b/(p)$, then $a \lor p = b \lor p$.
-\end{lemma}
-\begin{proof}
-  Note that
-  \[
-    a/(p) = b/(p) \quad \iff \quad a+b \in (p) \quad \iff \quad a+b \le p \quad
-    \iff \quad (a+b) \lor p = p
-  \]
-  by \cref{def:quotient,def:ideal}, and the definition of $\le$. So $p = (a
-  \land \neg b) \lor (\neg a \land b) \lor p$, and thus
-  \[
-    0 = p \land \neg p = (a \land \neg b \land \neg p) \lor (\neg a \land b
-    \land \neg p) \lor (p \land \neg p) = (a \land \neg (b \lor p)) \lor (b
-    \land \neg (a \lor p)).
-  \]
-  It follows that
-  \[
-    a \land \neg (b \lor p) = 0 \quad \text{and} \quad b \land \neg (a \lor p) =
-    0.
-  \]
-  Focusing on the first equation,
-  \[
-    \neg a = (\neg a \lor a) \land [\neg a \lor \neg (b \lor p)] = \neg [a \land
-    (b \lor p)],
-  \]
-  and so $a = a \land (b \lor p)$, and
-  \[
-    a \lor p = (a \lor p) \land (b \lor p) = (a \land b) \lor p.
-  \]
-  By similar arguments, $b \lor p = (a \land b) \lor p$ as well which shows that
-  $a \lor p = b \lor p$ as required.
-\end{proof}
-
-% TODO: Feedback 2: Where is this helping?
-\todo[inline]{Outdated. $m(a \land \neg p)$ is better than $m (a \lor p)$.}
-\begin{proposition}[Measures on quotients] \label{def:measures_on_quotients}
-  Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, and let $(p)$ be
-  a principal ideal. Let $m^*\colon \mathbf{B}/(p) \to \mathbb{R}_{\ge 0}$ be
-  defined as
-  \[
-    m^*(a/(p)) = m(a \lor p)
-  \]
-  for any $a \in \mathbf{B}$. The function $m^*$ is well-defined. Furthermore,
-  it is a measure on $\mathbf{B}/(p)$ if and only if $m(p) = 0$. Moreover, if it
-  is a measure, then the following properties transfer from $m$ to $m^*$:
-  \begin{itemize}
-  \item if $m$ is a \emph{probability measure}, then so is $m^*$;
-  \item if $m$ is \emph{strictly positive}, then so is $m^*$.
-  \end{itemize}
-\end{proposition}
-\begin{proof}
-  \Cref{lemma:well-defined} proves that the function is well-defined. Next,
-  note that
-  \[
-    m^*(0/(p)) = m(0 \lor p) = m(p),
-  \]
-  so $m^*(0/(p)) = 0$ if and only if $m(p) = 0$. For the second part of
-  \cref{def:measure}, let $a/(p), b/(p) \in \mathbf{B}/(p)$ be such that
-  \[
-    a/(p) \land b/(p) = a \land b / (p) = 0 / (p).
-  \]
-  This condition is equivalent to $a \land b \in (p)$ and $(a \land b) \lor p =
-  p$ by well-known properties of quotients and ideals
-  \cite{givant2008introduction}, \cref{def:ideal}, and the definition of $\le$,
-  respectively. Now
-  \begin{align*}
-    m^*(a/(p) \lor b/(p)) &= m^*(a \lor b / (p)) = m(a \lor b \lor p) = m((a \lor p) \lor (b \lor p)) \\
-                          &= m(a \lor p) + m(b \lor p) - m((a \lor p) \land (b \lor p)) \\
-                          &= m^*(a/(p)) + m^*(b/(p)) - m((a \lor p) \land (b \lor p))
-  \end{align*}
-  by \cref{lemma:sum}. However
-  \[
-    (a \lor p) \land (b \lor p) = (a \land b) \lor p = p,
-  \]
-  so $m^*(a/(p) \lor b/(p)) = m^*(a/(p)) + m^*(b/(p))$ if and only if $m(p) = 0$.
-
-  The two remaining properties are easy to prove:
-  \begin{itemize}
-  \item If $m(1) = 1$, then $m^*(1/(p)) = m(1 \lor p) = m (1) = 1$.
-  \item Suppose that $m$ is strictly positive, and let $a/(p) \in
-    \mathbf{B}/(p)$ be such that $a/(p) \ne 0/(p)$. Then
-    \[
-      m^*(a/(p)) = m(a \lor p) \ge m(a) > 0,
-    \]
-    where the first inequality comes from an elementary property of $\le$ that
-    $x \le x \lor y$ for any $x, y \in \mathbf{B}$ \cite{sikorski1969boolean}
-    and \cref{lemma:measure_and_order}; and the second inequality follows
-    because $a/(p) \ne 0/(p)$ implies that $a \ne 0$, and $m$ is assumed to be
-    strictly positive.
-  \end{itemize}
-\end{proof}
-% TODO: I think I need to cite something for: a/I = 0/I <=> a \in I
-
-\subsection{Lemma Galore}
-
-\todo[inline]{This section made me realise that I was using the wrong definition}
-
-% TODO: maybe 'unite' this with the result about a \/ p, i.e., a ~ a \/ p ~ a /\
-% ~p.
-% TODO: maybe I should state that A,B are assumed to be BAs with no additional
-% properties unless stated otherwise.
-\begin{lemma} \label{lemma:elements_in_quotients}
-  Let $(p)$ be a principal ideal. Then for any $a \in \mathbf{B}$, $(a \land
-  \neg p)/(p) = a/(p)$.
-\end{lemma}
-\begin{proof}
-  Note that
-  \[
-    (a \land \neg p)/(p) = a/(p) \quad \iff \quad (a \land \neg p) + a \in (p)
-    \quad \iff \quad (a \land \neg p) + a \le p.
-  \]
-  We also have that
-  \[
-    (a \land \neg p) + a = (a \land \neg p \land \neg a) \lor (\neg(a \land \neg
-    p) \land a) = (\neg a \lor p) \land a = (\neg a \land a) \lor (p \land a) =
-    p \land a.
-  \]
-  And, since $p \land a \le p$, we have that $(a \land \neg p) + a \le p$ as
-  required.
-\end{proof} % TODO: why? (the last bit) It's elementary
-% TODO: remove all those 'let (p) be a principal ideal'.
-
-\begin{lemma} \label{lemma:min_element_and_order}
-  Let $(p)$ be a principal ideal. For any $a, b \in \mathbf{B}$, $a/(p) \le
-  b/(p)$ if and only if $a \land \neg p \le b \land \neg p$.
-\end{lemma}
-\begin{proof}
-  Let us begin with the `only of' direction. \Cref{lemma:elements_in_quotients}
-  tells us that $(a \land \neg p)/(p) = a/(p)$. Combining this with
-  \cref{lemma:canonical_homomorphism,lemma:homomorphisms_and_order} shows that
-  \[
-    a \land \neg p \le b \land \neg p \quad \implies \quad (a \land \neg p)/(p)
-    \le (b \land \neg p)/(p) \quad \iff \quad a/(p) \le b/(p)
-  \]
-  as required.
-
-  For the other direction, let $a, b \in \mathbf{B}$ be such that $a/(p) \le
-  b/(p)$. Then, by \cref{lemma:order},
-  \[
-    [a/(p)] \land \neg [b/(p)] = (a \land \neg b)/(p) = 0/(p),
-  \]
-  i.e.,
-  \[
-    a \land \neg b \in (p) \quad \iff \quad a \land \neg b \le p \quad \iff
-    \quad a \land \neg b \land \neg p = 0
-  \]
-  by \cref{def:ideal,lemma:order}. We need to show that $a \land \neg p \le b
-  \land \neg p$. By \cref{lemma:order}, this is equivalent to $a \land \neg p
-  \land \neg(b \land \neg p) = 0$. But
-  \[
-    a \land \neg p \land \neg(b \land \neg p) = a \land \neg p \land (\neg b
-    \lor p) = (a \land \neg p \land \neg b) \lor (a \land \neg p \land p) = a
-    \land \neg p \land \neg b,
-  \]
-  and we already have that $a \land \neg p \land \neg b = 0$ by assumption.
-\end{proof}
-
-\begin{lemma} \label{lemma:measure_of_atom}
-  Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure, let $p \in
-  \mathbf{B}$ be such that $m(p) = 0$, and let $m^*\colon \mathbf{B}/(p) \to
-  \mathbb{R}_{\ge 0}$ be a measure defined by $m^*(a/(p)) = m(a \lor p)$. Then
-  for any $a \in \mathbf{B}$, if $a/(p)$ is an atom in $\mathbf{B}/(p)$, then $a
-  \land \neg p$ is an atom in $\mathbf{B}$ such that $m^*(a/(p)) = m(a \land
-  \neg p)$.
-\end{lemma}
-\begin{proof} % TODO: This proof is a mess and needs more citations.
-  First, we want to show that if $a/(p)$ is an atom, then $a \land \neg p$ is an
-  atom. We can instead prove the contrapositive statement, i.e., if there exists
-  a $b \in \mathbf{B}$ such that $0 < b < a \land \neg p$, then there exists a
-  $b' \in \mathbf{B}$ such that $0/(p) < b'/(p) < a/(p)$. We will show that, in
-  fact, we set $b' = b$.
-  \Cref{lemma:canonical_homomorphism,lemma:homomorphisms_and_order} already tell
-  us that $b/(p) \le a/(p)$, so we only need to show that $0/(p) < b/(p) \ne
-  a/(p)$. For the first part, note that
-  \[
-    0/(p) < b/(p) \quad \iff \quad b/(p) \ne 0/(p) \quad \iff \quad b \not\in
-    (p) \quad \iff \quad b \not\le p \quad \iff \quad b \land \neg p \ne 0
-  \]
-  by \cref{lemma:order}. But if $b \land \neg p = 0$, then $b \land a \land \neg
-  p = 0$. This contradicts either that $b \le a \land \neg p$ (i.e., $b \land a
-  \land \neg p = b$) or that $b \ne 0$. For the second part, i.e., $b/(p) \ne
-  a/(p)$, we will show that if $b/(p) = a/(p)$, and $b \le a \land \neg p$, then
-  $b = a \land \neg p$. Indeed,
-  \[
-    b/(p) = a/(p) \quad \iff \quad a + b \in (p) \quad \iff \quad a+b \le p
-    \quad \iff \quad (a+b) \land \neg p = 0,
-  \]
-  and
-  \[
-    (a+b) \land \neg p = [(a \land \neg b) \lor (\neg a \land b)] \land \neg p =
-    (a \land \neg b \land \neg p) \lor (\neg a \land b \land \neg p),
-  \]
-  so $(a+b) \land \neg p = 0$ implies that $a \land \neg b \land \neg p = 0$
-  which is equivalent to $a \land \neg p \le b$. Therefore we have that $a \land
-  \neg p \le b \le a \land \neg p$, so $b = a \land \neg p$ which, by
-  contradiction, shows that $b/(p) \ne a/(p)$ and finishes the proof that $0/(p)
-  < b/(p) < a/(p)$.
-
-  In order to show that $m^*(a/(p)) = m(a \land \neg p)$, note that $a \land p$,
-  $a \land \neg p$, and $\neg a \land p$ are pairwise disjoint and their
-  supremum is $a \lor p$, so we have that
-  \[
-    m^*(a/(p)) = m(a \lor p) =  m(a \land p) + m(a \land \neg p) + m(\neg a
-    \land p).
-  \]
-  Furthermore, since $a \land p \le p$, $m(a \land p) \le m(p) = 0$. Similarly,
-  $m(\neg a \land p) = 0$, so $m^*(a/(p)) = m(a \land \neg p)$ as required.
-\end{proof}
-% TODO: the undergraduate book vaguely mentions that, when taking a quotient
-% w.r.t. an ideal of elements with measure zero, all elements in an equivalence
-% class will have the same measure.
-
-\begin{lemma} \label{lemma:minimal_in_quotient} % TODO: define completeness
-  Let $\mathbf{B}$ be a complete BA. For any $a, b \in \mathbf{B}$, if $a/(p) =
-  b/(p)$, then $a \land \neg p = b \land \neg p$. As a consequence, $a \land
-  \neg p \le b$.
-\end{lemma}
-\begin{proof} % TODO: rename b to something else
-  As in the proof of \cref{lemma:measure_of_atom}, $a/(p) = b/(p)$ implies that
-  $a \land \neg p \le b$. Since $\mathbf{B}$ is complete, let $b = \bigwedge \{
-  c \in \mathbf{B} \mid c/(p) = a/(p) \}$; then we still have that $b/(p) =
-  a/(p)$. But then $b \le a \land \neg p \le b$, so $a \land \neg p = b$. This
-  defines $a \land \neg p$ independently of $a$ as the least element in $\{c \in
-  \mathbf{B} \mid c/(p) = a/(p) \}$.
-\end{proof}
-
-\begin{corollary}
-  For any complete BA $\mathbf{B}$, if $a \in \mathbf{B}$ is an atom, then
-  $a/(p)$ is either an atom or $0/(p)$. In the former case, $a = a \land \neg
-  p$.
-\end{corollary}
-\begin{proof}
-  Since \cref{lemma:minimal_in_quotient} tells us that for all $b \in
-  \mathbf{B}$, if $b/(p) = a/(p)$, then $b \ge a \land \neg p$, if there is an
-  atom $b \in \mathbf{B}$ such that $b/(p) = a/(p)$, then it must be $a \land
-  \neg p$. If $a$ is an atom, then $a \land \neg p \le a$ implies that either $a
-  = a \land \neg p$ or $a \land \neg p = 0$. The latter is equivalent to $a/(p)
-  = 0/(p)$ by \cref{lemma:order}. The former, combined with the assumption that
-  $a$ is an atom and \cref{lemma:min_element_and_order}, implies that $a/(p)$ is
-  an atom.
-\end{proof}
-
-% we can then move through the quotient BA using representatives we get
-% from mapping true things to 1 and false things to 0.
-
-%\[
-%  \begin{tikzcd}
-%    \mathbf{B}/(p) \arrow[rr, shift left, "x/(p) \mapsto x \lor p"] \arrow[rr,
-%    shift right, swap, "x/(p) \mapsto x \land \neg p"] & & \mathbf{B} \arrow{r}{\WMC} & \mathbb{R}_{\ge 0}
-%  \end{tikzcd}
-%\]
-
-%\begin{theorem}[Using the previous results]
-%  Let $L \subset \mathbf{B}$ and $w\colon L \to \mathbb{R}_{\ge 0}$ be such that
-%  $\WMC_w\colon \mathbf{B} \to \mathbb{R}_{\ge0}$ is a WMC measure. Let $p \in
-%  \mathbf{B}$ be such that $\WMC(p) = 0$, and let $g\colon \mathbf{B}/(p) \to
-%  \mathbf{B}$ be defined as $g(a/(p)) = a \land \neg p$. Then $\WMC \circ g$
-%  is a WMC measure on $\mathbf{B}/(p)$ with respect to the same $L$ and $w$
-%  such that
-%  \[
-%    \begin{tikzcd}
-%      \mathbf{B} \arrow{d}[swap]{\WMC} & \mathbf{B}/(p) \arrow{l}[swap]{g}
-%      \arrow{dl}{\WMC \circ g} \\
-%      \mathbb{R}_{\ge 0}
-%    \end{tikzcd}
-%  \]
-%  commutes.
-%\end{theorem}
-
-\section{What Measures Are WMC-Computable?}
+\section{What Measures Are WMC-Definable?}
 
 % TODO: Proofs need to be updated and propositions could be phrased in a better
 % way, but the gist should be the same.
 
 \subsection{WMC Requires Independent Literals}
 
-% TODO: maybe I should gives this kind of a BA a name? A synonym of 'complete',
-% perhaps.
-% TODO: a special case for weight=0.
+\begin{lemma} \label{lemma:before_theorem}
+  For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
+  \in \mathbf{B}$,
+  \begin{equation} \label{eq:to_prove}
+    m(a \land b) = m(a)m(b)
+  \end{equation}
+  if and only if
+  \begin{equation} \label{eq:to_prove2}
+    m(a \land b) \cdot m(\neg a \land \neg b) = m(a \land \neg b)
+    \cdot m(\neg a \land b).
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  First, note that $a = (a \land b) \lor (a \land \neg b)$ and $(a \land b)
+  \land (a \land \neg b) = 0$, so, by properties of a measure,
+  \begin{equation} \label{eq:temp}
+    m(a) = m(a \land b) + m(a \land \neg b).
+  \end{equation}
+  Applying \cref{eq:temp} and the equivalent expression for $m(b)$ allows us
+  to rewrite \cref{eq:to_prove} as
+  \[
+    m(a \land b) = [m(a \land b) + m(a \land \neg b)][m(a \land b) + m(\neg a
+    \land b)]
+  \]
+  which is equivalent to
+  \begin{equation} \label{eq:temp6}
+    m(a \land b)[1 - m(a \land b) - m(a \land \neg b) - m(\neg a \land b)] = m(a
+    \land \neg b)m(\neg a \land b).
+  \end{equation}
+  Since $a \land b$, $a \land \neg b$, $\neg a \land b$, $\neg a \land \neg b$
+  are pairwise disjoint and their supremum is $1$,
+  \[
+    m(a \land b) + m(a \land \neg b) + m(\neg a \land b) + m(\neg a \land \neg
+    b) = 1,
+  \]
+  and this allows us to rewrite \cref{eq:temp6} into \cref{eq:to_prove2}. As all
+  transformations are invertible, the two expressions are equivalent.
+\end{proof}
 
+% TODO: a special case for weight=0.
 \begin{theorem}
-  Let $\mathbf{B}$ be a finite measure algebra with measure $m\colon \mathbf{B} \to
-  \mathbb{R}_{\ge 0}$. Let $L \subset \mathbf{B}$ be defined as
-  \[
-  L = \{ l_i \mid i \in [n] \} \cup \{ \neg l_i \mid i \in [n] \}
-  \]
-  for some $n \in \mathbb{N}$. Finally, assume that $\mathbf{B}$ has $2^n$
-  atoms, where each atom $a \in \mathbf{B}$ is an infimum
-  \[
-    a = \bigwedge_{i=1}^n a_i
-  \]
-  such that $a_i \in \{ l_i, \neg l_i \}$ for $i \in [n]$. Then there exists a
-  weight function $w\colon L \to \mathbb{R}_{\ge 0}$ that makes $m$ a WMC measure if
-  and only if
+  Let $\mathbf{B}$ be a free BA on $n$ generators $\{ l_i \}_{i=1}^n$ (for some
+  $n \in \mathbb{N}$) with measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$,
+  and let $L = \{ l_i \}_{i = 1}^n \cup \{ \neg l_i \}_{i = 1}^n$. Then there
+  exists a weight function $w\colon L \to \mathbb{R}_{\ge 0}$ such that $m =
+  \WMC_w$ if and only if
   \begin{equation} \label{eq:wmccondition}
   m(l \land l') = m(l)m(l')
   \end{equation}
@@ -825,115 +433,41 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 \end{remark}
 
 \begin{proof}
-  Let us begin with the `if' part of the statement. Let $w\colon L \to
-  \mathbb{R}_{\ge 0}$ be defined by
+  ($\Leftarrow$) Let $w\colon L \to \mathbb{R}_{\ge 0}$ be defined by
   \begin{equation} \label{eq:assumption}
     w(l) = m(l)
   \end{equation}
-  for all $l \in L$. We are going
-  to show that $\nWMC = m$. First, note that $\nWMC(0) = 0 = m(0)$ by the
-  definitions of both $\nWMC$ and $m$. Second, let
+  for all $l \in L$. We are going to show that $\WMC_w = m$. First, note that
+  $\WMC_w(0) = 0 = m(0)$ by the definitions of both $\WMC_w$ and $m$. Second,
+  let
   \begin{equation} \label{eq:def_of_a}
     a = \bigwedge_{i=1}^n a_i
   \end{equation}
   be an atom in $\mathbf{B}$ such that $a_i \in \{ l_i, \neg l_i \}$ for all $i
   \in [n]$. Then
   \[
-    \nWMC(a) = \frac{\WMC(a)}{\WMC(1)} = \frac{1}{\WMC(1)} \prod_{i=1}^n w(a_i)
-    = \frac{1}{\WMC(1)} \prod_{i=1}^n m(a_i) = \frac{1}{\WMC(1)} m \left(
-      \bigwedge_{i=1}^n a_i \right) = \frac{m(a)}{\WMC(1)}
+    \WMC(a) = \prod_{i=1}^n w(a_i) = \prod_{i=1}^n m(a_i) = m
+    \left(\bigwedge_{i=1}^n a_i \right) = m(a)
   \]
-  by \cref{def:wmc,eq:assumption,eq:wmccondition,eq:def_of_a}. Now we just need
-  to show that $\WMC(1) = 1$. Indeed,
-  \begin{align*}
-    \WMC(1) &= \sum_{\text{atoms } a \in \mathbf{B}} \WMC(a) = \sum_{\text{atoms
-      } a \in \mathbf{B}} \prod_{i=1}^n w(a_i) = \sum_{\text{atoms } a \in
-      \mathbf{B}} \prod_{i=1}^n m(a_i) \\
-    &= \sum_{\text{atoms } a \in
-      \mathbf{B}} m \left( \bigwedge_{i=1}^n a_i \right) = \sum_{\text{atoms } a
-      \in \mathbf{B}} m(a) = m \left( \bigvee_{\text{atoms } a \in \mathbf{B}}
-    \right) = m(1) = 1.
-  \end{align*}
-  Finally, note that if $\nWMC$ and $m$ agree on all atoms, then they must also
-  agree on all other non-zero elements of the Boolean algebra.
+  by \cref{def:wmc,eq:assumption,eq:wmccondition,eq:def_of_a}. Finally, note
+  that if $\WMC$ and $m$ agree on all atoms, then they must also agree on all
+  other non-zero elements of the Boolean algebra.
 
-  For the other direction, we are given a weight function $w\colon L \to
-  \mathbb{R}_{\ge 0}$ that induces a measure $m = \nWMC\colon \mathbf{B} \to
-  \mathbb{R}_{\ge 0}$, and we want to show that \cref{eq:wmccondition} is
-  satisfied. Let $k_i, k_j \in L$ be such that $k_i \in \{ l_i, \neg l_i \}$,
-  $k_j \in \{ l_j, \neg l_j \}$, and $i \ne j$. We will first prove an auxiliary
-  result that
-  \begin{equation} \label{eq:to_prove}
+  ($\Rightarrow$) For the other direction, we are given a weight function
+  $w\colon L \to \mathbb{R}_{\ge 0}$ that induces a measure $m = \WMC_w\colon
+  \mathbf{B} \to \mathbb{R}_{\ge 0}$, and we want to show that
+  \cref{eq:wmccondition} is satisfied. Let $k_i, k_j \in L$ be such that $k_i
+  \in \{ l_i, \neg l_i \}$, $k_j \in \{ l_j, \neg l_j \}$, and $i \ne j$ for
+  some $i, j \in [n]$. We then want to show that
+  \begin{equation} \label{eq:to_prove3}
     m(k_i \land k_j) = m(k_i)m(k_j)
   \end{equation}
-  is equivalent to
-  \begin{equation} \label{eq:to_prove2}
+  which is equivalent to
+  \begin{equation} \label{eq:to_prove4}
     m(k_i \land k_j) \cdot m(\neg k_i \land \neg k_j) = m(k_i \land \neg k_j)
-    \cdot m(\neg k_i \land k_j).
+    \cdot m(\neg k_i \land k_j)
   \end{equation}
-  First, note that $k_i$ can be expressed as
-  \[
-    k_i = (k_i \land k_j) \lor (k_i \land \neg k_j)
-  \]
-  with the condition that
-  \[
-    (k_i \land k_j) \land (k_i \land \neg k_j) = 0,
-  \]
-  so, by properties of a measure,
-  \begin{equation} \label{eq:temp}
-    m(k_i) = m(k_i \land k_j) + m(k_i \land \neg k_j).
-  \end{equation}
-  Applying \cref{eq:temp} and the equivalent expression for $m(k_j)$ allows us
-  to rewrite \cref{eq:to_prove} as
-  \begin{align*}
-    m(k_i \land k_j) &= [m(k_i \land k_j) + m(k_i \land \neg k_j)] \cdot [m(k_i \land k_j) + m(\neg k_i \land k_j)] \\
-                     &= m(k_i \land k_j)^2 + m(k_i \land k_j)[m(k_i \land \neg k_j) + m(\neg k_i \land k_j)] + m(k_i \land \neg k_j)m(\neg k_i \land k_j)
-  \end{align*}
-  Dividing both sides by $m(k_i \land k_j)$ gives
-  \begin{equation} \label{eq:temp2}
-    1 = m(k_i \land k_j) + m(k_i \land \neg k_j) + m(\neg k_i \land k_j) +
-    \frac{m(k_i \land \neg k_j)m(\neg k_i \land k_j)}{m(k_i \land k_j)}.
-  \end{equation}
-  Since $k_i \land k_j \land k_i \land \neg k_j = 0$, and
-  \[
-    (k_i \land k_j) \lor (k_i \land \neg k_j) = k_i \land (k_j \lor \neg k_j) =
-    k_i \land 1 = k_i,
-  \]
-  we have that
-  \[
-    m(k_i \land k_j) + m(k_i \land \neg k_j) = m(k_i).
-  \]
-  Similarly, $k_i \land \neg k_i \land k_j = 0$, and
-  \[
-    k_i \lor (\neg k_i \land k_j) = (k_i \lor \neg k_i) \land (k_i \lor k_j) =
-    k_i \lor k_j,
-  \]
-  so
-  \[
-    m(k_i) + m(\neg k_i \land k_j) = m(k_i \lor k_j).
-  \]
-  Finally, note that
-  \[
-    (k_i \lor k_j) \land \neg(k_i \lor k_j) = 0,
-  \]
-  and
-  \[
-    (k_i \lor k_j) \lor \neg(k_i \lor k_j) = 1,
-  \]
-  so
-  \[
-    m(k_i \lor k_j) + m(\neg(k_i \lor k_j)) = m(1) = 1.
-  \]
-  This allows us to rewrite \cref{eq:temp2} as
-  \[
-    \frac{m(k_i \land \neg k_j)m(\neg k_i \land k_j)}{m(k_i \land k_j)} = 1 -
-    m(k_i \lor k_j) = m(\neg(k_i \lor k_j)) = m(\neg k_i \land \neg k_j)
-  \]
-  which immediately gives us \cref{eq:to_prove2}.
-
-  Now recall that $m = \nWMC$ and note that \cref{eq:to_prove2} can be
-  multiplied by $\WMC(1)^2$ to turn the equation into one for $\WMC$ instead of
-  $\nWMC$. Then
+  by \cref{lemma:before_theorem}. Then
   \begin{align*}
     \WMC(k_i \land k_j) &= \sum_{\text{atoms } a \le k_i \land k_j} \WMC(a) = \sum_{\text{atoms } a \le k_i \land k_j} \prod_{m \in [n]} w(a_m) \\
                         &= \sum_{\text{atoms } a \le k_i \land k_j} w(a_i)w(a_j) \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) = \sum_{\text{atoms } a \le k_i \land k_j} w(k_i)w(k_j) \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) \\
@@ -941,16 +475,12 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   \end{align*}
   where $C$ denotes the part of $\WMC(k_i \land k_j)$ that will be the same for
   $\WMC(\neg k_i \land k_j)$, $\WMC(k_i \land \neg k_j)$, and $\WMC(\neg k_i
-  \land \neg k_j)$ as well. But then \cref{eq:to_prove2} becomes
+  \land \neg k_j)$ as well. But then \cref{eq:to_prove4} becomes
   \[
     w(k_i)w(k_j)w(\neg k_i)w(\neg k_j)C^2 = w(k_i)w(\neg k_j)w(\neg k_i)w(k_j)C^2
   \]
-  which is trivially true. By showing that WMC satisfies \cref{eq:to_prove2}, we
-  also showed that it satisfies \cref{eq:to_prove}, finishing the second part of
-  the proof.
+  which is trivially true.
 \end{proof}
-% TODO: the auxiliary result should be a 'claim' in-between the theorem and the
-% proof.
 
 \subsection{Extending the Algebra}
 
@@ -993,8 +523,8 @@ idea to the language of Boolean algebras.
   for all $a \in \mathbf{B}$.
 \end{theorem}
 
-In simpler terms, any measure can be computed using WMC by extending the Boolean
-algebra with more literals. More precisely, we are given the red part in
+In simpler terms, any measure can be computed using WMC by extending the BA with
+more literals. More precisely, we are given the red part in
 \[
   \begin{tikzcd}
     \textcolor{red}{\mathbb{R}_{\ge 0}} & & \\
@@ -1014,26 +544,17 @@ and construct the black part in such a way that the triangle commutes.
     a_i = \bigwedge_{j \in J} a_{i,j}
   \]
   for some $\{ a_{i,j} \}_{j \in J} \subset L$. Moreover, each atom $b \in
-  \mathbf{B'}$ can be represented as either
-  \[
-    b = \phi_i \land a_i \quad \text{or} \quad b = \neg\phi_i \land a_i
-  \]
-  for some atom $a_i \in \mathbf{B}$, also making it an infimum over a subset of
-  $L'$. Then, for any $b \in \mathbf{B}$,
+  \mathbf{B'}$ can be represented as either $b = \phi_i \land a_i$ or $b =
+  \neg\phi_i \land a_i$ for some atom $a_i \in \mathbf{B}$, also making it an
+  infimum over a subset of $L'$. Then, for any $b \in \mathbf{B}$,
   \[
     (m' \circ \iota)(b) = \sum_{\substack{\text{atoms } a_i \in \mathbf{B}:\\
         \phi_i \land a_i \le \iota(b)}} (w(\phi_i) + w(\neg\phi_i)) \prod_{j \in
     J} w(a_{i,j}),
   \]
   recognising that, for any $\iota(b)$, any atom $a_i \in \mathbf{B}$ satisfies
-  \[
-    \phi_i \land a_i \le \iota(b)
-  \]
-  if and only if it satisfies
-  \[
-    \neg\phi_i \land a_i \le \iota(b).
-  \]
-  Then, according to the definition of $w$,
+  $\phi_i \land a_i \le \iota(b)$ if and only if it satisfies $\neg\phi_i \land
+  a_i \le \iota(b)$. Then, according to the definition of $w$,
   \[
     (m' \circ \iota)(b) = \sum_{\substack{\text{atoms } a_i \in \mathbf{B}:\\
         \phi_i \land a_i \le \iota(b)}} (w(\phi_i) + w(\neg\phi_i)) =
@@ -1057,12 +578,13 @@ possible.
 
 \begin{conjecture}
   Let $\mathbf{B}$ and $\mathbf{B'}$ be Boolean algebras, and $\iota\colon
-  \mathbf{B} \to \mathbf{B'}$ be the inclusion map such that $\mathbf{B}$ is
-  freely generated by $L$, all atoms of $\mathbf{B'}$ can be expressed as
-  meets of elements of $L'$, and the following subset relations are satisfied:
+  \mathbf{B} \hookrightarrow \mathbf{B'}$ be the inclusion map such that
+  $\mathbf{B}$ is freely generated by $L$, all atoms of $\mathbf{B'}$ can be
+  expressed as meets of elements of $L'$, and the following subset relations are
+  satisfied:
   \[
     \begin{tikzcd}
-      \mathbf{B} \arrow{r}{\iota} & \mathbf{B'} \\
+      \mathbf{B} \ar[r,hookrightarrow,"\iota"] & \mathbf{B'} \\
       L \arrow[Subset]{u}{} \arrow[Subset]{r}{} & L' \arrow[Subset]{u}{}
     \end{tikzcd}
   \]
@@ -1186,7 +708,7 @@ variables would suffice.
 
 \begin{definition}[\cite{koppelberg1989handbook}]
   Let $\mathbf{A}$ be a BA. Let $\mathbf{B}$ be a subalgebra of $\mathbf{A}$,
-  and let $(\mathbf{A}_i)_{i \in I}$ be a family of subalgebras of $\mathbf{A}$
+  and let $\{ \mathbf{A}_i\}_{i \in I}$ be a family of subalgebras of $\mathbf{A}$
   such that $\mathbf{A}_i \cap \mathbf{A}_j = \mathbf{B}$ for all $i \ne j$ in
   $I$. Let $\{ \iota_i \colon \mathbf{B} \to \mathbf{A}_i \}$ be a family of
   inclusion homomorphisms. Then $\mathbf{A}$ is the \emph{amalgamated free
@@ -1254,7 +776,7 @@ variables would suffice.
     \end{tikzcd}
   \]
   We want to show that there exists a unique homomorphism $\mathbf{A} \to
-  \mathbf{C}$. For $i \in I$, from $S_i \hookrightarrow S$ and $S \to
+  \mathbf{C}$. For all $i \in I$, from $S_i \hookrightarrow S$ and $S \to
   \mathbf{C}$ we get a map $S_i \to \mathbf{C}$, so---by the definition of a
   free BA---there is a unique homomorphism $\mathbf{A}_i \to \mathbf{C}$.
   Furthermore, a family of homomorphisms $\{ \mathbf{A}_i \to \mathbf{C} \}_{i
