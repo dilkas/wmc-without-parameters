@@ -1,0 +1,1376 @@
+// N = 14, R = 0.5
+// random seed = 1619022446
+network grid_problem { //14 variables and 14 distributions 
+}
+variable v_1_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 100) ;
+}
+variable v_1_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 100) ;
+}
+variable v_1_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 100) ;
+}
+variable v_1_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 100) ;
+}
+variable v_1_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 100) ;
+}
+variable v_1_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 100) ;
+}
+variable v_1_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 100) ;
+}
+variable v_1_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 100) ;
+}
+variable v_1_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 100) ;
+}
+variable v_1_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 100) ;
+}
+variable v_1_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 100) ;
+}
+variable v_1_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 100) ;
+}
+variable v_1_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 100) ;
+}
+variable v_1_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 100) ;
+}
+variable v_2_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 150) ;
+}
+variable v_2_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 150) ;
+}
+variable v_2_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 150) ;
+}
+variable v_2_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 150) ;
+}
+variable v_2_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 150) ;
+}
+variable v_2_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 150) ;
+}
+variable v_2_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 150) ;
+}
+variable v_2_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 150) ;
+}
+variable v_2_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 150) ;
+}
+variable v_2_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 150) ;
+}
+variable v_2_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 150) ;
+}
+variable v_2_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 150) ;
+}
+variable v_2_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 150) ;
+}
+variable v_2_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 150) ;
+}
+variable v_3_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 200) ;
+}
+variable v_3_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 200) ;
+}
+variable v_3_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 200) ;
+}
+variable v_3_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 200) ;
+}
+variable v_3_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 200) ;
+}
+variable v_3_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 200) ;
+}
+variable v_3_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 200) ;
+}
+variable v_3_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 200) ;
+}
+variable v_3_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 200) ;
+}
+variable v_3_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 200) ;
+}
+variable v_3_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 200) ;
+}
+variable v_3_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 200) ;
+}
+variable v_3_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 200) ;
+}
+variable v_3_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 200) ;
+}
+variable v_4_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 250) ;
+}
+variable v_4_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 250) ;
+}
+variable v_4_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 250) ;
+}
+variable v_4_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 250) ;
+}
+variable v_4_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 250) ;
+}
+variable v_4_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 250) ;
+}
+variable v_4_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 250) ;
+}
+variable v_4_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 250) ;
+}
+variable v_4_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 250) ;
+}
+variable v_4_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 250) ;
+}
+variable v_4_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 250) ;
+}
+variable v_4_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 250) ;
+}
+variable v_4_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 250) ;
+}
+variable v_4_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 250) ;
+}
+variable v_5_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 300) ;
+}
+variable v_5_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 300) ;
+}
+variable v_5_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 300) ;
+}
+variable v_5_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 300) ;
+}
+variable v_5_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 300) ;
+}
+variable v_5_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 300) ;
+}
+variable v_5_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 300) ;
+}
+variable v_5_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 300) ;
+}
+variable v_5_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 300) ;
+}
+variable v_5_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 300) ;
+}
+variable v_5_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 300) ;
+}
+variable v_5_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 300) ;
+}
+variable v_5_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 300) ;
+}
+variable v_5_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 300) ;
+}
+variable v_6_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 350) ;
+}
+variable v_6_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 350) ;
+}
+variable v_6_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 350) ;
+}
+variable v_6_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 350) ;
+}
+variable v_6_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 350) ;
+}
+variable v_6_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 350) ;
+}
+variable v_6_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 350) ;
+}
+variable v_6_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 350) ;
+}
+variable v_6_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 350) ;
+}
+variable v_6_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 350) ;
+}
+variable v_6_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 350) ;
+}
+variable v_6_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 350) ;
+}
+variable v_6_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 350) ;
+}
+variable v_6_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 350) ;
+}
+variable v_7_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 400) ;
+}
+variable v_7_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 400) ;
+}
+variable v_7_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 400) ;
+}
+variable v_7_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 400) ;
+}
+variable v_7_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 400) ;
+}
+variable v_7_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 400) ;
+}
+variable v_7_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 400) ;
+}
+variable v_7_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 400) ;
+}
+variable v_7_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 400) ;
+}
+variable v_7_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 400) ;
+}
+variable v_7_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 400) ;
+}
+variable v_7_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 400) ;
+}
+variable v_7_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 400) ;
+}
+variable v_7_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 400) ;
+}
+variable v_8_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 450) ;
+}
+variable v_8_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 450) ;
+}
+variable v_8_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 450) ;
+}
+variable v_8_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 450) ;
+}
+variable v_8_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 450) ;
+}
+variable v_8_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 450) ;
+}
+variable v_8_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 450) ;
+}
+variable v_8_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 450) ;
+}
+variable v_8_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 450) ;
+}
+variable v_8_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 450) ;
+}
+variable v_8_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 450) ;
+}
+variable v_8_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 450) ;
+}
+variable v_8_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 450) ;
+}
+variable v_8_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 450) ;
+}
+variable v_9_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 500) ;
+}
+variable v_9_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 500) ;
+}
+variable v_9_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 500) ;
+}
+variable v_9_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 500) ;
+}
+variable v_9_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 500) ;
+}
+variable v_9_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 500) ;
+}
+variable v_9_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 500) ;
+}
+variable v_9_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 500) ;
+}
+variable v_9_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 500) ;
+}
+variable v_9_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 500) ;
+}
+variable v_9_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 500) ;
+}
+variable v_9_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 500) ;
+}
+variable v_9_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 500) ;
+}
+variable v_9_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 500) ;
+}
+variable v_10_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 550) ;
+}
+variable v_10_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 550) ;
+}
+variable v_10_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 550) ;
+}
+variable v_10_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 550) ;
+}
+variable v_10_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 550) ;
+}
+variable v_10_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 550) ;
+}
+variable v_10_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 550) ;
+}
+variable v_10_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 550) ;
+}
+variable v_10_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 550) ;
+}
+variable v_10_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 550) ;
+}
+variable v_10_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 550) ;
+}
+variable v_10_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 550) ;
+}
+variable v_10_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 550) ;
+}
+variable v_10_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 550) ;
+}
+variable v_11_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 600) ;
+}
+variable v_11_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 600) ;
+}
+variable v_11_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 600) ;
+}
+variable v_11_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 600) ;
+}
+variable v_11_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 600) ;
+}
+variable v_11_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 600) ;
+}
+variable v_11_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 600) ;
+}
+variable v_11_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 600) ;
+}
+variable v_11_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 600) ;
+}
+variable v_11_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 600) ;
+}
+variable v_11_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 600) ;
+}
+variable v_11_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 600) ;
+}
+variable v_11_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 600) ;
+}
+variable v_11_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 600) ;
+}
+variable v_12_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 650) ;
+}
+variable v_12_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 650) ;
+}
+variable v_12_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 650) ;
+}
+variable v_12_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 650) ;
+}
+variable v_12_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 650) ;
+}
+variable v_12_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 650) ;
+}
+variable v_12_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 650) ;
+}
+variable v_12_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 650) ;
+}
+variable v_12_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 650) ;
+}
+variable v_12_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 650) ;
+}
+variable v_12_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 650) ;
+}
+variable v_12_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 650) ;
+}
+variable v_12_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 650) ;
+}
+variable v_12_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 650) ;
+}
+variable v_13_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 700) ;
+}
+variable v_13_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 700) ;
+}
+variable v_13_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 700) ;
+}
+variable v_13_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 700) ;
+}
+variable v_13_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 700) ;
+}
+variable v_13_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 700) ;
+}
+variable v_13_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 700) ;
+}
+variable v_13_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 700) ;
+}
+variable v_13_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 700) ;
+}
+variable v_13_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 700) ;
+}
+variable v_13_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 700) ;
+}
+variable v_13_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 700) ;
+}
+variable v_13_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 700) ;
+}
+variable v_13_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 700) ;
+}
+variable v_14_1 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (100, 750) ;
+}
+variable v_14_2 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (150, 750) ;
+}
+variable v_14_3 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (200, 750) ;
+}
+variable v_14_4 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (250, 750) ;
+}
+variable v_14_5 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (300, 750) ;
+}
+variable v_14_6 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (350, 750) ;
+}
+variable v_14_7 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (400, 750) ;
+}
+variable v_14_8 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (450, 750) ;
+}
+variable v_14_9 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (500, 750) ;
+}
+variable v_14_10 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (550, 750) ;
+}
+variable v_14_11 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (600, 750) ;
+}
+variable v_14_12 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (650, 750) ;
+}
+variable v_14_13 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (700, 750) ;
+}
+variable v_14_14 { // 2 values 
+	 type discrete[2] { true false };
+	 property position = (750, 750) ;
+}
+probability ( v_1_1 ) { // 1 variable and 2 values
+	table 0.205931 0.794069 ;
+}
+probability ( v_1_2 v_1_1 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_1_3 v_1_2 ) { // 2 variables and 4 values
+	table 0.139387 0.933837 0.860613 0.0661633 ;
+}
+probability ( v_1_4 v_1_3 ) { // 2 variables and 4 values
+	table 0.393578 0.573385 0.606422 0.426615 ;
+}
+probability ( v_1_5 v_1_4 ) { // 2 variables and 4 values
+	table 0.658788 0.793638 0.341212 0.206362 ;
+}
+probability ( v_1_6 v_1_5 ) { // 2 variables and 4 values
+	table 0.232525 0.887584 0.767475 0.112416 ;
+}
+probability ( v_1_7 v_1_6 ) { // 2 variables and 4 values
+	table 0.334554 0.740222 0.665446 0.259778 ;
+}
+probability ( v_1_8 v_1_7 ) { // 2 variables and 4 values
+	table 0 1 1 0 ;
+}
+probability ( v_1_9 v_1_8 ) { // 2 variables and 4 values
+	table 0.974043 0.138152 0.0259568 0.861848 ;
+}
+probability ( v_1_10 v_1_9 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_1_11 v_1_10 ) { // 2 variables and 4 values
+	table 0 1 1 0 ;
+}
+probability ( v_1_12 v_1_11 ) { // 2 variables and 4 values
+	table 0.571013 0.922322 0.428987 0.0776784 ;
+}
+probability ( v_1_13 v_1_12 ) { // 2 variables and 4 values
+	table 0.776945 0.0834349 0.223055 0.916565 ;
+}
+probability ( v_1_14 v_1_13 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_2_1 v_1_1 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_2_2 v_2_1 v_1_2 ) { // 3 variables and 8 values
+	table 1 1 1 0 0 0 0 1 ;
+}
+probability ( v_2_3 v_2_2 v_1_3 ) { // 3 variables and 8 values
+	table 0.722361 0.507713 0.462466 0.509054 0.277639 0.492287 0.537534 0.490946 ;
+}
+probability ( v_2_4 v_2_3 v_1_4 ) { // 3 variables and 8 values
+	table 0.202688 0.78777 0.700296 0.987409 0.797312 0.21223 0.299704 0.0125912 ;
+}
+probability ( v_2_5 v_2_4 v_1_5 ) { // 3 variables and 8 values
+	table 0.838449 0.228092 0.860668 0.235062 0.161551 0.771908 0.139332 0.764938 ;
+}
+probability ( v_2_6 v_2_5 v_1_6 ) { // 3 variables and 8 values
+	table 0.809329 0.806075 0.794344 0.511906 0.190671 0.193925 0.205656 0.488094 ;
+}
+probability ( v_2_7 v_2_6 v_1_7 ) { // 3 variables and 8 values
+	table 0.877778 0.785928 0.987539 0.1006 0.122222 0.214072 0.0124613 0.8994 ;
+}
+probability ( v_2_8 v_2_7 v_1_8 ) { // 3 variables and 8 values
+	table 0.105685 0.717 0.775032 0.840676 0.894315 0.283 0.224968 0.159324 ;
+}
+probability ( v_2_9 v_2_8 v_1_9 ) { // 3 variables and 8 values
+	table 0.349915 0.563037 0.499901 0.812381 0.650085 0.436963 0.500099 0.187619 ;
+}
+probability ( v_2_10 v_2_9 v_1_10 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_2_11 v_2_10 v_1_11 ) { // 3 variables and 8 values
+	table 1 0 0 0 0 1 1 1 ;
+}
+probability ( v_2_12 v_2_11 v_1_12 ) { // 3 variables and 8 values
+	table 1 0 0 0 0 1 1 1 ;
+}
+probability ( v_2_13 v_2_12 v_1_13 ) { // 3 variables and 8 values
+	table 0.774714 0.589508 0.49261 0.875314 0.225286 0.410492 0.50739 0.124686 ;
+}
+probability ( v_2_14 v_2_13 v_1_14 ) { // 3 variables and 8 values
+	table 0.598296 0.592315 0.358328 0.438972 0.401704 0.407685 0.641672 0.561028 ;
+}
+probability ( v_3_1 v_2_1 ) { // 2 variables and 4 values
+	table 0.708242 0.00200926 0.291758 0.997991 ;
+}
+probability ( v_3_2 v_3_1 v_2_2 ) { // 3 variables and 8 values
+	table 0 1 0 1 1 0 1 0 ;
+}
+probability ( v_3_3 v_3_2 v_2_3 ) { // 3 variables and 8 values
+	table 0.469038 0.538171 0.555639 0.349952 0.530962 0.461829 0.444361 0.650048 ;
+}
+probability ( v_3_4 v_3_3 v_2_4 ) { // 3 variables and 8 values
+	table 0.0379838 0.465928 0.871332 0.329657 0.962016 0.534072 0.128668 0.670343 ;
+}
+probability ( v_3_5 v_3_4 v_2_5 ) { // 3 variables and 8 values
+	table 1 1 1 0 0 0 0 1 ;
+}
+probability ( v_3_6 v_3_5 v_2_6 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_3_7 v_3_6 v_2_7 ) { // 3 variables and 8 values
+	table 0.422928 0.595112 0.37261 0.424938 0.577072 0.404888 0.62739 0.575062 ;
+}
+probability ( v_3_8 v_3_7 v_2_8 ) { // 3 variables and 8 values
+	table 0.893234 0.499039 0.106089 0.428926 0.106766 0.500961 0.893911 0.571074 ;
+}
+probability ( v_3_9 v_3_8 v_2_9 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_3_10 v_3_9 v_2_10 ) { // 3 variables and 8 values
+	table 0.0266253 0.391007 0.607169 0.356283 0.973375 0.608993 0.392831 0.643717 ;
+}
+probability ( v_3_11 v_3_10 v_2_11 ) { // 3 variables and 8 values
+	table 0.375437 0.489519 0.672037 0.918418 0.624563 0.510481 0.327963 0.0815824 ;
+}
+probability ( v_3_12 v_3_11 v_2_12 ) { // 3 variables and 8 values
+	table 1 0 0 1 0 1 1 0 ;
+}
+probability ( v_3_13 v_3_12 v_2_13 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_3_14 v_3_13 v_2_14 ) { // 3 variables and 8 values
+	table 0.621951 0.448516 0.388559 0.728041 0.378049 0.551484 0.611441 0.271959 ;
+}
+probability ( v_4_1 v_3_1 ) { // 2 variables and 4 values
+	table 0.821562 0.303168 0.178438 0.696832 ;
+}
+probability ( v_4_2 v_4_1 v_3_2 ) { // 3 variables and 8 values
+	table 0.810203 0.228247 0.580377 0.836829 0.189797 0.771753 0.419623 0.163171 ;
+}
+probability ( v_4_3 v_4_2 v_3_3 ) { // 3 variables and 8 values
+	table 0.187546 0.193111 0.398241 0.562983 0.812454 0.806889 0.601759 0.437017 ;
+}
+probability ( v_4_4 v_4_3 v_3_4 ) { // 3 variables and 8 values
+	table 0.0702777 0.4814 0.894894 0.127976 0.929722 0.5186 0.105106 0.872024 ;
+}
+probability ( v_4_5 v_4_4 v_3_5 ) { // 3 variables and 8 values
+	table 0.413199 0.16963 0.165436 0.595871 0.586801 0.83037 0.834564 0.404129 ;
+}
+probability ( v_4_6 v_4_5 v_3_6 ) { // 3 variables and 8 values
+	table 0.10787 0.151153 0.523734 0.729822 0.89213 0.848847 0.476266 0.270178 ;
+}
+probability ( v_4_7 v_4_6 v_3_7 ) { // 3 variables and 8 values
+	table 0.912293 0.457863 0.477112 0.733855 0.0877067 0.542137 0.522888 0.266145 ;
+}
+probability ( v_4_8 v_4_7 v_3_8 ) { // 3 variables and 8 values
+	table 0.321651 0.544058 0.989278 0.902028 0.678349 0.455942 0.0107216 0.0979719 ;
+}
+probability ( v_4_9 v_4_8 v_3_9 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_4_10 v_4_9 v_3_10 ) { // 3 variables and 8 values
+	table 0.256628 0.077051 0.133958 0.151523 0.743372 0.922949 0.866042 0.848477 ;
+}
+probability ( v_4_11 v_4_10 v_3_11 ) { // 3 variables and 8 values
+	table 0 1 0 1 1 0 1 0 ;
+}
+probability ( v_4_12 v_4_11 v_3_12 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_4_13 v_4_12 v_3_13 ) { // 3 variables and 8 values
+	table 0.911414 0.444898 0.413062 0.388525 0.0885861 0.555102 0.586938 0.611475 ;
+}
+probability ( v_4_14 v_4_13 v_3_14 ) { // 3 variables and 8 values
+	table 1 0 0 0 0 1 1 1 ;
+}
+probability ( v_5_1 v_4_1 ) { // 2 variables and 4 values
+	table 0.103697 0.771904 0.896303 0.228096 ;
+}
+probability ( v_5_2 v_5_1 v_4_2 ) { // 3 variables and 8 values
+	table 0.677695 0.778677 0.354336 0.934324 0.322305 0.221323 0.645664 0.0656764 ;
+}
+probability ( v_5_3 v_5_2 v_4_3 ) { // 3 variables and 8 values
+	table 0.488294 0.0858464 0.0607548 0.440365 0.511706 0.914154 0.939245 0.559635 ;
+}
+probability ( v_5_4 v_5_3 v_4_4 ) { // 3 variables and 8 values
+	table 0.435412 0.557872 0.81116 0.444282 0.564588 0.442128 0.18884 0.555718 ;
+}
+probability ( v_5_5 v_5_4 v_4_5 ) { // 3 variables and 8 values
+	table 0.122905 0.976887 0.738447 0.0343184 0.877095 0.0231133 0.261553 0.965682 ;
+}
+probability ( v_5_6 v_5_5 v_4_6 ) { // 3 variables and 8 values
+	table 0 0 1 1 1 1 0 0 ;
+}
+probability ( v_5_7 v_5_6 v_4_7 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_5_8 v_5_7 v_4_8 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_5_9 v_5_8 v_4_9 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_5_10 v_5_9 v_4_10 ) { // 3 variables and 8 values
+	table 0.775478 0.391448 0.287872 0.586638 0.224522 0.608552 0.712128 0.413362 ;
+}
+probability ( v_5_11 v_5_10 v_4_11 ) { // 3 variables and 8 values
+	table 0.0711201 0.709542 0.812617 0.809567 0.92888 0.290458 0.187383 0.190433 ;
+}
+probability ( v_5_12 v_5_11 v_4_12 ) { // 3 variables and 8 values
+	table 0.234401 0.961076 0.166705 0.834938 0.765599 0.0389239 0.833295 0.165062 ;
+}
+probability ( v_5_13 v_5_12 v_4_13 ) { // 3 variables and 8 values
+	table 0 1 1 1 1 0 0 0 ;
+}
+probability ( v_5_14 v_5_13 v_4_14 ) { // 3 variables and 8 values
+	table 0.0365257 0.491955 0.690071 0.0760786 0.963474 0.508045 0.309929 0.923921 ;
+}
+probability ( v_6_1 v_5_1 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_6_2 v_6_1 v_5_2 ) { // 3 variables and 8 values
+	table 0.58293 0.854046 0.927395 0.31293 0.41707 0.145954 0.0726047 0.68707 ;
+}
+probability ( v_6_3 v_6_2 v_5_3 ) { // 3 variables and 8 values
+	table 0.318843 0.600802 0.216162 0.154573 0.681157 0.399198 0.783838 0.845427 ;
+}
+probability ( v_6_4 v_6_3 v_5_4 ) { // 3 variables and 8 values
+	table 0.925704 0.96719 0.481489 0.669565 0.0742961 0.0328105 0.518511 0.330435 ;
+}
+probability ( v_6_5 v_6_4 v_5_5 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_6_6 v_6_5 v_5_6 ) { // 3 variables and 8 values
+	table 1 0 0 0 0 1 1 1 ;
+}
+probability ( v_6_7 v_6_6 v_5_7 ) { // 3 variables and 8 values
+	table 0.672899 0.470217 0.617497 0.966195 0.327101 0.529783 0.382503 0.0338054 ;
+}
+probability ( v_6_8 v_6_7 v_5_8 ) { // 3 variables and 8 values
+	table 0 0 0 1 1 1 1 0 ;
+}
+probability ( v_6_9 v_6_8 v_5_9 ) { // 3 variables and 8 values
+	table 0.682921 0.835095 0.462857 0.899083 0.317079 0.164905 0.537143 0.100917 ;
+}
+probability ( v_6_10 v_6_9 v_5_10 ) { // 3 variables and 8 values
+	table 0.134779 0.824787 0.956857 0.616269 0.865221 0.175213 0.043143 0.383731 ;
+}
+probability ( v_6_11 v_6_10 v_5_11 ) { // 3 variables and 8 values
+	table 0 0 0 1 1 1 1 0 ;
+}
+probability ( v_6_12 v_6_11 v_5_12 ) { // 3 variables and 8 values
+	table 0.466615 0.38979 0.292969 0.647559 0.533385 0.61021 0.707031 0.352441 ;
+}
+probability ( v_6_13 v_6_12 v_5_13 ) { // 3 variables and 8 values
+	table 0 0 0 1 1 1 1 0 ;
+}
+probability ( v_6_14 v_6_13 v_5_14 ) { // 3 variables and 8 values
+	table 1 0 0 1 0 1 1 0 ;
+}
+probability ( v_7_1 v_6_1 ) { // 2 variables and 4 values
+	table 0.697833 0.575823 0.302167 0.424177 ;
+}
+probability ( v_7_2 v_7_1 v_6_2 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_7_3 v_7_2 v_6_3 ) { // 3 variables and 8 values
+	table 1 0 0 0 0 1 1 1 ;
+}
+probability ( v_7_4 v_7_3 v_6_4 ) { // 3 variables and 8 values
+	table 0.124664 0.692035 0.758649 0.591279 0.875336 0.307965 0.241351 0.408721 ;
+}
+probability ( v_7_5 v_7_4 v_6_5 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_7_6 v_7_5 v_6_6 ) { // 3 variables and 8 values
+	table 0.891914 0.33789 0.84595 0.731418 0.108086 0.66211 0.15405 0.268582 ;
+}
+probability ( v_7_7 v_7_6 v_6_7 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_7_8 v_7_7 v_6_8 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_7_9 v_7_8 v_6_9 ) { // 3 variables and 8 values
+	table 0.0480762 0.747461 0.768784 0.545135 0.951924 0.252539 0.231216 0.454865 ;
+}
+probability ( v_7_10 v_7_9 v_6_10 ) { // 3 variables and 8 values
+	table 0.893448 0.23717 0.476682 0.484727 0.106552 0.76283 0.523318 0.515273 ;
+}
+probability ( v_7_11 v_7_10 v_6_11 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_7_12 v_7_11 v_6_12 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_7_13 v_7_12 v_6_13 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_7_14 v_7_13 v_6_14 ) { // 3 variables and 8 values
+	table 0 1 1 1 1 0 0 0 ;
+}
+probability ( v_8_1 v_7_1 ) { // 2 variables and 4 values
+	table 0.66834 0.151701 0.33166 0.848299 ;
+}
+probability ( v_8_2 v_8_1 v_7_2 ) { // 3 variables and 8 values
+	table 1 1 1 0 0 0 0 1 ;
+}
+probability ( v_8_3 v_8_2 v_7_3 ) { // 3 variables and 8 values
+	table 0.508252 0.8153 0.253003 0.0365527 0.491748 0.1847 0.746997 0.963447 ;
+}
+probability ( v_8_4 v_8_3 v_7_4 ) { // 3 variables and 8 values
+	table 0.82376 0.450859 0.821727 0.286432 0.17624 0.549141 0.178273 0.713568 ;
+}
+probability ( v_8_5 v_8_4 v_7_5 ) { // 3 variables and 8 values
+	table 1 0 0 0 0 1 1 1 ;
+}
+probability ( v_8_6 v_8_5 v_7_6 ) { // 3 variables and 8 values
+	table 0 0 0 1 1 1 1 0 ;
+}
+probability ( v_8_7 v_8_6 v_7_7 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_8_8 v_8_7 v_7_8 ) { // 3 variables and 8 values
+	table 0.116545 0.746653 0.592721 0.447118 0.883455 0.253347 0.407279 0.552882 ;
+}
+probability ( v_8_9 v_8_8 v_7_9 ) { // 3 variables and 8 values
+	table 0.100973 0.262418 0.933663 0.137526 0.899027 0.737582 0.0663374 0.862474 ;
+}
+probability ( v_8_10 v_8_9 v_7_10 ) { // 3 variables and 8 values
+	table 0.757423 0.588385 0.623009 0.0438545 0.242577 0.411615 0.376991 0.956145 ;
+}
+probability ( v_8_11 v_8_10 v_7_11 ) { // 3 variables and 8 values
+	table 0.573548 0.524375 0.125322 0.334627 0.426452 0.475625 0.874678 0.665373 ;
+}
+probability ( v_8_12 v_8_11 v_7_12 ) { // 3 variables and 8 values
+	table 0.525653 0.285809 0.140786 0.320145 0.474347 0.714191 0.859214 0.679855 ;
+}
+probability ( v_8_13 v_8_12 v_7_13 ) { // 3 variables and 8 values
+	table 0.151867 0.218262 0.214958 0.831288 0.848133 0.781738 0.785042 0.168712 ;
+}
+probability ( v_8_14 v_8_13 v_7_14 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_9_1 v_8_1 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_9_2 v_9_1 v_8_2 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_9_3 v_9_2 v_8_3 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_9_4 v_9_3 v_8_4 ) { // 3 variables and 8 values
+	table 0.112476 0.989836 0.778013 0.63813 0.887524 0.0101641 0.221987 0.36187 ;
+}
+probability ( v_9_5 v_9_4 v_8_5 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_9_6 v_9_5 v_8_6 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_9_7 v_9_6 v_8_7 ) { // 3 variables and 8 values
+	table 0.459347 0.602888 0.244739 0.154739 0.540653 0.397112 0.755261 0.845261 ;
+}
+probability ( v_9_8 v_9_7 v_8_8 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_9_9 v_9_8 v_8_9 ) { // 3 variables and 8 values
+	table 0.442419 0.600602 0.86289 0.0976277 0.557581 0.399398 0.13711 0.902372 ;
+}
+probability ( v_9_10 v_9_9 v_8_10 ) { // 3 variables and 8 values
+	table 0.975366 0.0874635 0.333322 0.613496 0.0246342 0.912536 0.666678 0.386504 ;
+}
+probability ( v_9_11 v_9_10 v_8_11 ) { // 3 variables and 8 values
+	table 0 1 1 0 1 0 0 1 ;
+}
+probability ( v_9_12 v_9_11 v_8_12 ) { // 3 variables and 8 values
+	table 0.0640472 0.224741 0.192922 0.298105 0.935953 0.775259 0.807078 0.701895 ;
+}
+probability ( v_9_13 v_9_12 v_8_13 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_9_14 v_9_13 v_8_14 ) { // 3 variables and 8 values
+	table 0.221375 0.590801 0.653704 0.582134 0.778625 0.409199 0.346296 0.417866 ;
+}
+probability ( v_10_1 v_9_1 ) { // 2 variables and 4 values
+	table 0.529439 0.0245535 0.470561 0.975447 ;
+}
+probability ( v_10_2 v_10_1 v_9_2 ) { // 3 variables and 8 values
+	table 0 1 1 0 1 0 0 1 ;
+}
+probability ( v_10_3 v_10_2 v_9_3 ) { // 3 variables and 8 values
+	table 1 1 1 0 0 0 0 1 ;
+}
+probability ( v_10_4 v_10_3 v_9_4 ) { // 3 variables and 8 values
+	table 0.178852 0.825215 0.301267 0.242899 0.821148 0.174785 0.698733 0.757101 ;
+}
+probability ( v_10_5 v_10_4 v_9_5 ) { // 3 variables and 8 values
+	table 0 1 1 1 1 0 0 0 ;
+}
+probability ( v_10_6 v_10_5 v_9_6 ) { // 3 variables and 8 values
+	table 1 0 1 0 0 1 0 1 ;
+}
+probability ( v_10_7 v_10_6 v_9_7 ) { // 3 variables and 8 values
+	table 0.0693823 0.247262 0.30534 0.598821 0.930618 0.752738 0.69466 0.401179 ;
+}
+probability ( v_10_8 v_10_7 v_9_8 ) { // 3 variables and 8 values
+	table 0 0 1 1 1 1 0 0 ;
+}
+probability ( v_10_9 v_10_8 v_9_9 ) { // 3 variables and 8 values
+	table 0 1 0 1 1 0 1 0 ;
+}
+probability ( v_10_10 v_10_9 v_9_10 ) { // 3 variables and 8 values
+	table 1 1 1 0 0 0 0 1 ;
+}
+probability ( v_10_11 v_10_10 v_9_11 ) { // 3 variables and 8 values
+	table 0.211904 0.688449 0.139148 0.336388 0.788096 0.311551 0.860852 0.663612 ;
+}
+probability ( v_10_12 v_10_11 v_9_12 ) { // 3 variables and 8 values
+	table 0.581144 0.780141 0.788374 0.996823 0.418856 0.219859 0.211626 0.00317737 ;
+}
+probability ( v_10_13 v_10_12 v_9_13 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_10_14 v_10_13 v_9_14 ) { // 3 variables and 8 values
+	table 0.964346 0.304996 0.656175 0.358342 0.0356544 0.695004 0.343825 0.641658 ;
+}
+probability ( v_11_1 v_10_1 ) { // 2 variables and 4 values
+	table 0.0150179 0.961983 0.984982 0.0380168 ;
+}
+probability ( v_11_2 v_11_1 v_10_2 ) { // 3 variables and 8 values
+	table 0.35505 0.138377 0.0600331 0.248043 0.64495 0.861623 0.939967 0.751957 ;
+}
+probability ( v_11_3 v_11_2 v_10_3 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_11_4 v_11_3 v_10_4 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_11_5 v_11_4 v_10_5 ) { // 3 variables and 8 values
+	table 0.754033 0.808883 0.995681 0.0866753 0.245967 0.191117 0.00431872 0.913325 ;
+}
+probability ( v_11_6 v_11_5 v_10_6 ) { // 3 variables and 8 values
+	table 0.688211 0.724657 0.540113 0.652557 0.311789 0.275343 0.459887 0.347443 ;
+}
+probability ( v_11_7 v_11_6 v_10_7 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_11_8 v_11_7 v_10_8 ) { // 3 variables and 8 values
+	table 0.641949 0.566357 0.11126 0.701982 0.358051 0.433643 0.88874 0.298018 ;
+}
+probability ( v_11_9 v_11_8 v_10_9 ) { // 3 variables and 8 values
+	table 0.604883 0.923963 0.256703 0.696651 0.395117 0.0760372 0.743297 0.303349 ;
+}
+probability ( v_11_10 v_11_9 v_10_10 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_11_11 v_11_10 v_10_11 ) { // 3 variables and 8 values
+	table 0.678532 0.107147 0.54851 0.674214 0.321468 0.892853 0.45149 0.325786 ;
+}
+probability ( v_11_12 v_11_11 v_10_12 ) { // 3 variables and 8 values
+	table 1 0 1 0 0 1 0 1 ;
+}
+probability ( v_11_13 v_11_12 v_10_13 ) { // 3 variables and 8 values
+	table 0 1 0 1 1 0 1 0 ;
+}
+probability ( v_11_14 v_11_13 v_10_14 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_12_1 v_11_1 ) { // 2 variables and 4 values
+	table 0 1 1 0 ;
+}
+probability ( v_12_2 v_12_1 v_11_2 ) { // 3 variables and 8 values
+	table 0.134676 0.00876452 0.411558 0.492523 0.865324 0.991235 0.588442 0.507477 ;
+}
+probability ( v_12_3 v_12_2 v_11_3 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_12_4 v_12_3 v_11_4 ) { // 3 variables and 8 values
+	table 0 1 0 1 1 0 1 0 ;
+}
+probability ( v_12_5 v_12_4 v_11_5 ) { // 3 variables and 8 values
+	table 0 0 0 1 1 1 1 0 ;
+}
+probability ( v_12_6 v_12_5 v_11_6 ) { // 3 variables and 8 values
+	table 0.174569 0.376677 0.783697 0.545874 0.825431 0.623323 0.216303 0.454126 ;
+}
+probability ( v_12_7 v_12_6 v_11_7 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_12_8 v_12_7 v_11_8 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_12_9 v_12_8 v_11_9 ) { // 3 variables and 8 values
+	table 0.951052 0.750984 0.389914 0.029804 0.0489478 0.249016 0.610086 0.970196 ;
+}
+probability ( v_12_10 v_12_9 v_11_10 ) { // 3 variables and 8 values
+	table 1 1 1 0 0 0 0 1 ;
+}
+probability ( v_12_11 v_12_10 v_11_11 ) { // 3 variables and 8 values
+	table 0.35936 0.265478 0.722494 0.710155 0.64064 0.734522 0.277506 0.289845 ;
+}
+probability ( v_12_12 v_12_11 v_11_12 ) { // 3 variables and 8 values
+	table 1 0 1 0 0 1 0 1 ;
+}
+probability ( v_12_13 v_12_12 v_11_13 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_12_14 v_12_13 v_11_14 ) { // 3 variables and 8 values
+	table 0 1 1 0 1 0 0 1 ;
+}
+probability ( v_13_1 v_12_1 ) { // 2 variables and 4 values
+	table 0.047014 0.711085 0.952986 0.288915 ;
+}
+probability ( v_13_2 v_13_1 v_12_2 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_13_3 v_13_2 v_12_3 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_13_4 v_13_3 v_12_4 ) { // 3 variables and 8 values
+	table 1 1 0 0 0 0 1 1 ;
+}
+probability ( v_13_5 v_13_4 v_12_5 ) { // 3 variables and 8 values
+	table 0.393978 0.168372 0.973127 0.652496 0.606022 0.831628 0.0268725 0.347504 ;
+}
+probability ( v_13_6 v_13_5 v_12_6 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_13_7 v_13_6 v_12_7 ) { // 3 variables and 8 values
+	table 0.829002 0.343453 0.710361 0.540088 0.170998 0.656547 0.289639 0.459912 ;
+}
+probability ( v_13_8 v_13_7 v_12_8 ) { // 3 variables and 8 values
+	table 0.147289 0.280977 0.955216 0.830611 0.852711 0.719023 0.0447838 0.169389 ;
+}
+probability ( v_13_9 v_13_8 v_12_9 ) { // 3 variables and 8 values
+	table 0.309724 0.810629 0.784811 0.0235912 0.690276 0.189371 0.215189 0.976409 ;
+}
+probability ( v_13_10 v_13_9 v_12_10 ) { // 3 variables and 8 values
+	table 0 1 0 1 1 0 1 0 ;
+}
+probability ( v_13_11 v_13_10 v_12_11 ) { // 3 variables and 8 values
+	table 0.877992 0.506992 0.931597 0.530488 0.122008 0.493008 0.0684031 0.469512 ;
+}
+probability ( v_13_12 v_13_11 v_12_12 ) { // 3 variables and 8 values
+	table 0.85246 0.944644 0.85875 0.921429 0.14754 0.0553558 0.14125 0.0785706 ;
+}
+probability ( v_13_13 v_13_12 v_12_13 ) { // 3 variables and 8 values
+	table 0.522097 0.750432 0.101731 0.232458 0.477903 0.249568 0.898269 0.767542 ;
+}
+probability ( v_13_14 v_13_13 v_12_14 ) { // 3 variables and 8 values
+	table 0 0 1 1 1 1 0 0 ;
+}
+probability ( v_14_1 v_13_1 ) { // 2 variables and 4 values
+	table 1 0 0 1 ;
+}
+probability ( v_14_2 v_14_1 v_13_2 ) { // 3 variables and 8 values
+	table 0.0209874 0.0352405 0.0145173 0.0771125 0.979013 0.96476 0.985483 0.922888 ;
+}
+probability ( v_14_3 v_14_2 v_13_3 ) { // 3 variables and 8 values
+	table 0.462132 0.561126 0.987045 0.420601 0.537868 0.438874 0.0129553 0.579399 ;
+}
+probability ( v_14_4 v_14_3 v_13_4 ) { // 3 variables and 8 values
+	table 0 1 0 0 1 0 1 1 ;
+}
+probability ( v_14_5 v_14_4 v_13_5 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_14_6 v_14_5 v_13_6 ) { // 3 variables and 8 values
+	table 1 0 1 1 0 1 0 0 ;
+}
+probability ( v_14_7 v_14_6 v_13_7 ) { // 3 variables and 8 values
+	table 1 0 1 0 0 1 0 1 ;
+}
+probability ( v_14_8 v_14_7 v_13_8 ) { // 3 variables and 8 values
+	table 1 1 0 1 0 0 1 0 ;
+}
+probability ( v_14_9 v_14_8 v_13_9 ) { // 3 variables and 8 values
+	table 0.649023 0.958508 0.659675 0.0696237 0.350977 0.0414922 0.340325 0.930376 ;
+}
+probability ( v_14_10 v_14_9 v_13_10 ) { // 3 variables and 8 values
+	table 0 0 1 0 1 1 0 1 ;
+}
+probability ( v_14_11 v_14_10 v_13_11 ) { // 3 variables and 8 values
+	table 0.281482 0.204205 0.752567 0.95401 0.718518 0.795795 0.247433 0.0459902 ;
+}
+probability ( v_14_12 v_14_11 v_13_12 ) { // 3 variables and 8 values
+	table 0.629087 0.728269 0.390101 0.796126 0.370913 0.271731 0.609899 0.203874 ;
+}
+probability ( v_14_13 v_14_12 v_13_13 ) { // 3 variables and 8 values
+	table 0 1 1 1 1 0 0 0 ;
+}
+probability ( v_14_14 v_14_13 v_13_14 ) { // 3 variables and 8 values
+	table 0.0985767 0.547832 0.769227 0.495959 0.901423 0.452168 0.230773 0.504041 ;
+}

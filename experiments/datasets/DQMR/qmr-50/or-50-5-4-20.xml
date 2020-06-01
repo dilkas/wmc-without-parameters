@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE batch SYSTEM "file:/homes/gws/sang/bayes/samiam/batchtool15/batchquery.dtd">
+<batch>
+	<query network="/homes/gws/sang/test/BN/toy-qmr/or-qmr/small-50/or-50-5-4.dne">
+		<probability algorithm="recursiveconditioning">
+			<evidence>
+				<id>c_9</id>
+				<state>true</state>
+			</evidence>
+			<evidence>
+				<id>c_42</id>
+				<state>true</state>
+			</evidence>
+			<evidence>
+				<id>c_19</id>
+				<state>true</state>
+			</evidence>
+			<evidence>
+				<id>c_47</id>
+				<state>true</state>
+			</evidence>
+			<evidence>
+				<id>c_14</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>c_21</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>c_18</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_37</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_24</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_15</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_32</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_43</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_2</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_39</id>
+				<state>false</state>
+			</evidence>
+			<evidence>
+				<id>p_45</id>
+				<state>false</state>
+			</evidence>
+		</probability>
+	</query>
+</batch>
+

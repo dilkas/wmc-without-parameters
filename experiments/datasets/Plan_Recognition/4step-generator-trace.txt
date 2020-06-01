@@ -1,0 +1,1333 @@
+c blackbox version 42
+c command line:  ./blackbox -axioms 23 -o domain.pddl -f generator/t2.pddl -printcnf -printmap -printexit
+
+c Loading domain file: domain.pddl
+c Loading fact file: generator/t2.pddl
+c Problem name: t2
+c Facts loaded.
+c time: 1, 30 facts and 8 exclusive pairs.
+c time: 2, 32 facts and 13 exclusive pairs.
+c time: 3, 34 facts and 19 exclusive pairs.
+c time: 4, 37 facts and 31 exclusive pairs.
+c Goals first reachable in 4 steps.
+c 343 nodes created.
+
+c ####################################################
+c goals at time 5:
+c at_package1_loc2-1 c at_package2_loc2-1 
+
+c Converting graph to wff
+a 1 noop_truck_truck2-1-1
+a 2 noop_airport_loc1-1-1
+a 3 noop_at_truck1-1_loc1-1-1
+a 4 fly-airplane_plane1_loc2-1_loc1-1-1
+a 5 load-truck_package1_truck2-1_loc2-2-1
+a 6 noop_airplane_plane1-1
+a 7 noop_truck_truck1-1-1
+a 8 noop_airplane_plane2-1
+a 9 noop_location_loc2-1-1
+a 10 noop_location_loc2-2-1
+a 11 noop_at_package1_loc2-2-1
+a 12 fly-airplane_plane2_loc2-1_loc1-1-1
+a 13 noop_at_plane1_loc2-1-1
+a 14 noop_at_package2_loc1-1-1
+a 15 noop_at_truck2-1_loc2-2-1
+a 16 noop_location_loc1-1-1
+a 17 drive-truck_truck2-1_loc2-2_loc2-1_city2-1
+a 18 noop_in-city_loc2-1_city2-1
+a 19 noop_airport_loc2-1-1
+a 20 load-truck_package2_truck1-1_loc1-1-1
+a 21 noop_in-city_loc2-2_city2-1
+a 22 noop_at_plane2_loc2-1-1
+a 23 noop_city_city2-1
+a 24 noop_obj_package1-1
+a 25 noop_obj_package2-1
+a 26 noop_truck_truck2-1-2
+a 27 noop_airport_loc1-1-2
+a 28 noop_at_plane2_loc1-1-2
+a 29 fly-airplane_plane1_loc1-1_loc2-1-2
+a 30 fly-airplane_plane1_loc2-1_loc1-1-2
+a 31 noop_in_package1_truck2-1-2
+a 32 load-truck_package1_truck2-1_loc2-2-2
+a 33 noop_airplane_plane1-2
+a 34 noop_location_loc2-1-2
+a 35 noop_airplane_plane2-2
+a 36 noop_location_loc2-2-2
+a 37 unload-truck_package1_truck2-1_loc2-2-2
+a 38 noop_at_package1_loc2-2-2
+a 39 fly-airplane_plane2_loc1-1_loc2-1-2
+a 40 fly-airplane_plane2_loc2-1_loc1-1-2
+a 41 noop_at_plane1_loc2-1-2
+a 42 noop_at_package2_loc1-1-2
+a 43 noop_at_truck2-1_loc2-1-2
+a 44 noop_at_truck2-1_loc2-2-2
+a 45 noop_location_loc1-1-2
+a 46 load-airplane_package2_plane2_loc1-1-2
+a 47 drive-truck_truck2-1_loc2-2_loc2-1_city2-2
+a 48 noop_in-city_loc2-1_city2-2
+a 49 noop_airport_loc2-1-2
+a 50 load-airplane_package2_plane1_loc1-1-2
+a 51 noop_at_plane1_loc1-1-2
+a 52 noop_in-city_loc2-2_city2-2
+a 53 drive-truck_truck2-1_loc2-1_loc2-2_city2-2
+a 54 noop_at_plane2_loc2-1-2
+a 55 noop_city_city2-2
+a 56 noop_obj_package1-2
+a 57 noop_obj_package2-2
+a 58 unload-truck_package2_truck1-1_loc1-1-2
+a 59 noop_truck_truck2-1-3
+a 60 fly-airplane_plane1_loc1-1_loc2-1-3
+a 61 noop_in_package1_truck2-1-3
+a 62 load-truck_package1_truck2-1_loc2-2-3
+a 63 noop_airplane_plane1-3
+a 64 noop_airplane_plane2-3
+a 65 noop_location_loc2-1-3
+a 66 unload-truck_package1_truck2-1_loc2-1-3
+a 67 fly-airplane_plane2_loc1-1_loc2-1-3
+a 68 noop_at_plane1_loc2-1-3
+a 69 noop_in_package2_plane1-3
+a 70 noop_in_package2_plane2-3
+a 71 noop_at_truck2-1_loc2-1-3
+a 72 load-airplane_package2_plane2_loc1-1-3
+a 73 drive-truck_truck2-1_loc2-2_loc2-1_city2-3
+a 74 load-airplane_package2_plane1_loc1-1-3
+a 75 noop_at_plane2_loc2-1-3
+a 76 noop_obj_package1-3
+a 77 noop_obj_package2-3
+a 78 unload-airplane_package2_plane2_loc2-1-4
+a 79 unload-airplane_package2_plane1_loc2-1-4
+a 80 unload-truck_package1_truck2-1_loc2-1-4
+a 81 noop_at_package1_loc2-1-4
+a 82 in-city_loc2-1_city2-0
+a 83 in-city_loc2-2_city2-0
+a 84 airplane_plane1-0
+a 85 location_loc2-1-0
+a 86 airplane_plane2-0
+a 87 location_loc2-2-0
+a 88 truck_truck2-1-0
+a 89 airport_loc1-1-0
+a 90 location_loc1-1-0
+a 91 truck_truck1-1-0
+a 92 at_plane2_loc2-1-0
+a 93 at_package1_loc2-2-0
+a 94 at_package2_loc1-1-0
+a 95 at_truck1-1_loc1-1-0
+a 96 obj_package1-0
+a 97 at_truck2-1_loc2-2-0
+a 98 at_plane1_loc2-1-0
+a 99 obj_package2-0
+a 100 city_city2-0
+a 101 airport_loc2-1-0
+a 102 at_plane1_loc1-1-1
+a 103 in_package2_truck1-1-1
+a 104 in-city_loc2-1_city2-1
+a 105 airplane_plane1-1
+a 106 in-city_loc2-2_city2-1
+a 107 airplane_plane2-1
+a 108 location_loc2-1-1
+a 109 truck_truck2-1-1
+a 110 location_loc2-2-1
+a 111 airport_loc1-1-1
+a 112 location_loc1-1-1
+a 113 truck_truck1-1-1
+a 114 in_package1_truck2-1-1
+a 115 at_plane2_loc2-1-1
+a 116 at_package1_loc2-2-1
+a 117 at_package2_loc1-1-1
+a 118 at_truck2-1_loc2-1-1
+a 119 obj_package1-1
+a 120 at_truck1-1_loc1-1-1
+a 121 obj_package2-1
+a 122 at_plane1_loc2-1-1
+a 123 at_truck2-1_loc2-2-1
+a 124 city_city2-1
+a 125 at_plane2_loc1-1-1
+a 126 airport_loc2-1-1
+a 127 at_plane1_loc1-1-2
+a 128 in-city_loc2-1_city2-2
+a 129 in-city_loc2-2_city2-2
+a 130 airplane_plane1-2
+a 131 location_loc2-1-2
+a 132 airplane_plane2-2
+a 133 location_loc2-2-2
+a 134 truck_truck2-1-2
+a 135 airport_loc1-1-2
+a 136 location_loc1-1-2
+a 137 in_package1_truck2-1-2
+a 138 at_plane2_loc2-1-2
+a 139 at_package1_loc2-2-2
+a 140 in_package2_plane1-2
+a 141 at_package2_loc1-1-2
+a 142 in_package2_plane2-2
+a 143 obj_package1-2
+a 144 at_truck2-1_loc2-1-2
+a 145 at_truck2-1_loc2-2-2
+a 146 at_plane1_loc2-1-2
+a 147 obj_package2-2
+a 148 city_city2-2
+a 149 at_plane2_loc1-1-2
+a 150 airport_loc2-1-2
+a 151 airplane_plane1-3
+a 152 airplane_plane2-3
+a 153 location_loc2-1-3
+a 154 truck_truck2-1-3
+a 155 in_package1_truck2-1-3
+a 156 at_plane2_loc2-1-3
+a 157 at_package1_loc2-1-3
+a 158 in_package2_plane1-3
+a 159 in_package2_plane2-3
+a 160 at_truck2-1_loc2-1-3
+a 161 obj_package1-3
+a 162 obj_package2-3
+a 163 at_plane1_loc2-1-3
+a 164 at_package2_loc2-1-4
+a 165 at_package1_loc2-1-4
+c number of action variables = 81
+c number of fluent variables = 84
+c total number variables = 165
+c number clauses = 418
+c added nodes: 114
+node 1 : name = noop_truck_truck2-1-1, type = 0
+no parents
+node 2 : name = noop_airport_loc1-1-1, type = 0
+no parents
+node 3 : name = noop_at_truck1-1_loc1-1-1, type = 0
+no parents
+node 4 : name = fly-airplane_plane1_loc2-1_loc1-1-1, type = 0
+no parents
+node 5 : name = load-truck_package1_truck2-1_loc2-2-1, type = 0
+no parents
+node 6 : name = noop_airplane_plane1-1, type = 0
+no parents
+node 7 : name = noop_truck_truck1-1-1, type = 0
+no parents
+node 8 : name = noop_airplane_plane2-1, type = 0
+no parents
+node 9 : name = noop_location_loc2-1-1, type = 0
+no parents
+node 10 : name = noop_location_loc2-2-1, type = 0
+no parents
+node 11 : name = noop_at_package1_loc2-2-1, type = 0
+no parents
+node 12 : name = fly-airplane_plane2_loc2-1_loc1-1-1, type = 0
+no parents
+node 13 : name = noop_at_plane1_loc2-1-1, type = 0
+no parents
+node 14 : name = noop_at_package2_loc1-1-1, type = 0
+no parents
+node 15 : name = noop_at_truck2-1_loc2-2-1, type = 0
+no parents
+node 16 : name = noop_location_loc1-1-1, type = 0
+no parents
+node 17 : name = drive-truck_truck2-1_loc2-2_loc2-1_city2-1, type = 0
+no parents
+node 18 : name = noop_in-city_loc2-1_city2-1, type = 0
+no parents
+node 19 : name = noop_airport_loc2-1-1, type = 0
+no parents
+node 20 : name = load-truck_package2_truck1-1_loc1-1-1, type = 0
+no parents
+node 21 : name = noop_in-city_loc2-2_city2-1, type = 0
+no parents
+node 22 : name = noop_at_plane2_loc2-1-1, type = 0
+no parents
+node 23 : name = noop_city_city2-1, type = 0
+no parents
+node 24 : name = noop_obj_package1-1, type = 0
+no parents
+node 25 : name = noop_obj_package2-1, type = 0
+no parents
+node 26 : name = noop_truck_truck2-1-2, type = 0
+no parents
+node 27 : name = noop_airport_loc1-1-2, type = 0
+no parents
+node 28 : name = noop_at_plane2_loc1-1-2, type = 0
+no parents
+node 29 : name = fly-airplane_plane1_loc1-1_loc2-1-2, type = 0
+no parents
+node 30 : name = fly-airplane_plane1_loc2-1_loc1-1-2, type = 0
+no parents
+node 31 : name = noop_in_package1_truck2-1-2, type = 0
+no parents
+node 32 : name = load-truck_package1_truck2-1_loc2-2-2, type = 0
+no parents
+node 33 : name = noop_airplane_plane1-2, type = 0
+no parents
+node 34 : name = noop_location_loc2-1-2, type = 0
+no parents
+node 35 : name = noop_airplane_plane2-2, type = 0
+no parents
+node 36 : name = noop_location_loc2-2-2, type = 0
+no parents
+node 37 : name = unload-truck_package1_truck2-1_loc2-2-2, type = 0
+no parents
+node 38 : name = noop_at_package1_loc2-2-2, type = 0
+no parents
+node 39 : name = fly-airplane_plane2_loc1-1_loc2-1-2, type = 0
+no parents
+node 40 : name = fly-airplane_plane2_loc2-1_loc1-1-2, type = 0
+no parents
+node 41 : name = noop_at_plane1_loc2-1-2, type = 0
+no parents
+node 42 : name = noop_at_package2_loc1-1-2, type = 0
+no parents
+node 43 : name = noop_at_truck2-1_loc2-1-2, type = 0
+no parents
+node 44 : name = noop_at_truck2-1_loc2-2-2, type = 0
+no parents
+node 45 : name = noop_location_loc1-1-2, type = 0
+no parents
+node 46 : name = load-airplane_package2_plane2_loc1-1-2, type = 0
+no parents
+node 47 : name = drive-truck_truck2-1_loc2-2_loc2-1_city2-2, type = 0
+no parents
+node 48 : name = noop_in-city_loc2-1_city2-2, type = 0
+no parents
+node 49 : name = noop_airport_loc2-1-2, type = 0
+no parents
+node 50 : name = load-airplane_package2_plane1_loc1-1-2, type = 0
+no parents
+node 51 : name = noop_at_plane1_loc1-1-2, type = 0
+no parents
+node 52 : name = noop_in-city_loc2-2_city2-2, type = 0
+no parents
+node 53 : name = drive-truck_truck2-1_loc2-1_loc2-2_city2-2, type = 0
+no parents
+node 54 : name = noop_at_plane2_loc2-1-2, type = 0
+no parents
+node 55 : name = noop_city_city2-2, type = 0
+no parents
+node 56 : name = noop_obj_package1-2, type = 0
+no parents
+node 57 : name = noop_obj_package2-2, type = 0
+no parents
+node 58 : name = unload-truck_package2_truck1-1_loc1-1-2, type = 0
+no parents
+node 59 : name = noop_truck_truck2-1-3, type = 0
+no parents
+node 60 : name = fly-airplane_plane1_loc1-1_loc2-1-3, type = 0
+no parents
+node 61 : name = noop_in_package1_truck2-1-3, type = 0
+no parents
+node 62 : name = load-truck_package1_truck2-1_loc2-2-3, type = 0
+no parents
+node 63 : name = noop_airplane_plane1-3, type = 0
+no parents
+node 64 : name = noop_airplane_plane2-3, type = 0
+no parents
+node 65 : name = noop_location_loc2-1-3, type = 0
+no parents
+node 66 : name = unload-truck_package1_truck2-1_loc2-1-3, type = 0
+no parents
+node 67 : name = fly-airplane_plane2_loc1-1_loc2-1-3, type = 0
+no parents
+node 68 : name = noop_at_plane1_loc2-1-3, type = 0
+no parents
+node 69 : name = noop_in_package2_plane1-3, type = 0
+no parents
+node 70 : name = noop_in_package2_plane2-3, type = 0
+no parents
+node 71 : name = noop_at_truck2-1_loc2-1-3, type = 0
+no parents
+node 72 : name = load-airplane_package2_plane2_loc1-1-3, type = 0
+no parents
+node 73 : name = drive-truck_truck2-1_loc2-2_loc2-1_city2-3, type = 0
+no parents
+node 74 : name = load-airplane_package2_plane1_loc1-1-3, type = 0
+no parents
+node 75 : name = noop_at_plane2_loc2-1-3, type = 0
+no parents
+node 76 : name = noop_obj_package1-3, type = 0
+no parents
+node 77 : name = noop_obj_package2-3, type = 0
+no parents
+node 78 : name = unload-airplane_package2_plane2_loc2-1-4, type = 0
+no parents
+node 79 : name = unload-airplane_package2_plane1_loc2-1-4, type = 0
+no parents
+node 80 : name = unload-truck_package1_truck2-1_loc2-1-4, type = 0
+no parents
+node 81 : name = noop_at_package1_loc2-1-4, type = 0
+no parents
+node 82 : name = in-city_loc2-1_city2-0, type = 1
+parents : 17 18 
+node 83 : name = in-city_loc2-2_city2-0, type = 1
+parents : 17 21 
+node 84 : name = airplane_plane1-0, type = 1
+parents : 4 6 
+node 85 : name = location_loc2-1-0, type = 1
+parents : 9 17 
+node 86 : name = airplane_plane2-0, type = 1
+parents : 8 12 
+node 87 : name = location_loc2-2-0, type = 1
+parents : 5 10 17 
+node 88 : name = truck_truck2-1-0, type = 1
+parents : 1 5 17 
+node 89 : name = airport_loc1-1-0, type = 1
+parents : 2 4 12 
+node 90 : name = location_loc1-1-0, type = 1
+parents : 16 20 
+node 91 : name = truck_truck1-1-0, type = 1
+parents : 7 20 
+node 92 : name = at_plane2_loc2-1-0, type = 1
+parents : 12 22 
+node 93 : name = at_package1_loc2-2-0, type = 1
+parents : 5 11 
+node 94 : name = at_package2_loc1-1-0, type = 1
+parents : 14 20 
+node 95 : name = at_truck1-1_loc1-1-0, type = 1
+parents : 3 20 
+node 96 : name = obj_package1-0, type = 1
+parents : 5 24 
+node 97 : name = at_truck2-1_loc2-2-0, type = 1
+parents : 5 15 17 
+node 98 : name = at_plane1_loc2-1-0, type = 1
+parents : 4 13 
+node 99 : name = obj_package2-0, type = 1
+parents : 20 25 
+node 100 : name = city_city2-0, type = 1
+parents : 17 23 
+node 101 : name = airport_loc2-1-0, type = 1
+parents : 4 12 19 
+node 102 : name = at_plane1_loc1-1-1, type = 1
+parents : 29 50 51 
+node 103 : name = in_package2_truck1-1-1, type = 1
+parents : 58 
+node 104 : name = in-city_loc2-1_city2-1, type = 1
+parents : 47 48 53 
+node 105 : name = airplane_plane1-1, type = 1
+parents : 29 30 33 50 
+node 106 : name = in-city_loc2-2_city2-1, type = 1
+parents : 47 52 53 
+node 107 : name = airplane_plane2-1, type = 1
+parents : 35 39 40 46 
+node 108 : name = location_loc2-1-1, type = 1
+parents : 34 47 53 
+node 109 : name = truck_truck2-1-1, type = 1
+parents : 26 32 37 47 53 
+node 110 : name = location_loc2-2-1, type = 1
+parents : 32 36 37 47 53 
+node 111 : name = airport_loc1-1-1, type = 1
+parents : 27 29 30 39 40 
+node 112 : name = location_loc1-1-1, type = 1
+parents : 45 46 50 58 
+node 113 : name = truck_truck1-1-1, type = 1
+parents : 58 
+node 114 : name = in_package1_truck2-1-1, type = 1
+parents : 31 37 
+node 115 : name = at_plane2_loc2-1-1, type = 1
+parents : 40 54 
+node 116 : name = at_package1_loc2-2-1, type = 1
+parents : 32 38 
+node 117 : name = at_package2_loc1-1-1, type = 1
+parents : 42 46 50 
+node 118 : name = at_truck2-1_loc2-1-1, type = 1
+parents : 43 53 
+node 119 : name = obj_package1-1, type = 1
+parents : 32 37 56 
+node 120 : name = at_truck1-1_loc1-1-1, type = 1
+parents : 58 
+node 121 : name = obj_package2-1, type = 1
+parents : 46 50 57 58 
+node 122 : name = at_plane1_loc2-1-1, type = 1
+parents : 30 41 
+node 123 : name = at_truck2-1_loc2-2-1, type = 1
+parents : 32 37 44 47 
+node 124 : name = city_city2-1, type = 1
+parents : 47 53 55 
+node 125 : name = at_plane2_loc1-1-1, type = 1
+parents : 28 39 46 
+node 126 : name = airport_loc2-1-1, type = 1
+parents : 29 30 39 40 49 
+node 127 : name = at_plane1_loc1-1-2, type = 1
+parents : 60 74 
+node 128 : name = in-city_loc2-1_city2-2, type = 1
+parents : 73 
+node 129 : name = in-city_loc2-2_city2-2, type = 1
+parents : 73 
+node 130 : name = airplane_plane1-2, type = 1
+parents : 60 63 74 
+node 131 : name = location_loc2-1-2, type = 1
+parents : 65 66 73 
+node 132 : name = airplane_plane2-2, type = 1
+parents : 64 67 72 
+node 133 : name = location_loc2-2-2, type = 1
+parents : 62 73 
+node 134 : name = truck_truck2-1-2, type = 1
+parents : 59 62 66 73 
+node 135 : name = airport_loc1-1-2, type = 1
+parents : 60 67 
+node 136 : name = location_loc1-1-2, type = 1
+parents : 72 74 
+node 137 : name = in_package1_truck2-1-2, type = 1
+parents : 61 66 
+node 138 : name = at_plane2_loc2-1-2, type = 1
+parents : 75 
+node 139 : name = at_package1_loc2-2-2, type = 1
+parents : 62 
+node 140 : name = in_package2_plane1-2, type = 1
+parents : 69 
+node 141 : name = at_package2_loc1-1-2, type = 1
+parents : 72 74 
+node 142 : name = in_package2_plane2-2, type = 1
+parents : 70 
+node 143 : name = obj_package1-2, type = 1
+parents : 62 66 76 
+node 144 : name = at_truck2-1_loc2-1-2, type = 1
+parents : 66 71 
+node 145 : name = at_truck2-1_loc2-2-2, type = 1
+parents : 62 73 
+node 146 : name = at_plane1_loc2-1-2, type = 1
+parents : 68 
+node 147 : name = obj_package2-2, type = 1
+parents : 72 74 77 
+node 148 : name = city_city2-2, type = 1
+parents : 73 
+node 149 : name = at_plane2_loc1-1-2, type = 1
+parents : 67 72 
+node 150 : name = airport_loc2-1-2, type = 1
+parents : 60 67 
+node 151 : name = airplane_plane1-3, type = 1
+parents : 79 
+node 152 : name = airplane_plane2-3, type = 1
+parents : 78 
+node 153 : name = location_loc2-1-3, type = 1
+parents : 78 79 80 
+node 154 : name = truck_truck2-1-3, type = 1
+parents : 80 
+node 155 : name = in_package1_truck2-1-3, type = 1
+parents : 80 
+node 156 : name = at_plane2_loc2-1-3, type = 1
+parents : 78 
+node 157 : name = at_package1_loc2-1-3, type = 1
+parents : 81 
+node 158 : name = in_package2_plane1-3, type = 1
+parents : 79 
+node 159 : name = in_package2_plane2-3, type = 1
+parents : 78 
+node 160 : name = at_truck2-1_loc2-1-3, type = 1
+parents : 80 
+node 161 : name = obj_package1-3, type = 1
+parents : 80 
+node 162 : name = obj_package2-3, type = 1
+parents : 78 79 
+node 163 : name = at_plane1_loc2-1-3, type = 1
+parents : 79 
+node 164 : name = at_package2_loc2-1-4, type = 1
+no parents
+node 165 : name = at_package1_loc2-1-4, type = 1
+no parents
+node 166 : name = at_plane1_loc1-1@fly-airplane_plane1_loc2-1_loc1-1-1, type = 3
+parents : 102 4 
+node 167 : name = in_package2_truck1-1@load-truck_package2_truck1-1_loc1-1-1, type = 3
+parents : 103 20 
+node 168 : name = in-city_loc2-1_city2@noop_in-city_loc2-1_city2-1, type = 3
+parents : 104 18 
+node 169 : name = airplane_plane1@noop_airplane_plane1-1, type = 3
+parents : 105 6 
+node 170 : name = in-city_loc2-2_city2@noop_in-city_loc2-2_city2-1, type = 3
+parents : 106 21 
+node 171 : name = airplane_plane2@noop_airplane_plane2-1, type = 3
+parents : 107 8 
+node 172 : name = location_loc2-1@noop_location_loc2-1-1, type = 3
+parents : 108 9 
+node 173 : name = truck_truck2-1@noop_truck_truck2-1-1, type = 3
+parents : 109 1 
+node 174 : name = location_loc2-2@noop_location_loc2-2-1, type = 3
+parents : 110 10 
+node 175 : name = airport_loc1-1@noop_airport_loc1-1-1, type = 3
+parents : 111 2 
+node 176 : name = location_loc1-1@noop_location_loc1-1-1, type = 3
+parents : 112 16 
+node 177 : name = truck_truck1-1@noop_truck_truck1-1-1, type = 3
+parents : 113 7 
+node 178 : name = in_package1_truck2-1@load-truck_package1_truck2-1_loc2-2-1, type = 3
+parents : 114 5 
+node 179 : name = at_plane2_loc2-1@noop_at_plane2_loc2-1-1, type = 3
+parents : 115 22 
+node 180 : name = at_package1_loc2-2@noop_at_package1_loc2-2-1, type = 3
+parents : 116 11 
+node 181 : name = at_package2_loc1-1@noop_at_package2_loc1-1-1, type = 3
+parents : 117 14 
+node 182 : name = at_truck2-1_loc2-1@drive-truck_truck2-1_loc2-2_loc2-1_city2-1, type = 3
+parents : 118 17 
+node 183 : name = obj_package1@noop_obj_package1-1, type = 3
+parents : 119 24 
+node 184 : name = at_truck1-1_loc1-1@noop_at_truck1-1_loc1-1-1, type = 3
+parents : 120 3 
+node 185 : name = obj_package2@noop_obj_package2-1, type = 3
+parents : 121 25 
+node 186 : name = at_plane1_loc2-1@noop_at_plane1_loc2-1-1, type = 3
+parents : 122 13 
+node 187 : name = at_truck2-1_loc2-2@noop_at_truck2-1_loc2-2-1, type = 3
+parents : 123 15 
+node 188 : name = city_city2@noop_city_city2-1, type = 3
+parents : 124 23 
+node 189 : name = at_plane2_loc1-1@fly-airplane_plane2_loc2-1_loc1-1-1, type = 3
+parents : 125 12 
+node 190 : name = airport_loc2-1@noop_airport_loc2-1-1, type = 3
+parents : 126 19 
+node 191 : name = load-truck_package1_truck2-1_loc2-2@drive-truck_truck2-1_loc2-2_loc2-1_city2-1, type = 2
+parents : 5 17 
+node 192 : name = at_plane1_loc1-1@noop_at_plane1_loc1-1@fly-airplane_plane1_loc2-1_loc1-1-2, type = 3
+parents : 127 51 30 
+node 193 : name = in-city_loc2-1_city2@noop_in-city_loc2-1_city2-2, type = 3
+parents : 128 48 
+node 194 : name = in-city_loc2-2_city2@noop_in-city_loc2-2_city2-2, type = 3
+parents : 129 52 
+node 195 : name = airplane_plane1@noop_airplane_plane1-2, type = 3
+parents : 130 33 
+node 196 : name = location_loc2-1@noop_location_loc2-1-2, type = 3
+parents : 131 34 
+node 197 : name = airplane_plane2@noop_airplane_plane2-2, type = 3
+parents : 132 35 
+node 198 : name = location_loc2-2@noop_location_loc2-2-2, type = 3
+parents : 133 36 
+node 199 : name = truck_truck2-1@noop_truck_truck2-1-2, type = 3
+parents : 134 26 
+node 200 : name = airport_loc1-1@noop_airport_loc1-1-2, type = 3
+parents : 135 27 
+node 201 : name = location_loc1-1@noop_location_loc1-1-2, type = 3
+parents : 136 45 
+node 202 : name = in_package1_truck2-1@noop_in_package1_truck2-1@load-truck_package1_truck2-1_loc2-2-2, type = 3
+parents : 137 31 32 
+node 203 : name = at_plane2_loc2-1@noop_at_plane2_loc2-1@fly-airplane_plane2_loc1-1_loc2-1-2, type = 3
+parents : 138 54 39 
+node 204 : name = at_package1_loc2-2@noop_at_package1_loc2-2@unload-truck_package1_truck2-1_loc2-2-2, type = 3
+parents : 139 38 37 
+node 205 : name = in_package2_plane1@load-airplane_package2_plane1_loc1-1-2, type = 3
+parents : 140 50 
+node 206 : name = at_package2_loc1-1@noop_at_package2_loc1-1@unload-truck_package2_truck1-1_loc1-1-2, type = 3
+parents : 141 42 58 
+node 207 : name = in_package2_plane2@load-airplane_package2_plane2_loc1-1-2, type = 3
+parents : 142 46 
+node 208 : name = obj_package1@noop_obj_package1-2, type = 3
+parents : 143 56 
+node 209 : name = at_truck2-1_loc2-1@noop_at_truck2-1_loc2-1@drive-truck_truck2-1_loc2-2_loc2-1_city2-2, type = 3
+parents : 144 43 47 
+node 210 : name = at_truck2-1_loc2-2@noop_at_truck2-1_loc2-2@drive-truck_truck2-1_loc2-1_loc2-2_city2-2, type = 3
+parents : 145 44 53 
+node 211 : name = at_plane1_loc2-1@noop_at_plane1_loc2-1@fly-airplane_plane1_loc1-1_loc2-1-2, type = 3
+parents : 146 41 29 
+node 212 : name = obj_package2@noop_obj_package2-2, type = 3
+parents : 147 57 
+node 213 : name = city_city2@noop_city_city2-2, type = 3
+parents : 148 55 
+node 214 : name = at_plane2_loc1-1@noop_at_plane2_loc1-1@fly-airplane_plane2_loc2-1_loc1-1-2, type = 3
+parents : 149 28 40 
+node 215 : name = airport_loc2-1@noop_airport_loc2-1-2, type = 3
+parents : 150 49 
+node 216 : name = noop_at_plane2_loc1-1@noop_at_plane2_loc2-1-2, type = 2
+parents : 28 54 
+node 217 : name = noop_at_plane2_loc1-1@fly-airplane_plane2_loc2-1_loc1-1-2, type = 2
+parents : 28 40 
+node 218 : name = fly-airplane_plane1_loc1-1_loc2-1@load-airplane_package2_plane1_loc1-1-2, type = 2
+parents : 29 50 
+node 219 : name = fly-airplane_plane1_loc1-1_loc2-1@noop_at_plane1_loc2-1-2, type = 2
+parents : 29 41 
+node 220 : name = fly-airplane_plane1_loc2-1_loc1-1@load-airplane_package2_plane1_loc1-1-2, type = 2
+parents : 30 50 
+node 221 : name = fly-airplane_plane1_loc2-1_loc1-1@noop_at_plane1_loc1-1-2, type = 2
+parents : 30 51 
+node 222 : name = noop_in_package1_truck2-1@drive-truck_truck2-1_loc2-1_loc2-2_city2-2, type = 2
+parents : 31 53 
+node 223 : name = noop_in_package1_truck2-1@load-truck_package1_truck2-1_loc2-2-2, type = 2
+parents : 31 32 
+node 224 : name = noop_in_package1_truck2-1@noop_at_package1_loc2-2-2, type = 2
+parents : 31 38 
+node 225 : name = noop_in_package1_truck2-1@noop_at_truck2-1_loc2-1-2, type = 2
+parents : 31 43 
+node 226 : name = load-truck_package1_truck2-1_loc2-2@drive-truck_truck2-1_loc2-2_loc2-1_city2-2, type = 2
+parents : 32 47 
+node 227 : name = load-truck_package1_truck2-1_loc2-2@drive-truck_truck2-1_loc2-1_loc2-2_city2-2, type = 2
+parents : 32 53 
+node 228 : name = load-truck_package1_truck2-1_loc2-2@noop_at_truck2-1_loc2-1-2, type = 2
+parents : 32 43 
+node 229 : name = unload-truck_package1_truck2-1_loc2-2@drive-truck_truck2-1_loc2-2_loc2-1_city2-2, type = 2
+parents : 37 47 
+node 230 : name = unload-truck_package1_truck2-1_loc2-2@noop_at_package1_loc2-2-2, type = 2
+parents : 37 38 
+node 231 : name = unload-truck_package1_truck2-1_loc2-2@drive-truck_truck2-1_loc2-1_loc2-2_city2-2, type = 2
+parents : 37 53 
+node 232 : name = unload-truck_package1_truck2-1_loc2-2@noop_at_truck2-1_loc2-1-2, type = 2
+parents : 37 43 
+node 233 : name = fly-airplane_plane2_loc1-1_loc2-1@load-airplane_package2_plane2_loc1-1-2, type = 2
+parents : 39 46 
+node 234 : name = fly-airplane_plane2_loc1-1_loc2-1@noop_at_plane2_loc2-1-2, type = 2
+parents : 39 54 
+node 235 : name = fly-airplane_plane2_loc2-1_loc1-1@load-airplane_package2_plane2_loc1-1-2, type = 2
+parents : 40 46 
+node 236 : name = noop_at_plane1_loc2-1@noop_at_plane1_loc1-1-2, type = 2
+parents : 41 51 
+node 237 : name = noop_at_plane1_loc2-1@load-airplane_package2_plane1_loc1-1-2, type = 2
+parents : 41 50 
+node 238 : name = noop_at_package2_loc1-1@unload-truck_package2_truck1-1_loc1-1-2, type = 2
+parents : 42 58 
+node 239 : name = noop_at_truck2-1_loc2-1@drive-truck_truck2-1_loc2-2_loc2-1_city2-2, type = 2
+parents : 43 47 
+node 240 : name = noop_at_truck2-1_loc2-1@noop_at_truck2-1_loc2-2-2, type = 2
+parents : 43 44 
+node 241 : name = noop_at_truck2-1_loc2-2@drive-truck_truck2-1_loc2-1_loc2-2_city2-2, type = 2
+parents : 44 53 
+node 242 : name = load-airplane_package2_plane2_loc1-1@load-airplane_package2_plane1_loc1-1-2, type = 2
+parents : 46 50 
+node 243 : name = load-airplane_package2_plane2_loc1-1@noop_at_plane2_loc2-1-2, type = 2
+parents : 46 54 
+node 244 : name = airplane_plane1@noop_airplane_plane1-3, type = 3
+parents : 151 63 
+node 245 : name = airplane_plane2@noop_airplane_plane2-3, type = 3
+parents : 152 64 
+node 246 : name = location_loc2-1@noop_location_loc2-1-3, type = 3
+parents : 153 65 
+node 247 : name = truck_truck2-1@noop_truck_truck2-1-3, type = 3
+parents : 154 59 
+node 248 : name = in_package1_truck2-1@noop_in_package1_truck2-1@load-truck_package1_truck2-1_loc2-2-3, type = 3
+parents : 155 61 62 
+node 249 : name = at_plane2_loc2-1@noop_at_plane2_loc2-1@fly-airplane_plane2_loc1-1_loc2-1-3, type = 3
+parents : 156 75 67 
+node 250 : name = at_package1_loc2-1@unload-truck_package1_truck2-1_loc2-1-3, type = 3
+parents : 157 66 
+node 251 : name = in_package2_plane1@noop_in_package2_plane1@load-airplane_package2_plane1_loc1-1-3, type = 3
+parents : 158 69 74 
+node 252 : name = in_package2_plane2@noop_in_package2_plane2@load-airplane_package2_plane2_loc1-1-3, type = 3
+parents : 159 70 72 
+node 253 : name = at_truck2-1_loc2-1@noop_at_truck2-1_loc2-1@drive-truck_truck2-1_loc2-2_loc2-1_city2-3, type = 3
+parents : 160 71 73 
+node 254 : name = obj_package1@noop_obj_package1-3, type = 3
+parents : 161 76 
+node 255 : name = obj_package2@noop_obj_package2-3, type = 3
+parents : 162 77 
+node 256 : name = at_plane1_loc2-1@noop_at_plane1_loc2-1@fly-airplane_plane1_loc1-1_loc2-1-3, type = 3
+parents : 163 68 60 
+node 257 : name = fly-airplane_plane1_loc1-1_loc2-1@load-airplane_package2_plane1_loc1-1-3, type = 2
+parents : 60 74 
+node 258 : name = fly-airplane_plane1_loc1-1_loc2-1@noop_at_plane1_loc2-1-3, type = 2
+parents : 60 68 
+node 259 : name = noop_in_package1_truck2-1@load-truck_package1_truck2-1_loc2-2-3, type = 2
+parents : 61 62 
+node 260 : name = load-truck_package1_truck2-1_loc2-2@drive-truck_truck2-1_loc2-2_loc2-1_city2-3, type = 2
+parents : 62 73 
+node 261 : name = load-truck_package1_truck2-1_loc2-2@noop_at_truck2-1_loc2-1-3, type = 2
+parents : 62 71 
+node 262 : name = unload-truck_package1_truck2-1_loc2-1@drive-truck_truck2-1_loc2-2_loc2-1_city2-3, type = 2
+parents : 66 73 
+node 263 : name = fly-airplane_plane2_loc1-1_loc2-1@load-airplane_package2_plane2_loc1-1-3, type = 2
+parents : 67 72 
+node 264 : name = fly-airplane_plane2_loc1-1_loc2-1@noop_at_plane2_loc2-1-3, type = 2
+parents : 67 75 
+node 265 : name = noop_at_plane1_loc2-1@load-airplane_package2_plane1_loc1-1-3, type = 2
+parents : 68 74 
+node 266 : name = noop_at_plane1_loc2-1@noop_in_package2_plane1-3, type = 2
+parents : 68 69 
+node 267 : name = noop_in_package2_plane1@load-airplane_package2_plane2_loc1-1-3, type = 2
+parents : 69 72 
+node 268 : name = noop_in_package2_plane1@load-airplane_package2_plane1_loc1-1-3, type = 2
+parents : 69 74 
+node 269 : name = noop_in_package2_plane1@noop_in_package2_plane2-3, type = 2
+parents : 69 70 
+node 270 : name = noop_in_package2_plane2@noop_at_plane2_loc2-1-3, type = 2
+parents : 70 75 
+node 271 : name = noop_in_package2_plane2@load-airplane_package2_plane1_loc1-1-3, type = 2
+parents : 70 74 
+node 272 : name = noop_in_package2_plane2@load-airplane_package2_plane2_loc1-1-3, type = 2
+parents : 70 72 
+node 273 : name = noop_at_truck2-1_loc2-1@drive-truck_truck2-1_loc2-2_loc2-1_city2-3, type = 2
+parents : 71 73 
+node 274 : name = load-airplane_package2_plane2_loc1-1@load-airplane_package2_plane1_loc1-1-3, type = 2
+parents : 72 74 
+node 275 : name = load-airplane_package2_plane2_loc1-1@noop_at_plane2_loc2-1-3, type = 2
+parents : 72 75 
+node 276 : name = at_package2_loc2-1@unload-airplane_package2_plane1_loc2-1@unload-airplane_package2_plane2_loc2-1-4, type = 3
+parents : 164 79 78 
+node 277 : name = at_package1_loc2-1@noop_at_package1_loc2-1@unload-truck_package1_truck2-1_loc2-1-4, type = 3
+parents : 165 81 80 
+node 278 : name = unload-airplane_package2_plane2_loc2-1@unload-airplane_package2_plane1_loc2-1-4, type = 2
+parents : 78 79 
+node 279 : name = unload-truck_package1_truck2-1_loc2-1@noop_at_package1_loc2-1-4, type = 2
+parents : 80 81 
+c network Planning Problems
+c 165 BN nodes, expanded to 165 nodes, and 0 added nodes
+p cnf 165 418
+w 1 0.5
+w 2 0.5
+w 3 0.5
+w 4 0.5
+w 5 0.5
+w 6 0.5
+w 7 0.5
+w 8 0.5
+w 9 0.5
+w 10 0.5
+w 11 0.5
+w 12 0.5
+w 13 0.5
+w 14 0.5
+w 15 0.5
+w 16 0.5
+w 17 0.5
+w 18 0.5
+w 19 0.5
+w 20 0.5
+w 21 0.5
+w 22 0.5
+w 23 0.5
+w 24 0.5
+w 25 0.5
+w 26 0.5
+w 27 0.5
+w 28 0.5
+w 29 0.5
+w 30 0.5
+w 31 0.5
+w 32 0.5
+w 33 0.5
+w 34 0.5
+w 35 0.5
+w 36 0.5
+w 37 0.5
+w 38 0.5
+w 39 0.5
+w 40 0.5
+w 41 0.5
+w 42 0.5
+w 43 0.5
+w 44 0.5
+w 45 0.5
+w 46 0.5
+w 47 0.5
+w 48 0.5
+w 49 0.5
+w 50 0.5
+w 51 0.5
+w 52 0.5
+w 53 0.5
+w 54 0.5
+w 55 0.5
+w 56 0.5
+w 57 0.5
+w 58 0.5
+w 59 0.5
+w 60 0.5
+w 61 0.5
+w 62 0.5
+w 63 0.5
+w 64 0.5
+w 65 0.5
+w 66 0.5
+w 67 0.5
+w 68 0.5
+w 69 0.5
+w 70 0.5
+w 71 0.5
+w 72 0.5
+w 73 0.5
+w 74 0.5
+w 75 0.5
+w 76 0.5
+w 77 0.5
+w 78 0.5
+w 79 0.5
+w 80 0.5
+w 81 0.5
+w 82 0.5
+w 83 0.5
+w 84 0.5
+w 85 0.5
+w 86 0.5
+w 87 0.5
+w 88 0.5
+w 89 0.5
+w 90 0.5
+w 91 0.5
+w 92 0.5
+w 93 0.5
+w 94 0.5
+w 95 0.5
+w 96 0.5
+w 97 0.5
+w 98 0.5
+w 99 0.5
+w 100 0.5
+w 101 0.5
+w 102 0.5
+w 103 0.5
+w 104 0.5
+w 105 0.5
+w 106 0.5
+w 107 0.5
+w 108 0.5
+w 109 0.5
+w 110 0.5
+w 111 0.5
+w 112 0.5
+w 113 0.5
+w 114 0.5
+w 115 0.5
+w 116 0.5
+w 117 0.5
+w 118 0.5
+w 119 0.5
+w 120 0.5
+w 121 0.5
+w 122 0.5
+w 123 0.5
+w 124 0.5
+w 125 0.5
+w 126 0.5
+w 127 0.5
+w 128 0.5
+w 129 0.5
+w 130 0.5
+w 131 0.5
+w 132 0.5
+w 133 0.5
+w 134 0.5
+w 135 0.5
+w 136 0.5
+w 137 0.5
+w 138 0.5
+w 139 0.5
+w 140 0.5
+w 141 0.5
+w 142 0.5
+w 143 0.5
+w 144 0.5
+w 145 0.5
+w 146 0.5
+w 147 0.5
+w 148 0.5
+w 149 0.5
+w 150 0.5
+w 151 0.5
+w 152 0.5
+w 153 0.5
+w 154 0.5
+w 155 0.5
+w 156 0.5
+w 157 0.5
+w 158 0.5
+w 159 0.5
+w 160 0.5
+w 161 0.5
+w 162 0.5
+w 163 0.5
+w 164 0.5
+w 165 0.5
+-1 88 0 
+-2 89 0 
+-3 95 0 
+-4 98 0 
+-4 89 0 
+-4 101 0 
+-4 84 0 
+-5 93 0 
+-5 97 0 
+-5 87 0 
+-5 88 0 
+-5 96 0 
+-6 84 0 
+-7 91 0 
+-8 86 0 
+-9 85 0 
+-10 87 0 
+-11 93 0 
+-12 92 0 
+-12 89 0 
+-12 101 0 
+-12 86 0 
+-13 98 0 
+-14 94 0 
+-15 97 0 
+-16 90 0 
+-17 82 0 
+-17 83 0 
+-17 97 0 
+-17 100 0 
+-17 85 0 
+-17 87 0 
+-17 88 0 
+-18 82 0 
+-19 101 0 
+-20 94 0 
+-20 95 0 
+-20 90 0 
+-20 91 0 
+-20 99 0 
+-21 83 0 
+-22 92 0 
+-23 100 0 
+-24 96 0 
+-25 99 0 
+-1 109 0 
+-2 111 0 
+-3 120 0 
+-4 102 0 
+-4 -122 0 
+-5 114 0 
+-5 -116 0 
+-6 105 0 
+-7 113 0 
+-8 107 0 
+-9 108 0 
+-10 110 0 
+-11 116 0 
+-12 125 0 
+-12 -115 0 
+-13 122 0 
+-14 117 0 
+-15 123 0 
+-16 112 0 
+-17 118 0 
+-17 -123 0 
+-18 104 0 
+-19 126 0 
+-20 103 0 
+-20 -117 0 
+-21 106 0 
+-22 115 0 
+-23 124 0 
+-24 119 0 
+-25 121 0 
+-26 109 0 
+-27 111 0 
+-28 125 0 
+-29 102 0 
+-29 126 0 
+-29 111 0 
+-29 105 0 
+-30 122 0 
+-30 111 0 
+-30 126 0 
+-30 105 0 
+-31 114 0 
+-32 116 0 
+-32 123 0 
+-32 110 0 
+-32 109 0 
+-32 119 0 
+-33 105 0 
+-34 108 0 
+-35 107 0 
+-36 110 0 
+-37 114 0 
+-37 123 0 
+-37 110 0 
+-37 109 0 
+-37 119 0 
+-38 116 0 
+-39 125 0 
+-39 126 0 
+-39 111 0 
+-39 107 0 
+-40 115 0 
+-40 111 0 
+-40 126 0 
+-40 107 0 
+-41 122 0 
+-42 117 0 
+-43 118 0 
+-44 123 0 
+-45 112 0 
+-46 125 0 
+-46 117 0 
+-46 112 0 
+-46 107 0 
+-46 121 0 
+-47 104 0 
+-47 106 0 
+-47 123 0 
+-47 124 0 
+-47 108 0 
+-47 110 0 
+-47 109 0 
+-48 104 0 
+-49 126 0 
+-50 102 0 
+-50 117 0 
+-50 112 0 
+-50 105 0 
+-50 121 0 
+-51 102 0 
+-52 106 0 
+-53 106 0 
+-53 104 0 
+-53 118 0 
+-53 124 0 
+-53 110 0 
+-53 108 0 
+-53 109 0 
+-54 115 0 
+-55 124 0 
+-56 119 0 
+-57 121 0 
+-58 103 0 
+-58 120 0 
+-58 112 0 
+-58 113 0 
+-58 121 0 
+-26 134 0 
+-27 135 0 
+-28 149 0 
+-29 146 0 
+-29 -127 0 
+-30 127 0 
+-30 -146 0 
+-31 137 0 
+-32 137 0 
+-32 -139 0 
+-33 130 0 
+-34 131 0 
+-35 132 0 
+-36 133 0 
+-37 139 0 
+-37 -137 0 
+-38 139 0 
+-39 138 0 
+-39 -149 0 
+-40 149 0 
+-40 -138 0 
+-41 146 0 
+-42 141 0 
+-43 144 0 
+-44 145 0 
+-45 136 0 
+-46 142 0 
+-46 -141 0 
+-47 144 0 
+-47 -145 0 
+-48 128 0 
+-49 150 0 
+-50 140 0 
+-50 -141 0 
+-51 127 0 
+-52 129 0 
+-53 145 0 
+-53 -144 0 
+-54 138 0 
+-55 148 0 
+-56 143 0 
+-57 147 0 
+-58 141 0 
+-59 134 0 
+-60 127 0 
+-60 150 0 
+-60 135 0 
+-60 130 0 
+-61 137 0 
+-62 139 0 
+-62 145 0 
+-62 133 0 
+-62 134 0 
+-62 143 0 
+-63 130 0 
+-64 132 0 
+-65 131 0 
+-66 137 0 
+-66 144 0 
+-66 131 0 
+-66 134 0 
+-66 143 0 
+-67 149 0 
+-67 150 0 
+-67 135 0 
+-67 132 0 
+-68 146 0 
+-69 140 0 
+-70 142 0 
+-71 144 0 
+-72 149 0 
+-72 141 0 
+-72 136 0 
+-72 132 0 
+-72 147 0 
+-73 128 0 
+-73 129 0 
+-73 145 0 
+-73 148 0 
+-73 131 0 
+-73 133 0 
+-73 134 0 
+-74 127 0 
+-74 141 0 
+-74 136 0 
+-74 130 0 
+-74 147 0 
+-75 138 0 
+-76 143 0 
+-77 147 0 
+-59 154 0 
+-60 163 0 
+-61 155 0 
+-62 155 0 
+-63 151 0 
+-64 152 0 
+-65 153 0 
+-66 157 0 
+-66 -155 0 
+-67 156 0 
+-68 163 0 
+-69 158 0 
+-70 159 0 
+-71 160 0 
+-72 159 0 
+-73 160 0 
+-74 158 0 
+-75 156 0 
+-76 161 0 
+-77 162 0 
+-78 156 0 
+-78 159 0 
+-78 153 0 
+-78 152 0 
+-78 162 0 
+-79 163 0 
+-79 158 0 
+-79 153 0 
+-79 151 0 
+-79 162 0 
+-80 155 0 
+-80 160 0 
+-80 153 0 
+-80 154 0 
+-80 161 0 
+-81 157 0 
+-78 164 0 
+-79 164 0 
+-80 165 0 
+-81 165 0 
+-102 4 0 
+-103 20 0 
+-104 18 0 
+-105 6 0 
+-106 21 0 
+-107 8 0 
+-108 9 0 
+-109 1 0 
+-110 10 0 
+-111 2 0 
+-112 16 0 
+-113 7 0 
+-114 5 0 
+-115 22 0 
+-116 11 0 
+-117 14 0 
+-118 17 0 
+-119 24 0 
+-120 3 0 
+-121 25 0 
+-122 13 0 
+-123 15 0 
+-124 23 0 
+-125 12 0 
+-126 19 0 
+-5 -17 0 
+-127 51 30 0 
+-128 48 0 
+-129 52 0 
+-130 33 0 
+-131 34 0 
+-132 35 0 
+-133 36 0 
+-134 26 0 
+-135 27 0 
+-136 45 0 
+-137 31 32 0 
+-138 54 39 0 
+-139 38 37 0 
+-140 50 0 
+-141 42 58 0 
+-142 46 0 
+-143 56 0 
+-144 43 47 0 
+-145 44 53 0 
+-146 41 29 0 
+-147 57 0 
+-148 55 0 
+-149 28 40 0 
+-150 49 0 
+-28 -54 0 
+-28 -40 0 
+-29 -50 0 
+-29 -41 0 
+-30 -50 0 
+-30 -51 0 
+-31 -53 0 
+-31 -32 0 
+-31 -38 0 
+-31 -43 0 
+-32 -47 0 
+-32 -53 0 
+-32 -43 0 
+-37 -47 0 
+-37 -38 0 
+-37 -53 0 
+-37 -43 0 
+-39 -46 0 
+-39 -54 0 
+-40 -46 0 
+-41 -51 0 
+-41 -50 0 
+-42 -58 0 
+-43 -47 0 
+-43 -44 0 
+-44 -53 0 
+-46 -50 0 
+-46 -54 0 
+-151 63 0 
+-152 64 0 
+-153 65 0 
+-154 59 0 
+-155 61 62 0 
+-156 75 67 0 
+-157 66 0 
+-158 69 74 0 
+-159 70 72 0 
+-160 71 73 0 
+-161 76 0 
+-162 77 0 
+-163 68 60 0 
+-60 -74 0 
+-60 -68 0 
+-61 -62 0 
+-62 -73 0 
+-62 -71 0 
+-66 -73 0 
+-67 -72 0 
+-67 -75 0 
+-68 -74 0 
+-68 -69 0 
+-69 -72 0 
+-69 -74 0 
+-69 -70 0 
+-70 -75 0 
+-70 -74 0 
+-70 -72 0 
+-71 -73 0 
+-72 -74 0 
+-72 -75 0 
+-164 79 78 0 
+-165 81 80 0 
+-78 -79 0 
+-80 -81 0 
+82 0 
+83 0 
+84 0 
+85 0 
+86 0 
+87 0 
+88 0 
+89 0 
+90 0 
+91 0 
+92 0 
+93 0 
+94 0 
+95 0 
+96 0 
+97 0 
+98 0 
+99 0 
+100 0 
+101 0 
+165 0 
+164 0 
