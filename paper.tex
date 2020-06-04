@@ -13,6 +13,7 @@
 \usepackage{tikz}
 \usepackage{xcolor}
 \usepackage[backgroundcolor=lightgray]{todonotes}
+\usepackage{complexity}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -35,6 +36,8 @@
 \DeclareMathOperator{\End}{End}
 
 \usetikzlibrary{cd}
+\usetikzlibrary{bayesnet}
+\usetikzlibrary{calc}
 
 \tikzset{
   Subset/.style={
@@ -816,6 +819,112 @@ variables would suffice.
 \begin{corollary}
   Similarly, coproducts of free BAs are free.
 \end{corollary}
+
+\section{How to represent a Bayesian network}
+
+Let $G = (V, E)$ be a DAG, and let $(X_v)_{v \in V}$ be the discrete random
+variables (RVs). Let $(d_v)_{v \in V}$ denote the numbers of values that each RV
+can take and assume that $d_v$ is a power of two for all $v \in V$.
+\begin{enumerate}
+\item For each $v \in V$, let $A_v$ be a set of $\log_2 d_v$ Boolean variables.
+  (If $d_v$ is not a power of two, we would need to manually forbid each illegal
+  value, e.g., by adding formulas such as $\neg(x_1 \land x_2 \land x_3 \land
+  \neg x_4)$ to the theory. Alternatively, we could set their probability to
+  zero, but the former should be better.)
+\item For $v \in V$:
+  \begin{enumerate}
+  \item If $v$ has no parents, we can directly provide a probability measure on
+    $\mathcal{F}(A_v)$.
+  \item Otherwise, we need a probability measure on
+    \[
+      \mathcal{F} \left( A_v \cup \bigcup_{(u, v) \in E} A_u \right).
+    \]
+    For any element $a_u \land a_v$ in this free Boolean algebra such that $a_v
+    \in A_v \setminus \{ 0, 1 \}$, and $a_u \not\in A_v$, we can set
+    \[
+      m(a_u \land a_v) = \Pr(a_v \mid a_u)\Pr(a_u).
+    \]
+  \end{enumerate}
+\item When a \#\SAT{} algorithm asks for the weight of a model $\bigwedge_{v \in
+    V} l_v$, split it into segments that correspond to each leaf, take the
+  probabilities from each such node, and multiply them. NB: The segments will
+  intersect, e.g., with
+  \[
+    \begin{tikzpicture}
+      \node[latent] (C) {$C$};
+      \node[latent, below left = of C] (A) {$A$};
+      \node[latent, below right = of C] (B) {$B$};
+      \node[latent, right = 2 of C] (D) {$D$};
+      \edge {C} {A, B};
+    \end{tikzpicture}
+  \]
+  $a \land b \land c \land d$ will be split into $(a \land c) \land (b \land c)
+  \land d$.
+\end{enumerate}
+
+\subsection{Bayesian networks as Boolean algebras}
+
+\begin{table}
+  \caption{Examples of how Bayesian networks encode as Boolean algebras. Here,
+    $A$ denotes $\mathcal{F}\{a\}$ and $AB$ denotes $\mathcal{F}\{a, b\}$.}
+  \centering
+  \begin{tabular}{cc}
+    \toprule
+    Bayesian network & Boolean algebra \\
+    \midrule \\[-1.3em]
+    \begin{tikzpicture}[baseline={(A.base)}]
+      \node[latent] (A) {$A$};
+    \end{tikzpicture} & $A$ \\
+    \midrule \\[-1.3em]
+    \begin{tikzpicture}[baseline={(A.base)}]
+      \node[latent] (A) {$A$};
+      \node[latent,right =of A] (B) {$B$};
+    \end{tikzpicture} & $A + B$ \\
+    \midrule \\[-1.3em]
+    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
+      \node[latent] (A) {$A$};
+      \node[latent,below =of A] (B) {$B$};
+      \edge {A} {B};
+    \end{tikzpicture} & $AB$ \\
+    \midrule \\[-1.3em]
+    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
+      \node[latent] (A) {$A$};
+      \node[latent,below =of A] (B) {$B$};
+      \node[latent,right =of A] (C) {$C$};
+      \edge {A} {B};
+    \end{tikzpicture} & $B +_A C$ \\
+    \midrule \\[-1.3em]
+    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
+      \node[latent] (A) {$A$};
+      \node[latent,below =of A] (B) {$B$};
+      \node[latent,right =of A] (C) {$C$};
+      \node[latent,below =of C] (D) {$D$};
+      \edge {A} {B};
+      \edge {C} {D};
+    \end{tikzpicture} & $B +_{A+C} D$ \\
+    \midrule \\[-1.3em]
+    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
+      \node[latent] (A) {$A$};
+      \node[latent,below left =of A] (B) {$B$};
+      \node[latent,below right=of A] (C) {$C$};
+      \node[latent,right = 2 of A] (D) {$D$};
+      \node[latent,below =of D] (E) {$E$};
+      \edge {A} {B,C};
+      \edge {D} {E};
+    \end{tikzpicture} & $B +_{A+D} C +_{A+D} E$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+To turn a Bayesian network into a Boolean algebra, run $f(\{ v \in V \mid
+\mathrm{outdeg}(v) = 0 \})$, where $f$ works as follows on an arbitrary $A
+\subseteq V$:
+\begin{enumerate}
+\item $S \gets \{ u \mid (u, v) \in E\text{, } v \in A \}$ (i.e., $S$ is the set
+  of parents of the elements in $A$).
+\item If $S = \emptyset$, return $\sum A$ (a coproduct).
+\item Otherwise, return $\sum_{f(S)} A$ (a pushout).
+\end{enumerate}
 
 \bibliographystyle{plain}
 \bibliography{paper}
