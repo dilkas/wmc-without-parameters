@@ -41,12 +41,13 @@ protected:
   VectorT<int_t> getMcsVarOrdering() const;
 
 public:
+  Cudd mgr;
   VectorT<int_t> getVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool inverse) const;
   int_t getDeclaredVarCount() const;
   MapT<int_t, double> getLiteralWeights() const;
   const VectorT<VectorT<int_t>> &getCnf() const;
   void printLiteralWeights() const;
   void printCnf() const;
-  Formula(const std::string &filePath, WeightFormat weightFormat);
+  Formula(const std::string &filePath, WeightFormat weightFormat, Cudd mgr);
   Formula(const VectorT<VectorT<int_t>> &clauses);
 };

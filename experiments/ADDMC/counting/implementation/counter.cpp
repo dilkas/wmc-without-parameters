@@ -88,7 +88,7 @@ void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_
 }
 
 double Counter::count(const std::string &filePath, WeightFormat weightFormat) {
-  Formula formula(filePath, weightFormat);
+  Formula formula(filePath, weightFormat, mgr);
   return count(formula);
 }
 
@@ -131,7 +131,8 @@ double MonolithicCounter::count(const Formula &formula) {
   return modelCount;
 }
 
-MonolithicCounter::MonolithicCounter(VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+MonolithicCounter::MonolithicCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->addVarOrderingHeuristic = addVarOrderingHeuristic;
   this->inverseAddVarOrdering = inverseAddVarOrdering;
 }
@@ -178,7 +179,8 @@ double LinearCounter::count(const Formula &formula) {
   return modelCount;
 }
 
-LinearCounter::LinearCounter(VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+LinearCounter::LinearCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->addVarOrderingHeuristic = addVarOrderingHeuristic;
   this->inverseAddVarOrdering = inverseAddVarOrdering;
 }
@@ -426,7 +428,8 @@ double BucketCounter::count(const Formula &formula) {
   return clusterTree ? NonlinearCounter::countWithTree(formula, minRank) : NonlinearCounter::countWithList(formula, minRank);
 }
 
-BucketCounter::BucketCounter(bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+BucketCounter::BucketCounter(Cudd mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->clusterTree = clusterTree;
   this->formulaVarOrderingHeuristic = formulaVarOrderingHeuristic;
   this->inverseFormulaVarOrdering = inverseFormulaVarOrdering;
@@ -442,7 +445,8 @@ double BouquetCounter::count(const Formula &formula) {
   // return NonlinearCounter::countWithTree(formula); /* #MAVC */
 }
 
-BouquetCounter::BouquetCounter(bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+BouquetCounter::BouquetCounter(Cudd mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->clusterTree = clusterTree;
   this->formulaVarOrderingHeuristic = formulaVarOrderingHeuristic;
   this->inverseFormulaVarOrdering = inverseFormulaVarOrdering;

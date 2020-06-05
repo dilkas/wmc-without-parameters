@@ -56,7 +56,8 @@ bool OptionDict::hasValidFilePath() {
 void testing::test() {
   if (VERBOSITY >= 1) std::cout << "test\n\n";
 
-  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET);
+  Cudd mgr;
+  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, mgr);
   if (VERBOSITY >= 1) {
     std::cout << "DIMACS declared var count: " << formula.getDeclaredVarCount() << "\n";
     util::printCnf(formula.getCnf());
@@ -66,12 +67,12 @@ void testing::test() {
   VarOrderingHeuristic addVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION);
   VarOrderingHeuristic formularVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_FORMULA_VAR_ORDERING_HEURISTIC_OPTION);
 
-  MonolithicCounter monolithicCounter(addVarOrderingHeuristic, false);
-  LinearCounter linearCounter(addVarOrderingHeuristic, false);
-  BucketCounter bucketListCounter(false, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
-  BucketCounter bucketTreeCounter(true, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
-  BouquetCounter bouquetListCounter(false, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
-  BouquetCounter bouquetTreeCounter(true, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
+  MonolithicCounter monolithicCounter(mgr, addVarOrderingHeuristic, false);
+  LinearCounter linearCounter(mgr, addVarOrderingHeuristic, false);
+  BucketCounter bucketListCounter(mgr, false, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
+  BucketCounter bucketTreeCounter(mgr, true, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
+  BouquetCounter bouquetListCounter(mgr, false, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
+  BouquetCounter bouquetTreeCounter(mgr, true, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
 
   int_t m = monolithicCounter.count(formula);
   int_t l = linearCounter.count(formula);
@@ -102,7 +103,8 @@ void testing::test() {
 void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, ClusteringHeuristic clusteringHeuristic, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
   std::cout << "\nReading DIMACS CNF file:\n";
   util::printRow("cnfFilePath", filePath);
-  Formula formula(filePath, weightFormat);
+  Cudd mgr;
+  Formula formula(filePath, weightFormat, mgr);
   if (VERBOSITY >= 1) {
     formula.printLiteralWeights();
     formula.printCnf();
@@ -120,32 +122,32 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   double modelCount;
   switch (clusteringHeuristic) {
     case ClusteringHeuristic::MONOLITHIC: {
-      MonolithicCounter monolithicCounter(addVarOrderingHeuristic, inverseAddVarOrdering);
+      MonolithicCounter monolithicCounter(mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
       modelCount = monolithicCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::LINEAR: {
-      LinearCounter linearCounter(addVarOrderingHeuristic, inverseAddVarOrdering);
+      LinearCounter linearCounter(mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
         modelCount = linearCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BUCKET_LIST: {
-      BucketCounter bucketCounter(false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BucketCounter bucketCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
       modelCount = bucketCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BUCKET_TREE: {
-      BucketCounter bucketCounter(true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BucketCounter bucketCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
       modelCount = bucketCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BOUQUET_LIST: {
-      BouquetCounter bouquetCounter(false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BouquetCounter bouquetCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
       modelCount = bouquetCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BOUQUET_TREE: {
-      BouquetCounter bouquetCounter(true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BouquetCounter bouquetCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
       modelCount = bouquetCounter.count(formula);
       break;
     }

@@ -39,11 +39,12 @@ const std::string CLUSTERING_HEURISTIC_OPTION = "ch";
 const std::string CLUSTER_VAR_ORDER_OPTION = "cv";
 const std::string DIAGRAM_VAR_ORDER_OPTION = "dv";
 
-enum class WeightFormat { UNWEIGHTED, MINIC2D, CACHET };
+enum class WeightFormat { UNWEIGHTED, MINIC2D, CACHET, CONDITIONAL };
 const std::map<int_t, WeightFormat> WEIGHT_FORMAT_OPTIONS = {
   {1, WeightFormat::UNWEIGHTED},
   {2, WeightFormat::MINIC2D},
-  {3, WeightFormat::CACHET} /* buggy -1 weight */
+  {3, WeightFormat::CACHET}, /* buggy -1 weight */
+  {4, WeightFormat::CONDITIONAL}
 };
 const int_t DEFAULT_WEIGHT_FORMAT_OPTION = 2;
 

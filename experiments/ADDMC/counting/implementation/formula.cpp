@@ -201,14 +201,18 @@ void Formula::printCnf() const {
   util::printCnf(cnf);
 }
 
-Formula::Formula(const std::string &filePath, WeightFormat weightFormat) {
+Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd mgr) {
   this->weightFormat = weightFormat;
+  this->mgr = mgr;
 
   int_t declaredClauseCount = DUMMY_MIN_INT;
   int_t processedClauseCount = 0;
 
   int_t lineIndex = 0;
   int_t minic2dWeightLineIndex = lineIndex;
+
+  /* list of pairs of the form ({variables -> values}, ADD (or a number)) */
+  VectorT<std::pair<MapT<int_t, bool>, ADD>> conditionalWeights;
 
   std::ifstream inputFileStream(filePath);
   if (!inputFileStream.is_open()) util::showError("unable to open file " + filePath);
@@ -248,14 +252,26 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat) {
       }
     }
     else if (startWord == CACHET_WEIGHT_WORD) {
-      if (weightFormat != WeightFormat::CACHET)
+      if (weightFormat != WeightFormat::CACHET && weightFormat != WeightFormat::CONDITIONAL)
         util::showError("Cachet weight in non-Cachet-weight-format file -- line " + std::to_string(lineIndex));
 
-      int_t var = std::stoi(words.at(1));
-      if (var <= 0 || var > declaredVarCount)
-        util::showError("var '" + std::to_string(var) + "' is inconsistent with declared var count '" + std::to_string(declaredVarCount) + "' -- line " + std::to_string(lineIndex));
-      double weight = std::stod(words.at(2));
-      literalWeights[var] = weight;
+      if (weightFormat == WeightFormat::CACHET) {
+        int_t var = std::stoi(words.at(1));
+        if (var <= 0 || var > declaredVarCount)
+          util::showError("var '" + std::to_string(var) + "' is inconsistent with declared var count '" + std::to_string(declaredVarCount) + "' -- line " + std::to_string(lineIndex));
+        double weight = std::stod(words.at(2));
+        literalWeights[var] = weight;
+      } else {
+        /* record the values of all conditional variables */
+        MapT<int_t, bool> conditions;
+        for (int_t i = 1; i < wordCount - 1; i++) {
+            int_t var = std::stoi(words.at(i));
+            conditions[std::abs(var)] = (var > 0);
+        }
+        double weight = std::stod(words.back());
+        ADD node = mgr.constant(weight);
+        conditionalWeights.push_back(std::make_pair(conditions, node));
+      }
     }
     else { /* clause line */
       VectorT<int_t> clause;

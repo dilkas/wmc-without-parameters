@@ -49,7 +49,7 @@ protected:
 
 public:
   double count(const Formula &formula);
-  MonolithicCounter(VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
+  MonolithicCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
 };
 
 class FactoredCounter : public Counter {}; /* abstract; builds an ADD for each clause */
@@ -60,7 +60,7 @@ protected:
 
 public:
   double count(const Formula &formula);
-  LinearCounter(VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
+  LinearCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
 };
 
 class NonlinearCounter : public FactoredCounter { /* abstract; puts clauses in clusters */
@@ -88,6 +88,7 @@ class BucketCounter : public NonlinearCounter { /* bucket elimination */
 public:
   double count(const Formula &formula);
   BucketCounter(
+    Cudd mgr,
     bool clusterTree,
     VarOrderingHeuristic formulaVarOrderingHeuristic,
     bool inverseFormulaVarOrdering,
@@ -99,6 +100,7 @@ class BouquetCounter : public NonlinearCounter { /* Bouquet's Method */
 public:
   double count(const Formula &formula);  /* #MAVC */
   BouquetCounter(
+    Cudd mgr,
     bool clusterTree,
     VarOrderingHeuristic formulaVarOrderingHeuristic,
     bool inverseFormulaVarOrdering,

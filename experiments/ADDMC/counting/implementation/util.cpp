@@ -33,6 +33,7 @@ std::string util::getWeightFormatName(WeightFormat weightFormat) {
     case WeightFormat::UNWEIGHTED: return "UNWEIGHTED";
     case WeightFormat::MINIC2D: return "MINIC2D";
     case WeightFormat::CACHET: return "CACHET";
+    case WeightFormat::CONDITIONAL: return "CONDITIONAL";
     default: showError("no such weightFormat"); return DUMMY_STR;
   }
 }
