@@ -57,7 +57,7 @@ void testing::test() {
   if (VERBOSITY >= 1) std::cout << "test\n\n";
 
   Cudd mgr;
-  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, mgr);
+  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, &mgr);
   if (VERBOSITY >= 1) {
     std::cout << "DIMACS declared var count: " << formula.getDeclaredVarCount() << "\n";
     util::printCnf(formula.getCnf());
@@ -104,7 +104,7 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   std::cout << "\nReading DIMACS CNF file:\n";
   util::printRow("cnfFilePath", filePath);
   Cudd mgr;
-  Formula formula(filePath, weightFormat, mgr);
+  Formula formula(filePath, weightFormat, &mgr);
   if (VERBOSITY >= 1) {
     formula.printLiteralWeights();
     formula.printCnf();

@@ -44,7 +44,7 @@ void dd::printMaxAddVarCount(int_t maxAddVarCount) {
 
 void Counter::writeDotFile(ADD &add, std::string dotFileDir) {
   if (VERBOSITY >= 1) {
-    writeDd(mgr, add, dotFileDir + "dd" + std::to_string(dotFileIndex) + ".dot");
+    writeDd(*mgr, add, dotFileDir + "dd" + std::to_string(dotFileIndex) + ".dot");
     dotFileIndex++;
   }
 }
@@ -58,15 +58,15 @@ void Counter::orderAddVars(const Formula &formula) {
   for (int_t addVar = 0; addVar < addVarToFormulaVarMap.size(); addVar++) {
     int_t formulaVar = addVarToFormulaVarMap.at(addVar);
     formulaVarToAddVarMap[formulaVar] = addVar;
-    mgr.addVar(addVar); /* creates addVar-th ADD var */
+    mgr->addVar(addVar); /* creates addVar-th ADD var */
   }
 }
 
 ADD Counter::getClauseAdd(const VectorT<int_t> &clause) {
-  ADD clauseAdd = mgr.addZero();
+  ADD clauseAdd = mgr->addZero();
   for (int_t literal : clause) {
     int_t addVar = formulaVarToAddVarMap.at(util::getFormulaVar(literal));
-    ADD literalAdd = mgr.addVar(addVar);
+    ADD literalAdd = mgr->addVar(addVar);
     if (!util::isPositiveLiteral(literal)) literalAdd = ~literalAdd;
     clauseAdd |= literalAdd;
   }
@@ -75,10 +75,10 @@ ADD Counter::getClauseAdd(const VectorT<int_t> &clause) {
 
 void Counter::abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights) {
   int_t formulaVar = addVarToFormulaVarMap.at(addVar);
-  ADD positiveWeight = mgr.constant(literalWeights.at(formulaVar));
-  ADD negativeWeight = mgr.constant(literalWeights.at(-formulaVar));
+  ADD positiveWeight = mgr->constant(literalWeights.at(formulaVar));
+  ADD negativeWeight = mgr->constant(literalWeights.at(-formulaVar));
 
-  add = positiveWeight * add.Compose(mgr.addOne(), addVar) + negativeWeight * add.Compose(mgr.addZero(), addVar);
+  add = positiveWeight * add.Compose(mgr->addOne(), addVar) + negativeWeight * add.Compose(mgr->addZero(), addVar);
 }
 
 void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights) {
@@ -105,7 +105,7 @@ void MonolithicCounter::setMonolithicClauseAdds(VectorT<ADD> &clauseAdds, const 
 void MonolithicCounter::setCnfAdd(ADD &cnfAdd, const Formula &formula) {
   VectorT<ADD> clauseAdds;
   setMonolithicClauseAdds(clauseAdds, formula);
-  cnfAdd = mgr.addOne();
+  cnfAdd = mgr->addOne();
   for (const ADD &clauseAdd : clauseAdds) {
     cnfAdd &= clauseAdd; /* operator& is operator* in class ADD */
   }
@@ -132,7 +132,7 @@ double MonolithicCounter::count(const Formula &formula) {
 }
 
 MonolithicCounter::MonolithicCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = mgr;
+  this->mgr = &mgr;
   this->addVarOrderingHeuristic = addVarOrderingHeuristic;
   this->inverseAddVarOrdering = inverseAddVarOrdering;
 }
@@ -143,7 +143,7 @@ MonolithicCounter::MonolithicCounter(Cudd mgr, VarOrderingHeuristic addVarOrderi
 
 void LinearCounter::setLinearClauseAdds(VectorT<ADD> &clauseAdds, const Formula &formula) {
   clauseAdds.clear();
-  clauseAdds.push_back(mgr.addOne());
+  clauseAdds.push_back(mgr->addOne());
   for (const VectorT<int_t> &clause : formula.getCnf()) {
     ADD clauseAdd = getClauseAdd(clause);
     clauseAdds.push_back(clauseAdd);
@@ -180,7 +180,7 @@ double LinearCounter::count(const Formula &formula) {
 }
 
 LinearCounter::LinearCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = mgr;
+  this->mgr = &mgr;
   this->addVarOrderingHeuristic = addVarOrderingHeuristic;
   this->inverseAddVarOrdering = inverseAddVarOrdering;
 }
@@ -286,11 +286,11 @@ double NonlinearCounter::countWithList(const Formula &formula, bool minRank) {
   if (VERBOSITY >= 1) printClusters(cnf);
 
   /* builds ADD for CNF: */
-  ADD cnfAdd = mgr.addOne();
+  ADD cnfAdd = mgr->addOne();
   SetT<int_t> projectedFormulaVars;
   for (int_t clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
     /* builds ADD for cluster: */
-    ADD clusterAdd = mgr.addOne();
+    ADD clusterAdd = mgr->addOne();
     const VectorT<int_t> &clauseIndices = clusters.at(clusterIndex);
     for (int_t clauseIndex : clauseIndices) {
       ADD clauseAdd = getClauseAdd(cnf.at(clauseIndex));
@@ -321,14 +321,14 @@ double NonlinearCounter::countWithTree(const Formula &formula, bool minRank) {
   fillProjectingAddVarSets(cnf, formulaVarOrdering, minRank);
 
   /* builds ADD for CNF: */
-  ADD cnfAdd = mgr.addOne();
+  ADD cnfAdd = mgr->addOne();
   SetT<int_t> projectedFormulaVars;
   int_t clusterCount = clusters.size();
   for (int_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++) {
     const VectorT<ADD> &addCluster = addClusters.at(clusterIndex);
     if (!addCluster.empty()) {
       /* builds ADD for cluster: */
-      ADD clusterAdd = mgr.addOne();
+      ADD clusterAdd = mgr->addOne();
       for (const ADD &add : addCluster) clusterAdd *= add;
 
       SetT<int_t> projectingAddVars = projectingAddVarSets.at(clusterIndex);
@@ -429,7 +429,7 @@ double BucketCounter::count(const Formula &formula) {
 }
 
 BucketCounter::BucketCounter(Cudd mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = mgr;
+  this->mgr = &mgr;
   this->clusterTree = clusterTree;
   this->formulaVarOrderingHeuristic = formulaVarOrderingHeuristic;
   this->inverseFormulaVarOrdering = inverseFormulaVarOrdering;
@@ -446,7 +446,7 @@ double BouquetCounter::count(const Formula &formula) {
 }
 
 BouquetCounter::BouquetCounter(Cudd mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = mgr;
+  this-> mgr = &mgr;
   this->clusterTree = clusterTree;
   this->formulaVarOrderingHeuristic = formulaVarOrderingHeuristic;
   this->inverseFormulaVarOrdering = inverseFormulaVarOrdering;

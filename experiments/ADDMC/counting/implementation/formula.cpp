@@ -201,9 +201,8 @@ void Formula::printCnf() const {
   util::printCnf(cnf);
 }
 
-Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd mgr) {
+Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *mgr) {
   this->weightFormat = weightFormat;
-  this->mgr = mgr;
 
   int_t declaredClauseCount = DUMMY_MIN_INT;
   int_t processedClauseCount = 0;
@@ -211,8 +210,8 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd mg
   int_t lineIndex = 0;
   int_t minic2dWeightLineIndex = lineIndex;
 
-  /* list of pairs of the form ({variables -> values}, ADD (or a number)) */
-  VectorT<std::pair<MapT<int_t, bool>, ADD>> conditionalWeights;
+  /* maps each variable to a map from a {variables -> values} assignment to an ADD */
+  std::map<int_t, std::map<std::map<int_t, bool>, ADD>> conditionalWeights;
 
   std::ifstream inputFileStream(filePath);
   if (!inputFileStream.is_open()) util::showError("unable to open file " + filePath);
@@ -263,14 +262,17 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd mg
         literalWeights[var] = weight;
       } else {
         /* record the values of all conditional variables */
-        MapT<int_t, bool> conditions;
+        std::map<int_t, bool> conditions;
+        int_t variable;
         for (int_t i = 1; i < wordCount - 1; i++) {
             int_t var = std::stoi(words.at(i));
             conditions[std::abs(var)] = (var > 0);
+            if (i == 1)
+              variable = var;
         }
         double weight = std::stod(words.back());
-        ADD node = mgr.constant(weight);
-        conditionalWeights.push_back(std::make_pair(conditions, node));
+        ADD node = mgr->constant(weight);
+        conditionalWeights[abs(variable)][conditions] = node;
       }
     }
     else { /* clause line */
@@ -322,6 +324,44 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd mg
 
       literalWeights[var] = varWeight;
       literalWeights[-var] = negativeLiteralWeight;
+    }
+  }
+
+  if (weightFormat == WeightFormat::CONDITIONAL) { /* compiles weights */
+    for (int_t mainVariable = 1; mainVariable <= declaredVarCount; mainVariable++) {
+      while (conditionalWeights[mainVariable].size() > 1) {
+        /* to be replaced with the MCS heuristic */
+        auto varValPair = conditionalWeights[mainVariable].begin()->first.begin();
+        int_t variable = varValPair->first;
+        bool value = varValPair->second;
+        std::map<std::map<int_t, bool>, ADD> combinedWeights;
+        while (conditionalWeights[mainVariable].size() > 0) {
+          auto originalPair = conditionalWeights[mainVariable].begin();
+          auto dualConditions = originalPair->first;
+          dualConditions[variable] = !dualConditions[variable];
+          auto dual = conditionalWeights[mainVariable].find(dualConditions);
+          ADD variableADD = mgr->addVar(variable);
+          ADD newDiagram;
+          if (dual != conditionalWeights[mainVariable].end()) {
+            if (value) {
+              newDiagram = originalPair->second * variableADD.Compose(mgr->addOne(), variable) +
+                           dual->second * variableADD.Compose(mgr->addZero(), variable);
+            } else {
+              newDiagram = dual->second * variableADD.Compose(mgr->addOne(), variable) +
+                           originalPair->second * variableADD.Compose(mgr->addZero(), variable);
+            }
+            conditionalWeights[mainVariable].erase(dual);
+          } else {
+            newDiagram = originalPair->second * variableADD.Compose((value) ? mgr->addOne() : mgr->addZero(), variable);
+          }
+          auto newAssignment = originalPair->first;
+          newAssignment.erase(variable);
+          combinedWeights[newAssignment] = newDiagram;
+          conditionalWeights[mainVariable].erase(originalPair);
+        }
+        conditionalWeights[mainVariable] = combinedWeights;
+      }
+      weights[mainVariable] = conditionalWeights[mainVariable].begin()->second;
     }
   }
 

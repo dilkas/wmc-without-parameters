@@ -19,7 +19,7 @@ namespace dd {
 class Counter { /* abstract */
 protected:
   int_t dotFileIndex = 1;
-  Cudd mgr;
+  Cudd *mgr;
   VarOrderingHeuristic addVarOrderingHeuristic;
   bool inverseAddVarOrdering;
   MapT<int_t, int_t> formulaVarToAddVarMap; /* e.g. {42: 0, 13: 1} */
