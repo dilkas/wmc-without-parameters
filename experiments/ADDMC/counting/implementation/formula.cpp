@@ -217,14 +217,17 @@ ADD Formula::literalToADD(int_t literal, Cudd *mgr, VarOrderingHeuristic varOrde
     return mgr->addVar(index);
 }
 
-ADD Formula::constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words,
+ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string> words,
                                    double weight, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
+  ADD negative = ~positive;
   for (int_t i = 2; i < words.size() - 1; i++) {
     int_t var = std::stoi(words.at(i));
     ADD varADD = literalToADD(var, mgr, varOrderingHeuristic, inverse);
-    cpt &= (var > 0) ? varADD : ~varADD;
+    ADD newVariable = (var > 0) ? varADD : ~varADD;
+    positive &= newVariable;
+    negative &= newVariable;
   }
-  return mgr->constant(2 * weight - 1) * cpt + mgr->constant(1 - weight);
+  return (mgr->constant(weight) * positive) + (mgr->constant(1 - weight) * negative);
 }
 
 Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
@@ -236,9 +239,6 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
 
   int_t lineIndex = 0;
   int_t minic2dWeightLineIndex = lineIndex;
-
-  /* TODO: remove */
-  int_t dotFileIndex = 0;
 
   std::ifstream inputFileStream(filePath);
   if (!inputFileStream.is_open()) util::showError("unable to open file " + filePath);
@@ -293,11 +293,10 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
         ADD varAdd = literalToADD(var, mgr, varOrderingHeuristic, inverse);
         double weight = std::stod(words.back());
         ADD cpt = constructAddFromWords(mgr, varAdd, words, weight, varOrderingHeuristic, inverse);
-        writeDd(*mgr, cpt, DOT_DIR + "cpt" + std::to_string(dotFileIndex++) + ".dot");
+        /*writeDd(*mgr, cpt, DOT_DIR + "cpt" + std::to_string(++dotFileIndex) + ".dot");*/
         auto previousEntry = weights.find(var);
         if (previousEntry != weights.end()) {
           previousEntry->second |= cpt;
-          writeDd(*mgr, previousEntry->second, DOT_DIR + "merged" + std::to_string(dotFileIndex++) + ".dot");
         } else {
           weights[var] = cpt;
         }

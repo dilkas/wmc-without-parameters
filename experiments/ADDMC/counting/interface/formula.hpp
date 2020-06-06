@@ -57,4 +57,4 @@ public:
   Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *mgr,
           VarOrderingHeuristic varOrderingHeuristic, bool inverse);
   Formula(const VectorT<VectorT<int_t>> &clauses);
-  };
+};

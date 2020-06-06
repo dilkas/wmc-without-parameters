@@ -18,10 +18,10 @@ double dd::countConstAddFloat(const ADD &add) {
   double minValue = getTerminalValue(minTerminal);
   double maxValue = getTerminalValue(maxTerminal);
 
-/*  if (minValue != maxValue) {
+  if (minValue != maxValue) {
     util::showError("ADD is nonconst: min value " + std::to_string(minValue) +
       ", max value " + std::to_string(maxValue));
-  }*/
+  }
 
   return minValue;
 }
@@ -123,12 +123,10 @@ double MonolithicCounter::count(const Formula &formula) {
 
   ADD cnfAdd;
   setCnfAdd(cnfAdd, formula);
-  writeDotFile(cnfAdd);
-
-  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL) {
+  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL)
     for (auto pair : formula.getWeights())
       cnfAdd *= pair.second;
-  }
+  writeDotFile(cnfAdd);
 
   SetT<int_t> support = util::getSupport(cnfAdd);
   for (int_t addVar : support) {
