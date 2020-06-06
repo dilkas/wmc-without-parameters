@@ -3,6 +3,7 @@
 /* includes *******************************************************************/
 
 #include "graph.hpp"
+#include "visual.hpp" /* TODO: remove */
 
 /* constants ******************************************************************/
 
@@ -31,6 +32,7 @@ protected:
   VectorT<VectorT<int_t>> cnf;
   VectorT<int_t> apparentVars; /* vars appearing in cnf, ordered by 1st appearance */
 
+  ADD constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words, double weight);
   void updateApparentVars(int_t literal); /* adds var to apparentVars */
   void addClause(const VectorT<int_t> &clause); /* writes: cnf, apparentVars */
   Graph getGaifmanGraph() const;

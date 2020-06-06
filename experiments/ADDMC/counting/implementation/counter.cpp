@@ -136,8 +136,11 @@ double MonolithicCounter::count(const Formula &formula) {
       writeDotFile(cnfAdd);
     }
   } else {
-    for (auto pair : formula.getWeights())
-      cnfAdd *= pair.second;
+    for (auto pair : formula.getWeights()) {
+      writeDotFile(pair.second);
+      cnfAdd &= pair.second;
+    }
+    /*writeDotFile(cnfAdd);*/
   }
 
   double modelCount = dd::countConstAddFloat(cnfAdd);

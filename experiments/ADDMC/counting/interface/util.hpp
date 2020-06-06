@@ -28,7 +28,7 @@ template<typename T> using VectorT = std::vector<T>;
 
 /* constants ******************************************************************/
 
-const int_t VERBOSITY = 0; /* 0: prints warnings/errors, 1: prints debugging info */
+const int_t VERBOSITY = 1; /* 0: prints warnings/errors, 1: prints debugging info */
 
 const std::string REQUIRED_OPTION_GROUP = "Required";
 const std::string CNF_FILE_OPTION = "cf";

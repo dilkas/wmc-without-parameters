@@ -209,6 +209,16 @@ void Formula::printCnf() const {
   util::printCnf(cnf);
 }
 
+ADD Formula::constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words, double weight) {
+  for (int_t i = 2; i < words.size() - 1; i++) {
+    int_t var = std::stoi(words.at(i));
+    updateApparentVars(var);
+    ADD varADD = mgr->addVar(std::abs(var));
+    cpt &= (var > 0) ? varADD : ~varADD;
+  }
+  return mgr->constant(2 * weight - 1) * cpt + mgr->constant(1 - weight);
+}
+
 Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *mgr) {
   this->weightFormat = weightFormat;
 
@@ -218,8 +228,8 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *m
   int_t lineIndex = 0;
   int_t minic2dWeightLineIndex = lineIndex;
 
-  /* maps each variable to a map from a {variables -> values} assignment to an ADD */
-  std::map<int_t, std::map<std::map<int_t, bool>, ADD>> conditionalWeights;
+  /* TODO: remove */
+  int_t dotFileIndex = 0;
 
   std::ifstream inputFileStream(filePath);
   if (!inputFileStream.is_open()) util::showError("unable to open file " + filePath);
@@ -269,19 +279,19 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *m
         double weight = std::stod(words.at(2));
         literalWeights[var] = weight;
       } else {
-        /* record the values of all conditional variables */
-        std::map<int_t, bool> conditions;
-        int_t variable;
-        for (int_t i = 1; i < wordCount - 1; i++) {
-            int_t var = std::stoi(words.at(i));
-            conditions[std::abs(var)] = (var > 0);
-            updateApparentVars(var);
-            if (i == 1)
-              variable = var;
-        }
+        int_t literal = std::stoi(words.at(1));
+        int_t var = std::abs(literal);
+        ADD varAdd = mgr->addVar(literal);
         double weight = std::stod(words.back());
-        ADD node = mgr->constant(weight);
-        conditionalWeights[abs(variable)][conditions] = node;
+        ADD cpt = constructAddFromWords(mgr, varAdd, words, weight);
+        writeDd(*mgr, cpt, DOT_DIR + "cpt" + std::to_string(dotFileIndex++) + ".dot");
+        auto previousEntry = weights.find(var);
+        if (previousEntry != weights.end()) {
+          previousEntry->second |= cpt;
+          writeDd(*mgr, previousEntry->second, DOT_DIR + "merged" + std::to_string(dotFileIndex++) + ".dot");
+        } else {
+          weights[var] = cpt;
+        }
       }
     }
     else { /* clause line */
@@ -333,44 +343,6 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *m
 
       literalWeights[var] = varWeight;
       literalWeights[-var] = negativeLiteralWeight;
-    }
-  }
-
-  if (weightFormat == WeightFormat::CONDITIONAL) { /* compiles weights */
-    for (int_t mainVariable = 1; mainVariable <= declaredVarCount; mainVariable++) {
-      while (conditionalWeights[mainVariable].size() > 1) {
-        /* to be replaced with the MCS heuristic */
-        auto varValPair = conditionalWeights[mainVariable].begin()->first.begin();
-        int_t variable = varValPair->first;
-        bool value = varValPair->second;
-        std::map<std::map<int_t, bool>, ADD> combinedWeights;
-        while (conditionalWeights[mainVariable].size() > 0) {
-          auto originalPair = conditionalWeights[mainVariable].begin();
-          auto dualConditions = originalPair->first;
-          dualConditions[variable] = !dualConditions[variable];
-          auto dual = conditionalWeights[mainVariable].find(dualConditions);
-          ADD variableADD = mgr->addVar(variable);
-          ADD newDiagram;
-          if (dual != conditionalWeights[mainVariable].end()) {
-            if (value) {
-              newDiagram = originalPair->second * variableADD.Compose(mgr->addOne(), variable) +
-                           dual->second * variableADD.Compose(mgr->addZero(), variable);
-            } else {
-              newDiagram = dual->second * variableADD.Compose(mgr->addOne(), variable) +
-                           originalPair->second * variableADD.Compose(mgr->addZero(), variable);
-            }
-            conditionalWeights[mainVariable].erase(dual);
-          } else {
-            newDiagram = originalPair->second * variableADD.Compose((value) ? mgr->addOne() : mgr->addZero(), variable);
-          }
-          auto newAssignment = originalPair->first;
-          newAssignment.erase(variable);
-          combinedWeights[newAssignment] = newDiagram;
-          conditionalWeights[mainVariable].erase(originalPair);
-        }
-        conditionalWeights[mainVariable] = combinedWeights;
-      }
-      weights[mainVariable] = conditionalWeights[mainVariable].begin()->second;
     }
   }
 
