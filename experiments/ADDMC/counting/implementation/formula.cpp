@@ -193,6 +193,10 @@ MapT<int_t, double> Formula::getLiteralWeights() const { return literalWeights; 
 
 const VectorT<VectorT<int_t>> &Formula::getCnf() const { return cnf; }
 
+WeightFormat Formula::getWeightFormat() const {
+  return weightFormat;
+}
+
 void Formula::printLiteralWeights() const {
   util::printLiteralWeights(literalWeights);
 }
@@ -267,6 +271,7 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *m
         for (int_t i = 1; i < wordCount - 1; i++) {
             int_t var = std::stoi(words.at(i));
             conditions[std::abs(var)] = (var > 0);
+            updateApparentVars(var);
             if (i == 1)
               variable = var;
         }

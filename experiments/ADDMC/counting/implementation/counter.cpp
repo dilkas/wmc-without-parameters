@@ -73,7 +73,10 @@ ADD Counter::getClauseAdd(const VectorT<int_t> &clause) {
   return clauseAdd;
 }
 
-void Counter::abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights) {
+void Counter::abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights,
+                       const WeightFormat weightFormat) {
+  if (weightFormat == WeightFormat::CONDITIONAL)
+    return;
   int_t formulaVar = addVarToFormulaVarMap.at(addVar);
   ADD positiveWeight = mgr->constant(literalWeights.at(formulaVar));
   ADD negativeWeight = mgr->constant(literalWeights.at(-formulaVar));
@@ -81,9 +84,12 @@ void Counter::abstract(ADD &add, int_t addVar, const MapT<int_t, double> &litera
   add = positiveWeight * add.Compose(mgr->addOne(), addVar) + negativeWeight * add.Compose(mgr->addZero(), addVar);
 }
 
-void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights) {
+void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights,
+                           const WeightFormat weightFormat) {
+  if (weightFormat == WeightFormat::CONDITIONAL)
+    return;
   for (int_t addVar :addVars) {
-    abstract(add, addVar, literalWeights);
+    abstract(add, addVar, literalWeights, weightFormat);
   }
 }
 
@@ -120,7 +126,7 @@ double MonolithicCounter::count(const Formula &formula) {
 
   SetT<int_t> support = util::getSupport(cnfAdd);
   for (int_t addVar : support) {
-    abstract(cnfAdd, addVar, formula.getLiteralWeights());
+    abstract(cnfAdd, addVar, formula.getLiteralWeights(), formula.getWeightFormat());
     if (VERBOSITY >= 1) std::cout << "Abstracted ADD var:\t" << addVar << "\n";
 
     writeDotFile(cnfAdd);
@@ -131,8 +137,8 @@ double MonolithicCounter::count(const Formula &formula) {
   return modelCount;
 }
 
-MonolithicCounter::MonolithicCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = &mgr;
+MonolithicCounter::MonolithicCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->addVarOrderingHeuristic = addVarOrderingHeuristic;
   this->inverseAddVarOrdering = inverseAddVarOrdering;
 }
@@ -168,7 +174,7 @@ double LinearCounter::count(const Formula &formula) {
 
     SetT<int_t> projectingAddVars;
     util::differ(projectingAddVars, productAddVars, otherAddVars);
-    abstractCube(product, projectingAddVars, formula.getLiteralWeights());
+    abstractCube(product, projectingAddVars, formula.getLiteralWeights(), formula.getWeightFormat());
     util::unionize(projectedFormulaVars, getFormulaVars(projectingAddVars));
 
     factorAdds.push_back(product);
@@ -179,8 +185,8 @@ double LinearCounter::count(const Formula &formula) {
   return modelCount;
 }
 
-LinearCounter::LinearCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = &mgr;
+LinearCounter::LinearCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->addVarOrderingHeuristic = addVarOrderingHeuristic;
   this->inverseAddVarOrdering = inverseAddVarOrdering;
 }
@@ -300,7 +306,7 @@ double NonlinearCounter::countWithList(const Formula &formula, bool minRank) {
     cnfAdd *= clusterAdd;
 
     SetT<int_t> projectingAddVars = getProjectingAddVars(clusterIndex, minRank, formulaVarOrdering, cnf);
-    abstractCube(cnfAdd, projectingAddVars, formula.getLiteralWeights());
+    abstractCube(cnfAdd, projectingAddVars, formula.getLiteralWeights(), formula.getWeightFormat());
     util::unionize(projectedFormulaVars, getFormulaVars(projectingAddVars));
   }
 
@@ -334,7 +340,7 @@ double NonlinearCounter::countWithTree(const Formula &formula, bool minRank) {
       SetT<int_t> projectingAddVars = projectingAddVarSets.at(clusterIndex);
       if (minRank && projectingAddVars.size() != 1) util::showError("wrong number of projecting vars (bucket elimination)");
 
-      abstractCube(clusterAdd, projectingAddVars, formula.getLiteralWeights());
+      abstractCube(clusterAdd, projectingAddVars, formula.getLiteralWeights(), formula.getWeightFormat());
       util::unionize(projectedFormulaVars, getFormulaVars(projectingAddVars));
 
       int_t newClusterIndex = getNewClusterIndex(clusterAdd, formulaVarOrdering, minRank);
@@ -428,8 +434,8 @@ double BucketCounter::count(const Formula &formula) {
   return clusterTree ? NonlinearCounter::countWithTree(formula, minRank) : NonlinearCounter::countWithList(formula, minRank);
 }
 
-BucketCounter::BucketCounter(Cudd mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this->mgr = &mgr;
+BucketCounter::BucketCounter(Cudd *mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this->mgr = mgr;
   this->clusterTree = clusterTree;
   this->formulaVarOrderingHeuristic = formulaVarOrderingHeuristic;
   this->inverseFormulaVarOrdering = inverseFormulaVarOrdering;
@@ -445,8 +451,8 @@ double BouquetCounter::count(const Formula &formula) {
   // return NonlinearCounter::countWithTree(formula); /* #MAVC */
 }
 
-BouquetCounter::BouquetCounter(Cudd mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
-  this-> mgr = &mgr;
+BouquetCounter::BouquetCounter(Cudd *mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+  this-> mgr = mgr;
   this->clusterTree = clusterTree;
   this->formulaVarOrderingHeuristic = formulaVarOrderingHeuristic;
   this->inverseFormulaVarOrdering = inverseFormulaVarOrdering;

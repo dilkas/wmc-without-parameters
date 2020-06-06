@@ -46,6 +46,7 @@ public:
   int_t getDeclaredVarCount() const;
   MapT<int_t, double> getLiteralWeights() const;
   const VectorT<VectorT<int_t>> &getCnf() const;
+  WeightFormat getWeightFormat() const;
   void printLiteralWeights() const;
   void printCnf() const;
   Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *mgr);

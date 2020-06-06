@@ -34,8 +34,9 @@ protected:
   const VectorT<int_t> &getAddVarOrdering() const; /* addVarToFormulaVarMap */
   void orderAddVars(const Formula &formula); /* writes: formulaVarToAddVarMap, addVarToFormulaVarMap */
   ADD getClauseAdd(const VectorT<int_t> &clause);
-  void abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights);
-  void abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights);
+  void abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights, const WeightFormat weightFormat);
+  void abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights,
+                    const WeightFormat weightFormat);
 
 public:
   virtual double count(const Formula &formula) = 0;
@@ -49,7 +50,7 @@ protected:
 
 public:
   double count(const Formula &formula);
-  MonolithicCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
+  MonolithicCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
 };
 
 class FactoredCounter : public Counter {}; /* abstract; builds an ADD for each clause */
@@ -60,7 +61,7 @@ protected:
 
 public:
   double count(const Formula &formula);
-  LinearCounter(Cudd mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
+  LinearCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
 };
 
 class NonlinearCounter : public FactoredCounter { /* abstract; puts clauses in clusters */
@@ -88,7 +89,7 @@ class BucketCounter : public NonlinearCounter { /* bucket elimination */
 public:
   double count(const Formula &formula);
   BucketCounter(
-    Cudd mgr,
+    Cudd *mgr,
     bool clusterTree,
     VarOrderingHeuristic formulaVarOrderingHeuristic,
     bool inverseFormulaVarOrdering,
@@ -100,7 +101,7 @@ class BouquetCounter : public NonlinearCounter { /* Bouquet's Method */
 public:
   double count(const Formula &formula);  /* #MAVC */
   BouquetCounter(
-    Cudd mgr,
+    Cudd *mgr,
     bool clusterTree,
     VarOrderingHeuristic formulaVarOrderingHeuristic,
     bool inverseFormulaVarOrdering,

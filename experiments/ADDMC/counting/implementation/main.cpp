@@ -56,8 +56,8 @@ bool OptionDict::hasValidFilePath() {
 void testing::test() {
   if (VERBOSITY >= 1) std::cout << "test\n\n";
 
-  Cudd mgr;
-  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, &mgr);
+  Cudd *mgr = new Cudd();
+  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, mgr);
   if (VERBOSITY >= 1) {
     std::cout << "DIMACS declared var count: " << formula.getDeclaredVarCount() << "\n";
     util::printCnf(formula.getCnf());
@@ -81,6 +81,8 @@ void testing::test() {
   int_t bml = bouquetListCounter.count(formula);
   int_t bmt = bouquetTreeCounter.count(formula);
 
+  delete (mgr);
+
   VectorT<int_t> counts = {m, l, bel, bet, bml, bmt};
   for (int_t i = 0; i < counts.size(); i++) {
     for (int_t j = i + 1; j < counts.size(); j++) {
@@ -103,8 +105,8 @@ void testing::test() {
 void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, ClusteringHeuristic clusteringHeuristic, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
   std::cout << "\nReading DIMACS CNF file:\n";
   util::printRow("cnfFilePath", filePath);
-  Cudd mgr;
-  Formula formula(filePath, weightFormat, &mgr);
+  Cudd *mgr = new Cudd();
+  Formula formula(filePath, weightFormat, mgr);
   if (VERBOSITY >= 1) {
     formula.printLiteralWeights();
     formula.printCnf();
@@ -153,6 +155,7 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
     }
     util::showError("no such clusteringHeuristic");
   }
+  delete(mgr);
   util::printRow("modelCount", modelCount);
 }
 
