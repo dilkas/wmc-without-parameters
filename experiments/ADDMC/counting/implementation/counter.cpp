@@ -75,13 +75,14 @@ ADD Counter::getClauseAdd(const VectorT<int_t> &clause) {
 
 void Counter::abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights,
                        const WeightFormat weightFormat) {
-  if (weightFormat == WeightFormat::CONDITIONAL)
-    return;
-  int_t formulaVar = addVarToFormulaVarMap.at(addVar);
-  ADD positiveWeight = mgr->constant(literalWeights.at(formulaVar));
-  ADD negativeWeight = mgr->constant(literalWeights.at(-formulaVar));
-
-  add = positiveWeight * add.Compose(mgr->addOne(), addVar) + negativeWeight * add.Compose(mgr->addZero(), addVar);
+  if (weightFormat != WeightFormat::CONDITIONAL) {
+    int_t formulaVar = addVarToFormulaVarMap.at(addVar);
+    ADD positiveWeight = mgr->constant(literalWeights.at(formulaVar));
+    ADD negativeWeight = mgr->constant(literalWeights.at(-formulaVar));
+    add = positiveWeight * add.Compose(mgr->addOne(), addVar) + negativeWeight * add.Compose(mgr->addZero(), addVar);
+  } else {
+    add = add.Compose(mgr->addOne(), addVar) + add.Compose(mgr->addZero(), addVar);
+  }
 }
 
 void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights,
@@ -94,7 +95,7 @@ void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_
 }
 
 double Counter::count(const std::string &filePath, WeightFormat weightFormat) {
-  Formula formula(filePath, weightFormat, mgr);
+  Formula formula(filePath, weightFormat, mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
   return count(formula);
 }
 
@@ -124,23 +125,19 @@ double MonolithicCounter::count(const Formula &formula) {
   setCnfAdd(cnfAdd, formula);
   writeDotFile(cnfAdd);
 
-  /* add weights */
-  SetT<int_t> support = util::getSupport(cnfAdd);
-  if (formula.getWeightFormat() != WeightFormat::CONDITIONAL) {
-    for (int_t addVar : support)
-    {
-      abstract(cnfAdd, addVar, formula.getLiteralWeights(), formula.getWeightFormat());
-      if (VERBOSITY >= 1)
-        std::cout << "Abstracted ADD var:\t" << addVar << "\n";
+  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL) {
+    for (auto pair : formula.getWeights())
+      cnfAdd *= pair.second;
+  }
 
-      writeDotFile(cnfAdd);
-    }
-  } else {
-    for (auto pair : formula.getWeights()) {
-      writeDotFile(pair.second);
-      cnfAdd &= pair.second;
-    }
-    /*writeDotFile(cnfAdd);*/
+  SetT<int_t> support = util::getSupport(cnfAdd);
+  for (int_t addVar : support) {
+    util::printRow("in counter", addVar);
+    abstract(cnfAdd, addVar, formula.getLiteralWeights(), formula.getWeightFormat());
+    if (VERBOSITY >= 1)
+      std::cout << "Abstracted ADD var:\t" << addVar << "\n";
+
+    writeDotFile(cnfAdd);
   }
 
   double modelCount = dd::countConstAddFloat(cnfAdd);

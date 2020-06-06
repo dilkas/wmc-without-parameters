@@ -56,16 +56,16 @@ bool OptionDict::hasValidFilePath() {
 void testing::test() {
   if (VERBOSITY >= 1) std::cout << "test\n\n";
 
+  VarOrderingHeuristic addVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION);
+  VarOrderingHeuristic formularVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_FORMULA_VAR_ORDERING_HEURISTIC_OPTION);
+
   Cudd *mgr = new Cudd();
-  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, mgr);
+  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, mgr, addVarOrderingHeuristic, false);
   if (VERBOSITY >= 1) {
     std::cout << "DIMACS declared var count: " << formula.getDeclaredVarCount() << "\n";
     util::printCnf(formula.getCnf());
     std::cout << "\n";
   }
-
-  VarOrderingHeuristic addVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION);
-  VarOrderingHeuristic formularVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_FORMULA_VAR_ORDERING_HEURISTIC_OPTION);
 
   MonolithicCounter monolithicCounter(mgr, addVarOrderingHeuristic, false);
   LinearCounter linearCounter(mgr, addVarOrderingHeuristic, false);
@@ -104,7 +104,7 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   std::cout << "\nReading DIMACS CNF file:\n";
   util::printRow("cnfFilePath", filePath);
   Cudd *mgr = new Cudd();
-  Formula formula(filePath, weightFormat, mgr);
+  Formula formula(filePath, weightFormat, mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
   if (VERBOSITY >= 1) {
     formula.printLiteralWeights();
     formula.printCnf();

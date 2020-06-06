@@ -209,17 +209,26 @@ void Formula::printCnf() const {
   util::printCnf(cnf);
 }
 
-ADD Formula::constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words, double weight) {
+ADD Formula::literalToADD(int_t literal, Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
+    updateApparentVars(literal);
+    auto varOrdering = getVarOrdering(varOrderingHeuristic, inverse);
+    auto it = std::find(varOrdering.begin(), varOrdering.end(), std::abs(literal));
+    int_t index = std::distance(varOrdering.begin(), it);
+    return mgr->addVar(index);
+}
+
+ADD Formula::constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words,
+                                   double weight, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
   for (int_t i = 2; i < words.size() - 1; i++) {
     int_t var = std::stoi(words.at(i));
-    updateApparentVars(var);
-    ADD varADD = mgr->addVar(std::abs(var));
+    ADD varADD = literalToADD(var, mgr, varOrderingHeuristic, inverse);
     cpt &= (var > 0) ? varADD : ~varADD;
   }
   return mgr->constant(2 * weight - 1) * cpt + mgr->constant(1 - weight);
 }
 
-Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *mgr) {
+Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
+                 Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
   this->weightFormat = weightFormat;
 
   int_t declaredClauseCount = DUMMY_MIN_INT;
@@ -281,9 +290,9 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat, Cudd *m
       } else {
         int_t literal = std::stoi(words.at(1));
         int_t var = std::abs(literal);
-        ADD varAdd = mgr->addVar(literal);
+        ADD varAdd = literalToADD(var, mgr, varOrderingHeuristic, inverse);
         double weight = std::stod(words.back());
-        ADD cpt = constructAddFromWords(mgr, varAdd, words, weight);
+        ADD cpt = constructAddFromWords(mgr, varAdd, words, weight, varOrderingHeuristic, inverse);
         writeDd(*mgr, cpt, DOT_DIR + "cpt" + std::to_string(dotFileIndex++) + ".dot");
         auto previousEntry = weights.find(var);
         if (previousEntry != weights.end()) {

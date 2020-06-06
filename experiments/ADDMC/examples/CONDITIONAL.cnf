@@ -1,4 +1,4 @@
-p cnf 4 2
+p cnf 4 1
 
 c Let's be very explicit for now to keep the code simple
 
@@ -7,15 +7,14 @@ w 1 0.5
 w 2 1 0.6
 w 2 -1 0.1
 
-w 3 1 0.7
-w 3 -1 0.2
+c w 3 1 0.7
+c w 3 -1 0.2
 
-w 4 2 3 1
-w 4 2 -3 0.5
-w 4 -2 3 0.4
-w 4 -2 -3 0
+c w 4 2 3 1
+c w 4 2 -3 0.5
+c w 4 -2 3 0.4
+c w 4 -2 -3 0
 
 c We're calculating the probability of Rest in the paper by Sang et al.
 
-4 0
-2 1 0
+2 0
