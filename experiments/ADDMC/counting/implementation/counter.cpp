@@ -18,10 +18,10 @@ double dd::countConstAddFloat(const ADD &add) {
   double minValue = getTerminalValue(minTerminal);
   double maxValue = getTerminalValue(maxTerminal);
 
-  if (minValue != maxValue) {
+/*  if (minValue != maxValue) {
     util::showError("ADD is nonconst: min value " + std::to_string(minValue) +
       ", max value " + std::to_string(maxValue));
-  }
+  }*/
 
   return minValue;
 }
@@ -124,16 +124,25 @@ double MonolithicCounter::count(const Formula &formula) {
   setCnfAdd(cnfAdd, formula);
   writeDotFile(cnfAdd);
 
+  /* add weights */
   SetT<int_t> support = util::getSupport(cnfAdd);
-  for (int_t addVar : support) {
-    abstract(cnfAdd, addVar, formula.getLiteralWeights(), formula.getWeightFormat());
-    if (VERBOSITY >= 1) std::cout << "Abstracted ADD var:\t" << addVar << "\n";
+  if (formula.getWeightFormat() != WeightFormat::CONDITIONAL) {
+    for (int_t addVar : support)
+    {
+      abstract(cnfAdd, addVar, formula.getLiteralWeights(), formula.getWeightFormat());
+      if (VERBOSITY >= 1)
+        std::cout << "Abstracted ADD var:\t" << addVar << "\n";
 
-    writeDotFile(cnfAdd);
+      writeDotFile(cnfAdd);
+    }
+  } else {
+    for (auto pair : formula.getWeights())
+      cnfAdd *= pair.second;
   }
 
   double modelCount = dd::countConstAddFloat(cnfAdd);
-  modelCount = util::adjustModelCount(modelCount, getFormulaVars(support), formula.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, getFormulaVars(support), formula.getLiteralWeights(),
+                                      formula.getWeightFormat());
   return modelCount;
 }
 
@@ -181,7 +190,8 @@ double LinearCounter::count(const Formula &formula) {
   }
 
   double modelCount = dd::countConstAddFloat(util::getSoleMember(factorAdds));
-  modelCount = util::adjustModelCount(modelCount, projectedFormulaVars, formula.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, projectedFormulaVars, formula.getLiteralWeights(),
+                                      formula.getWeightFormat());
   return modelCount;
 }
 
@@ -311,7 +321,8 @@ double NonlinearCounter::countWithList(const Formula &formula, bool minRank) {
   }
 
   double modelCount = dd::countConstAddFloat(cnfAdd);
-  modelCount = util::adjustModelCount(modelCount, formulaVarOrdering, formula.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, formulaVarOrdering, formula.getLiteralWeights(),
+                                      formula.getWeightFormat());
   return modelCount;
 }
 
@@ -361,7 +372,8 @@ double NonlinearCounter::countWithTree(const Formula &formula, bool minRank) {
   }
 
   double modelCount = dd::countConstAddFloat(cnfAdd);
-  modelCount = util::adjustModelCount(modelCount, projectedFormulaVars, formula.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, projectedFormulaVars, formula.getLiteralWeights(),
+                                      formula.getWeightFormat());
   return modelCount;
 }
 double NonlinearCounter::countWithTree(const Formula &formula) {  /* #MAVC */

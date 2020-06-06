@@ -191,6 +191,10 @@ int_t Formula::getDeclaredVarCount() const { return declaredVarCount; }
 
 MapT<int_t, double> Formula::getLiteralWeights() const { return literalWeights; }
 
+MapT<int_t, ADD> Formula::getWeights() const {
+  return weights;
+}
+
 const VectorT<VectorT<int_t>> &Formula::getCnf() const { return cnf; }
 
 WeightFormat Formula::getWeightFormat() const {

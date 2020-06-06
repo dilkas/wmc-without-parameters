@@ -198,7 +198,11 @@ namespace util {
     return true;
   }
 
-  template<typename T> double adjustModelCount(double apparentModelCount, const T &projectedFormulaVars, const MapT<int_t, double> &literalWeights) {
+  template <typename T>
+  double adjustModelCount(double apparentModelCount, const T &projectedFormulaVars,
+                          const MapT<int_t, double> &literalWeights, WeightFormat weightFormat) {
+    if (weightFormat == WeightFormat::CONDITIONAL)
+      return apparentModelCount;
     double totalModelCount = apparentModelCount;
 
     int_t totalLiteralCount = literalWeights.size();

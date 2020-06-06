@@ -81,8 +81,6 @@ void testing::test() {
   int_t bml = bouquetListCounter.count(formula);
   int_t bmt = bouquetTreeCounter.count(formula);
 
-  delete (mgr);
-
   VectorT<int_t> counts = {m, l, bel, bet, bml, bmt};
   for (int_t i = 0; i < counts.size(); i++) {
     for (int_t j = i + 1; j < counts.size(); j++) {
@@ -155,7 +153,6 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
     }
     util::showError("no such clusteringHeuristic");
   }
-  delete(mgr);
   util::printRow("modelCount", modelCount);
 }
 

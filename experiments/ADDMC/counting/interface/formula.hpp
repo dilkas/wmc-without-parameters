@@ -45,6 +45,7 @@ public:
   VectorT<int_t> getVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool inverse) const;
   int_t getDeclaredVarCount() const;
   MapT<int_t, double> getLiteralWeights() const;
+  MapT<int_t, ADD> getWeights() const;
   const VectorT<VectorT<int_t>> &getCnf() const;
   WeightFormat getWeightFormat() const;
   void printLiteralWeights() const;
