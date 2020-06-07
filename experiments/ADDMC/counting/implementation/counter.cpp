@@ -130,7 +130,6 @@ double MonolithicCounter::count(const Formula &formula) {
 
   SetT<int_t> support = util::getSupport(cnfAdd);
   for (int_t addVar : support) {
-    util::printRow("in counter", addVar);
     abstract(cnfAdd, addVar, formula.getLiteralWeights(), formula.getWeightFormat());
     if (VERBOSITY >= 1)
       std::cout << "Abstracted ADD var:\t" << addVar << "\n";

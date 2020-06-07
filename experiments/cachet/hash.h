@@ -34,7 +34,7 @@ public:
 	bool full;
 	bool quiet;
 	double load_factor;
-	struct sysinfo si;
+	//struct sysinfo si;
 
 	void test();
 	int clean_cache();	// return the number of entries removed during the cleaning
