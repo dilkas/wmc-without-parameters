@@ -124,9 +124,10 @@ double MonolithicCounter::count(const Formula &formula) {
   ADD cnfAdd;
   setCnfAdd(cnfAdd, formula);
   if (formula.getWeightFormat() == WeightFormat::CONDITIONAL)
-    for (auto pair : formula.getWeights())
+    for (auto pair : formula.getWeights()) {
+      /*writeDotFile(cnfAdd);*/
       cnfAdd *= pair.second;
-  writeDotFile(cnfAdd);
+    }
 
   SetT<int_t> support = util::getSupport(cnfAdd);
   for (int_t addVar : support) {

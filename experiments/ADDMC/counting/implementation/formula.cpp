@@ -36,6 +36,19 @@ Graph Formula::getGaifmanGraph() const {
         graph.addEdge(var1, var2);
       }
 
+  /*util::printRow("size", unparsedWeights.size());*/
+  for (auto words : unparsedWeights) {
+    for (int_t i = 1; i < words.size() - 1; i++) {
+      int_t var1 = std::abs(std::stoi(words.at(i)));
+      for (int_t j = i + 1; j < words.size() - 1; j++) {
+        int_t var2 = std::abs(std::stoi(words.at(j)));
+        /*util::printRow("var1", var1);*/
+        /*util::printRow("var2", var2);*/
+        graph.addEdge(var1, var2);
+      }
+    }
+  }
+
   return graph;
 }
 
@@ -231,7 +244,6 @@ ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string>
 Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
                  Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
   this->weightFormat = weightFormat;
-  VectorT<VectorT<std::string>> unparsedWeights;
 
   int_t declaredClauseCount = DUMMY_MIN_INT;
   int_t processedClauseCount = 0;
@@ -353,7 +365,10 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
       ADD cpt = constructAddFromWords(mgr, varAdd, words, weight, varOrdering);
       auto previousEntry = weights.find(var);
       if (previousEntry != weights.end()) {
-        previousEntry->second |= cpt;
+        /*writeDd(*mgr, previousEntry->second, DOT_DIR + "before" + std::to_string(var) + ".dot");
+        writeDd(*mgr, cpt, DOT_DIR + "beforen" + std::to_string(var) + ".dot");*/
+        previousEntry->second += cpt;
+        /*writeDd(*mgr, previousEntry->second, DOT_DIR + "after" + std::to_string(var) + ".dot");*/
       } else {
         weights[var] = cpt;
       }
