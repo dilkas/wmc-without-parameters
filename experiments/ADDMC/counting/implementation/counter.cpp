@@ -87,8 +87,6 @@ void Counter::abstract(ADD &add, int_t addVar, const MapT<int_t, double> &litera
 
 void Counter::abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights,
                            const WeightFormat weightFormat) {
-  if (weightFormat == WeightFormat::CONDITIONAL)
-    return;
   for (int_t addVar :addVars) {
     abstract(add, addVar, literalWeights, weightFormat);
   }
@@ -125,7 +123,6 @@ double MonolithicCounter::count(const Formula &formula) {
   setCnfAdd(cnfAdd, formula);
   if (formula.getWeightFormat() == WeightFormat::CONDITIONAL)
     for (auto pair : formula.getWeights()) {
-      /*writeDotFile(cnfAdd);*/
       cnfAdd *= pair.second;
     }
 
@@ -161,6 +158,9 @@ void LinearCounter::setLinearClauseAdds(VectorT<ADD> &clauseAdds, const Formula 
     ADD clauseAdd = getClauseAdd(clause);
     clauseAdds.push_back(clauseAdd);
   }
+  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL)
+    for (auto pair : formula.getWeights())
+      clauseAdds.push_back(pair.second);
 }
 
 double LinearCounter::count(const Formula &formula) {
@@ -170,6 +170,7 @@ double LinearCounter::count(const Formula &formula) {
   setLinearClauseAdds(factorAdds, formula);
   SetT<int_t> projectedFormulaVars;
   while (factorAdds.size() > 1) {
+    util::printRow("remaining", factorAdds.size());
     ADD factor1, factor2;
     util::popBack(factor1, factorAdds);
     util::popBack(factor2, factorAdds);
@@ -181,6 +182,7 @@ double LinearCounter::count(const Formula &formula) {
 
     SetT<int_t> projectingAddVars;
     util::differ(projectingAddVars, productAddVars, otherAddVars);
+    util::printRow("projecting", projectingAddVars.size());
     abstractCube(product, projectingAddVars, formula.getLiteralWeights(), formula.getWeightFormat());
     util::unionize(projectedFormulaVars, getFormulaVars(projectingAddVars));
 
