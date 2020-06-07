@@ -209,20 +209,18 @@ void Formula::printCnf() const {
   util::printCnf(cnf);
 }
 
-ADD Formula::literalToADD(int_t literal, Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
-    updateApparentVars(literal);
-    auto varOrdering = getVarOrdering(varOrderingHeuristic, inverse);
+ADD Formula::literalToADD(int_t literal, Cudd *mgr, VectorT<int_t> varOrdering) {
     auto it = std::find(varOrdering.begin(), varOrdering.end(), std::abs(literal));
     int_t index = std::distance(varOrdering.begin(), it);
     return mgr->addVar(index);
 }
 
 ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string> words,
-                                   double weight, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
+                                   double weight, VectorT<int_t> varOrdering) {
   ADD negative = ~positive;
   for (int_t i = 2; i < words.size() - 1; i++) {
     int_t var = std::stoi(words.at(i));
-    ADD varADD = literalToADD(var, mgr, varOrderingHeuristic, inverse);
+    ADD varADD = literalToADD(var, mgr, varOrdering);
     ADD newVariable = (var > 0) ? varADD : ~varADD;
     positive &= newVariable;
     negative &= newVariable;
@@ -233,6 +231,7 @@ ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string>
 Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
                  Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
   this->weightFormat = weightFormat;
+  VectorT<VectorT<std::string>> unparsedWeights;
 
   int_t declaredClauseCount = DUMMY_MIN_INT;
   int_t processedClauseCount = 0;
@@ -278,28 +277,18 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
       }
     }
     else if (startWord == CACHET_WEIGHT_WORD) {
-      if (weightFormat != WeightFormat::CACHET && weightFormat != WeightFormat::CONDITIONAL)
-        util::showError("Cachet weight in non-Cachet-weight-format file -- line " + std::to_string(lineIndex));
-
       if (weightFormat == WeightFormat::CACHET) {
         int_t var = std::stoi(words.at(1));
         if (var <= 0 || var > declaredVarCount)
           util::showError("var '" + std::to_string(var) + "' is inconsistent with declared var count '" + std::to_string(declaredVarCount) + "' -- line " + std::to_string(lineIndex));
         double weight = std::stod(words.at(2));
         literalWeights[var] = weight;
+      } else if (weightFormat == WeightFormat::CONDITIONAL) {
+        unparsedWeights.push_back(words);
+        for (int_t i = 1; i < words.size() - 1; i++)
+          updateApparentVars(std::stoi(words.at(i)));
       } else {
-        int_t literal = std::stoi(words.at(1));
-        int_t var = std::abs(literal);
-        ADD varAdd = literalToADD(var, mgr, varOrderingHeuristic, inverse);
-        double weight = std::stod(words.back());
-        ADD cpt = constructAddFromWords(mgr, varAdd, words, weight, varOrderingHeuristic, inverse);
-        /*writeDd(*mgr, cpt, DOT_DIR + "cpt" + std::to_string(++dotFileIndex) + ".dot");*/
-        auto previousEntry = weights.find(var);
-        if (previousEntry != weights.end()) {
-          previousEntry->second |= cpt;
-        } else {
-          weights[var] = cpt;
-        }
+        util::showError("Cachet weight in non-Cachet-weight-format file -- line " + std::to_string(lineIndex));
       }
     }
     else { /* clause line */
@@ -351,6 +340,23 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
 
       literalWeights[var] = varWeight;
       literalWeights[-var] = negativeLiteralWeight;
+    }
+  }
+
+  if (weightFormat == WeightFormat::CONDITIONAL) { /* compiles weights into ADDs */
+    auto varOrdering = getVarOrdering(varOrderingHeuristic, inverse);
+    for (auto words : unparsedWeights) {
+      int_t literal = std::stoi(words.at(1));
+      int_t var = std::abs(literal);
+      ADD varAdd = literalToADD(var, mgr, varOrdering);
+      double weight = std::stod(words.back());
+      ADD cpt = constructAddFromWords(mgr, varAdd, words, weight, varOrdering);
+      auto previousEntry = weights.find(var);
+      if (previousEntry != weights.end()) {
+        previousEntry->second |= cpt;
+      } else {
+        weights[var] = cpt;
+      }
     }
   }
 

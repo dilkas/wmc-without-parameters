@@ -44,5 +44,5 @@ for ratio in ['Ratio_50/', 'Ratio_75/', 'Ratio_90/']:
             continue
         with open(input_dir + ratio + filename) as f:
             encoding = convert(f.read())
-        with open(output_dir + ratio + filename[:filename.rindex('.')] + '.cnf', 'w') as f:
+        with open(output_dir + ratio + filename[:filename.rindex('.')] + '-q.cnf', 'w') as f:
             f.write(encoding)

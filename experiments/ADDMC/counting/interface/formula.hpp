@@ -32,9 +32,8 @@ protected:
   VectorT<VectorT<int_t>> cnf;
   VectorT<int_t> apparentVars; /* vars appearing in cnf, ordered by 1st appearance */
 
-  ADD literalToADD(int_t literal, Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse);
-  ADD constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words, double weight,
-                            VarOrderingHeuristic varOrderingHeuristic, bool inverse);
+  ADD literalToADD(int_t literal, Cudd *mgr, VectorT<int_t> varOrdering);
+  ADD constructAddFromWords(Cudd *mgr, ADD cpt, VectorT<std::string> words, double weight, VectorT<int_t> varOrdering);
   void updateApparentVars(int_t literal);       /* adds var to apparentVars */
   void addClause(const VectorT<int_t> &clause); /* writes: cnf, apparentVars */
   Graph getGaifmanGraph() const;
