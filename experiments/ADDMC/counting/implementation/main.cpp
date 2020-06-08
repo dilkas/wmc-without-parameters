@@ -59,20 +59,20 @@ void testing::test() {
   VarOrderingHeuristic addVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION);
   VarOrderingHeuristic formularVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(DEFAULT_FORMULA_VAR_ORDERING_HEURISTIC_OPTION);
 
-  Cudd *mgr = new Cudd();
-  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, mgr, addVarOrderingHeuristic, false);
+  Cudd mgr;
+  Formula formula(TEST_DIR + "weighted.cnf", WeightFormat::CACHET, &mgr, addVarOrderingHeuristic, false);
   if (VERBOSITY >= 1) {
     std::cout << "DIMACS declared var count: " << formula.getDeclaredVarCount() << "\n";
     util::printCnf(formula.getCnf());
     std::cout << "\n";
   }
 
-  MonolithicCounter monolithicCounter(mgr);
-  LinearCounter linearCounter(mgr);
-  BucketCounter bucketListCounter(mgr, false, formularVarOrderingHeuristic, false);
-  BucketCounter bucketTreeCounter(mgr, true, formularVarOrderingHeuristic, false);
-  BouquetCounter bouquetListCounter(mgr, false, formularVarOrderingHeuristic, false);
-  BouquetCounter bouquetTreeCounter(mgr, true, formularVarOrderingHeuristic, false);
+  MonolithicCounter monolithicCounter(&mgr);
+  LinearCounter linearCounter(&mgr);
+  BucketCounter bucketListCounter(&mgr, false, formularVarOrderingHeuristic, false);
+  BucketCounter bucketTreeCounter(&mgr, true, formularVarOrderingHeuristic, false);
+  BouquetCounter bouquetListCounter(&mgr, false, formularVarOrderingHeuristic, false);
+  BouquetCounter bouquetTreeCounter(&mgr, true, formularVarOrderingHeuristic, false);
 
   int_t m = monolithicCounter.count(formula);
   int_t l = linearCounter.count(formula);
@@ -103,8 +103,8 @@ void testing::test() {
 void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, ClusteringHeuristic clusteringHeuristic, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
   std::cout << "\nReading DIMACS CNF file:\n";
   util::printRow("cnfFilePath", filePath);
-  Cudd *mgr = new Cudd();
-  Formula formula(filePath, weightFormat, mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
+  Cudd mgr;
+  Formula formula(filePath, weightFormat, &mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
   if (VERBOSITY >= 1) {
     formula.printLiteralWeights();
     formula.printCnf();
@@ -122,32 +122,32 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   double modelCount;
   switch (clusteringHeuristic) {
     case ClusteringHeuristic::MONOLITHIC: {
-      MonolithicCounter monolithicCounter(mgr);
+      MonolithicCounter monolithicCounter(&mgr);
       modelCount = monolithicCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::LINEAR: {
-      LinearCounter linearCounter(mgr);
+      LinearCounter linearCounter(&mgr);
         modelCount = linearCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BUCKET_LIST: {
-      BucketCounter bucketCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
+      BucketCounter bucketCounter(&mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bucketCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BUCKET_TREE: {
-      BucketCounter bucketCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
+      BucketCounter bucketCounter(&mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bucketCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BOUQUET_LIST: {
-      BouquetCounter bouquetCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
+      BouquetCounter bouquetCounter(&mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bouquetCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BOUQUET_TREE: {
-      BouquetCounter bouquetCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
+      BouquetCounter bouquetCounter(&mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bouquetCounter.count(formula);
       break;
     }
