@@ -241,6 +241,7 @@ void NonlinearCounter::fillClusters(const VectorT<VectorT<int_t>> &cnf, const Ma
   }
   for (auto dependency : dependencies) {
     int_t clusterIndex = minRank ? util::getMinClauseRank(dependency.second, formulaVarOrdering) : util::getMaxClauseRank(dependency.second, formulaVarOrdering);
+    clusterIndex = (clusterIndex == DUMMY_MAX_INT || clusterIndex == DUMMY_MIN_INT) ? 0 : clusterIndex;
     clusters.at(clusterIndex).push_back(cnf.size() + dependency.first);
   }
 }

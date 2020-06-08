@@ -376,9 +376,9 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
       }
     }
     for (auto weight : weights) {
-      for (int_t index : util::getSupport(weight.second)) {
+      dependencies[weight.first] = {};
+      for (int_t index : util::getSupport(weight.second))
         dependencies[weight.first].push_back(varOrdering[index]);
-      }
     }
   }
 
