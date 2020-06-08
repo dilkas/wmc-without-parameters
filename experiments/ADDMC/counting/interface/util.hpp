@@ -108,8 +108,10 @@ namespace util {
   /* functions: CNF ***********************************************************/
 
   int_t getFormulaVar(int_t literal);
-  SetT<int_t> getClauseFormulaVars(const VectorT<int_t> &clause);
-  SetT<int_t> getClusterFormulaVars(const VectorT<int_t> &cluster, const VectorT<VectorT<int_t>> &cnf);
+  SetT<int_t> getClauseFormulaVars(const VectorT<VectorT<int_t>> &cnf,
+                                   const MapT<int_t, VectorT<int_t>> &dependencies, int_t clauseIndex);
+  SetT<int_t> getClusterFormulaVars(const VectorT<int_t> &cluster, const VectorT<VectorT<int_t>> &cnf,
+                                    const MapT<int_t, VectorT<int_t>> &dependencies);
 
   bool appearsIn(int_t formulaVar, const VectorT<int_t> &clause);
   bool isPositiveLiteral(int_t literal);

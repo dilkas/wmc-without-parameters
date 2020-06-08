@@ -53,8 +53,8 @@ const VectorT<int_t> &Counter::getAddVarOrdering() const {
   return addVarToFormulaVarMap;
 }
 
-void Counter::orderAddVars(const Formula &formula) {
-  addVarToFormulaVarMap = formula.getVarOrdering(addVarOrderingHeuristic, inverseAddVarOrdering);
+void Counter::orderAddVars(Formula &formula) {
+  addVarToFormulaVarMap = formula.getVarOrdering();
   for (int_t addVar = 0; addVar < addVarToFormulaVarMap.size(); addVar++) {
     int_t formulaVar = addVarToFormulaVarMap.at(addVar);
     formulaVarToAddVarMap[formulaVar] = addVar;
@@ -99,7 +99,7 @@ double Counter::count(const std::string &filePath, WeightFormat weightFormat) {
 
 /* class MonolithicCounter ****************************************************/
 
-void MonolithicCounter::setMonolithicClauseAdds(VectorT<ADD> &clauseAdds, const Formula &formula) {
+void MonolithicCounter::setMonolithicClauseAdds(VectorT<ADD> &clauseAdds, Formula &formula) {
   clauseAdds.clear();
   for (const VectorT<int_t> &clause : formula.getCnf()) {
     ADD clauseAdd = getClauseAdd(clause);
@@ -107,7 +107,7 @@ void MonolithicCounter::setMonolithicClauseAdds(VectorT<ADD> &clauseAdds, const 
   }
 }
 
-void MonolithicCounter::setCnfAdd(ADD &cnfAdd, const Formula &formula) {
+void MonolithicCounter::setCnfAdd(ADD &cnfAdd, Formula &formula) {
   VectorT<ADD> clauseAdds;
   setMonolithicClauseAdds(clauseAdds, formula);
   cnfAdd = mgr->addOne();
@@ -116,7 +116,7 @@ void MonolithicCounter::setCnfAdd(ADD &cnfAdd, const Formula &formula) {
   }
 }
 
-double MonolithicCounter::count(const Formula &formula) {
+double MonolithicCounter::count(Formula &formula) {
   orderAddVars(formula);
 
   ADD cnfAdd;
@@ -151,7 +151,7 @@ MonolithicCounter::MonolithicCounter(Cudd *mgr, VarOrderingHeuristic addVarOrder
 
 /* class LinearCounter ******************************************************/
 
-void LinearCounter::setLinearClauseAdds(VectorT<ADD> &clauseAdds, const Formula &formula) {
+void LinearCounter::setLinearClauseAdds(VectorT<ADD> &clauseAdds, Formula &formula) {
   clauseAdds.clear();
   clauseAdds.push_back(mgr->addOne());
   for (const VectorT<int_t> &clause : formula.getCnf()) {
@@ -163,14 +163,13 @@ void LinearCounter::setLinearClauseAdds(VectorT<ADD> &clauseAdds, const Formula 
       clauseAdds.push_back(pair.second);
 }
 
-double LinearCounter::count(const Formula &formula) {
+double LinearCounter::count(Formula &formula) {
   orderAddVars(formula);
 
   VectorT<ADD> factorAdds;
   setLinearClauseAdds(factorAdds, formula);
   SetT<int_t> projectedFormulaVars;
   while (factorAdds.size() > 1) {
-    util::printRow("remaining", factorAdds.size());
     ADD factor1, factor2;
     util::popBack(factor1, factorAdds);
     util::popBack(factor2, factorAdds);
@@ -182,7 +181,6 @@ double LinearCounter::count(const Formula &formula) {
 
     SetT<int_t> projectingAddVars;
     util::differ(projectingAddVars, productAddVars, otherAddVars);
-    util::printRow("projecting", projectingAddVars.size());
     abstractCube(product, projectingAddVars, formula.getLiteralWeights(), formula.getWeightFormat());
     util::unionize(projectedFormulaVars, getFormulaVars(projectingAddVars));
 
@@ -203,18 +201,21 @@ LinearCounter::LinearCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuri
 
 /* class NonlinearCounter ********************************************************/
 
-SetT<int_t> NonlinearCounter::getProjectingAddVars(int_t clusterIndex, bool minRank, const VectorT<int_t> &formulaVarOrdering, const VectorT<VectorT<int_t>> &cnf) {
+SetT<int_t> NonlinearCounter::getProjectingAddVars(int_t clusterIndex, bool minRank,
+                                                   const VectorT<int_t> &formulaVarOrdering,
+                                                   const VectorT<VectorT<int_t>> &cnf,
+                                                   const MapT<int_t, VectorT<int_t>> &dependencies) {
   SetT<int_t> projectingFormulaVars;
 
   if (minRank) { /* bucket elimination */
     projectingFormulaVars.insert(formulaVarOrdering.at(clusterIndex));
   }
   else { /* Bouquet's Method */
-    SetT<int_t> activeFormulaVars = util::getClusterFormulaVars(clusters.at(clusterIndex), cnf);
+    SetT<int_t> activeFormulaVars = util::getClusterFormulaVars(clusters.at(clusterIndex), cnf, dependencies);
 
     SetT<int_t> otherFormulaVars;
     for (int_t i = clusterIndex + 1; i < clusters.size(); i++)
-      util::unionize(otherFormulaVars, util::getClusterFormulaVars(clusters.at(i), cnf));
+      util::unionize(otherFormulaVars, util::getClusterFormulaVars(clusters.at(i), cnf, dependencies));
 
     util::differ(projectingFormulaVars, activeFormulaVars, otherFormulaVars);
   }
@@ -226,45 +227,58 @@ SetT<int_t> NonlinearCounter::getProjectingAddVars(int_t clusterIndex, bool minR
   return projectingAddVars;
 }
 
-void NonlinearCounter::printClusters(const VectorT<VectorT<int_t>> &cnf) const {
+void NonlinearCounter::printClusters(const VectorT<VectorT<int_t>> &cnf,
+                                     const MapT<int_t, VectorT<int_t>> &dependencies) const {
   std::cout << "clusters: {\n";
   for (int_t clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
     std::cout << "\tcluster of rank " << clusterIndex << ":\n";
     for (int_t clauseIndex : clusters.at(clusterIndex)) {
       std::cout << "\t\tclause";
-      util::printClause(cnf.at(clauseIndex));
+      util::printClause((clauseIndex < cnf.size()) ? cnf.at(clauseIndex) : dependencies.at(clauseIndex - cnf.size()));
     }
   }
   std::cout << "} (end of clusters)\n";
 }
 
-void NonlinearCounter::fillClusters(const VectorT<VectorT<int_t>> &cnf, const VectorT<int_t> &formulaVarOrdering, bool minRank) {
+void NonlinearCounter::fillClusters(const VectorT<VectorT<int_t>> &cnf, const MapT<int_t, VectorT<int_t>> &dependencies,
+                                    const VectorT<int_t> &formulaVarOrdering, bool minRank)
+{
   clusters = VectorT<VectorT<int_t>>(formulaVarOrdering.size(), VectorT<int_t>());
   for (int_t clauseIndex = 0; clauseIndex < cnf.size(); clauseIndex++) {
     int_t clusterIndex = minRank ? util::getMinClauseRank(cnf.at(clauseIndex), formulaVarOrdering) : util::getMaxClauseRank(cnf.at(clauseIndex), formulaVarOrdering);
     clusters.at(clusterIndex).push_back(clauseIndex);
   }
+  for (auto dependency : dependencies) {
+    int_t clusterIndex = minRank ? util::getMinClauseRank(dependency.second, formulaVarOrdering) : util::getMaxClauseRank(dependency.second, formulaVarOrdering);
+    clusters.at(clusterIndex).push_back(cnf.size() + dependency.first);
+  }
 }
 
-void NonlinearCounter::fillAddClusters(const VectorT<VectorT<int_t>> &cnf, const VectorT<int_t> &formulaVarOrdering, bool minRank) {
-  fillClusters(cnf, formulaVarOrdering, minRank);
-  if (VERBOSITY >= 1) printClusters(cnf);
+void NonlinearCounter::fillAddClusters(const VectorT<VectorT<int_t>> &cnf,
+                                       const MapT<int_t, VectorT<int_t>> &dependencies, const MapT<int_t, ADD> &weights,
+                                       const VectorT<int_t> &formulaVarOrdering, bool minRank) {
+  fillClusters(cnf, dependencies, formulaVarOrdering, minRank);
+  if (VERBOSITY >= 1) printClusters(cnf, dependencies);
 
   addClusters = VectorT<VectorT<ADD>>(formulaVarOrdering.size(), VectorT<ADD>());
   for (int_t clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
     for (int_t clauseIndex : clusters.at(clusterIndex)) {
-      ADD clauseAdd = getClauseAdd(cnf.at(clauseIndex));
+      ADD clauseAdd = (clauseIndex < cnf.size()) ? getClauseAdd(cnf.at(clauseIndex)) : weights.at(clauseIndex - cnf.size());
       addClusters.at(clusterIndex).push_back(clauseAdd);
     }
   }
 }
 
-void NonlinearCounter::fillProjectingAddVarSets(const VectorT<VectorT<int_t>> &cnf, const VectorT<int_t> &formulaVarOrdering, bool minRank) {
-  fillAddClusters(cnf, formulaVarOrdering, minRank);
+void NonlinearCounter::fillProjectingAddVarSets(const VectorT<VectorT<int_t>> &cnf,
+                                                const MapT<int_t, VectorT<int_t>> &dependencies,
+                                                const MapT<int_t, ADD> &weights,
+                                                const VectorT<int_t> &formulaVarOrdering, bool minRank) {
+  fillAddClusters(cnf, dependencies, weights, formulaVarOrdering, minRank);
 
   projectingAddVarSets = VectorT<SetT<int_t>>(formulaVarOrdering.size(), SetT<int_t>());
   for (int_t clusterIndex = 0; clusterIndex < addClusters.size(); clusterIndex++) {
-    projectingAddVarSets[clusterIndex] = getProjectingAddVars(clusterIndex, minRank, formulaVarOrdering, cnf);
+    projectingAddVarSets[clusterIndex] = getProjectingAddVars(clusterIndex, minRank, formulaVarOrdering,
+                                                              cnf, dependencies);
   }
 }
 
@@ -281,25 +295,20 @@ int_t NonlinearCounter::getNewClusterIndex(const ADD &abstractedClusterAdd, cons
     return DUMMY_MAX_INT;
   }
 }
-int_t NonlinearCounter::getNewClusterIndex(const SetT<int_t> &remainingAddVars) {  /* #MAVC */
-  for (int_t clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
-    if (!util::isDisjoint(projectingAddVarSets.at(clusterIndex), remainingAddVars))
-      return clusterIndex;
-  }
-  return DUMMY_MAX_INT;
-}
 
-double NonlinearCounter::countWithList(const Formula &formula, bool minRank) {
+double NonlinearCounter::countWithList(Formula &formula, bool minRank) {
   /* checks whether CNF has empty clause: */
   for (const auto &clause : formula.getCnf()) if (clause.empty()) return 0;
 
   orderAddVars(formula);
 
-  VectorT<int_t> formulaVarOrdering = formula.getVarOrdering(formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
+  VectorT<int_t> formulaVarOrdering = formula.getVarOrdering();
   const VectorT<VectorT<int_t>> &cnf = formula.getCnf();
+  const MapT<int_t, VectorT<int_t>> &dependencies = formula.getDependencies();
+  const MapT<int_t, ADD> &weights = formula.getWeights();
 
-  fillClusters(cnf, formulaVarOrdering, minRank);
-  if (VERBOSITY >= 1) printClusters(cnf);
+  fillClusters(cnf, dependencies, formulaVarOrdering, minRank);
+  if (VERBOSITY >= 1) printClusters(cnf, dependencies);
 
   /* builds ADD for CNF: */
   ADD cnfAdd = mgr->addOne();
@@ -309,13 +318,13 @@ double NonlinearCounter::countWithList(const Formula &formula, bool minRank) {
     ADD clusterAdd = mgr->addOne();
     const VectorT<int_t> &clauseIndices = clusters.at(clusterIndex);
     for (int_t clauseIndex : clauseIndices) {
-      ADD clauseAdd = getClauseAdd(cnf.at(clauseIndex));
+      ADD clauseAdd = (clauseIndex < cnf.size()) ? getClauseAdd(cnf.at(clauseIndex)) : weights.at(clauseIndex - cnf.size());
       clusterAdd *= clauseAdd;
     }
 
     cnfAdd *= clusterAdd;
 
-    SetT<int_t> projectingAddVars = getProjectingAddVars(clusterIndex, minRank, formulaVarOrdering, cnf);
+    SetT<int_t> projectingAddVars = getProjectingAddVars(clusterIndex, minRank, formulaVarOrdering, cnf, dependencies);
     abstractCube(cnfAdd, projectingAddVars, formula.getLiteralWeights(), formula.getWeightFormat());
     util::unionize(projectedFormulaVars, getFormulaVars(projectingAddVars));
   }
@@ -326,16 +335,18 @@ double NonlinearCounter::countWithList(const Formula &formula, bool minRank) {
   return modelCount;
 }
 
-double NonlinearCounter::countWithTree(const Formula &formula, bool minRank) {
+double NonlinearCounter::countWithTree(Formula &formula, bool minRank) {
   /* checks whether CNF has empty clause: */
   for (const auto &clause : formula.getCnf()) if (clause.empty()) return 0;
 
   orderAddVars(formula);
 
-  VectorT<int_t> formulaVarOrdering = formula.getVarOrdering(formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
+  VectorT<int_t> formulaVarOrdering = formula.getVarOrdering();
   const VectorT<VectorT<int_t>> &cnf = formula.getCnf();
+  const MapT<int_t, VectorT<int_t>> &dependencies = formula.getDependencies();
+  const MapT<int_t, ADD> weights = formula.getWeights();
 
-  fillProjectingAddVarSets(cnf, formulaVarOrdering, minRank);
+  fillProjectingAddVarSets(cnf, dependencies, weights, formulaVarOrdering, minRank);
 
   /* builds ADD for CNF: */
   ADD cnfAdd = mgr->addOne();
@@ -376,72 +387,10 @@ double NonlinearCounter::countWithTree(const Formula &formula, bool minRank) {
                                       formula.getWeightFormat());
   return modelCount;
 }
-double NonlinearCounter::countWithTree(const Formula &formula) {  /* #MAVC */
-  /* checks whether CNF has empty clause: */
-  for (const auto &clause : formula.getCnf()) {
-    if (clause.empty()) {
-      dd::printMaxAddVarCount(0);
-      util::showWarning("DUMMY_MODEL_COUNT");
-      return DUMMY_MODEL_COUNT;
-    }
-  }
-
-  size_t maxAddVarCount = 0;
-
-  orderAddVars(formula);
-
-  VectorT<int_t> formulaVarOrdering = formula.getVarOrdering(formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
-  const VectorT<VectorT<int_t>> &cnf = formula.getCnf();
-
-  bool minRank = false;
-
-  fillProjectingAddVarSets(cnf, formulaVarOrdering, minRank);
-
-  VectorT<SetT<int_t>> clustersAddVars; /* clusterIndex |-> addVars */
-  for (const auto &addCluster : addClusters) {
-    clustersAddVars.push_back(util::getSupportSuperset(addCluster));
-  }
-
-  SetT <int_t> cnfAddVars;
-  int_t clusterCount = clusters.size();
-  for (int_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++) {
-    const VectorT<ADD> &addCluster = addClusters.at(clusterIndex);
-    if (!addCluster.empty()) {
-      SetT<int_t> clusterAddVars = clustersAddVars.at(clusterIndex);
-
-      maxAddVarCount = std::max(maxAddVarCount, clusterAddVars.size());
-
-      SetT<int_t> projectingAddVars = projectingAddVarSets.at(clusterIndex);
-
-      SetT<int_t> remainingAddVars;
-      util::differ(remainingAddVars, clusterAddVars, projectingAddVars);
-
-      int_t newClusterIndex = getNewClusterIndex(remainingAddVars);
-
-      if (newClusterIndex <= clusterIndex) {
-        util::showError("newClusterIndex == " + std::to_string(newClusterIndex) + " <= clusterIndex == " + std::to_string(clusterIndex));
-      }
-      else if (newClusterIndex < clusterCount) { /* some var remains */
-        util::unionize(clustersAddVars.at(newClusterIndex), remainingAddVars);
-      }
-      else if (newClusterIndex < DUMMY_MAX_INT) {
-        util::showError("clusterCount <= newClusterIndex < DUMMY_MAX_INT");
-      }
-      else { /* no var remains */
-        util::unionize(cnfAddVars, remainingAddVars);
-        maxAddVarCount = std::max(maxAddVarCount, cnfAddVars.size());
-      }
-    }
-  }
-
-  dd::printMaxAddVarCount(maxAddVarCount);
-  util::showWarning("DUMMY_MODEL_COUNT");
-  return DUMMY_MODEL_COUNT;
-}
 
 /* class BucketCounter ********************************************************/
 
-double BucketCounter::count(const Formula &formula) {
+double BucketCounter::count(Formula &formula) {
   bool minRank = true;
   return clusterTree ? NonlinearCounter::countWithTree(formula, minRank) : NonlinearCounter::countWithList(formula, minRank);
 }
@@ -457,10 +406,9 @@ BucketCounter::BucketCounter(Cudd *mgr, bool clusterTree, VarOrderingHeuristic f
 
 /* class BouquetCounter *******************************************************/
 
-double BouquetCounter::count(const Formula &formula) {
+double BouquetCounter::count(Formula &formula) {
   bool minRank = false;
   return clusterTree ? NonlinearCounter::countWithTree(formula, minRank) : NonlinearCounter::countWithList(formula, minRank);
-  // return NonlinearCounter::countWithTree(formula); /* #MAVC */
 }
 
 BouquetCounter::BouquetCounter(Cudd *mgr, bool clusterTree, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {

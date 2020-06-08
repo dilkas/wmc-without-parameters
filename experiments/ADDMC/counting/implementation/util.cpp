@@ -124,15 +124,23 @@ int_t util::getFormulaVar(int_t literal) {
   return std::abs(literal);
 }
 
-SetT<int_t> util::getClauseFormulaVars(const VectorT<int_t> &clause) {
+SetT<int_t> util::getClauseFormulaVars(const VectorT<VectorT<int_t>> &cnf,
+                                       const MapT<int_t, VectorT<int_t>> &dependencies,
+                                       int_t clauseIndex) {
   SetT<int_t> formulaVars;
-  for (int_t literal : clause) formulaVars.insert(getFormulaVar(literal));
+  if (clauseIndex < cnf.size()) {
+    for (int_t literal : cnf.at(clauseIndex)) formulaVars.insert(getFormulaVar(literal));
+  } else {
+    for (int_t dependency : dependencies.at(clauseIndex - cnf.size()))
+      formulaVars.insert(dependency);
+  }
   return formulaVars;
 }
 
-SetT<int_t> util::getClusterFormulaVars(const VectorT<int_t> &cluster, const VectorT<VectorT<int_t>> &cnf) {
+SetT<int_t> util::getClusterFormulaVars(const VectorT<int_t> &cluster, const VectorT<VectorT<int_t>> &cnf,
+                                        const MapT<int_t, VectorT<int_t>> &dependencies) {
   SetT<int_t> formulaVars;
-  for (int_t clauseIndex : cluster) unionize(formulaVars, getClauseFormulaVars(cnf.at(clauseIndex)));
+  for (int_t clauseIndex : cluster) unionize(formulaVars, getClauseFormulaVars(cnf, dependencies, clauseIndex));
   return formulaVars;
 }
 

@@ -32,24 +32,24 @@ protected:
     return formulaVars;
   }
   const VectorT<int_t> &getAddVarOrdering() const; /* addVarToFormulaVarMap */
-  void orderAddVars(const Formula &formula); /* writes: formulaVarToAddVarMap, addVarToFormulaVarMap */
+  void orderAddVars(Formula &formula); /* writes: formulaVarToAddVarMap, addVarToFormulaVarMap */
   ADD getClauseAdd(const VectorT<int_t> &clause);
   void abstract(ADD &add, int_t addVar, const MapT<int_t, double> &literalWeights, const WeightFormat weightFormat);
   void abstractCube(ADD &add, const SetT<int_t> &addVars, const MapT<int_t, double> &literalWeights,
                     const WeightFormat weightFormat);
 
 public:
-  virtual double count(const Formula &formula) = 0;
+  virtual double count(Formula &formula) = 0;
   double count(const std::string &filePath, WeightFormat weightFormat);
 };
 
 class MonolithicCounter : public Counter { /* builds an ADD for the entire CNF */
 protected:
-  void setMonolithicClauseAdds(VectorT<ADD> &clauseAdds, const Formula &formula);
-  void setCnfAdd(ADD &cnfAdd, const Formula &formula);
+  void setMonolithicClauseAdds(VectorT<ADD> &clauseAdds, Formula &formula);
+  void setCnfAdd(ADD &cnfAdd, Formula &formula);
 
 public:
-  double count(const Formula &formula);
+  double count(Formula &formula);
   MonolithicCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
 };
 
@@ -57,10 +57,10 @@ class FactoredCounter : public Counter {}; /* abstract; builds an ADD for each c
 
 class LinearCounter : public FactoredCounter { /* combines adjacent clauses */
 protected:
-  void setLinearClauseAdds(VectorT<ADD> &clauseAdds, const Formula &formula);
+  void setLinearClauseAdds(VectorT<ADD> &clauseAdds, Formula &formula);
 
 public:
-  double count(const Formula &formula);
+  double count(Formula &formula);
   LinearCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
 };
 
@@ -73,21 +73,25 @@ protected:
   VectorT<VectorT<ADD>> addClusters; /* clusterIndex |-> adds (for cluster tree) */
   VectorT<SetT<int_t>> projectingAddVarSets; /* clusterIndex |-> addVars (for cluster tree) */
 
-  SetT<int_t> getProjectingAddVars(int_t clusterIndex, bool minRank, const VectorT<int_t> &formulaVarOrdering, const VectorT<VectorT<int_t>> &cnf);
-  void printClusters(const VectorT<VectorT<int_t>> &cnf) const;
-  void fillClusters(const VectorT<VectorT<int_t>> &cnf, const VectorT<int_t> &formulaVarOrdering, bool minRank);
-  void fillAddClusters(const VectorT<VectorT<int_t>> &cnf, const VectorT<int_t> &formulaVarOrdering, bool minRank); /* (for cluster tree) */
-  void fillProjectingAddVarSets(const VectorT<VectorT<int_t>> &cnf, const VectorT<int_t> &formulaVarOrdering, bool minRank); /* (for cluster tree) */
+  SetT<int_t> getProjectingAddVars(int_t clusterIndex, bool minRank, const VectorT<int_t> &formulaVarOrdering,
+                                   const VectorT<VectorT<int_t>> &cnf, const MapT<int_t, VectorT<int_t>> &dependencies);
+  void printClusters(const VectorT<VectorT<int_t>> &cnf, const MapT<int_t, VectorT<int_t>> &dependencies) const;
+  void fillClusters(const VectorT<VectorT<int_t>> &cnf, const MapT<int_t, VectorT<int_t>> &dependencies,
+                    const VectorT<int_t> &formulaVarOrdering, bool minRank);
+  /* (for cluster tree) */
+  void fillAddClusters(const VectorT<VectorT<int_t>> &cnf, const MapT<int_t, VectorT<int_t>> &dependencies,
+                       const MapT<int_t, ADD> &weights, const VectorT<int_t> &formulaVarOrdering, bool minRank);
+  void fillProjectingAddVarSets(const VectorT<VectorT<int_t>> &cnf, const MapT<int_t, VectorT<int_t>> &dependencies,
+                                const MapT<int_t, ADD> &weights, const VectorT<int_t> &formulaVarOrdering,
+                                bool minRank); /* (for cluster tree) */
   int_t getNewClusterIndex(const ADD &abstractedClusterAdd, const VectorT<int_t> &formulaVarOrdering, bool minRank); /* returns DUMMY_MAX_INT if no var remains (for cluster tree) */
-  int_t getNewClusterIndex(const SetT<int_t> &remainingAddVars); /* returns DUMMY_MAX_INT if no var remains (for cluster tree) #MAVC */
-  double countWithList(const Formula &formula, bool minRank);
-  double countWithTree(const Formula &formula, bool minRank);
-  double countWithTree(const Formula &formula); /* #MAVC */
+  double countWithList(Formula &formula, bool minRank);
+  double countWithTree(Formula &formula, bool minRank);
 };
 
 class BucketCounter : public NonlinearCounter { /* bucket elimination */
 public:
-  double count(const Formula &formula);
+  double count(Formula &formula);
   BucketCounter(
     Cudd *mgr,
     bool clusterTree,
@@ -99,7 +103,7 @@ public:
 
 class BouquetCounter : public NonlinearCounter { /* Bouquet's Method */
 public:
-  double count(const Formula &formula);  /* #MAVC */
+  double count(Formula &formula);  /* #MAVC */
   BouquetCounter(
     Cudd *mgr,
     bool clusterTree,

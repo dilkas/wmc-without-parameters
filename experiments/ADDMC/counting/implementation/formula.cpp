@@ -36,14 +36,11 @@ Graph Formula::getGaifmanGraph() const {
         graph.addEdge(var1, var2);
       }
 
-  /*util::printRow("size", unparsedWeights.size());*/
   for (auto words : unparsedWeights) {
     for (int_t i = 1; i < words.size() - 1; i++) {
       int_t var1 = std::abs(std::stoi(words.at(i)));
       for (int_t j = i + 1; j < words.size() - 1; j++) {
         int_t var2 = std::abs(std::stoi(words.at(j)));
-        /*util::printRow("var1", var1);*/
-        /*util::printRow("var2", var2);*/
         graph.addEdge(var1, var2);
       }
     }
@@ -165,7 +162,7 @@ VectorT<int_t> Formula::getMcsVarOrdering() const {
   return varOrdering;
 }
 
-VectorT<int_t> Formula::getVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool inverse) const {
+VectorT<int_t> Formula::generateVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool inverse) const {
   VectorT<int_t> varOrdering;
   switch (varOrderingHeuristic) {
     case VarOrderingHeuristic::APPEARANCE: {
@@ -200,12 +197,20 @@ VectorT<int_t> Formula::getVarOrdering(VarOrderingHeuristic varOrderingHeuristic
   return varOrdering;
 }
 
+VectorT<int_t> Formula::getVarOrdering() const {
+  return varOrdering;
+}
+
 int_t Formula::getDeclaredVarCount() const { return declaredVarCount; }
 
 MapT<int_t, double> Formula::getLiteralWeights() const { return literalWeights; }
 
-MapT<int_t, ADD> Formula::getWeights() const {
+const MapT<int_t, ADD> &Formula::getWeights() const {
   return weights;
+}
+
+const MapT<int_t, VectorT<int_t>> &Formula::getDependencies() const {
+  return dependencies;
 }
 
 const VectorT<VectorT<int_t>> &Formula::getCnf() const { return cnf; }
@@ -222,18 +227,17 @@ void Formula::printCnf() const {
   util::printCnf(cnf);
 }
 
-ADD Formula::literalToADD(int_t literal, Cudd *mgr, VectorT<int_t> varOrdering) {
+ADD Formula::literalToADD(int_t literal, Cudd *mgr) {
     auto it = std::find(varOrdering.begin(), varOrdering.end(), std::abs(literal));
     int_t index = std::distance(varOrdering.begin(), it);
     return mgr->addVar(index);
 }
 
-ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string> words,
-                                   double weight, VectorT<int_t> varOrdering) {
+ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string> words, double weight) {
   ADD negative = ~positive;
   for (int_t i = 2; i < words.size() - 1; i++) {
     int_t var = std::stoi(words.at(i));
-    ADD varADD = literalToADD(var, mgr, varOrdering);
+    ADD varADD = literalToADD(var, mgr);
     ADD newVariable = (var > 0) ? varADD : ~varADD;
     positive &= newVariable;
     negative &= newVariable;
@@ -355,22 +359,25 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
     }
   }
 
+  varOrdering = generateVarOrdering(varOrderingHeuristic, inverse);
+
   if (weightFormat == WeightFormat::CONDITIONAL) { /* compiles weights into ADDs */
-    auto varOrdering = getVarOrdering(varOrderingHeuristic, inverse);
     for (auto words : unparsedWeights) {
       int_t literal = std::stoi(words.at(1));
       int_t var = std::abs(literal);
-      ADD varAdd = literalToADD(var, mgr, varOrdering);
+      ADD varAdd = literalToADD(var, mgr);
       double weight = std::stod(words.back());
-      ADD cpt = constructAddFromWords(mgr, varAdd, words, weight, varOrdering);
+      ADD cpt = constructAddFromWords(mgr, varAdd, words, weight);
       auto previousEntry = weights.find(var);
       if (previousEntry != weights.end()) {
-        /*writeDd(*mgr, previousEntry->second, DOT_DIR + "before" + std::to_string(var) + ".dot");
-        writeDd(*mgr, cpt, DOT_DIR + "beforen" + std::to_string(var) + ".dot");*/
         previousEntry->second += cpt;
-        /*writeDd(*mgr, previousEntry->second, DOT_DIR + "after" + std::to_string(var) + ".dot");*/
       } else {
         weights[var] = cpt;
+      }
+    }
+    for (auto weight : weights) {
+      for (int_t index : util::getSupport(weight.second)) {
+        dependencies[weight.first].push_back(varOrdering[index]);
       }
     }
   }
@@ -380,11 +387,4 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
 
   util::printRow("declaredClauseCount", declaredClauseCount);
   util::printRow("apparentClauseCount", processedClauseCount);
-}
-
-Formula::Formula(const VectorT<VectorT<int_t>> &clauses) {
-  cnf = clauses;
-
-  for (const VectorT<int_t> &clause : clauses)
-    for (int_t literal : clause) updateApparentVars(literal);
 }
