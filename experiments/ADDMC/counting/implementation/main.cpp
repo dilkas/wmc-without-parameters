@@ -67,12 +67,12 @@ void testing::test() {
     std::cout << "\n";
   }
 
-  MonolithicCounter monolithicCounter(mgr, addVarOrderingHeuristic, false);
-  LinearCounter linearCounter(mgr, addVarOrderingHeuristic, false);
-  BucketCounter bucketListCounter(mgr, false, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
-  BucketCounter bucketTreeCounter(mgr, true, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
-  BouquetCounter bouquetListCounter(mgr, false, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
-  BouquetCounter bouquetTreeCounter(mgr, true, formularVarOrderingHeuristic, false, addVarOrderingHeuristic, false);
+  MonolithicCounter monolithicCounter(mgr);
+  LinearCounter linearCounter(mgr);
+  BucketCounter bucketListCounter(mgr, false, formularVarOrderingHeuristic, false);
+  BucketCounter bucketTreeCounter(mgr, true, formularVarOrderingHeuristic, false);
+  BouquetCounter bouquetListCounter(mgr, false, formularVarOrderingHeuristic, false);
+  BouquetCounter bouquetTreeCounter(mgr, true, formularVarOrderingHeuristic, false);
 
   int_t m = monolithicCounter.count(formula);
   int_t l = linearCounter.count(formula);
@@ -122,32 +122,32 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   double modelCount;
   switch (clusteringHeuristic) {
     case ClusteringHeuristic::MONOLITHIC: {
-      MonolithicCounter monolithicCounter(mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
+      MonolithicCounter monolithicCounter(mgr);
       modelCount = monolithicCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::LINEAR: {
-      LinearCounter linearCounter(mgr, addVarOrderingHeuristic, inverseAddVarOrdering);
+      LinearCounter linearCounter(mgr);
         modelCount = linearCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BUCKET_LIST: {
-      BucketCounter bucketCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BucketCounter bucketCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bucketCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BUCKET_TREE: {
-      BucketCounter bucketCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BucketCounter bucketCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bucketCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BOUQUET_LIST: {
-      BouquetCounter bouquetCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BouquetCounter bouquetCounter(mgr, false, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bouquetCounter.count(formula);
       break;
     }
     case ClusteringHeuristic::BOUQUET_TREE: {
-      BouquetCounter bouquetCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+      BouquetCounter bouquetCounter(mgr, true, formulaVarOrderingHeuristic, inverseFormulaVarOrdering);
       modelCount = bouquetCounter.count(formula);
       break;
     }

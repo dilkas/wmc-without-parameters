@@ -20,8 +20,6 @@ class Counter { /* abstract */
 protected:
   int_t dotFileIndex = 1;
   Cudd *mgr;
-  VarOrderingHeuristic addVarOrderingHeuristic;
-  bool inverseAddVarOrdering;
   MapT<int_t, int_t> formulaVarToAddVarMap; /* e.g. {42: 0, 13: 1} */
   VectorT<int_t> addVarToFormulaVarMap; /* e.g. [42, 13], i.e. addVarOrdering */
 
@@ -40,7 +38,6 @@ protected:
 
 public:
   virtual double count(Formula &formula) = 0;
-  double count(const std::string &filePath, WeightFormat weightFormat);
 };
 
 class MonolithicCounter : public Counter { /* builds an ADD for the entire CNF */
@@ -50,7 +47,7 @@ protected:
 
 public:
   double count(Formula &formula);
-  MonolithicCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
+  MonolithicCounter(Cudd *mgr);
 };
 
 class FactoredCounter : public Counter {}; /* abstract; builds an ADD for each clause */
@@ -61,7 +58,7 @@ protected:
 
 public:
   double count(Formula &formula);
-  LinearCounter(Cudd *mgr, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering);
+  LinearCounter(Cudd *mgr);
 };
 
 class NonlinearCounter : public FactoredCounter { /* abstract; puts clauses in clusters */
@@ -96,9 +93,7 @@ public:
     Cudd *mgr,
     bool clusterTree,
     VarOrderingHeuristic formulaVarOrderingHeuristic,
-    bool inverseFormulaVarOrdering,
-    VarOrderingHeuristic addVarOrderingHeuristic,
-    bool inverseAddVarOrdering);
+    bool inverseFormulaVarOrdering);
 };
 
 class BouquetCounter : public NonlinearCounter { /* Bouquet's Method */
@@ -108,7 +103,5 @@ public:
     Cudd *mgr,
     bool clusterTree,
     VarOrderingHeuristic formulaVarOrderingHeuristic,
-    bool inverseFormulaVarOrdering,
-    VarOrderingHeuristic addVarOrderingHeuristic,
-    bool inverseAddVarOrdering);
+    bool inverseFormulaVarOrdering);
 };
