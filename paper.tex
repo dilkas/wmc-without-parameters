@@ -7,6 +7,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{hyperref}
 \usepackage[capitalise]{cleveref}
 \usepackage{bm}
 \usepackage{booktabs}
@@ -14,6 +15,7 @@
 \usepackage{xcolor}
 \usepackage[backgroundcolor=lightgray]{todonotes}
 \usepackage{complexity}
+\usepackage{soul} % temp
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -47,43 +49,138 @@
   }
 }
 
-\title{What Boolean Algebras Can Teach Us About Weighted Model Counting}
-%\title{Generalising Weighted Model Counting to Boolean Algebras}
-%\title{On the Limitations of Weighted Model Counting}
-%\title{Weighted Model Counting/Integration from the Perspective of Boolean Algebras}
-%\title{What Boolean Algebras Can Teach Us About Weighted Model Counting/Integration?}
+\title{Weighted Model Counting with Conditional Probabilities}
 \author{Paulius Dilkas}
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
-% Feedback: What are the main claims, what are the main takeaways, intuitive
-% [???] of theorems to follow. To do this, we appeal to algebraic constructions
-% to define the main concepts for introducing measures on Boolean algebras.
 
-% Feedback: Can you say something here about factorized vs non-factorized
-% weight function definitions? That is, factorized is when w maps literals to
-% R_>=0, non-factorized is when w maps models to R_>=0 and show:
-% a) come up with nice example when non-factorized weights are intuitive
-% c) clarify that the factorized definition have is w.r.t. models, in case some
-% one gets confused [It doesn't have to be, if the BA is not free -- P.]
+\paragraph{Legend.}
+\begin{description}
+\item[F] Feedback (round 1).
+\item[F2] Feedback (round 2).
+\item[FP] Feedback from the review panel.
+\item[\textbullet] My own idea.
+\end{description}
 
-% Feedback 2: The paper at this stage is very technical - the danger is that
-% WMC/SRL people may not be able to follow it and so would be hard to get
-% accepted. Without clear target audience, [???] get work accepted. My main high
-% level suggestion is that let us tease apart what you have and see if a story
-% emerges. That is, let us attempt to write a paper *with examples* and see
-% whether with significant motivation, we have a story emerging. Below, sample
-% text needed to adequately motivate [???] for WMC/SRL community.
+\paragraph{The big TODO list.}
+\begin{itemize}
+\item Look into ways to theoretically justify the performance benefits. Some
+  suggestions:
+  \begin{itemize}
+  \item the number of variables,
+  \item the number of clauses/CPTs/lines in CPTs,
+  \item the proportion of edges that exist,
+  \item average degree,
+  \item average number of clauses that a variable is in,
+  \item the number of clusters in the linear/tree-like decomposition.
+  \end{itemize}
+\item Have an example of how the ADDs function in this situation. If not for the
+  paper, then at least for slides. Use the framework to check its correctness.
+\item Along with comparing the (3?) encodings, I could also compare this
+  to using ADDs directly on Bayesian networks.
+\item[F] Give a concrete example of something impossible to represent using WMC.
+\item Describe the changes to the Cachet DIMACS CNF format (and mention that, if
+  needed, the assumption that $\Pr(A) + \Pr(\neg A) = 1$ can be discarded).
+  Instead of \texttt{w 1 0.1}, we have \texttt{w 1 2 0.1} and \texttt{w 1 -2
+    0.5}. This provides half of the information; the remaining half can be
+  deduced, but the algorithm itself can support weights that are not necessarily
+  probabilities.
+\item Rename the repository into `conditional-wmc'.
+\item Give some examples (and/or a proof) of why this is correct when combined
+  with arbitrary clauses (i.e., conjunctions of disjunctions).
+\item Turn the saved PDFs into citations.
+\item Add a mini theorem: my model can express any probability distribution on
+  the BA (just like BNs can express any discrete distribution).
+\item[F] What are the main claims, what are the main takeaways, intuitive [???]
+  of theorems to follow. To do this, we appeal to algebraic constructions to
+  define the main concepts for introducing measures on Boolean algebras.
+\item[F] Can you say something here about factorized vs non-factorized
+  weight function definitions? That is, factorized is when $w$ maps literals to
+  $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
+  \begin{itemize}
+  \item come up with nice example when non-factorized weights are intuitive;
+  \item clarify that the factorized definition have is w.r.t. models, in case some
+    one gets confused. [It doesn't have to be, if the BA is not free---P.]
+  \end{itemize}
+\item[F2] The paper at this stage is very technical---the danger is that WMC/SRL
+  people may not be able to follow it and so would be hard to get accepted.
+  Without clear target audience, [???] get work accepted. My main high level
+  suggestion is that let us tease apart what you have and see if a story
+  emerges. That is, let us attempt to write a paper {\bf with examples} and
+  see whether with significant motivation, we have a story emerging. Below,
+  sample text needed to adequately motivate [???] for WMC/SRL community.
+\item[FP] Clear up questions about independence between literals.
+\item[F2] Preliminaries: explain with examples: models $=$ elements [atoms] of
+  algebra.
+\item WMC as a Measure
+  \begin{itemize}
+  \item[F2] Need to explain how WMC and NWMC connects to standard definitions of
+    WMC and $\Pr(\phi \mid e) = \WMC(\phi \land e)/\WMC(e)$.
+  \item[F2] You need to explain what precisely these mean in logic and models
+    and weight functions are usually defined and understood.
+  \item Be careful about mentioning ideals, filters, and quotients.
+  \end{itemize}
+\item What Measures are WMC-Definable: proofs need to be updated and
+  propositions could be phrased in a better way, but the gist should be the
+  same.
+\item Extending the Algebra.
+  \begin{itemize}
+  \item[F2] If you prove (b) above, you could motivate why weights on literals
+    is attractive and whether there is a way to augment the expressivity of WMC
+    while still maintaining literal level weights. Hence this action.
+  \item[F2] You need to explain the significance of this result.
+  \end{itemize}
+\item Make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x, y$?).
+\item Decide on terminology: coproducts/pushouts vs (amalgamated) free products.
+  Probably the former.
+\item Terminology: `with generating set $S$' $\to$ `over $S$'.
+\item Perhaps reorder the section of preliminaries into paragraphs, i.e., a
+  paragraph for order, for homomorphisms, etc. This would take up less space.
+\item Notation: if $L$ denotes literals, then it doesn't denote a generating
+  set.
+\end{itemize}
 
-% Feedback from the panel: Clear up questions about independence between
-% literals.
-
-% TODO for later:
-% 1) make up my mind about a,b vs x,y and stick to it (maybe x,y?)
-% 2) Coproducts/pushouts vs (amalgamated) free products. Probably the former.
-% 3) 'with generating set S' -> 'over S'
+\paragraph{Experimental setup.}
+\begin{itemize}
+\item
+  Algorithms\footnote{\url{http://beyondnp.org/pages/solvers/model-counters-exact/}}
+  (highlighted the initial setup, can expand later):
+  \begin{itemize}
+  \item \hl{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} (rediscovered the
+    multiplicativity of BAs in different words) (with optimal settings)
+  \item Cachet \cite{DBLP:conf/sat/SangBBKP04}
+  \item c2d \cite{DBLP:conf/ecai/Darwiche04}
+  \item d4 \cite{DBLP:conf/ijcai/LagniezM17} (closed source, boo!)
+  \item miniC2D  \cite{DBLP:conf/ijcai/OztokD15}
+  \end{itemize}
+\item Encodings:
+  \begin{itemize}
+  \item Darwiche \cite{DBLP:conf/kr/Darwiche02}
+  \item \hl{Sang et al.} \cite{DBLP:conf/aaai/SangBK05}
+  \item \hl{mine}
+  \end{itemize}
+\item Datasets\footnote{There might be more at
+    \url{https://meelgroup.github.io/}.}
+  \begin{itemize}
+  \item binary Bayesian networks from Sang et
+    al.\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}
+    \cite{DBLP:conf/aaai/SangBK05}
+    \begin{itemize}
+    \item \hl{Grid networks}: computing marginal probability of the last node in
+      the grid.
+    \item Plan recognition problems.
+    \item Deterministic quick medical reference.
+    \end{itemize}
+    For the last two, the task can be to calculate the marginal probability of a
+    randomly chosen node (so, repeat at least ten times).
+  \item non-binary Bayesian networks?
+  \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
+  \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
+  \end{itemize}
+\end{itemize}
 
 \paragraph{Contributions.}
 \begin{itemize}
@@ -121,13 +218,39 @@
   \end{itemize}
 \end{itemize}
 
-\section{Preliminaries}
+\paragraph{Notes.}
+\begin{itemize}
+\item Thesis: many important computational problems are solved by encoding them
+  as WMC. But if the weight function is extended to `conditional probabilities',
+  the problem becomes easier because current approaches need workarounds in
+  order to be independent.
+\item Shorter thesis: many important problems are encoded as WMC, but they can
+  be encoded in a better way if we allow for conditional probabilities.
+\item We extend the Gaifman graph to add edges when two variables occur in the
+  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
+  B)$).
+\item Extra benefit: one does not need to come up with a way to turn some probability
+distribution to into a fully independent one.
+\item Trivial CPTs such as $\Pr(A \mid B) = \Pr(\neg A \mid B) = 0.5$, the ADDs
+  of which simplify to a single number, are put in the first cluster.
+\item Observation: by inspecting the BN, we could identify CPTs that could be
+  completely ignored, but maybe good heuristics take care of that anyway.
+\item Observation: ADDs have a restrict command. I'm not going to use it, but it
+  could be nice.
+\item Alternative scenario to consider for future work: \#\SAT{} solver
+  generates solutions which are then used to restrict the ADDs that calculate
+  probabilities.
+\item Important future work: replacing ADDs with
+  AADDs\footnote{\url{https://github.com/ssanner/dd-inference}} is likely to
+  bring performance benefits. Other extensions:
+  \begin{itemize}
+  \item FOADDs can represent first order statements;
+  \item XADDs can replace WMI for continuous variables;
+  \item ADDs with intervals can do approximations.
+  \end{itemize}
+\end{itemize}
 
-% TODO
-% 1) Feedback 2: Explain with examples: models = elements [atoms] of algebra
-% 2) Perhaps reorder the section of preliminaries into paragraphs, i.e., a
-% paragraph for order, for homomorphisms, etc. This would take up less space.
-% 3) how to compute the number of elements in the algebra.
+\section{Preliminaries}
 
 \begin{definition} \label{def:ba}
   A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
@@ -247,8 +370,6 @@ are \emph{disjoint} if $a \land b = 0$.
 \end{lemma}
 
 \section{WMC as a Measure}
-% TODO: Feedback 2: Need to explain how WMC and NWMC connects to standard
-% definitions of WMC and Pr(phi|e) = WMC(phi /\ e)/WMC(e).
 
 \begin{definition} \label{def:algebra_from_logic}
   Let $\mathcal{L}$ be a propositional (or first-order) logic, and let
@@ -293,7 +414,6 @@ are \emph{disjoint} if $a \land b = 0$.
     w(p)w(q) + w(p)w(\neg q) = 0.3.
   \]
 
-  % TODO: be careful about mentioning ideals, filters, and quotients
   The corresponding BA $B(\Delta)$ can then be constructed using
   \cref{def:algebra_from_logic}. Alternatively, one can first construct the free
   BA generated by the set $\{ p, q \}$ and then take a quotient with respect to
@@ -307,7 +427,7 @@ are \emph{disjoint} if $a \land b = 0$.
   representing the set of all (four) models, each atom representing a single
   model, and each edge going upward representing a subset relation. Thus,
   the Boolean-algebraic way of calculating the WMC of $\Delta$ consists of:
-  \begin{enumerate} % TODO: why is step 1 always possible?
+  \begin{enumerate}
   \item Identifying an element $a \in B(\mathcal{L})$ that corresponds to
     $\Delta$.
   \item Finding all atoms of $B(\mathcal{L})$ that are `dominated' by $a$
@@ -317,12 +437,18 @@ are \emph{disjoint} if $a \land b = 0$.
   \end{enumerate}
   This motivates the following definition of WMC generalised to BAs.
 \end{example}
-% TODO: clarify what B(L) means. And whether B(Delta) is even necessary.
-% TODO: reference for the set/subset thing.
+\todo[inline,caption={}]{
+  \begin{itemize}
+  \item Why is Step 1 always possible?
+  \item Clarify what $B(L)$ means and whether $B(\Delta)$ is even necessary.
+  \item Find a reference for the set/subset thing.
+  \item This should be replaced with inner sums (a.k.a. free products).
+  \item Mention that the subsequent definition can be reduced to a single
+    formula (i.e., without cases).
+  \item Any measure is a WMC measure if all atoms are in $L$.
+  \end{itemize}
+}
 
-% TODO: Feedback 2: You need to explain what precisely these mean in logic and
-% models and weight functions are usually defined and understood.
-% TODO: This should be replaced with inner sums (a.k.a. free products)
 \begin{definition} \label{def:wmc}
   Let $\mathbf{B}$ be an atomic BA, and let $M \subset \mathbf{B}$ be its set of
   atoms. Let $L \subset \mathbf{B}$ be such that every atom $m \in M$ can be
@@ -345,9 +471,6 @@ are \emph{disjoint} if $a \land b = 0$.
   there exists a subset $L \subset \mathbf{B}$ and a weight function $w\colon L
   \to \mathbb{R}_{\ge 0}$ such that $m = \WMC_w$.
 \end{definition}
-% TODO: mention that the definition can be reduced to a single formula (i.e.,
-% without cases)
-% TODO: any measure is a WMC measure if all atoms are in L
 
 \begin{theorem}
   $\WMC$ is a measure, and $\nWMC$ is a probability measure.
@@ -397,9 +520,6 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
 \section{What Measures Are WMC-Definable?}
 
-% TODO: Proofs need to be updated and propositions could be phrased in a better
-% way, but the gist should be the same.
-
 \subsection{WMC Requires Independent Literals}
 
 \begin{lemma} \label{lemma:before_theorem}
@@ -441,7 +561,7 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   transformations are invertible, the two expressions are equivalent.
 \end{proof}
 
-% TODO: a special case for weight=0.
+\todo[inline]{This theorem needs a special case for zero weights.}
 \begin{theorem}
   Let $\mathbf{B}$ be a free BA over $\{ l_i \}_{i=1}^n$ (for some $n \in
   \mathbb{N}$) with measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$, and let
@@ -511,17 +631,12 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
 \subsection{Extending the Algebra}
 
-% TODO: Feedback 2: If you prove (b) above, you could motivate why weights on
-% literals is attractive and whether there is a way to augment the expressivity
-% of WMC while still maintaining literal level weights. Hence this action.
-
 Given this requirement for independence, a well-known way to represent
 probability distributions that do not consist entirely of independent variables
 is by adding more literals \cite{DBLP:journals/ai/ChaviraD08}, i.e., extending
 the set $L$ covered by the WMC weight function $w\colon L \to \mathbb{R}_{\ge
   0}$. Let us translate this idea to the language of BAs.
 
-% TODO: If L denotes literals, then it doesn't denote a generating set
 \begin{theorem} \label{thm:extension}
   Let $\mathbf{B}$ be a free BA over a finite set $S$, and let $m\colon
   \mathbf{B} \to \mathbb{R}_{\ge 0}$ be an arbitrary measure. Let $L = \{ s \mid
@@ -561,8 +676,13 @@ more literals. More precisely, we are given the left-hand column in
 \]
 and construct the remaining part in such a way that the triangle commutes.
 
-% TODO: make J depend on i
-\begin{proof} % TODO: find a reference for this first claim
+\todo[inline,caption={}]{
+  \begin{itemize}
+  \item Make $J$ depend on $i$.
+  \item Find a reference for this first claim in the following proof.
+  \end{itemize}
+}
+\begin{proof}
   Since $\mathbf{B}$ is free over $S$, each atom $a_i \in \mathbf{B}$ is an
   infimum of elements in $L$, i.e.,
   \[
@@ -675,8 +795,6 @@ variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
 \]
 variables would suffice.
 
-% TODO: Feedback 2: You need to explain the significance of this result.
-
 \section{Representing Independence and Conditional Independence}
 
 \subsection{Preliminaries}
@@ -756,7 +874,7 @@ variables would suffice.
 
 \subsection{New Results}
 
-% TODO: make sure that this is enough to guarantee a pushout
+\todo[inline]{Make sure that this is enough to guarantee a pushout.}
 \begin{theorem}
   Let $\{ S_i \}_{i=0}^n$ be a finite set of finite sets for some $n > 1$ such
   that for all distinct positive integers $i$ and $j$, $S_i \cap S_j = S_0$, and
@@ -775,9 +893,6 @@ variables would suffice.
     \land a_j).
   \]
 \end{theorem}
-\begin{proof}
-  % TODO: start here
-\end{proof}
 
 \begin{theorem}
   The number of weights needed to encode a Bayesian network using
@@ -925,24 +1040,6 @@ To turn a Bayesian network into a Boolean algebra, run $f(\{ v \in V \mid
 \item If $S = \emptyset$, return $\sum A$ (a coproduct).
 \item Otherwise, return $\sum_{f(S)} A$ (a pushout).
 \end{enumerate}
-
-Notes on the implementation of the algorithm
-\begin{itemize}
-\item We extend the Gaifman graph to add edges when two variables occur in the
-  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
-  B)$).
-\item Extra benefit: one does not need to come up with a way to turn some probability
-distribution to into a fully independent one.
-\item Trivial CPTs such as $\Pr(A \mid B) = \Pr(\neg A \mid B) = 0.5$, the ADDs
-  of which simplify to a single number, are put in the first cluster.
-\item TODO: Look into ways to theoretically justify the performance benefits (I
-  have some suggestions in my notes).
-\item TODO: when performing experiments, measure memory usage as well.
-\item TODO: Along with comparing the (3?) encodings, I could also compare this
-  to using ADDs directly on Bayesian networks.
-\item TODO: Feedback: Give a concrete example of something impossible to
-  represent using WMC.
-\end{itemize}
 
 \bibliographystyle{plain}
 \bibliography{paper}
