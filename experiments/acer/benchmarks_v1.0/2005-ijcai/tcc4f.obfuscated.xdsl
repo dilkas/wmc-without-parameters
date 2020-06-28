@@ -1,0 +1,1788 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smile version="1.0" id="net" numsamples="1000">
+	<nodes>
+		<cpt id="n0" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.005000000000000001 0.995</probabilities>
+			<property id="KI_SHORTNAME">Power Supply 5V</property>
+			<property id="KI_LONGNAME">Power Supply 5V</property>
+		</cpt>
+		<cpt id="n1" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.02 0.98</probabilities>
+			<property id="KI_SHORTNAME">Serial Link Board (C003)</property>
+			<property id="KI_LONGNAME">Serial Link Board (C003)</property>
+		</cpt>
+		<cpt id="n2" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.016 0.984</probabilities>
+			<property id="KI_SHORTNAME">Interface Boards (C075, C083)</property>
+			<property id="KI_LONGNAME">Interface Boards (C075, C083)</property>
+		</cpt>
+		<cpt id="n3" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.014 0.986</probabilities>
+			<property id="KI_SHORTNAME">Control Board (C011)</property>
+			<property id="KI_LONGNAME">Control Board (C011)</property>
+		</cpt>
+		<cpt id="n4" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.013 0.987</probabilities>
+			<property id="KI_SHORTNAME">Input/output Boards (G059, G067)</property>
+			<property id="KI_LONGNAME">Input/output Boards (G059, G067)</property>
+		</cpt>
+		<cpt id="n5" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.012 0.988</probabilities>
+			<property id="KI_SHORTNAME">Monitoring Board (C043)</property>
+			<property id="KI_LONGNAME">Monitoring Board (C043)</property>
+		</cpt>
+		<cpt id="n6" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.016 0.984</probabilities>
+			<property id="KI_SHORTNAME">Memory/Processor Board (C035, C027)</property>
+			<property id="KI_LONGNAME">Memory/Processor Board (C035, C027)</property>
+		</cpt>
+		<noisymax id="n7" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n0 n1 n2 n3 n4 n5 n6</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.3493493358823891 0.6506506241176113 0 1 0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 04 Power Supply - 5V</property>
+			<property id="KI_LONGNAME">TCC 04 Power Supply - 5V</property>
+		</noisymax>
+		<cpt id="n8" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.003 0.997</probabilities>
+			<property id="KI_SHORTNAME">Power Supply 24V</property>
+			<property id="KI_LONGNAME">Power Supply 24V</property>
+		</cpt>
+		<cpt id="n9" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.011 0.989</probabilities>
+			<property id="KI_SHORTNAME">Current Transducer (U3)</property>
+			<property id="KI_LONGNAME">Current Transducer (U3)</property>
+		</cpt>
+		<cpt id="n10" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.011 0.989</probabilities>
+			<property id="KI_SHORTNAME">Current Transducer (U4)</property>
+			<property id="KI_LONGNAME">Current Transducer (U4)</property>
+		</cpt>
+		<cpt id="n11" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.011 0.989</probabilities>
+			<property id="KI_SHORTNAME">Current Transducer (U5)</property>
+			<property id="KI_LONGNAME">Current Transducer (U5)</property>
+		</cpt>
+		<noisymax id="n12" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n8 n9 n10 n11</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.6996996826956989 0.3003003073043012 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 04 Power Supply - 24V</property>
+			<property id="KI_LONGNAME">TCC 04 Power Supply - 24V</property>
+		</noisymax>
+		<cpt id="n13" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.005000000000000001 0.995</probabilities>
+			<property id="KI_SHORTNAME">Power Supply 14V</property>
+			<property id="KI_LONGNAME">Power Supply 14V</property>
+		</cpt>
+		<cpt id="n14" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.004 0.996</probabilities>
+			<property id="KI_SHORTNAME">Speed Sensor 1/4</property>
+			<property id="KI_LONGNAME">Speed Sensor 1/4</property>
+		</cpt>
+		<cpt id="n15" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.004 0.996</probabilities>
+			<property id="KI_SHORTNAME">Speed Sensor 2/5</property>
+			<property id="KI_LONGNAME">Speed Sensor 2/5</property>
+		</cpt>
+		<cpt id="n16" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.004 0.996</probabilities>
+			<property id="KI_SHORTNAME">Speed Sensor 3/6</property>
+			<property id="KI_LONGNAME">Speed Sensor 3/6</property>
+		</cpt>
+		<noisymax id="n17" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n13 n14 n15 n16</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.8998998709019033 0.1001000990980971 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 04 Power Supply - 15V</property>
+			<property id="KI_LONGNAME">TCC 04 Power Supply - 15V</property>
+		</noisymax>
+		<cpt id="n18" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.004 0.996</probabilities>
+			<property id="KI_SHORTNAME">GTO Power Spl 24V</property>
+			<property id="KI_LONGNAME">GTO Power Spl 24V</property>
+		</cpt>
+		<noisymax id="n19" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n18</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.1991991972052133 0.8008008027947867 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 04 Power Supply - GTO 24V</property>
+			<property id="KI_LONGNAME">TCC 04 Power Supply - GTO 24V</property>
+		</noisymax>
+		<cpt id="n20" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.046 0.954</probabilities>
+			<property id="KI_SHORTNAME">Other TCC faults</property>
+			<property id="KI_LONGNAME">Other TCC faults</property>
+		</cpt>
+		<cpt id="n21" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.0054 0.9946</probabilities>
+			<property id="KI_SHORTNAME">Engine, Generators &amp; VDCL Transducer </property>
+			<property id="KI_LONGNAME">Engine, Generators &amp; VDCL Transducer </property>
+		</cpt>
+		<noisymax id="n22" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n20 n21 n18</parents>
+			<strengths>0 1 0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.1991991972052133 0.8008008027947867 0 1 0.5995996135976016 0.4004004064023983 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 05 Low Power Supply - GTO 24V</property>
+			<property id="KI_LONGNAME">TCC 05 Low Power Supply - GTO 24V</property>
+		</noisymax>
+		<noisymax id="n23" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n20 n18</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.4994994945095147 0.5005004954904855 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 06 Missing Power Supply - GTO 24V</property>
+			<property id="KI_LONGNAME">TCC 06 Missing Power Supply - GTO 24V</property>
+		</noisymax>
+		<cpt id="n24" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.039 0.961</probabilities>
+			<property id="KI_SHORTNAME">Gate Unit R</property>
+			<property id="KI_LONGNAME">Gate Unit R</property>
+		</cpt>
+		<cpt id="n25" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.039 0.961</probabilities>
+			<property id="KI_SHORTNAME">Gate Unit S</property>
+			<property id="KI_LONGNAME">Gate Unit S</property>
+		</cpt>
+		<noisymax id="n26" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n24 n25</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 07 Gate Unit R/S Pulse Intrpt</property>
+			<property id="KI_LONGNAME">TCC 07 Gate Unit R/S Pulse Intrpt</property>
+		</noisymax>
+		<cpt id="n27" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.039 0.961</probabilities>
+			<property id="KI_SHORTNAME">Gate Unit T</property>
+			<property id="KI_LONGNAME">Gate Unit T</property>
+		</cpt>
+		<noisymax id="n28" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n27</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 08 Gate Unit T Pulse Intrpt</property>
+			<property id="KI_LONGNAME">TCC 08 Gate Unit T Pulse Intrpt</property>
+		</noisymax>
+		<cpt id="n29" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.008 0.992</probabilities>
+			<property id="KI_SHORTNAME">Thyristor Control Board (A11, A12)</property>
+			<property id="KI_LONGNAME">Thyristor Control Board (A11, A12)</property>
+		</cpt>
+		<noisymax id="n30" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n5 n20 n29</parents>
+			<strengths>0 1 0 1 0 1</strengths>
+			<parameters>0.2992993063233304 0.7007006836766698 0 1 0.1991991972052133 0.8008008027947867 0 1 0.2992993063233304 0.7007006836766698 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 10 Unjustified Crowbar Other TCC</property>
+			<property id="KI_LONGNAME">TCC 10 Unjustified Crowbar Other TCC</property>
+		</noisymax>
+		<cpt id="n31" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.005000000000000001 0.995</probabilities>
+			<property id="KI_SHORTNAME">DC Voltage Transducer (U1)</property>
+			<property id="KI_LONGNAME">DC Voltage Transducer (U1)</property>
+		</cpt>
+		<cpt id="n32" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.0054 0.9946</probabilities>
+			<property id="KI_SHORTNAME">EM2000 Computer, Communication &amp; Radar</property>
+			<property id="KI_LONGNAME">EM2000 Computer, Communication &amp; Radar</property>
+		</cpt>
+		<noisymax id="n33" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n31 n21 n32 n4</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.2992993063233304 0.7007006836766698 0 1 0.1991991972052133 0.8008008027947867 0 1 0.2992993063233304 0.7007006836766698 0 1 0.1991991972052133 0.8008008027947867 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 0C DC Link Overvoltage </property>
+			<property id="KI_LONGNAME">TCC 0C DC Link Overvoltage </property>
+		</noisymax>
+		<noisymax id="n34" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n31 n21 n32</parents>
+			<strengths>0 1 0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.249249246764272 0.7507507432357282 0 1 0.3493493358823891 0.6506506241176113 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 0C DC Link Overvoltage Both TCC</property>
+			<property id="KI_LONGNAME">TCC 0C DC Link Overvoltage Both TCC</property>
+		</noisymax>
+		<cpt id="n35" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.012 0.988</probabilities>
+			<property id="KI_SHORTNAME">Reactor (L456)</property>
+			<property id="KI_LONGNAME">Reactor (L456)</property>
+		</cpt>
+		<noisymax id="n36" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n31 n21 n32 n35</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.6996996826956989 0.3003003073043012 0 1 0.249249246764272 0.7507507432357282 0 1 0.249249246764272 0.7507507432357282 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 11 DC Link Undervoltage </property>
+			<property id="KI_LONGNAME">TCC 11 DC Link Undervoltage </property>
+		</noisymax>
+		<noisymax id="n37" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n31 n21 n32</parents>
+			<strengths>0 1 0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.2992993063233304 0.7007006836766698 0 1 0.2992993063233304 0.7007006836766698 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 11 DC Link Undervoltage Both TCC</property>
+			<property id="KI_LONGNAME">TCC 11 DC Link Undervoltage Both TCC</property>
+		</noisymax>
+		<cpt id="n38" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.015 0.985</probabilities>
+			<property id="KI_SHORTNAME">Phase Module R</property>
+			<property id="KI_LONGNAME">Phase Module R</property>
+		</cpt>
+		<noisymax id="n39" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n24 n38</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.3493493358823891 0.6506506241176113 0 1 0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 15 GTO R Monitoring</property>
+			<property id="KI_LONGNAME">TCC 15 GTO R Monitoring</property>
+		</noisymax>
+		<cpt id="n40" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.015 0.985</probabilities>
+			<property id="KI_SHORTNAME">Phase Module S</property>
+			<property id="KI_LONGNAME">Phase Module S</property>
+		</cpt>
+		<noisymax id="n41" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n25 n40</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.3493493358823891 0.6506506241176113 0 1 0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 15 GTO S Monitoring</property>
+			<property id="KI_LONGNAME">TCC 15 GTO S Monitoring</property>
+		</noisymax>
+		<cpt id="n42" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.015 0.985</probabilities>
+			<property id="KI_SHORTNAME">Phase Module T</property>
+			<property id="KI_LONGNAME">Phase Module T</property>
+		</cpt>
+		<noisymax id="n43" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n27 n42</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.3493493358823891 0.6506506241176113 0 1 0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 15 GTO T Monitoring</property>
+			<property id="KI_LONGNAME">TCC 15 GTO T Monitoring</property>
+		</noisymax>
+		<cpt id="n44" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.0054 0.9946</probabilities>
+			<property id="KI_SHORTNAME">1/4 Traction Motor</property>
+			<property id="KI_LONGNAME">1/4 Traction Motor</property>
+		</cpt>
+		<cpt id="n45" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.0054 0.9946</probabilities>
+			<property id="KI_SHORTNAME">2/5 Traction Motor</property>
+			<property id="KI_LONGNAME">2/5 Traction Motor</property>
+		</cpt>
+		<cpt id="n46" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.0054 0.9946</probabilities>
+			<property id="KI_SHORTNAME">3/6 Traction Motor</property>
+			<property id="KI_LONGNAME">3/6 Traction Motor</property>
+		</cpt>
+		<cpt id="n47" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.01 0.99</probabilities>
+		</cpt>
+		<noisymax id="n48" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n24 n25 n27 n20 n44 n45 n46 n47</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.1991991991991992 0.8008008008008009 0 1 0.1991991991991992 0.8008008008008009 0 1 0.1991991991991992 0.8008008008008009 0 1 0.4994994994994995 0.5005005005005005 0 1 0.4994994994994995 0.5005005005005005 0 1 0.4994994994994995 0.5005005005005005 0 1 0.4994994994994995 0.5005005005005005 0 1 0.2992992992992993 0.7007007007007007 0 1 0.001000000000000001 0.999</parameters>
+			<property id="KI_SHORTNAME">TCC 28, 29 AC Output Voltage Low</property>
+			<property id="KI_LONGNAME">TCC 28, 29 AC Output Voltage Low</property>
+		</noisymax>
+		<noisymax id="n49" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n32 n18</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.1991991972052133 0.8008008027947867 0 1 0.1991991972052133 0.8008008027947867 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 3D GTO Power Supply Feedback</property>
+			<property id="KI_LONGNAME">TCC 3D GTO Power Supply Feedback</property>
+		</noisymax>
+		<noisymax id="n50" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n4 n5 n9 n10 n11 n44 n45 n46</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.04904904857808778 0.9509509314219126 0 1 0.9499499304509518 0.05005004954904856 0 1 0.9499499304509518 0.05005004954904856 0 1 0.9499499304509518 0.05005004954904856 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 38 Output Currents Unbalanced</property>
+			<property id="KI_LONGNAME">TCC 38 Output Currents Unbalanced</property>
+		</noisymax>
+		<cpt id="n51" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.019 0.981</probabilities>
+			<property id="KI_SHORTNAME">Fan Tier Board (E147 or E000)</property>
+			<property id="KI_LONGNAME">Fan Tier Board (E147 or E000)</property>
+		</cpt>
+		<noisymax id="n52" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n51</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 52 ASG Fan Tier</property>
+			<property id="KI_LONGNAME">TCC 52 ASG Fan Tier</property>
+		</noisymax>
+		<cpt id="n53" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.005000000000000001 0.995</probabilities>
+			<property id="KI_SHORTNAME">Startup Unit (C157)</property>
+			<property id="KI_LONGNAME">Startup Unit (C157)</property>
+		</cpt>
+		<noisymax id="n54" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n1 n6 n20 n32 n53</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.7997998018038057 0.2002001981961942 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.7997998018038057 0.2002001981961942 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 5A-66 ASG Computer &amp; Communication</property>
+			<property id="KI_LONGNAME">TCC 5A-66 ASG Computer &amp; Communication</property>
+		</noisymax>
+		<noisymax id="n55" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n2 n4 n44 n14</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.8998998709019033 0.1001000990980971 0 1 0.4994994945095147 0.5005004954904855 0 1 0.1991991972052133 0.8008008027947867 0 1 0.8998998709019033 0.1001000990980971 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 8D,90 Speed Sensor 1/4 </property>
+			<property id="KI_LONGNAME">TCC 8D,90 Speed Sensor 1/4 </property>
+		</noisymax>
+		<noisymax id="n56" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n2 n4 n45 n15</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.8998998709019033 0.1001000990980971 0 1 0.4994994945095147 0.5005004954904855 0 1 0.1991991972052133 0.8008008027947867 0 1 0.8998998709019033 0.1001000990980971 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 8E, 92 Speed Sensor 2/5</property>
+			<property id="KI_LONGNAME">TCC 8E, 92 Speed Sensor 2/5</property>
+		</noisymax>
+		<noisymax id="n57" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n2 n4 n46 n16</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.8998998709019033 0.1001000990980971 0 1 0.4994994945095147 0.5005004954904855 0 1 0.1991991972052133 0.8008008027947867 0 1 0.8998998709019033 0.1001000990980971 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 8F, 94 Speed Sensor 3/6</property>
+			<property id="KI_LONGNAME">TCC 8F, 94 Speed Sensor 3/6</property>
+		</noisymax>
+		<cpt id="n58" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.004 0.996</probabilities>
+			<property id="KI_SHORTNAME">Wheel mismatch</property>
+			<property id="KI_LONGNAME">Wheel mismatch</property>
+		</cpt>
+		<noisymax id="n59" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n44 n45 n46 n58</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 9A, 9B Wheel Mismatch</property>
+			<property id="KI_LONGNAME">TCC 9A, 9B Wheel Mismatch</property>
+		</noisymax>
+		<noisymax id="n60" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n24 n9 n44 n45 n46</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.7997998018038057 0.2002001981961942 0 1 0.04904904857808778 0.9509509314219126 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC E3, E6 Gate Unit R Monitoring</property>
+			<property id="KI_LONGNAME">TCC E3, E6 Gate Unit R Monitoring</property>
+		</noisymax>
+		<noisymax id="n61" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n25 n10 n44 n45 n46</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.7997998018038057 0.2002001981961942 0 1 0.04904904857808778 0.9509509314219126 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC E4, E7 Gate Unit S Monitoring</property>
+			<property id="KI_LONGNAME">TCC E4, E7 Gate Unit S Monitoring</property>
+		</noisymax>
+		<noisymax id="n62" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n27 n11 n44 n45 n46</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.7997998018038057 0.2002001981961942 0 1 0.04904904857808778 0.9509509314219126 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC E5, E8 Gate Unit T Monitoring</property>
+			<property id="KI_LONGNAME">TCC E5, E8 Gate Unit T Monitoring</property>
+		</noisymax>
+		<noisymax id="n63" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n24 n25 n27 n20 n44 n45 n46</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.4994994945095147 0.5005004954904855 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Locomotive Vibration</property>
+			<property id="KI_LONGNAME">Locomotive Vibration</property>
+		</noisymax>
+		<noisymax id="n64" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n1 n31 n9 n10 n11 n21 n32</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.1991991972052133 0.8008008027947867 0 1 0.09909909813714624 0.9009008718628542 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.1991991972052133 0.8008008027947867 0 1 0.2992993063233304 0.7007006836766698 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Locomotive Surging</property>
+			<property id="KI_LONGNAME">Locomotive Surging</property>
+		</noisymax>
+		<noisymax id="n65" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n5 n38 n40 n42 n20 n29</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.2992993063233304 0.7007006836766698 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.1991991972052133 0.8008008027947867 0 1 0.7997998018038057 0.2002001981961942 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">EM2K 791 Unexpected Crowbar</property>
+			<property id="KI_LONGNAME">EM2K 791 Unexpected Crowbar</property>
+		</noisymax>
+		<noisymax id="n66" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n5 n38 n40 n42</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.2992993063233304 0.7007006836766698 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">EM2K 322, 1143 DC Link Overcurrent</property>
+			<property id="KI_LONGNAME">EM2K 322, 1143 DC Link Overcurrent</property>
+		</noisymax>
+		<cpt id="n67" diagtype="target" ranked="true">
+			<state id="s0" fault="true" />
+			<state id="s1" />
+			<probabilities>0.006 0.994</probabilities>
+			<property id="KI_SHORTNAME">Crowbar Reactor (L12)</property>
+			<property id="KI_LONGNAME">Crowbar Reactor (L12)</property>
+		</cpt>
+		<noisymax id="n68" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n35 n67</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.6996996826956989 0.3003003073043012 0 1 0.6996996826956989 0.3003003073043012 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">EM2K 359, 859 Ground Relay</property>
+			<property id="KI_LONGNAME">EM2K 359, 859 Ground Relay</property>
+		</noisymax>
+		<noisymax id="n69" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n24 n38</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.1991991972052133 0.8008008027947867 0 1 0.4994994945095147 0.5005004954904855 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit R Green Light</property>
+			<property id="KI_LONGNAME">Gate Unit R Green Light</property>
+		</noisymax>
+		<noisymax id="n70" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n25 n40</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.1991991972052133 0.8008008027947867 0 1 0.4994994945095147 0.5005004954904855 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit S Green Light</property>
+			<property id="KI_LONGNAME">Gate Unit S Green Light</property>
+		</noisymax>
+		<noisymax id="n71" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n27 n42</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.1991991972052133 0.8008008027947867 0 1 0.4994994945095147 0.5005004954904855 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit T Green Light</property>
+			<property id="KI_LONGNAME">Gate Unit T Green Light</property>
+		</noisymax>
+		<noisymax id="n72" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n24 n38</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit R Yellow Light</property>
+			<property id="KI_LONGNAME">Gate Unit R Yellow Light</property>
+		</noisymax>
+		<noisymax id="n73" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n25 n40</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit S Yellow Light</property>
+			<property id="KI_LONGNAME">Gate Unit S Yellow Light</property>
+		</noisymax>
+		<noisymax id="n74" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n27 n42</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit T Yellow Light</property>
+			<property id="KI_LONGNAME">Gate Unit T Yellow Light</property>
+		</noisymax>
+		<noisymax id="n75" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n24 n38</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.5995996135976016 0.4004004064023983 0 1 0.5995996135976016 0.4004004064023983 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit R Firing Pulses</property>
+			<property id="KI_LONGNAME">Gate Unit R Firing Pulses</property>
+		</noisymax>
+		<noisymax id="n76" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n25 n40</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.5995996135976016 0.4004004064023983 0 1 0.5995996135976016 0.4004004064023983 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit S Firing Pulses</property>
+			<property id="KI_LONGNAME">Gate Unit S Firing Pulses</property>
+		</noisymax>
+		<noisymax id="n77" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n27 n42</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.5995996135976016 0.4004004064023983 0 1 0.5995996135976016 0.4004004064023983 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Gate Unit T Firing Pulses</property>
+			<property id="KI_LONGNAME">Gate Unit T Firing Pulses</property>
+		</noisymax>
+		<noisymax id="n78" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n1 n2 n3 n4 n5 n6 n0</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Power Supply 5V Light</property>
+			<property id="KI_LONGNAME">Power Supply 5V Light</property>
+		</noisymax>
+		<noisymax id="n79" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n13 n14 n15 n16</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.249249246764272 0.7507507432357282 0 1 0.249249246764272 0.7507507432357282 0 1 0.249249246764272 0.7507507432357282 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Power Supply 15V Light</property>
+			<property id="KI_LONGNAME">Power Supply 15V Light</property>
+		</noisymax>
+		<noisymax id="n80" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n8 n9 n10 n11</parents>
+			<strengths>0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.249249246764272 0.7507507432357282 0 1 0.249249246764272 0.7507507432357282 0 1 0.249249246764272 0.7507507432357282 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Power Supply 24V Light</property>
+			<property id="KI_LONGNAME">Power Supply 24V Light</property>
+		</noisymax>
+		<noisymax id="n81" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n21 n18</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Power Supply 24V GTO Voltage</property>
+			<property id="KI_LONGNAME">Power Supply 24V GTO Voltage</property>
+		</noisymax>
+		<noisymax id="n82" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n38</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Phase Module R Visual</property>
+			<property id="KI_LONGNAME">Phase Module R Visual</property>
+		</noisymax>
+		<noisymax id="n83" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n40</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Phase Module S Visual</property>
+			<property id="KI_LONGNAME">Phase Module S Visual</property>
+		</noisymax>
+		<noisymax id="n84" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n42</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Phase Module T Visual</property>
+			<property id="KI_LONGNAME">Phase Module T Visual</property>
+		</noisymax>
+		<noisymax id="n85" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n38</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Phase Module R Resistance</property>
+			<property id="KI_LONGNAME">Phase Module R Resistance</property>
+		</noisymax>
+		<noisymax id="n86" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n40</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Phase Module S Resistance</property>
+			<property id="KI_LONGNAME">Phase Module S Resistance</property>
+		</noisymax>
+		<noisymax id="n87" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n42</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Phase Module T Resistance</property>
+			<property id="KI_LONGNAME">Phase Module T Resistance</property>
+		</noisymax>
+		<noisymax id="n88" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n51</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.04904904857808778 0.9509509314219126 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">ASG Fan Tier Light</property>
+			<property id="KI_LONGNAME">ASG Fan Tier Light</property>
+		</noisymax>
+		<noisymax id="n89" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n35</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.7497497422547574 0.2502502477452427 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Reactor Visual Inspection</property>
+			<property id="KI_LONGNAME">Reactor Visual Inspection</property>
+		</noisymax>
+		<noisymax id="n90" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n35</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.7497497422547574 0.2502502477452427 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Reactor Ground Short</property>
+			<property id="KI_LONGNAME">Reactor Ground Short</property>
+		</noisymax>
+		<noisymax id="n91" diagtype="observation">
+			<state id="s0" />
+			<state id="s1" default="true" />
+			<parents>n1 n6 n20 n32 n53</parents>
+			<strengths>0 1 0 1 0 1 0 1 0 1</strengths>
+			<parameters>0.09909909813714624 0.9009008718628542 0 1 0.04904904857808778 0.9509509314219126 0 1 0.04904904857808778 0.9509509314219126 0 1 0.8998998709019033 0.1001000990980971 0 1 0.04904904857808778 0.9509509314219126 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">TCC 5A-66 ASG Computer &amp; Communication both TCC</property>
+			<property id="KI_LONGNAME">TCC 5A-66 ASG Computer &amp; Communication both TCC</property>
+		</noisymax>
+		<noisymax id="n92" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n6 n0 n53</parents>
+			<strengths>0 1 0 1 0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.7997998018038057 0.2002001981961942 0 1 0.7997998018038057 0.2002001981961942 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">EM2K ### ? Communication Failure, empty TCC archive</property>
+			<property id="KI_LONGNAME">EM2K ### ? Communication Failure, empty TCC archive </property>
+		</noisymax>
+		<noisymax id="n93" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n67</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.2992993063233304 0.7007006836766698 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Reactor (L12) Ground Short</property>
+			<property id="KI_LONGNAME">Reactor (L12) Ground Short</property>
+		</noisymax>
+		<noisymax id="n94" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n67</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.7497497422547574 0.2502502477452427 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Reactor ( L12) Visual Inspection</property>
+			<property id="KI_LONGNAME">Reactor ( L12) Visual Inspection</property>
+		</noisymax>
+		<noisymax id="n95" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n53</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.8498498613428444 0.1501501586571556 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Visual Inspection of Lights in ASG computer</property>
+			<property id="KI_LONGNAME">Visual Inspection of Lights in ASG computer</property>
+		</noisymax>
+		<noisymax id="n96" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n58</parents>
+			<strengths>0 1</strengths>
+			<parameters>0.9499499304509518 0.05005004954904856 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Wheel Thickness Test</property>
+			<property id="KI_LONGNAME">Wheel Thickness Test</property>
+		</noisymax>
+		<noisymax id="n97" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n1 n32</parents>
+			<strengths>0 1 0 1</strengths>
+			<parameters>0.8998998709019033 0.1001000990980971 0 1 0.8998998709019033 0.1001000990980971 0 1 0.0009999999999998899 0.9990000100000001</parameters>
+			<property id="KI_SHORTNAME">Stall Test with Communication Failures</property>
+			<property id="KI_LONGNAME">Stall Test with Communication Failures</property>
+		</noisymax>
+		<cpt id="n98" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n46</parents>
+			<probabilities>0.7 0.3 0 1</probabilities>
+		</cpt>
+		<cpt id="n99" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n45</parents>
+			<probabilities>0.7 0.3 0 1</probabilities>
+		</cpt>
+		<cpt id="n100" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n44</parents>
+			<probabilities>0.7 0.3 0 1</probabilities>
+		</cpt>
+		<cpt id="n101" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n47</parents>
+			<probabilities>0.8 0.2 0 1</probabilities>
+		</cpt>
+		<cpt id="n102" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n10</parents>
+			<probabilities>0.8 0.2 0 1</probabilities>
+		</cpt>
+		<cpt id="n103" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n9</parents>
+			<probabilities>0.8 0.2 0 1</probabilities>
+		</cpt>
+		<cpt id="n104" diagtype="observation" ranked="true">
+			<state id="s0" />
+			<state id="s1" />
+			<parents>n11</parents>
+			<probabilities>0.8 0.2 0 1</probabilities>
+		</cpt>
+	</nodes>
+	<extensions>
+		<genie version="1.0" name="net" faultnameformat="nodestate">
+			<node id="n0" faultnameformat="nodestate">
+				<name>n0</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2419 680 2616 724</position>
+				<state id="s0" faultname="Power Supply 5V" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n1" faultnameformat="nodestate">
+				<name>n1</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2612 236 2853 276</position>
+				<state id="s0" faultname="Serial Link Board (C003)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n2" faultnameformat="nodestate">
+				<name>n2</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2018 1152 2318 1194</position>
+				<state id="s0" faultname="Interface Boards (C075, C083)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n3" faultnameformat="nodestate">
+				<name>n3</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1405 660 1645 704</position>
+				<state id="s0" faultname="Control Board (C011)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n4" faultnameformat="nodestate">
+				<name>n4</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1685 1148 1997 1188</position>
+				<state id="s0" faultname="Input/output Boards (G059, G067)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n5" faultnameformat="nodestate">
+				<name>n5</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1190 672 1403 712</position>
+				<state id="s0" faultname="Monitoring Board (C043)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n6" faultnameformat="nodestate">
+				<name>n6</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2324 255 2564 298</position>
+				<state id="s0" faultname="Memory/Processor Board (C035, C027)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n7" faultnameformat="nodestate">
+				<name>n7</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2122 442 2341 482</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n8" faultnameformat="nodestate">
+				<name>n8</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1645 661 1895 701</position>
+				<state id="s0" faultname="Power Supply 24V" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n9" faultnameformat="nodestate">
+				<name>n9</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1890 663 2102 711</position>
+				<state id="s0" faultname="Current Transducer (U3)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n10" faultnameformat="nodestate">
+				<name>n10</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1007 665 1170 719</position>
+				<state id="s0" faultname="Current Transducer (U4)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n11" faultnameformat="nodestate">
+				<name>n11</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2621 678 2866 729</position>
+				<state id="s0" faultname="Current Transducer (U5)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n12" faultnameformat="nodestate">
+				<name>n12</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1596 433 1854 475</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n13" faultnameformat="nodestate">
+				<name>n13</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2198 1742 2440 1782</position>
+				<state id="s0" faultname="Power Supply 14V" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n14" faultnameformat="nodestate">
+				<name>n14</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1913 1468 2153 1508</position>
+				<state id="s0" faultname="Speed Sensor 1/4" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n15" faultnameformat="nodestate">
+				<name>n15</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2619 1482 2872 1525</position>
+				<state id="s0" faultname="Speed Sensor 2/5" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n16" faultnameformat="nodestate">
+				<name>n16</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2257 1474 2511 1514</position>
+				<state id="s0" faultname="Speed Sensor 3/6" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n17" faultnameformat="nodestate">
+				<name>n17</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1957 1672 2234 1712</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n18" faultnameformat="nodestate">
+				<name>n18</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3606 678 3859 718</position>
+				<state id="s0" faultname="GTO Power Spl 24V" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n19" faultnameformat="nodestate">
+				<name>n19</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3246 883 3404 935</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n20" faultnameformat="nodestate">
+				<name>n20</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2148 675 2375 715</position>
+				<state id="s0" faultname="Other TCC faults" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n21" faultnameformat="nodestate">
+				<name>n21</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3130 687 3363 727</position>
+				<state id="s0" faultname="Engine, Generators &amp; VDCL Transducer " />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n22" faultnameformat="nodestate">
+				<name>n22</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3704 420 3848 476</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n23" faultnameformat="nodestate">
+				<name>n23</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2958 436 3168 476</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n24" faultnameformat="nodestate">
+				<name>n24</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1165 1046 1327 1087</position>
+				<state id="s0" faultname="Gate Unit R" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n25" faultnameformat="nodestate">
+				<name>n25</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1165 1415 1374 1462</position>
+				<state id="s0" faultname="Gate Unit S" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n26" faultnameformat="nodestate">
+				<name>n26</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1024 1218 1201 1268</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n27" faultnameformat="nodestate">
+				<name>n27</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2093 227 2261 269</position>
+				<state id="s0" faultname="Gate Unit T" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n28" faultnameformat="nodestate">
+				<name>n28</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2282 164 2461 212</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n29" faultnameformat="nodestate">
+				<name>n29</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>650 669 810 721</position>
+				<state id="s0" faultname="Thyristor Control Board (A11, A12)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n30" faultnameformat="nodestate">
+				<name>n30</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1375 454 1572 502</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n31" faultnameformat="nodestate">
+				<name>n31</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2877 688 3100 728</position>
+				<state id="s0" faultname="DC Voltage Transducer (U1)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n32" faultnameformat="nodestate">
+				<name>n32</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3386 683 3580 728</position>
+				<state id="s0" faultname="EM2000 Computer, Communication &amp; Radar" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n33" faultnameformat="nodestate">
+				<name>n33</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2838 893 3024 937</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n34" faultnameformat="nodestate">
+				<name>n34</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3591 884 3773 933</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n35" faultnameformat="nodestate">
+				<name>n35</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3493 185 3729 227</position>
+				<state id="s0" faultname="Reactor (L456)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n36" faultnameformat="nodestate">
+				<name>n36</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3531 418 3686 469</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n37" faultnameformat="nodestate">
+				<name>n37</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3422 891 3585 935</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n38" faultnameformat="nodestate">
+				<name>n38</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>837 664 994 715</position>
+				<state id="s0" faultname="Phase Module R" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n39" faultnameformat="nodestate">
+				<name>n39</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>912 982 1107 1027</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n40" faultnameformat="nodestate">
+				<name>n40</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>378 674 595 714</position>
+				<state id="s0" faultname="Phase Module S" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n41" faultnameformat="nodestate">
+				<name>n41</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>429 1197 583 1254</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n42" faultnameformat="nodestate">
+				<name>n42</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1935 227 2071 269</position>
+				<state id="s0" faultname="Phase Module T" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n43" faultnameformat="nodestate">
+				<name>n43</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1828 38 2008 89</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n44" faultnameformat="nodestate">
+				<name>n44</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2936 1144 3197 1186</position>
+				<state id="s0" faultname="1/4 Traction Motor" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n45" faultnameformat="nodestate">
+				<name>n45</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2651 1153 2918 1193</position>
+				<state id="s0" faultname="2/5 Traction Motor" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n46" faultnameformat="nodestate">
+				<name>n46</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2350 1150 2615 1191</position>
+				<state id="s0" faultname="3/6 Traction Motor" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n47" faultnameformat="inherit">
+				<name>n47</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1469 1151 1666 1187</position>
+			</node>
+			<node id="n48" faultnameformat="nodestate">
+				<name>n48</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1592 895 1828 941</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n49" faultnameformat="nodestate">
+				<name>n49</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3874 430 4045 475</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n50" faultnameformat="nodestate">
+				<name>n50</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2631 893 2828 938</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n51" faultnameformat="nodestate">
+				<name>n51</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>771 262 1073 306</position>
+				<state id="s0" faultname="Fan Tier Board (E147 or E000)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n52" faultnameformat="nodestate">
+				<name>n52</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>609 190 854 233</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n53" faultnameformat="nodestate">
+				<name>n53</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2878 206 3096 254</position>
+				<state id="s0" faultname="Startup Unit (C157)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n54" faultnameformat="nodestate">
+				<name>n54</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2347 445 2565 489</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n55" faultnameformat="nodestate">
+				<name>n55</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1845 1328 2157 1376</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n56" faultnameformat="nodestate">
+				<name>n56</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2580 1329 2903 1374</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n57" faultnameformat="nodestate">
+				<name>n57</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2204 1321 2535 1366</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n58" faultnameformat="nodestate">
+				<name>n58</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2961 1473 3201 1513</position>
+				<state id="s0" faultname="Wheel mismatch" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n59" faultnameformat="nodestate">
+				<name>n59</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2925 1333 3248 1376</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n60" faultnameformat="nodestate">
+				<name>n60</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2441 888 2614 942</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n61" faultnameformat="nodestate">
+				<name>n61</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1229 905 1550 946</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n62" faultnameformat="nodestate">
+				<name>n62</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2069 888 2231 942</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n63" faultnameformat="nodestate">
+				<name>n63</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1851 891 2031 947</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n64" faultnameformat="nodestate">
+				<name>n64</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2794 436 2953 481</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n65" faultnameformat="nodestate">
+				<name>n65</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>892 462 1115 508</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n66" faultnameformat="nodestate">
+				<name>n66</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1126 465 1334 506</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n67" faultnameformat="nodestate">
+				<name>n67</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3166 173 3463 216</position>
+				<state id="s0" faultname="Crowbar Reactor (L12)" />
+				<state id="s1" faultname=" OK" />
+			</node>
+			<node id="n68" faultnameformat="nodestate">
+				<name>n68</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3169 27 3483 71</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n69" faultnameformat="nodestate">
+				<name>n69</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1014 934 1177 981</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n70" faultnameformat="nodestate">
+				<name>n70</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>292 1257 462 1297</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n71" faultnameformat="nodestate">
+				<name>n71</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2004 4 2159 45</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n72" faultnameformat="nodestate">
+				<name>n72</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>800 1032 985 1079</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n73" faultnameformat="nodestate">
+				<name>n73</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>160 1302 324 1349</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n74" faultnameformat="nodestate">
+				<name>n74</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2143 49 2337 94</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n75" faultnameformat="nodestate">
+				<name>n75</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>685 1092 828 1133</position>
+				<state id="s0" faultname=" yes" />
+				<state id="s1" faultname=" no" />
+			</node>
+			<node id="n76" faultnameformat="nodestate">
+				<name>n76</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>34 1342 191 1405</position>
+				<state id="s0" faultname=" yes" />
+				<state id="s1" faultname=" no" />
+			</node>
+			<node id="n77" faultnameformat="nodestate">
+				<name>n77</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2262 113 2421 153</position>
+				<state id="s0" faultname=" yes" />
+				<state id="s1" faultname=" no" />
+			</node>
+			<node id="n78" faultnameformat="nodestate">
+				<name>n78</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2261 889 2432 937</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n79" faultnameformat="nodestate">
+				<name>n79</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2354 1667 2658 1708</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n80" faultnameformat="nodestate">
+				<name>n80</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1869 440 2117 483</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n81" faultnameformat="nodestate">
+				<name>n81</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3031 888 3229 937</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n82" faultnameformat="nodestate">
+				<name>n82</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>667 866 811 920</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n83" faultnameformat="nodestate">
+				<name>n83</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>71 581 277 633</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n84" faultnameformat="nodestate">
+				<name>n84</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1690 85 1873 125</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n85" faultnameformat="nodestate">
+				<name>n85</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>598 807 766 849</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n86" faultnameformat="nodestate">
+				<name>n86</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>4 666 317 712</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n87" faultnameformat="nodestate">
+				<name>n87</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1702 170 1863 213</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n88" faultnameformat="nodestate">
+				<name>n88</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>995 200 1268 243</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n89" faultnameformat="nodestate">
+				<name>n89</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3508 22 3812 66</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n90" faultnameformat="nodestate">
+				<name>n90</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3837 22 4114 65</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n91" faultnameformat="nodestate">
+				<name>n91</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3184 431 3326 478</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n92" faultnameformat="nodestate">
+				<name>n92</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2566 439 2779 485</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n93" faultnameformat="nodestate">
+				<name>n93</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3139 257 3358 300</position>
+				<state id="s0" faultname=" no" />
+				<state id="s1" faultname=" yes" />
+			</node>
+			<node id="n94" faultnameformat="nodestate">
+				<name>n94</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3365 257 3557 302</position>
+				<state id="s0" faultname=" pass" />
+				<state id="s1" faultname=" fail" />
+			</node>
+			<node id="n95" faultnameformat="nodestate">
+				<name>n95</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2838 51 3115 94</position>
+				<state id="s0" faultname=" pass" />
+				<state id="s1" faultname=" fail" />
+			</node>
+			<node id="n96" faultnameformat="nodestate">
+				<name>n96</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2943 1630 3220 1673</position>
+				<state id="s0" faultname=" pass" />
+				<state id="s1" faultname=" fail" />
+			</node>
+			<node id="n97" faultnameformat="nodestate">
+				<name>n97</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3347 441 3520 484</position>
+				<state id="s0" faultname=" absent" />
+				<state id="s1" faultname=" present" />
+			</node>
+			<node id="n98" faultnameformat="inherit">
+				<name>n98</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3299 1340 3507 1376</position>
+			</node>
+			<node id="n99" faultnameformat="inherit">
+				<name>n99</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3295 1288 3509 1324</position>
+			</node>
+			<node id="n100" faultnameformat="inherit">
+				<name>n100</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>3291 1233 3508 1269</position>
+			</node>
+			<node id="n101" faultnameformat="inherit">
+				<name>n101</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1481 1312 1707 1360</position>
+			</node>
+			<node id="n102" faultnameformat="inherit">
+				<name>n102</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1050 854 1280 890</position>
+			</node>
+			<node id="n103" faultnameformat="inherit">
+				<name>n103</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>1475 840 1684 876</position>
+			</node>
+			<node id="n104" faultnameformat="inherit">
+				<name>n104</name>
+				<interior color="ffff00" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>2760 835 2960 878</position>
+			</node>
+		</genie>
+	</extensions>
+</smile>

@@ -1,0 +1,3947 @@
+net
+{
+}
+
+node friendsIo1po1I
+{
+	label = "friends(o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo1po1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io1po1po1I
+{
+	label = "wclause1(o1,o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po1I | friendsIo1po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0 );
+}
+
+node friendsIo1po2I
+{
+	label = "friends(o1,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo1po2I)
+{
+	data = (0.5 0.5 );
+}
+
+node or_friendsIo1po2I_wclause2Io1I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo1po2I_wclause2Io1I_CC0_CC0_CC0 | friendsIo1po1I friendsIo1po2I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node friendsIo1po3I
+{
+	label = "friends(o1,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo1po3I)
+{
+	data = (0.5 0.5 );
+}
+
+node or_friendsIo1po3I_wclause2Io1I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo1po3I_wclause2Io1I_CC0_CC0_CC0 | or_friendsIo1po2I_wclause2Io1I_CC0_CC0_CC0 friendsIo1po3I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node friendsIo1po4I
+{
+	label = "friends(o1,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo1po4I)
+{
+	data = (0.5 0.5 );
+}
+
+node or_friendsIo1po4I_wclause2Io1I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo1po4I_wclause2Io1I_CC0_CC0_CC0 | or_friendsIo1po3I_wclause2Io1I_CC0_CC0_CC0 friendsIo1po4I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node smokesIo1I
+{
+	label = "smokes(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (smokesIo1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause2Io1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io1I_CC0 | or_friendsIo1po4I_wclause2Io1I_CC0_CC0_CC0 smokesIo1I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io1I
+{
+	label = "wclause2(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io1I | wclause2Io1I_CC0 )
+{
+	data = (0.8998 0.1002
+	0.0 1.0 );
+}
+
+node wclause4Io1po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po1I_CC0 | friendsIo1po1I smokesIo1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po1I
+{
+	label = "wclause4(o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po1I | wclause4Io1po1I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node cancerIo1I
+{
+	label = "cancer(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (cancerIo1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause3Io1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io1I_CC0 | smokesIo1I cancerIo1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause3Io1I
+{
+	label = "wclause3(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io1I | wclause3Io1I_CC0 )
+{
+	data = (0.77687 0.22313
+	0.0 1.0 );
+}
+
+node smokesIo2I
+{
+	label = "smokes(o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (smokesIo2I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause4Io2po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po1I_CC0_CC1 | smokesIo2I smokesIo1I )
+{
+	data = (0.0 1.0
+	1.0 0.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po2I_CC0 | friendsIo1po2I wclause4Io2po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po2I
+{
+	label = "wclause4(o1,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po2I | wclause4Io1po2I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node friendsIo2po1I
+{
+	label = "friends(o2,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo2po1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause4Io2po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po1I_CC0 | friendsIo2po1I wclause4Io2po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io2po1I
+{
+	label = "wclause4(o2,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po1I | wclause4Io2po1I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node friendsIo2po2I
+{
+	label = "friends(o2,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo2po2I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io2po2po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po1I_CC0 | friendsIo2po2I friendsIo2po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po2po1I
+{
+	label = "wclause1(o2,o2,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po1I | wclause1Io2po2po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po2po2I
+{
+	label = "wclause1(o2,o2,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po2I | friendsIo2po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po2I_CC0_CC1 | friendsIo2po2I friendsIo1po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po2I_CC0 | friendsIo1po2I wclause1Io1po2po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po2I
+{
+	label = "wclause1(o1,o2,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po2I | wclause1Io1po2po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po2I_CC0_CC1 | friendsIo1po2I friendsIo2po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po2I_CC0 | friendsIo2po1I wclause1Io2po1po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po2I
+{
+	label = "wclause1(o2,o1,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po2I | wclause1Io2po1po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo2po3I
+{
+	label = "friends(o2,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo2po3I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io2po2po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po3I_CC0 | friendsIo2po2I friendsIo2po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po2po3I
+{
+	label = "wclause1(o2,o2,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po3I | wclause1Io2po2po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po3I_CC0_CC1 | friendsIo2po3I friendsIo1po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po3I_CC0 | friendsIo1po2I wclause1Io1po2po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po3I
+{
+	label = "wclause1(o1,o2,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po3I | wclause1Io1po2po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po3I_CC0_CC1 | friendsIo1po3I friendsIo2po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po3I_CC0 | friendsIo2po1I wclause1Io2po1po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po3I
+{
+	label = "wclause1(o2,o1,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po3I | wclause1Io2po1po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo3po1I
+{
+	label = "friends(o3,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo3po1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io2po3po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po1I_CC0_CC1 | friendsIo3po1I friendsIo2po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po1I_CC0 | friendsIo2po3I wclause1Io2po3po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po1I
+{
+	label = "wclause1(o2,o3,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po1I | wclause1Io2po3po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo3po3I
+{
+	label = "friends(o3,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo3po3I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io3po3po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po1I_CC0 | friendsIo3po3I friendsIo3po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po3po1I
+{
+	label = "wclause1(o3,o3,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po1I | wclause1Io3po3po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po3po3I
+{
+	label = "wclause1(o3,o3,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po3I | friendsIo3po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po3I_CC0_CC1 | friendsIo3po3I friendsIo1po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po3I_CC0 | friendsIo1po3I wclause1Io1po3po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po3I
+{
+	label = "wclause1(o1,o3,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po3I | wclause1Io1po3po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po3I_CC0_CC1 | friendsIo3po3I friendsIo2po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po3I_CC0 | friendsIo2po3I wclause1Io2po3po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po3I
+{
+	label = "wclause1(o2,o3,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po3I | wclause1Io2po3po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po3I_CC0_CC1 | friendsIo1po3I friendsIo3po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po3I_CC0 | friendsIo3po1I wclause1Io3po1po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po3I
+{
+	label = "wclause1(o3,o1,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po3I | wclause1Io3po1po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po3I_CC0_CC1 | friendsIo2po3I friendsIo3po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node friendsIo3po2I
+{
+	label = "friends(o3,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo3po2I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io3po2po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po3I_CC0 | friendsIo3po2I wclause1Io3po2po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po3I
+{
+	label = "wclause1(o3,o2,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po3I | wclause1Io3po2po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po3po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po2I_CC0 | friendsIo3po3I friendsIo3po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po3po2I
+{
+	label = "wclause1(o3,o3,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po2I | wclause1Io3po3po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po2I_CC0_CC1 | friendsIo3po2I friendsIo1po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po2I_CC0 | friendsIo1po3I wclause1Io1po3po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po2I
+{
+	label = "wclause1(o1,o3,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po2I | wclause1Io1po3po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po2I_CC0_CC1 | friendsIo3po2I friendsIo2po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po2I_CC0 | friendsIo2po3I wclause1Io2po3po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po2I
+{
+	label = "wclause1(o2,o3,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po2I | wclause1Io2po3po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po2I_CC0_CC1 | friendsIo1po2I friendsIo3po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po2I_CC0 | friendsIo3po1I wclause1Io3po1po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po2I
+{
+	label = "wclause1(o3,o1,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po2I | wclause1Io3po1po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po1I_CC0_CC1 | friendsIo2po1I friendsIo3po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po1I_CC0 | friendsIo3po2I wclause1Io3po2po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po1I
+{
+	label = "wclause1(o3,o2,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po1I | wclause1Io3po2po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po2I_CC0_CC1 | friendsIo2po2I friendsIo3po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po2I_CC0 | friendsIo3po2I wclause1Io3po2po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po2I
+{
+	label = "wclause1(o3,o2,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po2I | wclause1Io3po2po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo2po4I
+{
+	label = "friends(o2,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo2po4I)
+{
+	data = (0.5 0.5 );
+}
+
+node friendsIo3po4I
+{
+	label = "friends(o3,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo3po4I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io3po2po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po4I_CC0_CC1 | friendsIo2po4I friendsIo3po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po4I_CC0 | friendsIo3po2I wclause1Io3po2po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po2po4I
+{
+	label = "wclause1(o3,o2,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po2po4I | wclause1Io3po2po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po3po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po4I_CC0 | friendsIo3po3I friendsIo3po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po3po4I
+{
+	label = "wclause1(o3,o3,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po3po4I | wclause1Io3po3po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po4I_CC0_CC1 | friendsIo3po4I friendsIo1po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po4I_CC0 | friendsIo1po3I wclause1Io1po3po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po4I
+{
+	label = "wclause1(o1,o3,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po4I | wclause1Io1po3po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po4I_CC0_CC1 | friendsIo3po4I friendsIo2po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po4I_CC0 | friendsIo2po3I wclause1Io2po3po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po3po4I
+{
+	label = "wclause1(o2,o3,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po3po4I | wclause1Io2po3po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po4I_CC0_CC1 | friendsIo1po4I friendsIo3po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po4I_CC0 | friendsIo3po1I wclause1Io3po1po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po4I
+{
+	label = "wclause1(o3,o1,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po4I | wclause1Io3po1po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo4po1I
+{
+	label = "friends(o4,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo4po1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io3po4po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po1I_CC0_CC1 | friendsIo4po1I friendsIo3po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po1I_CC0 | friendsIo3po4I wclause1Io3po4po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po1I
+{
+	label = "wclause1(o3,o4,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po1I | wclause1Io3po4po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo4po4I
+{
+	label = "friends(o4,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo4po4I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io4po4po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po1I_CC0 | friendsIo4po4I friendsIo4po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po4po1I
+{
+	label = "wclause1(o4,o4,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po1I | wclause1Io4po4po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po4po4I
+{
+	label = "wclause1(o4,o4,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po4I | friendsIo4po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po4I_CC0_CC1 | friendsIo4po4I friendsIo1po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po4I_CC0 | friendsIo1po4I wclause1Io1po4po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po4I
+{
+	label = "wclause1(o1,o4,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po4I | wclause1Io1po4po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po4I_CC0_CC1 | friendsIo4po4I friendsIo2po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po4I_CC0 | friendsIo2po4I wclause1Io2po4po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po4I
+{
+	label = "wclause1(o2,o4,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po4I | wclause1Io2po4po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po4I_CC0_CC1 | friendsIo4po4I friendsIo3po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po4I_CC0 | friendsIo3po4I wclause1Io3po4po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po4I
+{
+	label = "wclause1(o3,o4,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po4I | wclause1Io3po4po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po4I_CC0_CC1 | friendsIo1po4I friendsIo4po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po4I_CC0 | friendsIo4po1I wclause1Io4po1po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po4I
+{
+	label = "wclause1(o4,o1,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po4I | wclause1Io4po1po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po4I_CC0_CC1 | friendsIo2po4I friendsIo4po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node friendsIo4po2I
+{
+	label = "friends(o4,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo4po2I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io4po2po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po4I_CC0 | friendsIo4po2I wclause1Io4po2po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po4I
+{
+	label = "wclause1(o4,o2,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po4I | wclause1Io4po2po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po4po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po2I_CC0 | friendsIo4po4I friendsIo4po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po4po2I
+{
+	label = "wclause1(o4,o4,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po2I | wclause1Io4po4po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po2I_CC0_CC1 | friendsIo4po2I friendsIo1po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po2I_CC0 | friendsIo1po4I wclause1Io1po4po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po2I
+{
+	label = "wclause1(o1,o4,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po2I | wclause1Io1po4po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po2I_CC0_CC1 | friendsIo4po2I friendsIo2po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po2I_CC0 | friendsIo2po4I wclause1Io2po4po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po2I
+{
+	label = "wclause1(o2,o4,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po2I | wclause1Io2po4po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po2I_CC0_CC1 | friendsIo4po2I friendsIo3po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po2I_CC0 | friendsIo3po4I wclause1Io3po4po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po2I
+{
+	label = "wclause1(o3,o4,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po2I | wclause1Io3po4po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po2I_CC0_CC1 | friendsIo1po2I friendsIo4po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po2I_CC0 | friendsIo4po1I wclause1Io4po1po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po2I
+{
+	label = "wclause1(o4,o1,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po2I | wclause1Io4po1po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po1I_CC0_CC1 | friendsIo2po1I friendsIo4po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po1I_CC0 | friendsIo4po2I wclause1Io4po2po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po1I
+{
+	label = "wclause1(o4,o2,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po1I | wclause1Io4po2po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po2I_CC0_CC1 | friendsIo2po2I friendsIo4po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po2I_CC0 | friendsIo4po2I wclause1Io4po2po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po2I
+{
+	label = "wclause1(o4,o2,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po2I | wclause1Io4po2po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node friendsIo4po3I
+{
+	label = "friends(o4,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo4po3I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io4po2po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po3I_CC0_CC1 | friendsIo2po3I friendsIo4po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po3I_CC0 | friendsIo4po2I wclause1Io4po2po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po2po3I
+{
+	label = "wclause1(o4,o2,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po2po3I | wclause1Io4po2po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po4po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po3I_CC0 | friendsIo4po4I friendsIo4po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po4po3I
+{
+	label = "wclause1(o4,o4,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po4po3I | wclause1Io4po4po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po3I_CC0_CC1 | friendsIo4po3I friendsIo1po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po3I_CC0 | friendsIo1po4I wclause1Io1po4po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po3I
+{
+	label = "wclause1(o1,o4,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po3I | wclause1Io1po4po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po3I_CC0_CC1 | friendsIo4po3I friendsIo2po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po3I_CC0 | friendsIo2po4I wclause1Io2po4po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po3I
+{
+	label = "wclause1(o2,o4,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po3I | wclause1Io2po4po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po3I_CC0_CC1 | friendsIo4po3I friendsIo3po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po3I_CC0 | friendsIo3po4I wclause1Io3po4po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po4po3I
+{
+	label = "wclause1(o3,o4,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po4po3I | wclause1Io3po4po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po3I_CC0_CC1 | friendsIo1po3I friendsIo4po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po3I_CC0 | friendsIo4po1I wclause1Io4po1po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po3I
+{
+	label = "wclause1(o4,o1,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po3I | wclause1Io4po1po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po1I_CC0_CC1 | friendsIo3po1I friendsIo4po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po1I_CC0 | friendsIo4po3I wclause1Io4po3po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po1I
+{
+	label = "wclause1(o4,o3,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po1I | wclause1Io4po3po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po2I_CC0_CC1 | friendsIo3po2I friendsIo4po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po2I_CC0 | friendsIo4po3I wclause1Io4po3po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po2I
+{
+	label = "wclause1(o4,o3,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po2I | wclause1Io4po3po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po3I_CC0_CC1 | friendsIo3po3I friendsIo4po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po3I_CC0 | friendsIo4po3I wclause1Io4po3po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po3I
+{
+	label = "wclause1(o4,o3,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po3I | wclause1Io4po3po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po4I_CC0_CC1 | friendsIo3po4I friendsIo4po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po4I_CC0 | friendsIo4po3I wclause1Io4po3po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po3po4I
+{
+	label = "wclause1(o4,o3,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po3po4I | wclause1Io4po3po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node or_friendsIo4po2I_wclause2Io4I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo4po2I_wclause2Io4I_CC0_CC0_CC0 | friendsIo4po1I friendsIo4po2I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node or_friendsIo4po3I_wclause2Io4I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo4po3I_wclause2Io4I_CC0_CC0_CC0 | or_friendsIo4po2I_wclause2Io4I_CC0_CC0_CC0 friendsIo4po3I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node or_friendsIo4po4I_wclause2Io4I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo4po4I_wclause2Io4I_CC0_CC0_CC0 | or_friendsIo4po3I_wclause2Io4I_CC0_CC0_CC0 friendsIo4po4I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node smokesIo4I
+{
+	label = "smokes(o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (smokesIo4I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause2Io4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io4I_CC0 | or_friendsIo4po4I_wclause2Io4I_CC0_CC0_CC0 smokesIo4I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io4I
+{
+	label = "wclause2(o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io4I | wclause2Io4I_CC0 )
+{
+	data = (0.8998 0.1002
+	0.0 1.0 );
+}
+
+node wclause4Io4po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po4I_CC0 | friendsIo4po4I smokesIo4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause4Io4po4I
+{
+	label = "wclause4(o4,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po4I | wclause4Io4po4I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node cancerIo4I
+{
+	label = "cancer(o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (cancerIo4I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause3Io4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io4I_CC0 | smokesIo4I cancerIo4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause3Io4I
+{
+	label = "wclause3(o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io4I | wclause3Io4I_CC0 )
+{
+	data = (0.77687 0.22313
+	0.0 1.0 );
+}
+
+node wclause4Io4po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po1I_CC0_CC1 | smokesIo4I smokesIo1I )
+{
+	data = (0.0 1.0
+	1.0 0.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po4I_CC0 | friendsIo1po4I wclause4Io4po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po4I
+{
+	label = "wclause4(o1,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po4I | wclause4Io1po4I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io4po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po1I_CC0 | friendsIo4po1I wclause4Io4po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io4po1I
+{
+	label = "wclause4(o4,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po1I | wclause4Io4po1I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io4po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po2I_CC0_CC1 | smokesIo4I smokesIo2I )
+{
+	data = (0.0 1.0
+	1.0 0.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io2po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po4I_CC0 | friendsIo2po4I wclause4Io4po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io2po4I
+{
+	label = "wclause4(o2,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po4I | wclause4Io2po4I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io4po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po2I_CC0 | friendsIo4po2I wclause4Io4po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io4po2I
+{
+	label = "wclause4(o4,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po2I | wclause4Io4po2I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node smokesIo3I
+{
+	label = "smokes(o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (smokesIo3I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause4Io4po3I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po3I_CC0_CC1 | smokesIo4I smokesIo3I )
+{
+	data = (0.0 1.0
+	1.0 0.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io3po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po4I_CC0 | friendsIo3po4I wclause4Io4po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io3po4I
+{
+	label = "wclause4(o3,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po4I | wclause4Io3po4I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io4po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po3I_CC0 | friendsIo4po3I wclause4Io4po3I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io4po3I
+{
+	label = "wclause4(o4,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io4po3I | wclause4Io4po3I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io3po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po3I_CC0 | friendsIo3po3I smokesIo3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause4Io3po3I
+{
+	label = "wclause4(o3,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po3I | wclause4Io3po3I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node or_friendsIo3po2I_wclause2Io3I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo3po2I_wclause2Io3I_CC0_CC0_CC0 | friendsIo3po1I friendsIo3po2I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node or_friendsIo3po3I_wclause2Io3I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo3po3I_wclause2Io3I_CC0_CC0_CC0 | or_friendsIo3po2I_wclause2Io3I_CC0_CC0_CC0 friendsIo3po3I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node or_friendsIo3po4I_wclause2Io3I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo3po4I_wclause2Io3I_CC0_CC0_CC0 | or_friendsIo3po3I_wclause2Io3I_CC0_CC0_CC0 friendsIo3po4I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io3I_CC0 | or_friendsIo3po4I_wclause2Io3I_CC0_CC0_CC0 smokesIo3I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io3I
+{
+	label = "wclause2(o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io3I | wclause2Io3I_CC0 )
+{
+	data = (0.8998 0.1002
+	0.0 1.0 );
+}
+
+node cancerIo3I
+{
+	label = "cancer(o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (cancerIo3I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause3Io3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io3I_CC0 | smokesIo3I cancerIo3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause3Io3I
+{
+	label = "wclause3(o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io3I | wclause3Io3I_CC0 )
+{
+	data = (0.77687 0.22313
+	0.0 1.0 );
+}
+
+node wclause4Io3po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po1I_CC0_CC1 | smokesIo3I smokesIo1I )
+{
+	data = (0.0 1.0
+	1.0 0.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po3I_CC0 | friendsIo1po3I wclause4Io3po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po3I
+{
+	label = "wclause4(o1,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po3I | wclause4Io1po3I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io3po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po1I_CC0 | friendsIo3po1I wclause4Io3po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io3po1I
+{
+	label = "wclause4(o3,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po1I | wclause4Io3po1I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io3po2I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po2I_CC0_CC1 | smokesIo3I smokesIo2I )
+{
+	data = (0.0 1.0
+	1.0 0.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io2po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po3I_CC0 | friendsIo2po3I wclause4Io3po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io2po3I
+{
+	label = "wclause4(o2,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po3I | wclause4Io2po3I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause4Io3po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po2I_CC0 | friendsIo3po2I wclause4Io3po2I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause4Io3po2I
+{
+	label = "wclause4(o3,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io3po2I | wclause4Io3po2I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po1I_CC0_CC1 | friendsIo4po1I friendsIo1po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po1I_CC0 | friendsIo1po4I wclause1Io1po4po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po4po1I
+{
+	label = "wclause1(o1,o4,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po4po1I | wclause1Io1po4po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po1I_CC0_CC1 | friendsIo4po1I friendsIo2po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po1I_CC0 | friendsIo2po4I wclause1Io2po4po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po4po1I
+{
+	label = "wclause1(o2,o4,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po4po1I | wclause1Io2po4po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po1I_CC0_CC1 | friendsIo1po1I friendsIo4po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po1I_CC0 | friendsIo4po1I wclause1Io4po1po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io4po1po1I
+{
+	label = "wclause1(o4,o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io4po1po1I | wclause1Io4po1po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po2po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po4I_CC0 | friendsIo2po2I friendsIo2po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po2po4I
+{
+	label = "wclause1(o2,o2,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po2po4I | wclause1Io2po2po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po4I_CC0_CC1 | friendsIo2po4I friendsIo1po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po4I_CC0 | friendsIo1po2I wclause1Io1po2po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po4I
+{
+	label = "wclause1(o1,o2,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po4I | wclause1Io1po2po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po4I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po4I_CC0_CC1 | friendsIo1po4I friendsIo2po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po4I_CC0 | friendsIo2po1I wclause1Io2po1po4I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po4I
+{
+	label = "wclause1(o2,o1,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po4I | wclause1Io2po1po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node or_friendsIo2po2I_wclause2Io2I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo2po2I_wclause2Io2I_CC0_CC0_CC0 | friendsIo2po1I friendsIo2po2I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node or_friendsIo2po3I_wclause2Io2I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo2po3I_wclause2Io2I_CC0_CC0_CC0 | or_friendsIo2po2I_wclause2Io2I_CC0_CC0_CC0 friendsIo2po3I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node or_friendsIo2po4I_wclause2Io2I_CC0_CC0_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (or_friendsIo2po4I_wclause2Io2I_CC0_CC0_CC0 | or_friendsIo2po3I_wclause2Io2I_CC0_CC0_CC0 friendsIo2po4I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io2I_CC0 | or_friendsIo2po4I_wclause2Io2I_CC0_CC0_CC0 smokesIo2I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io2I
+{
+	label = "wclause2(o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io2I | wclause2Io2I_CC0 )
+{
+	data = (0.8998 0.1002
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po1I_CC0_CC1 | friendsIo3po1I friendsIo1po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po1I_CC0 | friendsIo1po3I wclause1Io1po3po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po3po1I
+{
+	label = "wclause1(o1,o3,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po3po1I | wclause1Io1po3po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po1I_CC0_CC1 | friendsIo1po1I friendsIo3po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po1I_CC0 | friendsIo3po1I wclause1Io3po1po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io3po1po1I
+{
+	label = "wclause1(o3,o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io3po1po1I | wclause1Io3po1po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause4Io2po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po2I_CC0 | friendsIo2po2I smokesIo2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause4Io2po2I
+{
+	label = "wclause4(o2,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io2po2I | wclause4Io2po2I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po1I_CC0_CC1 | friendsIo2po1I friendsIo1po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po1I_CC0 | friendsIo1po2I wclause1Io1po2po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po2po1I
+{
+	label = "wclause1(o1,o2,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po2po1I | wclause1Io1po2po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po1I_CC0_CC1
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po1I_CC0_CC1 | friendsIo1po1I friendsIo2po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po1I_CC0 | friendsIo2po1I wclause1Io2po1po1I_CC0_CC1 )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause1Io2po1po1I
+{
+	label = "wclause1(o2,o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io2po1po1I | wclause1Io2po1po1I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node cancerIo2I
+{
+	label = "cancer(o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (cancerIo2I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause3Io2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io2I_CC0 | smokesIo2I cancerIo2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause3Io2I
+{
+	label = "wclause3(o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io2I | wclause3Io2I_CC0 )
+{
+	data = (0.77687 0.22313
+	0.0 1.0 );
+}
+
+node wclause1Io1po1po4I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po4I_CC0 | friendsIo1po1I friendsIo1po4I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po1po4I
+{
+	label = "wclause1(o1,o1,o4)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po4I | wclause1Io1po1po4I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po1po3I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po3I_CC0 | friendsIo1po1I friendsIo1po3I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po1po3I
+{
+	label = "wclause1(o1,o1,o3)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po3I | wclause1Io1po1po3I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
+
+node wclause1Io1po1po2I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po2I_CC0 | friendsIo1po1I friendsIo1po2I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause1Io1po1po2I
+{
+	label = "wclause1(o1,o1,o2)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po2I | wclause1Io1po1po2I_CC0 )
+{
+	data = (0.50342 0.49658
+	0.0 1.0 );
+}
