@@ -14,4 +14,4 @@ else
   export LD_LIBRARY_PATH=$ACEDIR
   OPTIONS=''
 fi
-java $OPTIONS -Xmx1512m -classpath "$ACEDIR/ace.jar:$ACEDIR/inflib.jar:$ACEDIR/jdom.jar" edu.ucla.belief.ace.AceEvaluate "$@"
+java $OPTIONS -Xmx7000m -classpath "$ACEDIR/ace.jar:$ACEDIR/inflib.jar:$ACEDIR/jdom.jar" edu.ucla.belief.ace.AceEvaluate "$@"
