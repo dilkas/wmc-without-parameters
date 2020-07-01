@@ -2,10 +2,12 @@ import itertools
 import os
 import random
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from optparse import OptionParser
 
+ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
 names = []
 def name2int(name):
     return str(names.index(name)+1)
@@ -35,8 +37,6 @@ def encode_dne(filename):
             conditions = list(probability_conditions(negation_pattern, parents))
             clauses.append('w ' + ' '.join([name2int(name)] + conditions + [prob]))
     return clauses
-# TODO: formatting things such as in the line above should be done outside this function
-# This should just return a list of clauses (most likely in string form)
 
 def encode_inst_evidence(filename):
     clauses = []
@@ -50,43 +50,46 @@ def encode_inst_evidence(filename):
         clauses.append(sign + name2int(inst.attrib['id']) + ' 0')
     return clauses
 
-def encode(network, evidence=None, last_node_as_goal=False):
+def encode(network, evidence=None):
     clauses = encode_dne(network)
-    goal = clauses[-1].split(' ')[1] if last_node_as_goal else name2int(random.choice(names))
     if evidence:
         evidence_clauses += encode_inst_evidence(evidence)
-        num_clauses = len(evidence_clauses) + 1
+        num_clauses = len(evidence_clauses)
     else:
+        clauses.append(clauses[-1].split(' ')[1] + ' 0')
         num_clauses = 1
-    clauses.append(goal + ' 0')
     return 'p cnf {} {}\n'.format(len(names), num_clauses) + '\n'.join(clauses) + '\n'
 
-# Let's start with the Grid networks. Other datasets require computing all/most
-# marginals and it's not clear what the CNF encoding represents.
-# Grid/{Dne,Cnf}/{Ratio_50,Ratio_75,Ratio_90}/*
-# DQMR/{qmr-100,qmr-50,qmr-60,qmr-70}/*.{dne,cnf} (ignore cnfs that are not coupled with dnes)
-# Plan_Recognition/*.{cnf,dne}
-
-# directory = 'data/Grid/'
-# for ratio in ['Ratio_50/', 'Ratio_75/', 'Ratio_90/']:
-#     for filename in os.listdir(directory + ratio):
-#         if not filename.endswith('.dne'):
-#             continue
-#         with open(directory + ratio + filename) as f:
-#             encoding = my_encoding(f.read())
-#         with open(directory + ratio + filename[:filename.rindex('.')] + '-q.cnf', 'w') as f:
-#             f.write(encoding)
+def encode_using_ace(network, evidence=None):
+    command = ACE + ['-e', evidence, network] if evidence else ACE + [network]
+    subprocess.run(command)
+    # Move weights from the LMAP file to the CNF file
+    with open(network + '.lmap') as f:
+        lines = f.readlines()
+    weights = {}
+    max_literal = 0
+    for line in lines:
+        if line.startswith('cc$I') or line.startswith('cc$C'):
+            components = line.split('$')
+            literal = int(components[2])
+            weight = components[3]
+            weights[literal] = weight
+            max_literal = max(max_literal, abs(literal))
+    weights_line = []
+    for literal in range(1, max_literal + 1):
+        weights_line += [weights[literal], weights[-literal]]
+    with open(network + '.cnf', 'a') as f:
+        f.write('c weights ' + ' '.join(weights_line) + '\n')
 
 if __name__ == '__main__':
     parser = OptionParser('usage: %prog [options] bayesian_network')
     parser.add_option('-e', dest='evidence', help="evidence file (in the 'inst' format)")
-    parser.add_option('-g', action='store_true', dest='last_node_as_goal',
-                      help='fix the goal as the last node in the Bayesian network')
+    parser.add_option('-a', action = 'store_true', dest='ace', help="use Ace")
     options, args = parser.parse_args()
     if len(args) != 1:
         parser.print_help()
     else:
-        encoding = encode(args[0], options.evidence, options.last_node_as_goal)
-        output_filename = (options.evidence if options.evidence else args[0]) + '.cnf'
-        with open(output_filename, 'w') as f:
-            f.write(encoding)
+        encoding = encode_using_ace(args[0], options.evidence) if options.ace else encode(args[0], options.evidence)
+        output_filename = args[0] + '.cnf'
+#        with open(output_filename, 'w') as f:
+#            f.write(encoding)
