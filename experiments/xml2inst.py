@@ -1,7 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 
-directory = 'data/DQMR/qmr-50/'
+directory = 'data/Plan_Recognition/'
 for filename in os.listdir(directory):
     if not filename.endswith('.xml'):
         continue
