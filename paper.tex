@@ -161,10 +161,17 @@
   \end{itemize}
 \item Encodings:
   \begin{itemize}
-  \item Darwiche \cite{DBLP:conf/kr/Darwiche02}
-  \item \hl{Sang et al.} \cite{DBLP:conf/aaai/SangBK05}
-  \item \hl{mine}
+  \item \texttt{-d02} \cite{DBLP:conf/kr/Darwiche02}
+  \item \texttt{-sbk05} \cite{DBLP:conf/aaai/SangBK05}
+  \item \texttt{-cd05} \cite{DBLP:conf/ijcai/ChaviraD05}
+  \item \texttt{-cd06} \cite{DBLP:conf/sat/ChaviraD06} (supposed to be the best)
+  \item mine
   \end{itemize}
+  All except mine are from Ace
+  3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and should be compiled
+  with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC) and
+  \texttt{-noEclause} (i.e., only use standard syntax) flags. Ace also has its
+  own benchmarks (with evidence) but they're still binary.
 \item Datasets\footnote{There might be more at
     \url{https://meelgroup.github.io/}.}
   \begin{itemize}
@@ -173,13 +180,18 @@
     \cite{DBLP:conf/aaai/SangBK05}
     \begin{itemize}
     \item \hl{Grid networks}: computing marginal probability of the last node in
-      the grid.
-    \item Plan recognition problems.
-    \item Deterministic quick medical reference.
+      the grid (DNE).
+    \item Plan recognition problems (DNE + XML).
+    \item Deterministic quick medical reference (DNE + XML).
     \end{itemize}
     For the last two, the task can be to calculate the marginal probability of a
     randomly chosen node (so, repeat at least ten times).
-  \item non-binary Bayesian networks?
+  \item Bayesian networks \emph{with evidence} (some binary, some non-binary)
+    \begin{itemize}
+    \item \texttt{2004-pgm}: NET + inst (\cite{DBLP:journals/ijar/ChaviraDJ06})
+    \item \texttt{2005-ijcai}: XDSL/NET/Hugin + inst (\cite{DBLP:conf/ijcai/ChaviraD05})
+    \item \texttt{2006-ijar}: NET + inst (\cite{DBLP:journals/ijar/ChaviraDJ06})
+    \end{itemize}
   \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
   \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
   \end{itemize}
