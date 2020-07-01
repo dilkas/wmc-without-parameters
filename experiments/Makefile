@@ -1,9 +1,12 @@
 TIMEOUT = 1000
 ALGORITHM := timeout $(TIMEOUT) /usr/bin/time -v ./ADDMC/counting/addmc
+
 CACHET_FLAG := --wf 3
 MY_FLAG := --wf 4
+
 CACHET_DATA := ./data/Grid/Cnf/
 MY_DATA := ./data/Grid/Cnf2/
+
 CACHET_OUTPUT := ./results/sang/Grid/
 MY_OUTPUT := ./results/conditional/Grid/
 
