@@ -1,4 +1,4 @@
-TIMEOUT = 60
+TIMEOUT = 1000
 ALGORITHM := timeout $(TIMEOUT) /usr/bin/time -v ./ADDMC/counting/addmc
 CACHET_FLAG := --wf 3
 MY_FLAG := --wf 4
