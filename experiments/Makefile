@@ -1,7 +1,7 @@
 # TODO: increase this before running
 TIMEOUT := 1
 MAX_MEMORY_USAGE := 1048576 # 1 GB
-OUTPUT_DIR := results/temp
+OUTPUT_DIR := results
 ALGORITHM := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_USAGE) && /usr/bin/time -v ./ADDMC/counting/addmc
 
 all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Grid/*/*.dne))
@@ -43,13 +43,13 @@ clean:
 	rm -f data/DQMR/qmr-50/*.dne.*
 	rm -f data/DQMR/qmr-60/*.dne.*
 	rm -f data/DQMR/qmr-70/*.dne.*
-	rm -f $(OUTPUT_DIR)/Grid/Ratio_50/*
-	rm -f $(OUTPUT_DIR)/Grid/Ratio_75/*
-	rm -f $(OUTPUT_DIR)/Grid/Ratio_90/*
-	rm -f $(OUTPUT_DIR)/DQMR/qmr-100/*
-	rm -f $(OUTPUT_DIR)/DQMR/qmr-50/*
-	rm -f $(OUTPUT_DIR)/DQMR/qmr-60/*
-	rm -f $(OUTPUT_DIR)/DQMR/qmr-70/*
+#	rm -f $(OUTPUT_DIR)/Grid/Ratio_50/*
+#	rm -f $(OUTPUT_DIR)/Grid/Ratio_75/*
+#	rm -f $(OUTPUT_DIR)/Grid/Ratio_90/*
+#	rm -f $(OUTPUT_DIR)/DQMR/qmr-100/*
+#	rm -f $(OUTPUT_DIR)/DQMR/qmr-50/*
+#	rm -f $(OUTPUT_DIR)/DQMR/qmr-60/*
+#	rm -f $(OUTPUT_DIR)/DQMR/qmr-70/*
 	rm -f data/Grid/Ratio_50/*.inst.dne
 	rm -f data/Grid/Ratio_75/*.inst.dne
 	rm -f data/Grid/Ratio_90/*.inst.dne

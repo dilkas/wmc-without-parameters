@@ -1,7 +1,17 @@
 require(ggplot2)
 require(scales)
+require(dplyr)
+require(maditr)
 
-df <- read.csv("results/all.csv", header = TRUE, sep = ",")
+df <- read.csv("results.csv", header = TRUE, sep = ",")
+
+answers <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "answer")
+time <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "time")
+
+answers[answers$db20 - answers$d02 > 0.01,]
+interesting <- answers[answers$db20 - answers$sbk05 > 0.01,]
+
+# ================= older stuff =======================
 
 sang.data <- df[df$encoding == "sang",]
 conditional.data <- df[df$encoding == "conditional",]
@@ -37,7 +47,8 @@ ggplot(merged, aes(x = difference)) +
 
 ggplot(merged, aes(x = relative.difference)) +
   geom_histogram(binwidth = 0.1) +
-  scale_x_continuous(breaks = round(seq(min(merged$relative.difference, na.rm = TRUE), max(merged$relative.difference, na.rm = TRUE), by = 0.5), 1))
+  scale_x_continuous(breaks = round(seq(min(merged$relative.difference, na.rm = TRUE),
+                                        max(merged$relative.difference, na.rm = TRUE), by = 0.5), 1))
 
 quantile(merged$relative.difference, 0.90, na.rm = TRUE)
 quantile(merged$relative.difference, 0.10, na.rm = TRUE)

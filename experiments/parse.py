@@ -16,27 +16,27 @@ def parse(filename):
 def parse_dir(directory, additional_data = {}):
     data = []
     for filename in os.listdir(directory):
-        if not filename.endswith('.cnf'):
-            continue
         d = parse(directory + filename)
         d.update(additional_data)
-        d['instance'] = filename
+        d['instance'] = directory + filename.split('.')[0]
+        d['encoding'] = filename[filename.rindex('.')+1:]
         data.append(d)
     return data
 
 data = []
-data += parse_dir('results/sang/Grid/Ratio_50/', {'encoding': 'sang', 'ratio': 50})
-data += parse_dir('results/sang/Grid/Ratio_75/', {'encoding': 'sang', 'ratio': 75})
-data += parse_dir('results/sang/Grid/Ratio_90/', {'encoding': 'sang', 'ratio': 90})
-data += parse_dir('results/conditional/Grid/Ratio_50/', {'encoding': 'conditional', 'ratio': 50})
-data += parse_dir('results/conditional/Grid/Ratio_75/', {'encoding': 'conditional', 'ratio': 75})
-data += parse_dir('results/conditional/Grid/Ratio_90/', {'encoding': 'conditional', 'ratio': 90})
+data += parse_dir('results/Grid/Ratio_50/', {'dataset': 'Grid-50'})
+data += parse_dir('results/Grid/Ratio_75/', {'dataset': 'Grid-75'})
+data += parse_dir('results/Grid/Ratio_90/', {'dataset': 'Grid-90'})
+data += parse_dir('results/DQMR/qmr-100/', {'dataset': 'DQMR-100'})
+data += parse_dir('results/DQMR/qmr-50/', {'dataset': 'DQMR-50'})
+data += parse_dir('results/DQMR/qmr-60/', {'dataset': 'DQMR-60'})
+data += parse_dir('results/DQMR/qmr-70/', {'dataset': 'DQMR-70'})
 
 fieldnames = set()
 for d in data:
     fieldnames.update(d.keys())
 
-with open('results/all.csv', 'w', newline='') as csvfile:
+with open('results.csv', 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
     for d in data:
