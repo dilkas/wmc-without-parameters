@@ -1,10 +1,8 @@
 import argparse
 import itertools
 import os
-import random
 import re
 import subprocess
-import sys
 import xml.etree.ElementTree as ET
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
@@ -12,46 +10,63 @@ names = []
 def name2int(name):
     return str(names.index(name)+1)
 
-def encode_dne(filename):
-    with open(filename) as f:
-        text = f.read()
+def probability_conditions(negation_pattern, parents):
+    for negate, parent in zip(negation_pattern, parents):
+        yield ('-' if negate else '') + name2int(parent)
+
+def construct_cpt(name, parents, probabilities, reverse=False):
+    assert(len(probabilities) == 2**len(parents))
+    possible_negations = itertools.product([True, False] if reverse else [False, True], repeat=len(parents))
+    return ['w ' + ' '.join([name2int(name)] + list(probability_conditions(negation_pattern, parents)) + [prob])
+            for negation_pattern, prob in zip(possible_negations, probabilities)]
+
+def encode_dne(text):
     clauses = []
-    def probability_conditions(negation_pattern, parents):
-        for negate, parent in zip(negation_pattern, parents):
-            yield ('-' if negate else '') + name2int(parent)
     for node in re.finditer(r'\nnode (\w+)', text):
         end_of_name = node.end()
         name = node.group(1).lstrip().rstrip()
         names.append(name)
+
         states = re.search(r'states = \(([^()]*)\)', text[end_of_name:]).group(1)
         assert(states == 'true, false')
+
         parents = [s.lstrip().rstrip()
                    for s in re.search(r'parents = \(([^()]*)\)', text[end_of_name:]).group(1).split(', ') if s != '']
         # Parse only the numbers and discard every other one
         probs_str = re.search(r'probs = ([^;]*);', text[end_of_name:]).group(1)
         probs = [p for p in re.split(r'[, ()\n\t]+', probs_str) if p != ''][0::2]
-        assert(len(probs) == 2**len(parents))
-        possible_negations = itertools.product([False, True], repeat=len(parents))
-        weight_lines = zip(possible_negations, probs)
-        for negation_pattern, prob in weight_lines:
-            conditions = list(probability_conditions(negation_pattern, parents))
-            clauses.append('w ' + ' '.join([name2int(name)] + conditions + [prob]))
+        clauses += construct_cpt(name, parents, probs)
+    return clauses
+
+def encode_net(text):
+    clauses = []
+    for node in re.finditer(r'\nnode (\w+)', text):
+        end_of_name = node.end()
+        name = node.group(1).lstrip().rstrip()
+        names.append(name)
+        states = re.search(r'states = \(([^()]*)\)', text[end_of_name:]).group(1).lstrip().rstrip()
+        assert(states == '"false" "true"')
+    for potential in re.finditer(r'\npotential([^{]*){([^}]*)}', text):
+        header = re.findall(r'\w+', potential.group(1))
+        probabilities = re.findall(r'\d+\.?\d*', potential.group(2))[1::2]
+        assert(len(probabilities) == 2**(len(header) - 1))
+        clauses += construct_cpt(header[0], header[1:], probabilities)
     return clauses
 
 def encode_inst_evidence(filename):
     clauses = []
     for inst in ET.parse(filename).findall('inst'):
-        if inst.attrib['value'] == 'true':
-            sign = ''
-        elif inst.attrib['value'] == 'false':
-            sign = '-'
-        else:
-            raise Exception('non-binary networks are not supported')
+        assert(inst.attrib['value'] in ['true', 'false'])
+        sign = '' if inst.attrib['value'] == 'true' else '-'
         clauses.append(sign + name2int(inst.attrib['id']) + ' 0')
     return clauses
 
 def encode(network, evidence):
-    clauses = encode_dne(network)
+    assert(network.endswith('.dne') or network.endswith('.net'))
+    with open(network) as f:
+        text = f.read()
+        clauses = encode_dne(text) if network.endswith('.dne') else encode_net(text)
+
     if evidence:
         evidence_clauses = encode_inst_evidence(evidence)
         num_clauses = len(evidence_clauses)
@@ -99,7 +114,7 @@ def encode_using_ace(network, evidence, encoding):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of weighted model counting (WMC)')
-    parser.add_argument('network', metavar='network', help='a Bayesian network (in the DNE format)')
+    parser.add_argument('network', metavar='network', help='a Bayesian network (in either DNE or NET format)')
     parser.add_argument('encoding', choices=['d02', 'sbk05', 'cd05', 'cd06', 'db20'], help='a WMC encoding')
     parser.add_argument('-e', dest='evidence', help="evidence file (in the INST format)")
     args = parser.parse_args()

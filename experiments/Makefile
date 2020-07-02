@@ -13,28 +13,28 @@ all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evid
 all: $(addsuffix /WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
 
 data/%/WITHOUT_EVIDENCE:
-	python dne2cnf.py data/$* db20
+	python encode.py data/$* db20
 	-$(ALGORITHM) --wf 4 --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.db20
-	python dne2cnf.py data/$* d02
+	python encode.py data/$* d02
 	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.d02
-	python dne2cnf.py data/$* sbk05
+	python encode.py data/$* sbk05
 	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.sbk05
-	python dne2cnf.py data/$* cd05
+	python encode.py data/$* cd05
 	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.cd05
-	python dne2cnf.py data/$* cd06
+	python encode.py data/$* cd06
 	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.cd06
 
 data/%/WITH_EVIDENCE:
 	cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.dne/g") data/$*.dne
-	python dne2cnf.py data/$*.dne -e data/$* db20
+	python encode.py data/$*.dne -e data/$* db20
 	-$(ALGORITHM) --wf 4 --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.db20
-	python dne2cnf.py data/$*.dne -e data/$* d02
+	python encode.py data/$*.dne -e data/$* d02
 	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.d02
-	python dne2cnf.py data/$*.dne -e data/$* sbk05
+	python encode.py data/$*.dne -e data/$* sbk05
 	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.sbk05
-	python dne2cnf.py data/$*.dne -e data/$* cd05
+	python encode.py data/$*.dne -e data/$* cd05
 	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.cd05
-	python dne2cnf.py data/$*.dne -e data/$* cd06
+	python encode.py data/$*.dne -e data/$* cd06
 	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.cd06
 
 clean:
