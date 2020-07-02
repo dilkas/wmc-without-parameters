@@ -170,8 +170,7 @@
   All except mine are from Ace
   3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and should be compiled
   with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC) and
-  \texttt{-noEclause} (i.e., only use standard syntax) flags. Ace also has its
-  own benchmarks (with evidence) but they're still binary.
+  \texttt{-noEclause} (i.e., only use standard syntax) flags.
 \item Datasets\footnote{There might be more at
     \url{https://meelgroup.github.io/}.}
   \begin{itemize}
@@ -263,6 +262,11 @@ distribution to into a fully independent one.
   \item XADDs can replace WMI for continuous variables;
   \item ADDs with intervals can do approximations.
   \end{itemize}
+\item In preliminary results, the SBK05 encoding gives the wrong asnwer in 60
+  QMR instances (all with evidence files). Sometimes that answer is $\gg 1$.
+\item Similarly, cd06 is supposed to be the fastest, but seems to be one of the
+  slowest (along with cd05). Perhaps the best encoding for arithmetic circuits
+  has very little to do with the best encoding for CNF WMC solvers?
 \end{itemize}
 
 \section{Preliminaries}

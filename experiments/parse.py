@@ -31,6 +31,8 @@ data += parse_dir('results/DQMR/qmr-100/', {'dataset': 'DQMR-100'})
 data += parse_dir('results/DQMR/qmr-50/', {'dataset': 'DQMR-50'})
 data += parse_dir('results/DQMR/qmr-60/', {'dataset': 'DQMR-60'})
 data += parse_dir('results/DQMR/qmr-70/', {'dataset': 'DQMR-70'})
+data += parse_dir('results/Plan_Recognition/without_evidence/', {'dataset': 'Plan Recognition'})
+data += parse_dir('results/Plan_Recognition/with_evidence/', {'dataset': 'Plan Recognition'})
 
 fieldnames = set()
 for d in data:
