@@ -3,56 +3,33 @@ require(scales)
 require(dplyr)
 require(maditr)
 
+TIMEOUT <- 1
 df <- read.csv("results.csv", header = TRUE, sep = ",")
+df$time[df$time > TIMEOUT] <- TIMEOUT
+df$time[is.na(df$time)] <- TIMEOUT
 answers <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "answer")
-time <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "time")
+time <- dcast(data = df, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = "time")
 
-answers[answers$db20 - answers$d02 > 0.01,]
-interesting <- answers[answers$db20 - answers$sbk05 > 0.01,]
+# Where answers don't match
+interesting <- answers[abs(answers$db20 - answers$cd05) > 0.01,]
+answers[abs(answers$db20 - answers$cd06) > 0.01,]
+answers[abs(answers$db20 - answers$d02) > 0.01,]
+answers[abs(answers$db20 - answers$sbk05) > 0.01,]
 
-# ================= older stuff =======================
+# Proportion of instances where my encoding is the best
+time$min <- apply(time, 1, min)
+sum(time$db20 == time$min)/nrow(time)
 
-sang.data <- df[df$encoding == "sang",]
-conditional.data <- df[df$encoding == "conditional",]
+# Proportion unsolved
+sum(is.na(answers$cd05))/nrow(answers)
+sum(is.na(answers$cd06))/nrow(answers)
+sum(is.na(answers$d02))/nrow(answers)
+sum(is.na(answers$db20))/nrow(answers)
+sum(is.na(answers$sbk05))/nrow(answers)
 
-# Numbers of unsolved instances (incomplete)
-sum(is.na(sang.data$answer))
-sum(is.na(conditional.data$answer))
-
-summary(sang.data$time)
-summary(conditional.data$time)
-
-# NOTE: Some timed out instances are omitted from this
-merged <- merge(sang.data, conditional.data, by = "instance")
-merged$difference <- merged$time.x - merged$time.y
-merged$relative.difference <- merged$difference / merged$time.x
-# The percentage of instances where my encoding is better
-nrow(merged[merged$time.y < merged$time.x,])/nrow(merged)
-summary(merged$difference)
-
-ggplot(merged, aes(x = time.x, y = time.y)) +
+ggplot(time, aes(x = db20, y = d02, col = dataset)) +
   geom_point() +
-  geom_abline(slope = 1, intercept = 0) +
-#  scale_x_continuous(trans = log2_trans()) +
-#  scale_y_continuous(trans = log2_trans()) +
-  xlab("Inference time for the encoding by Sang et al.") +
-  ylab("Inference time for the conditional encoding")
+  geom_abline(slope = 1, intercept = 0)
 
-ggplot(df, aes(x = time, y = encoding)) +
+ggplot(df, aes(x = encoding, y = time)) +
   geom_boxplot()
-
-ggplot(merged, aes(x = difference)) +
-  geom_histogram(binwidth = 1)
-
-ggplot(merged, aes(x = relative.difference)) +
-  geom_histogram(binwidth = 0.1) +
-  scale_x_continuous(breaks = round(seq(min(merged$relative.difference, na.rm = TRUE),
-                                        max(merged$relative.difference, na.rm = TRUE), by = 0.5), 1))
-
-quantile(merged$relative.difference, 0.90, na.rm = TRUE)
-quantile(merged$relative.difference, 0.10, na.rm = TRUE)
-summary(merged$relative.difference)
-median(merged$relative.difference, na.rm = TRUE)
-# The running time of a typical instance is reduced by 74%
-
-# TL;DR: Almost never worse. Usually better by only a small amount, but sometimes significantly better.

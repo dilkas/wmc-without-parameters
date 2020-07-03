@@ -65,9 +65,10 @@ def encode_inst_evidence(filename):
     return clauses
 
 def encode(network, evidence):
-    assert(network.endswith('.dne') or network.endswith('.net'))
+    assert(network.endswith('.dne') or network.endswith('.net') or network.endswith('.hugin'))
     with open(network) as f:
         text = f.read()
+        # Hugin and NET are equivalent formats
         clauses = encode_dne(text) if network.endswith('.dne') else encode_net(text)
 
     # Add a goal clause if necessary
@@ -119,7 +120,7 @@ def encode_using_ace(network, evidence, encoding):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of weighted model counting (WMC)')
-    parser.add_argument('network', metavar='network', help='a Bayesian network (in either DNE or NET format)')
+    parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
     parser.add_argument('encoding', choices=['d02', 'sbk05', 'cd05', 'cd06', 'db20'], help='a WMC encoding')
     parser.add_argument('-e', dest='evidence', help="evidence file (in the INST format)")
     args = parser.parse_args()
