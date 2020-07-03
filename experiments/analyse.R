@@ -4,7 +4,6 @@ require(dplyr)
 require(maditr)
 
 df <- read.csv("results.csv", header = TRUE, sep = ",")
-
 answers <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "answer")
 time <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "time")
 

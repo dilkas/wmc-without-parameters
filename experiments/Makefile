@@ -1,67 +1,57 @@
-# TODO: increase this before running
 TIMEOUT := 1
 MAX_MEMORY_USAGE := 1048576 # 1 GB
-OUTPUT_DIR := results
+
 ALGORITHM := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_USAGE) && /usr/bin/time -v ./ADDMC/counting/addmc
+DIRECTORIES = Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-50 DQMR/qmr-60 DQMR/qmr-70 Plan_Recognition/without_evidence Plan_Recognition/with_evidence 2004-pgm 2005-ijcai 2006-ijar
 
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Grid/*/*.dne))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/DQMR/qmr-100/*.dne))
-#all: $(addsuffix /WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
-#all: $(addsuffix /WITH_EVIDENCE,$(wildcard data/DQMR/qmr-60/*.inst))
-#all: $(addsuffix /WITH_EVIDENCE,$(wildcard data/DQMR/qmr-70/*.inst))
-all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
-all: $(addsuffix /WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-60/*.inst))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-70/*.inst))
+#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
+all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2004-pgm/*.inst))
+#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2006-ijar/*.inst))
+
+#===============================================================================
+
+define run_algorithms_with_evidence
+	cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
+	python encode.py data/$*.$(1) -e data/$* db20
+	-$(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.db20
+	python encode.py data/$*.$(1) -e data/$* d02
+	-$(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.d02
+	python encode.py data/$*.$(1) -e data/$* sbk05
+	-$(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.sbk05
+	python encode.py data/$*.$(1) -e data/$* cd05
+	-$(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd05
+	python encode.py data/$*.$(1) -e data/$* cd06
+	-$(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd06
+endef
 
 data/%/WITHOUT_EVIDENCE:
 	python encode.py data/$* db20
-	-$(ALGORITHM) --wf 4 --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.db20
+	-$(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.db20
 	python encode.py data/$* d02
-	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.d02
+	-$(ALGORITHM) --cf data/$*.cnf &> results/$*.d02
 	python encode.py data/$* sbk05
-	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.sbk05
+	-$(ALGORITHM) --cf data/$*.cnf &> results/$*.sbk05
 	python encode.py data/$* cd05
-	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.cd05
+	-$(ALGORITHM) --cf data/$*.cnf &> results/$*.cd05
 	python encode.py data/$* cd06
-	-$(ALGORITHM) --cf data/$*.cnf &> $(OUTPUT_DIR)/$*.cd06
+	-$(ALGORITHM) --cf data/$*.cnf &> results/$*.cd06
 
-data/%/WITH_EVIDENCE:
-	cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.dne/g") data/$*.dne
-	python encode.py data/$*.dne -e data/$* db20
-	-$(ALGORITHM) --wf 4 --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.db20
-	python encode.py data/$*.dne -e data/$* d02
-	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.d02
-	python encode.py data/$*.dne -e data/$* sbk05
-	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.sbk05
-	python encode.py data/$*.dne -e data/$* cd05
-	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.cd05
-	python encode.py data/$*.dne -e data/$* cd06
-	-$(ALGORITHM) --cf data/$*.dne.cnf &> $(OUTPUT_DIR)/$*.cd06
+data/%/DNE_WITH_EVIDENCE:
+	$(call run_algorithms_with_evidence,dne)
+
+data/%/NET_WITH_EVIDENCE:
+	$(call run_algorithms_with_evidence,net)
 
 clean:
-	rm -f data/Grid/Ratio_50/*.dne.*
-	rm -f data/Grid/Ratio_75/*.dne.*
-	rm -f data/Grid/Ratio_90/*.dne.*
-	rm -f data/DQMR/qmr-100/*.dne.*
-	rm -f data/DQMR/qmr-50/*.dne.*
-	rm -f data/DQMR/qmr-60/*.dne.*
-	rm -f data/DQMR/qmr-70/*.dne.*
-	rm -f data/Plan_Recognition/without_evidence/*.dne.*
-	rm -f data/Plan_Recognition/with_evidence/*.dne.*
-#	rm -f $(OUTPUT_DIR)/Grid/Ratio_50/*
-#	rm -f $(OUTPUT_DIR)/Grid/Ratio_75/*
-#	rm -f $(OUTPUT_DIR)/Grid/Ratio_90/*
-#	rm -f $(OUTPUT_DIR)/DQMR/qmr-100/*
-#	rm -f $(OUTPUT_DIR)/DQMR/qmr-50/*
-#	rm -f $(OUTPUT_DIR)/DQMR/qmr-60/*
-#	rm -f $(OUTPUT_DIR)/DQMR/qmr-70/*
-#	rm -f $(OUTPUT_DIR)/Plan_Recognition/without_evidence/*
-#	rm -f $(OUTPUT_DIR)/Plan_Recognition/with_evidence/*
-	rm -f data/Grid/Ratio_50/*.inst.dne
-	rm -f data/Grid/Ratio_75/*.inst.dne
-	rm -f data/Grid/Ratio_90/*.inst.dne
-	rm -f data/DQMR/qmr-100/*.inst.dne
-	rm -f data/DQMR/qmr-50/*.inst.dne
-	rm -f data/DQMR/qmr-60/*.inst.dne
-	rm -f data/DQMR/qmr-70/*.inst.dne
-	rm -f data/Plan_Recognition/without_evidence/*.inst.dne
-	rm -f data/Plan_Recognition/with_evidence/*.inst.dne
+	for d in $(DIRECTORIES) ; do \
+		rm -f data/$$d/*.dne.* ; \
+		rm -f data/$$d/*.net.* ; \
+		rm -f data/$$d/*.inst.dne ; \
+		rm -f data/$$d/*.inst.net ; \
+	done

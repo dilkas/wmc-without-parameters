@@ -33,6 +33,9 @@ data += parse_dir('results/DQMR/qmr-60/', {'dataset': 'DQMR-60'})
 data += parse_dir('results/DQMR/qmr-70/', {'dataset': 'DQMR-70'})
 data += parse_dir('results/Plan_Recognition/without_evidence/', {'dataset': 'Plan Recognition'})
 data += parse_dir('results/Plan_Recognition/with_evidence/', {'dataset': 'Plan Recognition'})
+data += parse_dir('results/2004-pgm/', {'dataset': '2004-PGM'})
+data += parse_dir('results/2005-ijcai/', {'dataset': '2005-IJCAI'})
+data += parse_dir('results/2006-ijar/', {'dataset': '2006-IJAR'})
 
 fieldnames = set()
 for d in data:

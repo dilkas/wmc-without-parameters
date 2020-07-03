@@ -34,7 +34,7 @@ def encode_dne(text):
                    for s in re.search(r'parents = \(([^()]*)\)', text[end_of_name:]).group(1).split(', ') if s != '']
         # Parse only the numbers and discard every other one
         probs_str = re.search(r'probs = ([^;]*);', text[end_of_name:]).group(1)
-        probs = [p for p in re.split(r'[, ()\n\t]+', probs_str) if p != ''][0::2]
+        probs = [p for p in re.split(r'[, ()\n\t]+', probs_str) if p != ''][::2]
         clauses += construct_cpt(name, parents, probs)
     return clauses
 
@@ -48,12 +48,15 @@ def encode_net(text):
         assert(states == '"false" "true"')
     for potential in re.finditer(r'\npotential([^{]*){([^}]*)}', text):
         header = re.findall(r'\w+', potential.group(1))
+        # First false, then true
         probabilities = re.findall(r'\d+\.?\d*', potential.group(2))[1::2]
         assert(len(probabilities) == 2**(len(header) - 1))
-        clauses += construct_cpt(header[0], header[1:], probabilities)
+        clauses += construct_cpt(header[0], header[1:], probabilities, reverse=True)
     return clauses
 
 def encode_inst_evidence(filename):
+    if filename is None:
+        return []
     clauses = []
     for inst in ET.parse(filename).findall('inst'):
         assert(inst.attrib['value'] in ['true', 'false'])
@@ -67,13 +70,15 @@ def encode(network, evidence):
         text = f.read()
         clauses = encode_dne(text) if network.endswith('.dne') else encode_net(text)
 
-    if evidence:
-        evidence_clauses = encode_inst_evidence(evidence)
+    # Add a goal clause if necessary
+    evidence_clauses = encode_inst_evidence(evidence)
+    if evidence_clauses:
         num_clauses = len(evidence_clauses)
         clauses += evidence_clauses
     else:
         clauses.append(clauses[-1].split(' ')[1] + ' 0')
         num_clauses = 1
+
     encoding = 'p cnf {} {}\n'.format(len(names), num_clauses) + '\n'.join(clauses) + '\n'
     with open(network + '.cnf', 'w') as f:
         f.write(encoding)
@@ -107,7 +112,7 @@ def encode_using_ace(network, evidence, encoding):
         weights_line += [weights[literal], weights[-literal]]
     encoding = 'c weights ' + ' '.join(weights_line) + '\n'
     if (evidence is None):
-        encoding += '-{} 0\n'.format(goal_literal)
+        encoding += '{} 0\n'.format(goal_literal)
     with open(network + '.cnf', 'a') as f:
         f.write(encoding)
 
