@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
 names = []
+values_per_variable = {}
 def name2int(name):
     return str(names.index(name)+1)
 
@@ -14,11 +15,21 @@ def probability_conditions(negation_pattern, parents):
     for negate, parent in zip(negation_pattern, parents):
         yield ('-' if negate else '') + name2int(parent)
 
-def construct_cpt(name, parents, probabilities, reverse=False):
+def construct_binary_cpt(name, parents, probabilities, reverse=False):
     assert(len(probabilities) == 2**len(parents))
     possible_negations = itertools.product([True, False] if reverse else [False, True], repeat=len(parents))
     return ['w ' + ' '.join([name2int(name)] + list(probability_conditions(negation_pattern, parents)) + [prob])
             for negation_pattern, prob in zip(possible_negations, probabilities)]
+
+# def construct_general_cpt(name, parents, probabilities):
+#   parent_patterns = itertools.product(values_per_variable[p] for p in parents)
+#   clauses = []
+#   i = 0
+#   for pattern in parent_patterns:
+#     for value in values_per_variable[name]:
+#       conditions = [name2int((parent, parent_value)) for parent, parent_value in zip(parents, parent_patterns)]
+#       clauses.append('w' + ' '.join([name2int((name, value))] + conditions + [probabilities[i]]))
+#       i += 1
 
 def encode_dne(text):
     clauses = []
@@ -43,15 +54,31 @@ def encode_net(text):
     for node in re.finditer(r'\nnode (\w+)', text):
         end_of_name = node.end()
         name = node.group(1).lstrip().rstrip()
+
+        # states = re.search(r'states = \(\s*"([^()]*)"\s*\)', text[end_of_name:]).group(1).split(' " ')
+        # if len(states) == 2:
+        #   assert(states == ['false', 'true'])
         names.append(name)
+        # else:
+        #   names += [(name, v) for v in states]
+        #   values_per_variable[name] = states
+        #   # Add all the extra rules
+        #   clauses.append(' '.join(name2int((name, value)) for value in states) + ' 0')
+        #   for v1, v2 in itertools.combinations(values, 2):
+        #     clauses.append('-{} -{} 0'.format(name2int((name, v1)), name2int((name, v2))))
+
+        # TODO: replace the below with the above
         states = re.search(r'states = \(([^()]*)\)', text[end_of_name:]).group(1).lstrip().rstrip()
         assert(states == '"false" "true"')
+
     for potential in re.finditer(r'\npotential([^{]*){([^}]*)}', text):
         header = re.findall(r'\w+', potential.group(1))
+        probabilities = re.findall(r'\d+\.?\d*', potential.group(2))
+        # if len(states) == 2:
         # First false, then true
-        probabilities = re.findall(r'\d+\.?\d*', potential.group(2))[1::2]
-        assert(len(probabilities) == 2**(len(header) - 1))
-        clauses += construct_cpt(header[0], header[1:], probabilities, reverse=True)
+        clauses += construct_binary_cpt(header[0], header[1:], probabilities[1::2], reverse=True)
+        # else:
+        #   clauses += construct_general_cpt(header[0], header[1:], probabilities)
     return clauses
 
 def encode_inst_evidence(filename):

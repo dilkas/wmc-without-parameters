@@ -1,0 +1,20 @@
+net
+{
+}
+node a
+{
+  states = ("false" "true" );
+}
+potential ( a )
+{
+  data = ( 1.0 0.0 );
+}
+node b
+{
+  states = ("false" "true" );
+}
+potential ( b | a )
+{
+  data = (( 0.7 0.3 )
+          ( 0.6 0.4 ));
+}

@@ -11,12 +11,13 @@ answers <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, 
 time <- dcast(data = df, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = "time")
 
 # Where answers don't match
-interesting <- answers[abs(answers$db20 - answers$cd05) > 0.01,]
+interesting <- answers[abs(answers$db20 - answers$sbk05) > 0.01,]
 answers[abs(answers$db20 - answers$cd06) > 0.01,]
 answers[abs(answers$db20 - answers$d02) > 0.01,]
 answers[abs(answers$db20 - answers$sbk05) > 0.01,]
 
 # Proportion of instances where my encoding is the best
+# TODO: ignore rows with all NAs
 time$min <- apply(time, 1, min)
 sum(time$db20 == time$min)/nrow(time)
 

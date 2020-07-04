@@ -144,13 +144,13 @@
   paragraph for order, for homomorphisms, etc. This would take up less space.
 \item Notation: if $L$ denotes literals, then it doesn't denote a generating
   set.
+\item Are they called Boolean Bayesian networks or binary Bayesian networks?
 \end{itemize}
 
 \paragraph{Experimental setup.}
 \begin{itemize}
 \item
   Algorithms\footnote{\url{http://beyondnp.org/pages/solvers/model-counters-exact/}}
-  (highlighted the initial setup, can expand later):
   \begin{itemize}
   \item ADDMC \cite{DBLP:conf/aaai/DudekPV20} (rediscovered the
     multiplicativity of BAs in different words) (with optimal settings)
@@ -178,18 +178,19 @@
     al.\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}
     \cite{DBLP:conf/aaai/SangBK05}
     \begin{itemize}
-    \item Grid networks: computing marginal probability of the last node in
-      the grid (DNE).
-    \item Plan recognition problems (DNE + inst).
-    \item Deterministic quick medical reference (DNE + inst).
+    \item Grid (networks) (ratio 75 means that 75\% of the nodes are
+      deterministic),
+    \item Plan recognition (problems),
+    \item Deterministic quick medical reference (what do the numbers mean? the
+      README doesn't say).
     \end{itemize}
-    For the last two, the task can be to calculate the marginal probability of a
-    randomly chosen node (so, repeat at least ten times).
-  \item Bayesian networks available with Ace (some binary, some non-binary)
+  \item Bayesian networks available with Ace
     \begin{itemize}
-    \item \texttt{2004-pgm}: NET + inst (\cite{DBLP:journals/ijar/ChaviraDJ06})
-    \item \texttt{2005-ijcai}: XDSL/NET/Hugin + inst (\cite{DBLP:conf/ijcai/ChaviraD05})
-    \item \texttt{2006-ijar}: NET + inst (\cite{DBLP:journals/ijar/ChaviraDJ06})
+    \item \texttt{2004-pgm} \cite{DBLP:journals/ijar/ChaviraDJ06}
+    \item \texttt{2005-ijcai} \cite{DBLP:conf/ijcai/ChaviraD05}. The Genie/Smile
+      files have their own citation data that I should probably extract. This is
+      the only dataset that has some non-binary networks.
+    \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06}
     \end{itemize}
   \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
   \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
