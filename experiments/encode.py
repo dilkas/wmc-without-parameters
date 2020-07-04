@@ -98,12 +98,12 @@ def encode(network, evidence):
         # Hugin and NET are equivalent formats
         clauses = encode_dne(text) if network.endswith('.dne') else encode_net(text)
 
-    # Add a goal clause if necessary
     evidence_clauses = encode_inst_evidence(evidence)
     if evidence_clauses:
         num_clauses = len(evidence_clauses)
         clauses += evidence_clauses
     else:
+        # Add a goal clause if necessary: the last value of the last variable
         clauses.append(clauses[-1].split(' ')[1] + ' 0')
         num_clauses = 1
 
@@ -133,7 +133,7 @@ def encode_using_ace(network, evidence, encoding):
             weight = components[3]
             weights[literal] = weight
             max_literal = max(max_literal, abs(literal))
-            if components[5] == name:
+            if components[5] == name: # TODO: this will need to change
                 goal_literal = abs(literal)
     weights_line = []
     for literal in range(1, max_literal + 1):
