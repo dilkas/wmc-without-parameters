@@ -80,8 +80,8 @@ const int_t DUMMY_MAX_INT = std::numeric_limits<int_t>::max();
 
 const std::string DUMMY_STR = "DUMMY_STR";
 
-const std::string DOT_DIR = "../tests/";
-const std::string TEST_DIR = "../tests/test/";
+const std::string DOT_DIR = "tests/";
+const std::string TEST_DIR = "tests/test/";
 
 /* namespaces *****************************************************************/
 

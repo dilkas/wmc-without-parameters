@@ -6,6 +6,15 @@ import subprocess
 import xml.etree.ElementTree as ET
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
+NODE_RE = r'\nnode (\w+)'
+NET_STATES_RE = r'states = \(\s*"([^()]*)"\s*\)'
+DNE_STATES_RE = r'states = \(([^()]*)\)'
+PARENTS_RE = r'parents = \(([^()]*)\)'
+PROBS_RE = r'probs = ([^;]*);'
+POTENTIAL_RE = r'\npotential([^{]*){([^}]*)}'
+NUMBER_RE = r'\d+\.?\d*'
+PROB_SPLITTER_RE = r'[, ()\n\t]+'
+
 names = []
 values_per_variable = {}
 def name2int(name):
@@ -21,64 +30,64 @@ def construct_binary_cpt(name, parents, probabilities, reverse=False):
     return ['w ' + ' '.join([name2int(name)] + list(probability_conditions(negation_pattern, parents)) + [prob])
             for negation_pattern, prob in zip(possible_negations, probabilities)]
 
-# def construct_general_cpt(name, parents, probabilities):
-#   parent_patterns = itertools.product(values_per_variable[p] for p in parents)
-#   clauses = []
-#   i = 0
-#   for pattern in parent_patterns:
-#     for value in values_per_variable[name]:
-#       conditions = [name2int((parent, parent_value)) for parent, parent_value in zip(parents, parent_patterns)]
-#       clauses.append('w' + ' '.join([name2int((name, value))] + conditions + [probabilities[i]]))
-#       i += 1
+def construct_general_cpt(name, parents, probabilities):
+    parent_patterns = itertools.product(*[values_per_variable[p] for p in parents])
+    clauses = []
+    i = 0
+    for pattern in parent_patterns:
+        probability_denominator = 1
+        probability = 0
+        conditions = [name2int((parent, parent_value)) for parent, parent_value in zip(parents, pattern)]
+        for j in range(len(values_per_variable[name])):
+            current_value = name2int((name, values_per_variable[name][j]))
+            previous_values = [name2int((name, value)) for value in values_per_variable[name][:j]]
+            clauses += ['w {} {} 0'.format(current_value, previous_value) for previous_value in previous_values]
+            negated_previous = ['-{}'.format(v) for v in previous_values]
+            probability = float(probabilities[i]) / probability_denominator
+            probability_denominator *= 1 - probability
+            clauses.append('w {} {}'.format(' '.join([current_value] + negated_previous + conditions), probability))
+            i += 1
+    return clauses
 
 def encode_dne(text):
     clauses = []
-    for node in re.finditer(r'\nnode (\w+)', text):
+    for node in re.finditer(NODE_RE, text):
         end_of_name = node.end()
         name = node.group(1).lstrip().rstrip()
         names.append(name)
 
-        states = re.search(r'states = \(([^()]*)\)', text[end_of_name:]).group(1)
-        assert(states == 'true, false')
+        values = re.search(DNE_STATES_RE, text[end_of_name:]).group(1)
+        assert(values == 'true, false')
 
         parents = [s.lstrip().rstrip()
-                   for s in re.search(r'parents = \(([^()]*)\)', text[end_of_name:]).group(1).split(', ') if s != '']
+                   for s in re.search(PARENTS_RE, text[end_of_name:]).group(1).split(', ') if s != '']
         # Parse only the numbers and discard every other one
-        probs_str = re.search(r'probs = ([^;]*);', text[end_of_name:]).group(1)
-        probs = [p for p in re.split(r'[, ()\n\t]+', probs_str) if p != ''][::2]
+        probs_str = re.search(PROBS_RE, text[end_of_name:]).group(1)
+        probs = [p for p in re.split(PROB_SPLITTER_RE, probs_str) if p != ''][::2]
         clauses += construct_cpt(name, parents, probs)
     return clauses
 
 def encode_net(text):
     clauses = []
-    for node in re.finditer(r'\nnode (\w+)', text):
+    for node in re.finditer(NODE_RE, text):
         end_of_name = node.end()
         name = node.group(1).lstrip().rstrip()
+        values = re.search(NET_STATES_RE, text[end_of_name:]).group(1).split('" "')
+        if len(values) == 2:
+            assert(values == ['false', 'true'])
+            names.append(name)
+        else:
+            names.extend([(name, v) for v in values])
+            values_per_variable[name] = values
 
-        # states = re.search(r'states = \(\s*"([^()]*)"\s*\)', text[end_of_name:]).group(1).split(' " ')
-        # if len(states) == 2:
-        #   assert(states == ['false', 'true'])
-        names.append(name)
-        # else:
-        #   names += [(name, v) for v in states]
-        #   values_per_variable[name] = states
-        #   # Add all the extra rules
-        #   clauses.append(' '.join(name2int((name, value)) for value in states) + ' 0')
-        #   for v1, v2 in itertools.combinations(values, 2):
-        #     clauses.append('-{} -{} 0'.format(name2int((name, v1)), name2int((name, v2))))
-
-        # TODO: replace the below with the above
-        states = re.search(r'states = \(([^()]*)\)', text[end_of_name:]).group(1).lstrip().rstrip()
-        assert(states == '"false" "true"')
-
-    for potential in re.finditer(r'\npotential([^{]*){([^}]*)}', text):
+    for potential in re.finditer(POTENTIAL_RE, text):
         header = re.findall(r'\w+', potential.group(1))
-        probabilities = re.findall(r'\d+\.?\d*', potential.group(2))
-        # if len(states) == 2:
-        # First false, then true
-        clauses += construct_binary_cpt(header[0], header[1:], probabilities[1::2], reverse=True)
-        # else:
-        #   clauses += construct_general_cpt(header[0], header[1:], probabilities)
+        probabilities = re.findall(NUMBER_RE, potential.group(2))
+        if len(values) == 2:
+            # First false, then true
+            clauses += construct_binary_cpt(header[0], header[1:], probabilities[1::2], reverse=True)
+        else:
+            clauses += construct_general_cpt(header[0], header[1:], probabilities)
     return clauses
 
 def encode_inst_evidence(filename):
@@ -119,7 +128,10 @@ def encode_using_ace(network, evidence, encoding):
 
     # Which marginal probability should we compute?
     with open(network) as f:
-        name = re.findall(r'\nnode (\w+)', f.read())[-1]
+        text = f.read()
+    goal_node, goal_node_end = [(i.group(1), i.end()) for i in re.finditer(NODE_RE, text)][-1]
+    goal_num_values = len(re.search(NET_STATES_RE, text[goal_node_end:]).group(1).split('" "'))
+    # TODO: default value = 2
 
     # Move weights from the LMAP file to the CNF file
     with open(network + '.lmap') as f:
@@ -133,13 +145,13 @@ def encode_using_ace(network, evidence, encoding):
             weight = components[3]
             weights[literal] = weight
             max_literal = max(max_literal, abs(literal))
-            if components[5] == name: # TODO: this will need to change
-                goal_literal = abs(literal)
+            if components[5] == goal_node and components[6] == '{}\n'.format(goal_num_values - 1):
+                goal_literal = literal
     weights_line = []
     for literal in range(1, max_literal + 1):
         weights_line += [weights[literal], weights[-literal]]
     encoding = 'c weights ' + ' '.join(weights_line) + '\n'
-    if (evidence is None):
+    if evidence is None:
         encoding += '{} 0\n'.format(goal_literal)
     with open(network + '.cnf', 'a') as f:
         f.write(encoding)

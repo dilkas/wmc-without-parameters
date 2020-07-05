@@ -15,7 +15,7 @@
 \usepackage{xcolor}
 \usepackage[backgroundcolor=lightgray]{todonotes}
 \usepackage{complexity}
-\usepackage{soul} % temp
+\usepackage{soul}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -67,9 +67,6 @@
 
 \paragraph{The big TODO list.}
 \begin{itemize}
-\item For both DQMR and Plan Recognition, I will need two DNE $\to$ CNF
-  encoders. I should formalise the algorithms behind them as well, since they
-  are described informally.
 \item Look into ways to theoretically justify the performance benefits. Some
   suggestions:
   \begin{itemize}
@@ -82,15 +79,13 @@
   \end{itemize}
 \item Have an example of how the ADDs function in this situation. If not for the
   paper, then at least for slides. Use the framework to check its correctness.
-\item Along with comparing the (3?) encodings, I could also compare this
-  to using ADDs directly on Bayesian networks.
 \item[F] Give a concrete example of something impossible to represent using WMC.
 \item Describe the changes to the Cachet DIMACS CNF format (and mention that, if
   needed, the assumption that $\Pr(A) + \Pr(\neg A) = 1$ can be discarded).
   Instead of \texttt{w 1 0.1}, we have \texttt{w 1 2 0.1} and \texttt{w 1 -2
     0.5}. This provides half of the information; the remaining half can be
   deduced, but the algorithm itself can support weights that are not necessarily
-  probabilities.
+  probabilities. Ditto for non-binary values (the shorter version).
 \item Rename the repository into `conditional-wmc'.
 \item Give some examples (and/or a proof) of why this is correct when combined
   with arbitrary clauses (i.e., conjunctions of disjunctions).
@@ -270,9 +265,14 @@ distribution to into a fully independent one.
   has very little to do with the best encoding for CNF WMC solvers?
 \item When the Bayesian network has an evidence file, we compute the probability
   of evidence. Otherwise, we pick the last (i.e., last to be mentioned) node in
-  the Bayesian network to be the goal. This applies to the Grid data set (as
+  the Bayesian network to be the goal (the positive value for binary networks
+  and the last value in the general case). This applies to the Grid data set (as
   intended) and also to two instances of Plan Reconstruction and roughly half of
   2004-PGM.
+\item Bayesian networks are often solved in a compile once, query many times
+  fashion. This can be achieved using ADDMC by selecting a subset $S$ of
+  variable we may want to query over and running ADDMC while excluding $S$ from
+  variable elimination/projection/$\exists$.
 \end{itemize}
 
 \section{Preliminaries}
@@ -960,111 +960,46 @@ variables would suffice.
   Similarly, coproducts of free BAs are free.
 \end{corollary}
 
-\section{How to represent a Bayesian network}
+\section{Representation of conditional probability tables}
 
-Let $G = (V, E)$ be a DAG, and let $(X_v)_{v \in V}$ be the discrete random
-variables (RVs). Let $(d_v)_{v \in V}$ denote the numbers of values that each RV
-can take and assume that $d_v$ is a power of two for all $v \in V$.
-\begin{enumerate}
-\item For each $v \in V$, let $A_v$ be a set of $\log_2 d_v$ Boolean variables.
-  (If $d_v$ is not a power of two, we would need to manually forbid each illegal
-  value, e.g., by adding formulas such as $\neg(x_1 \land x_2 \land x_3 \land
-  \neg x_4)$ to the theory. Alternatively, we could set their probability to
-  zero, but the former should be better.)
-\item For $v \in V$:
-  \begin{enumerate}
-  \item If $v$ has no parents, we can directly provide a probability measure on
-    $\mathcal{F}(A_v)$.
-  \item Otherwise, we need a probability measure on
-    \[
-      \mathcal{F} \left( A_v \cup \bigcup_{(u, v) \in E} A_u \right).
-    \]
-    For any element $a_u \land a_v$ in this free Boolean algebra such that $a_v
-    \in A_v \setminus \{ 0, 1 \}$, and $a_u \not\in A_v$, we can set
-    \[
-      m(a_u \land a_v) = \Pr(a_v \mid a_u)\Pr(a_u).
-    \]
-  \end{enumerate}
-\item When a \#\SAT{} algorithm asks for the weight of a model $\bigwedge_{v \in
-    V} l_v$, split it into segments that correspond to each leaf, take the
-  probabilities from each such node, and multiply them. NB: The segments will
-  intersect, e.g., with
-  \[
-    \begin{tikzpicture}
-      \node[latent] (C) {$C$};
-      \node[latent, below left = of C] (A) {$A$};
-      \node[latent, below right = of C] (B) {$B$};
-      \node[latent, right = 2 of C] (D) {$D$};
-      \edge {C} {A, B};
-    \end{tikzpicture}
-  \]
-  $a \land b \land c \land d$ will be split into $(a \land c) \land (b \land c)
-  \land d$.
-\end{enumerate}
+The probability of a variable with $n$ values $x_1, \dots, x_n$ (whether
+conditioned on something or not) can be represented with an ADD of size
+$\Theta(n^2)$ by representing each of $\Pr(x_1), \Pr(x_2 \mid x_1), \dots,
+\Pr(x_n \mid x_1, \dots, x_{n-1})$ by a separate ADD. For example, if $n=3$, the
+last of the three ADDs would look like this
+\[
+  \begin{tikzpicture}
+    \node[ellipse,draw] (x3) {$x_3$};
+    \node[ellipse,draw,below left = of x3] (x21) {$x_2$};
+    \node[ellipse,draw,below right = of x3] (x22) {$x_2$};
+    \node[ellipse,draw,below = of x21] (x11) {$x_1$};
+    \node[ellipse,draw,below = of x22] (x12) {$x_1$};
+    \node[rectangle,draw,below = of x11] (n2) {$0.7$};
+    \node[rectangle,draw,left = of n2] (n1) {$0$};
+    \node[rectangle,draw,below = of x12] (n3) {$0.3$};
+    \node[rectangle,draw,right = of n3] (n4) {$1$};
 
-\subsection{Bayesian networks as Boolean algebras}
+    \draw (x3) edge (x21);
+    \draw (x21) edge (n1);
+    \draw (x11) edge (n1);
+    \draw[dashed] (x21) edge (x11);
+    \draw[dashed] (x11) edge (n2);
 
-\begin{table}
-  \caption{Examples of how Bayesian networks encode as Boolean algebras. Here,
-    $A$ denotes $\mathcal{F}\{a\}$ and $AB$ denotes $\mathcal{F}\{a, b\}$.}
-  \centering
-  \begin{tabular}{cc}
-    \toprule
-    Bayesian network & Boolean algebra \\
-    \midrule \\[-1.3em]
-    \begin{tikzpicture}[baseline={(A.base)}]
-      \node[latent] (A) {$A$};
-    \end{tikzpicture} & $A$ \\
-    \midrule \\[-1.3em]
-    \begin{tikzpicture}[baseline={(A.base)}]
-      \node[latent] (A) {$A$};
-      \node[latent,right =of A] (B) {$B$};
-    \end{tikzpicture} & $A + B$ \\
-    \midrule \\[-1.3em]
-    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
-      \node[latent] (A) {$A$};
-      \node[latent,below =of A] (B) {$B$};
-      \edge {A} {B};
-    \end{tikzpicture} & $AB$ \\
-    \midrule \\[-1.3em]
-    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
-      \node[latent] (A) {$A$};
-      \node[latent,below =of A] (B) {$B$};
-      \node[latent,right =of A] (C) {$C$};
-      \edge {A} {B};
-    \end{tikzpicture} & $B +_A C$ \\
-    \midrule \\[-1.3em]
-    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
-      \node[latent] (A) {$A$};
-      \node[latent,below =of A] (B) {$B$};
-      \node[latent,right =of A] (C) {$C$};
-      \node[latent,below =of C] (D) {$D$};
-      \edge {A} {B};
-      \edge {C} {D};
-    \end{tikzpicture} & $B +_{A+C} D$ \\
-    \midrule \\[-1.3em]
-    \begin{tikzpicture}[baseline={($(A.base)!.5!(B.base)$)}]
-      \node[latent] (A) {$A$};
-      \node[latent,below left =of A] (B) {$B$};
-      \node[latent,below right=of A] (C) {$C$};
-      \node[latent,right = 2 of A] (D) {$D$};
-      \node[latent,below =of D] (E) {$E$};
-      \edge {A} {B,C};
-      \edge {D} {E};
-    \end{tikzpicture} & $B +_{A+D} C +_{A+D} E$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+    \draw[dashed] (x3) edge (x22);
+    \draw[dashed] (x22) edge (x12);
+    \draw[dashed] (x12) edge (n3);
+    \draw (x22) edge (n4);
+    \draw (x12) edge (n4);
+  \end{tikzpicture}
+\]
+Such an ADD for $x_n$ has $2n+3$ nodes and $4n-2$ edges. The same information
+can be represented in textual form as
+\begin{align*}
+  &\texttt{w 3 1 0} \\
+  &\texttt{w 3 2 0} \\
+  &\texttt{w 3 -1 -2 0.7}
+\end{align*}
 
-To turn a Bayesian network into a Boolean algebra, run $f(\{ v \in V \mid
-\mathrm{outdeg}(v) = 0 \})$, where $f$ works as follows on an arbitrary $A
-\subseteq V$:
-\begin{enumerate}
-\item $S \gets \{ u \mid (u, v) \in E\text{, } v \in A \}$ (i.e., $S$ is the set
-  of parents of the elements in $A$).
-\item If $S = \emptyset$, return $\sum A$ (a coproduct).
-\item Otherwise, return $\sum_{f(S)} A$ (a pushout).
-\end{enumerate}
 
 \bibliographystyle{plain}
 \bibliography{paper}
