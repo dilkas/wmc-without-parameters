@@ -139,7 +139,7 @@
   paragraph for order, for homomorphisms, etc. This would take up less space.
 \item Notation: if $L$ denotes literals, then it doesn't denote a generating
   set.
-\item Are they called Boolean Bayesian networks or binary Bayesian networks?
+\item There is a new version of ADDMC.
 \end{itemize}
 
 \paragraph{Experimental setup.}
@@ -273,6 +273,26 @@ distribution to into a fully independent one.
   fashion. This can be achieved using ADDMC by selecting a subset $S$ of
   variable we may want to query over and running ADDMC while excluding $S$ from
   variable elimination/projection/$\exists$.
+\item \texttt{cd05} relaxes the encoding so much that extra models become
+  possible. They are supposed to be filtered out by the algorithm, but mine
+  can't do that because it doesn't deal with models. Same for \texttt{cd06}
+  because it's based on \texttt{cd05}.
+\item For ground ProbLog, we can encode a program
+\begin{verbatim}
+p :: a :- b
+q :: a :- c
+\end{verbatim}
+  into $P(a \mid b)=p$, $P(a \mid c)=q$ instead of having clauses $b \Rightarrow
+  a$, $c \Rightarrow a$. Some logical structure is likely to remain.
+\item Potential criticism may be that this is a step backwards and doesn't allow
+  us to use SAT-based techniques for probabilistic inference. However, they can
+  still be used for the 'theory+query' part.
+\item We don't compare 'compile times' because our encoding time is linear, so
+  we would easily beat everyone else.
+\item The claim behind this paper is that allowing for conditional probabilities
+  in the context of weighted model counting seems to be a good idea. Bayesian
+  networks and ADDMC are only particular examples. This should also work with
+  Cachet.
 \end{itemize}
 
 \section{Preliminaries}
@@ -999,7 +1019,11 @@ can be represented in textual form as
   &\texttt{w 3 2 0} \\
   &\texttt{w 3 -1 -2 0.7}
 \end{align*}
-
+The encoding weights depend on the probabilities in the CPT as in
+\[
+  w(x_n \mid \neg x_1, \dots, \neg x_{n-1}) = \Pr(X = x_n) \prod_{i=1}^{n-1}
+  \frac{1}{1 - w(x_i \mid \neg x_1, \dots, \neg x_{i-1})}.
+\]
 
 \bibliographystyle{plain}
 \bibliography{paper}
