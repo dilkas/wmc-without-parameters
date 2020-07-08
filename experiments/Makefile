@@ -13,8 +13,8 @@ DIRECTORIES = Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-50
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2004-pgm/*.inst))
-#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2005-ijcai/*.inst))
-all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2006-ijar/*.inst))
+all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2005-ijcai/*.inst))
+#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2006-ijar/*.inst))
 
 #===============================================================================
 
@@ -70,5 +70,13 @@ clean:
 	python encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
 
-test: $(addsuffix .test, $(basename $(wildcard test_data/*.net)))
+%.test2: %.net %.inst.answer %.inst $(ALGORITHM) encode.py
+	python encode.py $< -e $(word 3, $?) db20
+	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) d02
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) sbk05
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+
+test: $(addsuffix .test, $(basename $(wildcard test_data/*.net))) $(addsuffix .test2, $(basename $(wildcard test_data/*.inst)))
 	@echo "Success, all tests passed."
