@@ -1,0 +1,12 @@
+bnet general2 {
+node a {
+     states = (a1, a2, a3);
+     parents = ();
+     probs = (0.5, 0.1, 0.4);
+};
+node b {
+     states = (b1, b2);
+     parents = (a);
+     probs = ((1, 0), (0.6, 0.4), (0, 1));
+};
+};

@@ -1,0 +1,12 @@
+bnet binary {
+node a {
+     states = (false, true);
+     parents = ();
+     probs = (1, 0);
+};
+node b {
+     states = (false, true);
+     parents = (a);
+     probs = ((0.7, 0.3), (0.6, 0.4));
+};
+};

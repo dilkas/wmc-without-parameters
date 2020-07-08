@@ -36,7 +36,8 @@ def construct_cpt(name, parents, probabilities):
             if current_value.startswith('-'):
                 i += 1
                 continue
-            previous_values = [bayesian2logical(name, value) for value in values_per_variable[name][:j]] if len(values_per_variable[name]) > 2 else []
+            previous_values = [bayesian2logical(name, value) for value in
+                               values_per_variable[name][:j]] if len(values_per_variable[name]) > 2 else []
             clauses += ['w {} {} 0'.format(current_value, previous_value) for previous_value in previous_values]
             negated_previous = [(v[1:] if v.startswith('-') else '-' + v) for v in previous_values]
             probability = float(probabilities[i]) / probability_denominator
@@ -61,7 +62,7 @@ def encode_text(text, mode):
             parents = [s.lstrip().rstrip()
                        for s in re.search(PARENTS_RE, text[end_of_name:]).group(1).split(', ') if s != '']
             probs_str = re.search(PROBS_RE, text[end_of_name:]).group(1)
-            probs = [p for p in re.split(PROB_SPLITTER_RE, probs_str) if p != ''][::2]
+            probs = [p for p in re.split(PROB_SPLITTER_RE, probs_str) if p != '']
             clauses += construct_cpt(name, parents, probs)
 
     if mode == 'net':
