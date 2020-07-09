@@ -4,33 +4,33 @@ require(dplyr)
 require(maditr)
 
 TIMEOUT <- 1
-df <- read.csv("results.csv", header = TRUE, sep = ",")
-df$time[df$time > TIMEOUT] <- TIMEOUT
-df$time[is.na(df$time)] <- TIMEOUT
-answers <- dcast(data = df, formula = instance ~ encoding, fun.aggregate = sum, value.var = "answer")
-time <- dcast(data = df, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = "time")
+df0 <- read.csv("results.csv", header = TRUE, sep = ",")
+df0$time[df0$time > TIMEOUT] <- TIMEOUT
+df0$time[is.na(df0$time)] <- TIMEOUT
+df <- dcast(data = df0, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = c("answer", "time"))
 
 # Where answers don't match
-interesting <- answers[abs(answers$db20 - answers$sbk05) > 0.01,]
-answers[abs(answers$db20 - answers$cd06) > 0.01,]
-answers[abs(answers$db20 - answers$d02) > 0.01,]
-answers[abs(answers$db20 - answers$sbk05) > 0.01,]
+interesting <- df[abs(df$answer_db20 - df$answer_sbk05) > 0.01,]
+df[abs(df$answer_db20 - df$answer_cd06) > 0.01,]
+df[abs(df$answer_db20 - df$answer_d02) > 0.01,]
+df[abs(df$answer_db20 - df$answer_sbk05) > 0.01,]
 
 # Proportion of instances where my encoding is the best
 # TODO: ignore rows with all NAs
-time$min <- apply(time, 1, min)
-sum(time$db20 == time$min)/nrow(time)
+#time$min <- apply(time, 1, min)
+#sum(time$db20 == time$min)/nrow(time)
 
 # Proportion unsolved
-sum(is.na(answers$cd05))/nrow(answers)
-sum(is.na(answers$cd06))/nrow(answers)
-sum(is.na(answers$d02))/nrow(answers)
-sum(is.na(answers$db20))/nrow(answers)
-sum(is.na(answers$sbk05))/nrow(answers)
+sum(is.na(df$answer_cd05))/nrow(df)
+sum(is.na(df$answer_cd06))/nrow(df)
+sum(is.na(df$answer_d02))/nrow(df)
+sum(is.na(df$answer_db20))/nrow(df)
+sum(is.na(df$answer_sbk05))/nrow(df)
 
-ggplot(time, aes(x = db20, y = d02, col = dataset)) +
+# By dataset
+ggplot(df, aes(x = time_db20, y = time_d02, col = dataset)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0)
 
-ggplot(df, aes(x = encoding, y = time)) +
+ggplot(df0, aes(x = encoding, y = time)) +
   geom_boxplot()
