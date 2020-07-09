@@ -1021,11 +1021,16 @@ can be represented in textual form as
   &\texttt{w 3 2 0} \\
   &\texttt{w 3 -1 -2 0.7}
 \end{align*}
-The encoding weights depend on the probabilities in the CPT as in
+The encoding weights depend on the probabilities in the CPT as follows. For each
+value $x_n$, if $\Pr(X = x_n) = 0$, then $w(x_n) = 0$. Otherwise, let $I_n = \{ 1
+\le i \le n - 1 \mid \Pr(X = x_i) \ne 0 \}$. Then
 \[
-  w(x_n \mid \neg x_1, \dots, \neg x_{n-1}) = \Pr(X = x_n) \prod_{i=1}^{n-1}
-  \frac{1}{1 - w(x_i \mid \neg x_1, \dots, \neg x_{i-1})}.
+  w \left( x_n \;\middle|\; \bigwedge_{i \in I_n} \neg x_i \right) = \Pr(X =
+  x_n) \prod_{i \in I_n} \frac{1}{1 - w \left( x_i \;\middle|\; \bigwedge_{j \in
+        I_i} \neg x_j \right)}.
 \]
+All of these weights/probabilities may have other conditions that come from the
+structure of the Bayesian network.
 
 \bibliographystyle{plain}
 \bibliography{paper}

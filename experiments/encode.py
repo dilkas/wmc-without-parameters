@@ -36,8 +36,13 @@ def construct_cpt(name, parents, probabilities):
             if current_value.startswith('-'):
                 i += 1
                 continue
-            previous_values = [bayesian2logical(name, value) for value in
-                               values_per_variable[name][:j]] if len(values_per_variable[name]) > 2 else []
+            if probabilities[i] == '0':
+                clauses.append('w {} {}'.format(' '.join([current_value] + conditions), probabilities[i]))
+                continue
+            previous_values = [bayesian2logical(name, value)
+                               for k, value in enumerate(values_per_variable[name][:j])
+                               if probabilities[i-len(values_per_variable[name][:j])+k] != '0'] if len(
+                                       values_per_variable[name]) > 2 else []
             clauses += ['w {} {} 0'.format(current_value, previous_value) for previous_value in previous_values]
             negated_previous = [(v[1:] if v.startswith('-') else '-' + v) for v in previous_values]
             probability = float(probabilities[i]) / probability_denominator
@@ -92,9 +97,11 @@ def encode(network, evidence):
     if evidence_clauses:
         num_clauses = len(evidence_clauses)
         clauses += evidence_clauses
-    else:
-        # Add a goal clause if necessary
-        clauses.append(clauses[-1].split(' ')[1] + ' 0')
+    else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
+        variable = variables[-1][0]
+        literal = (variables.index((variable, 'true')) if (variable, 'true') in variables else
+                   next(i for i, t in enumerate(variables) if t[0] == variable)) + 1
+        clauses.append('{} 0'.format(literal))
         num_clauses = 1
 
     encoding = 'p cnf {} {}\n'.format(len(variables), num_clauses) + '\n'.join(clauses) + '\n'
