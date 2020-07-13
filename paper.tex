@@ -264,11 +264,12 @@ distribution to into a fully independent one.
   slowest (along with cd05). Perhaps the best encoding for arithmetic circuits
   has very little to do with the best encoding for CNF WMC solvers?
 \item When the Bayesian network has an evidence file, we compute the probability
-  of evidence. Otherwise, we pick the last (i.e., last to be mentioned) node in
-  the Bayesian network to be the goal (the positive value for binary networks
-  and the last value in the general case). This applies to the Grid data set (as
+  of evidence. Otherwise, let $X$ denote the last-mentioned node in the Bayesian
+  network. If $\mathsf{true}$ is a valid value of $X$, we compute the marginal
+  probability of $X = \mathsf{true}$. Otherwise, we pick the first value of $X$
+  and calculate its marginal probability. This applies to the Grid data set (as
   intended) and also to two instances of Plan Reconstruction and roughly half of
-  2004-PGM.
+  the instances from 2004-PGM that have empty evidence files.
 \item Bayesian networks are often solved in a compile once, query many times
   fashion. This can be achieved using ADDMC by selecting a subset $S$ of
   variable we may want to query over and running ADDMC while excluding $S$ from

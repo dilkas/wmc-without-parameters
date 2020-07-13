@@ -11,9 +11,8 @@ df <- dcast(data = df0, formula = instance + dataset ~ encoding, fun.aggregate =
 
 # Where answers don't match
 interesting <- df[abs(df$answer_db20 - df$answer_sbk05) > 0.01,]
-df[abs(df$answer_db20 - df$answer_cd06) > 0.01,]
 df[abs(df$answer_db20 - df$answer_d02) > 0.01,]
-df[abs(df$answer_db20 - df$answer_sbk05) > 0.01,]
+df[abs(df$answer_db20 - df$answer_cd06) > 0.01,]
 
 # Proportion of instances where my encoding is the best
 # TODO: ignore rows with all NAs
