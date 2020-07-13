@@ -151,31 +151,28 @@ def run_ace(network, evidence, encoding):
         command += ['-e', evidence]
     subprocess.run(command)
 
-# TODO: refactor!
-def encode_using_ace(network, evidence_file, encoding):
-    mode = get_format(network)
-    run_ace(network, evidence_file, encoding)
-
-    # Which marginal probability should we compute?
-    with open(network) as f:
-        text = f.read()
+def identify_goal(text, mode):
+    'Which marginal probability should we compute?'
     goal_node, goal_node_end = [(i.group(1), i.end()) for i in re.finditer(NODE_RE, text)][-1]
     values = re.split(STATE_SPLITTER_RE[mode], re.search(STATES_RE[mode], text[goal_node_end:]).group(1))
     goal_value = values.index('true') if 'true' in values else 0
-    # make a variable -> list of values map
-    values = {}
-    for node in re.finditer(NODE_RE, text):
-        variable = node.group(1)
-        v = re.split(STATE_SPLITTER_RE[mode], re.search(STATES_RE[mode], text[node.end():]).group(1))
-        values[variable] = v
+    return goal_node, goal_value
+
+def encode_using_ace(network, evidence_file, encoding):
+    run_ace(network, evidence_file, encoding)
+
+    with open(network) as f:
+        text = f.read()
+    mode = get_format(network)
+    goal_node, goal_value = identify_goal(text, mode)
+    # Make a variable -> list of values map
+    values = {node.group(1) : re.split(STATE_SPLITTER_RE[mode], re.search(STATES_RE[mode], text[node.end():]).group(1))
+              for node in re.finditer(NODE_RE, text)}
 
     # Move weights from the LMAP file to the CNF file
-    with open(network + '.lmap') as f:
-        lines = f.readlines()
-    variablesAndValues = {} # to work around a bug with the sbk05 encoding
     weights = {}
     max_literal = 0
-    for line in lines:
+    for line in open(network + '.lmap'):
         if line.startswith('cc$I') or line.startswith('cc$C') or line.startswith('cc$P'):
             components = line.split('$')
             literal = int(components[2])
@@ -185,18 +182,16 @@ def encode_using_ace(network, evidence_file, encoding):
             if line.startswith('cc$I'):
                 variable = components[5]
                 value = int(components[6].rstrip())
-                variablesAndValues[literal] = (variable, values[variable][value])
+                if literal > 0:
+                    variables.add_literal(variable, values[variable][value], literal)
                 if variable == goal_node and value == goal_value:
                     goal_literal = literal
 
     evidence = ''
-    if encoding == 'sbk05':
-        literals = sorted(l for l in variablesAndValues.keys() if l > 0)
-        for i in literals:
-            variables.add_literal(variablesAndValues[i][0], variablesAndValues[i][1], i)
-        evidence = '\n'.join(encode_inst_evidence(evidence_file))
     if evidence_file_is_empty(evidence_file):
         evidence = '{} 0\n'.format(goal_literal)
+    elif encoding == 'sbk05':
+        evidence = '\n'.join(encode_inst_evidence(evidence_file))
 
     weight_encoding = 'c weights ' + ' '.join(l for literal in range(1, max_literal + 1)
                                               for l in [weights[literal], weights[-literal]])
