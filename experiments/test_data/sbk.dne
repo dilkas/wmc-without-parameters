@@ -1,0 +1,17 @@
+bnet sbk {
+node friends {
+     states = (false, true);
+     parents = ();
+     probs = (0.5, 0.5);
+};
+node smokes {
+     states = (false, true);
+     parents = ();
+     probs = (0.5, 0.5);
+};
+node wclause {
+     states = (false, true);
+     parents = (friends, smokes);
+     probs = ((1, 0), (0, 1), (0, 1), (0, 1));
+};
+};

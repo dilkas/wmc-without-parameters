@@ -62,35 +62,37 @@ clean:
 	done
 
 # cd05 and cd06 are supposed to produce wrong answers
-%.test: %.net %.dne %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
+%.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
 # NET
 	python encode.py $< db20
-	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 3, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
+	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
 	python encode.py $< d02
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 3, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< sbk05
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 3, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
 # NET with evidence
-	python encode.py $< -e $(word 4, $?) db20
-	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 5, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
-	python encode.py $< -e $(word 4, $?) d02
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 5, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
-	python encode.py $< -e $(word 4, $?) sbk05
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 5, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) db20
+	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) d02
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) sbk05
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+
+%.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
 # DNE
-	python encode.py $(word 2, $?) db20
-	$(ALGORITHM) --wf 4 --cf $(word 2, $?).cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 3, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
-	python encode.py $(word 2, $?) d02
-	$(ALGORITHM) --cf $(word 2, $?).cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 3, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
-	python encode.py $(word 2, $?) sbk05
-	$(ALGORITHM) --cf $(word 2, $?).cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 3, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< db20
+	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
+	python encode.py $< d02
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
+	python encode.py $< sbk05
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
 # DNE with evidence
-	python encode.py $(word 2, $?) -e $(word 4, $?) db20
-	$(ALGORITHM) --wf 4 --cf $(word 2, $?).cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 5, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
-	python encode.py $(word 2, $?) -e $(word 4, $?) d02
-	$(ALGORITHM) --cf $(word 2, $?).cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 5, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
-	python encode.py $(word 2, $?) -e $(word 4, $?) sbk05
-	$(ALGORITHM) --cf $(word 2, $?).cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 5, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) db20
+	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "DB20 on $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) d02
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) sbk05
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
 
 test: $(addsuffix .test, $(basename $(wildcard test_data/*.inst)))
 	@echo "Success, all tests passed."

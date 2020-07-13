@@ -70,6 +70,7 @@ def construct_cpt(name, parents, probabilities):
                 continue
             if float(probabilities[i]) == 0:
                 clauses.append('w {} {}'.format(' '.join([current_value] + conditions), probabilities[i]))
+                i += 1
                 continue
             previous_values = [variables.get_literal_string(name, value)
                                for k, value in enumerate(values_per_variable[name][:j])
