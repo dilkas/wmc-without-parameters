@@ -55,35 +55,37 @@ class LiteralDict:
 variables = LiteralDict()
 values_per_variable = {}
 
+# TODO: make this readable
+# TODO: describe this as an algorithm
 def construct_cpt(name, parents, probabilities):
     parent_patterns = itertools.product(*[values_per_variable[p] for p in parents])
     clauses = []
-    i = 0
+    beginning_of_probabilities = 0
     for pattern_index, pattern in enumerate(parent_patterns):
         probability_denominator = Fraction(1)
         probability = 0
         conditions = [variables.get_literal_string(parent, parent_value)
                       for parent, parent_value in zip(parents, pattern)]
-        for j in range(len(values_per_variable[name])):
-            current_value = variables.get_literal_string(name, values_per_variable[name][j])
+        values = sorted(enumerate(values_per_variable[name]),
+                        key=lambda t: probabilities[beginning_of_probabilities + t[0]], reverse=True)
+        for i, (j, value) in enumerate(values):
+            current_value = variables.get_literal_string(name, value)
             if current_value.startswith('-'):
-                i += 1
                 continue
-            if float(probabilities[i]) == 0:
-                clauses.append('w {} {}'.format(' '.join([current_value] + conditions), probabilities[i]))
-                i += 1
+            if float(probabilities[beginning_of_probabilities + j]) == 0:
+                clauses.append('w {} {}'.format(' '.join([current_value] + conditions),
+                                                probabilities[beginning_of_probabilities + j]))
                 continue
-            previous_values = [variables.get_literal_string(name, value)
-                               for k, value in enumerate(values_per_variable[name][:j])
-                               if float(probabilities[i-len(values_per_variable[name][:j])+k]) != 0] if len(
-                                       values_per_variable[name]) > 2 else []
-            if pattern_index == 0:
-                clauses += ['w {} {} 0'.format(current_value, previous_value) for previous_value in previous_values]
+            previous_values = [] if len(values_per_variable[name]) <= 2 else [variables.get_literal_string(name, value)
+                                                                              for k, value in values[:i]]
+            clauses += ['w {} 0'.format(' '.join([current_value, previous_value] + conditions))
+                        for previous_value in previous_values]
             negated_previous = [(v[1:] if v.startswith('-') else '-' + v) for v in previous_values]
-            probability = Fraction(min(1, max(0, float(probabilities[i]) / probability_denominator))).limit_denominator()
+            probability = Fraction(min(1, max(0, float(probabilities[beginning_of_probabilities + j]) /
+                                              probability_denominator))).limit_denominator()
             probability_denominator = Fraction(probability_denominator * (1 - probability)).limit_denominator()
             clauses.append('w {} {}'.format(' '.join([current_value] + negated_previous + conditions), float(probability)))
-            i += 1
+        beginning_of_probabilities += len(values_per_variable[name])
     return clauses
 
 def encode_text(text, mode):

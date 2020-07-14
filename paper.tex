@@ -293,6 +293,13 @@ q :: a :- c
   Cachet.
 \item For the ProbLog $\to$ WMC conversion, check out this
   guy.\footnote{\url{https://users.ics.aalto.fi/ttj/}}
+\item Zero-probability weights and one-probability weights can be interpreted as
+  logical clauses. This doesn't affect ADDMC but could be useful for other
+  solvers.
+\item Filtering out ADDs that have nothing to do with the answer helps
+  tremendously, but I'm not sure if I should do that.
+\item For each row in each CPT, we order values by decreasing probabilities.
+  Need to check if this makes the solver more accurate.
 \end{itemize}
 
 \section{Preliminaries}
