@@ -1,0 +1,30 @@
+net 
+{
+    node_size = (76 36);
+}
+
+node node_31
+{
+    label = "VENTALV";
+    position = (177 586);
+    states = ("value0"  "value1");
+}
+
+node node_19
+{
+    label = "PVSAT";
+    position = (491 275);
+    states = ("value0"  "value1" "value2");
+}
+
+potential (node_31)
+{
+    data = (0.96000000 0.04000000);
+}
+
+potential (node_19 | node_31)
+{
+    data = ((1.00000000 0.00000000 0.00000000)
+        (0.99000000 0.01000000 0.00000000));
+}
+

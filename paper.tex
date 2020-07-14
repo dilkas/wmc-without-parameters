@@ -297,7 +297,8 @@ q :: a :- c
   logical clauses. This doesn't affect ADDMC but could be useful for other
   solvers.
 \item Filtering out ADDs that have nothing to do with the answer helps
-  tremendously, but I'm not sure if I should do that.
+  tremendously, but I'm not sure if I should do that. Could a heuristic do the
+  same thing?
 \item For each row in each CPT, we order values by decreasing probabilities.
   Need to check if this makes the solver more accurate.
 \end{itemize}
