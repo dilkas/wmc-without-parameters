@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import xml.etree.ElementTree as ET
+from fractions import Fraction
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
 NODE_RE = r'\nnode (\w+)'
@@ -58,8 +59,8 @@ def construct_cpt(name, parents, probabilities):
     parent_patterns = itertools.product(*[values_per_variable[p] for p in parents])
     clauses = []
     i = 0
-    for pattern in parent_patterns:
-        probability_denominator = 1
+    for pattern_index, pattern in enumerate(parent_patterns):
+        probability_denominator = Fraction(1)
         probability = 0
         conditions = [variables.get_literal_string(parent, parent_value)
                       for parent, parent_value in zip(parents, pattern)]
@@ -76,11 +77,12 @@ def construct_cpt(name, parents, probabilities):
                                for k, value in enumerate(values_per_variable[name][:j])
                                if float(probabilities[i-len(values_per_variable[name][:j])+k]) != 0] if len(
                                        values_per_variable[name]) > 2 else []
-            clauses += ['w {} {} 0'.format(current_value, previous_value) for previous_value in previous_values]
+            if pattern_index == 0:
+                clauses += ['w {} {} 0'.format(current_value, previous_value) for previous_value in previous_values]
             negated_previous = [(v[1:] if v.startswith('-') else '-' + v) for v in previous_values]
-            probability = float(probabilities[i]) / probability_denominator
-            probability_denominator *= 1 - probability
-            clauses.append('w {} {}'.format(' '.join([current_value] + negated_previous + conditions), probability))
+            probability = Fraction(min(1, max(0, float(probabilities[i]) / probability_denominator))).limit_denominator()
+            probability_denominator = Fraction(probability_denominator * (1 - probability)).limit_denominator()
+            clauses.append('w {} {}'.format(' '.join([current_value] + negated_previous + conditions), float(probability)))
             i += 1
     return clauses
 
