@@ -37,9 +37,9 @@ Graph Formula::getGaifmanGraph() const {
       }
 
   for (auto words : unparsedWeights) {
-    for (int_t i = 1; i < words.size() - 1; i++) {
+    for (int_t i = 1; i < words.size() - 2; i++) {
       int_t var1 = std::abs(std::stoi(words.at(i)));
-      for (int_t j = i + 1; j < words.size() - 1; j++) {
+      for (int_t j = i + 1; j < words.size() - 2; j++) {
         int_t var2 = std::abs(std::stoi(words.at(j)));
         graph.addEdge(var1, var2);
       }
@@ -233,16 +233,19 @@ ADD Formula::literalToADD(int_t literal, Cudd *mgr) {
     return mgr->addVar(index);
 }
 
-ADD Formula::constructAddFromWords(Cudd *mgr, ADD positive, VectorT<std::string> words, double weight) {
+ADD Formula::constructADDFromWords(Cudd *mgr, int_t var, VectorT<std::string> words) {
+  ADD positive = literalToADD(var, mgr);
   ADD negative = ~positive;
-  for (int_t i = 2; i < words.size() - 1; i++) {
+  for (int_t i = 2; i < words.size() - 2; i++) {
     int_t var = std::stoi(words.at(i));
     ADD varADD = literalToADD(var, mgr);
     ADD newVariable = (var > 0) ? varADD : ~varADD;
     positive &= newVariable;
     negative &= newVariable;
   }
-  return (mgr->constant(weight) * positive) + (mgr->constant(1 - weight) * negative);
+  double_t positiveWeight = std::stod(words.at(words.size() - 2));
+  double_t negativeWeight = std::stod(words.at(words.size() - 1));
+  return (mgr->constant(positiveWeight) * positive) + (mgr->constant(negativeWeight) * negative);
 }
 
 Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
@@ -301,7 +304,7 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
         literalWeights[var] = weight;
       } else if (weightFormat == WeightFormat::CONDITIONAL) {
         unparsedWeights.push_back(words);
-        for (int_t i = 1; i < words.size() - 1; i++)
+        for (int_t i = 1; i < words.size() - 2; i++)
           updateApparentVars(std::stoi(words.at(i)));
       } else {
         util::showError("Cachet weight in non-Cachet-weight-format file -- line " + std::to_string(lineIndex));
@@ -364,15 +367,15 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
   if (weightFormat == WeightFormat::CONDITIONAL) { /* compiles weights into ADDs */
     for (auto words : unparsedWeights) {
       int_t literal = std::stoi(words.at(1));
-      int_t var = std::abs(literal);
-      ADD varAdd = literalToADD(var, mgr);
-      double weight = std::stod(words.back());
-      ADD cpt = constructAddFromWords(mgr, varAdd, words, weight);
-      auto previousEntry = weights.find(var);
+      if (literal <= 0)
+        util::showError("the first literal of any weight line must be positive, but " +
+                        std::to_string(literal) + " is not");
+      ADD cpt = constructADDFromWords(mgr, literal, words);
+      auto previousEntry = weights.find(literal);
       if (previousEntry != weights.end()) {
         previousEntry->second += cpt;
       } else {
-        weights[var] = cpt;
+        weights[literal] = cpt;
       }
     }
     for (auto weight : weights) {

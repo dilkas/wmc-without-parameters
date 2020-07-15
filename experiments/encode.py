@@ -34,16 +34,16 @@ class LiteralDict:
         return variableAndValue in self._var2lit
 
     def get_literal(self, variable, value):
-        return self._var2lit[(variable, value)]
+        return str(self._var2lit[(variable, value)])
 
     def get_min_literal(self, variable):
-        return min(lit for lit, (var, val) in self._lit2var.items() if var == variable)
+        return str(min(lit for lit, (var, val) in self._lit2var.items() if var == variable))
 
     def get_true_or_min_literal(self, variable):
         return self.get_literal(variable, 'true') if (variable, 'true') in self else self.get_min_literal(variable)
 
     def get_literal_string(self, variable, value):
-        return (str(self.get_literal(variable, value)) if (variable, value) in self else
+        return (self.get_literal(variable, value) if (variable, value) in self else
                 '-{}'.format(self.get_min_literal(variable)))
 
     def get_last_variable(self):
@@ -55,37 +55,42 @@ class LiteralDict:
 variables = LiteralDict()
 values_per_variable = {}
 
-# TODO: make this readable
-# TODO: describe this as an algorithm
-def construct_cpt(name, parents, probabilities):
-    parent_patterns = itertools.product(*[values_per_variable[p] for p in parents])
+# 1. If the variable is binary
+# 1.1. For each row of the CPT
+# 1.1.1. w var [conditions] positive_weight negative_weight
+# 2. Else
+# 2.1. v1 ... vn 0
+# 2.2. For i<j
+# 2.2.1. -vi -vj 0
+# 2.3 For each value
+# 2.3.1. For each row of the CPT
+# 2.3.1.1. w value [conditions] positive_weight negative_weight
+
+def construct_weights(literal, num_values, parents, probabilities, probability_index, negate_probability):
+    rows_of_cpt = itertools.product(*[values_per_variable[p] for p in parents])
     clauses = []
-    beginning_of_probabilities = 0
-    for pattern_index, pattern in enumerate(parent_patterns):
-        probability_denominator = Fraction(1)
-        probability = 0
-        conditions = [variables.get_literal_string(parent, parent_value)
-                      for parent, parent_value in zip(parents, pattern)]
-        values = sorted(enumerate(values_per_variable[name]),
-                        key=lambda t: probabilities[beginning_of_probabilities + t[0]], reverse=True)
-        for i, (j, value) in enumerate(values):
-            current_value = variables.get_literal_string(name, value)
-            if current_value.startswith('-'):
-                continue
-            if float(probabilities[beginning_of_probabilities + j]) == 0:
-                clauses.append('w {} {}'.format(' '.join([current_value] + conditions),
-                                                probabilities[beginning_of_probabilities + j]))
-                continue
-            previous_values = [] if len(values_per_variable[name]) <= 2 else [variables.get_literal_string(name, value)
-                                                                              for k, value in values[:i]]
-            clauses += ['w {} 0'.format(' '.join([current_value, previous_value] + conditions))
-                        for previous_value in previous_values]
-            negated_previous = [(v[1:] if v.startswith('-') else '-' + v) for v in previous_values]
-            probability = Fraction(min(1, max(0, float(probabilities[beginning_of_probabilities + j]) /
-                                              probability_denominator))).limit_denominator()
-            probability_denominator = Fraction(probability_denominator * (1 - probability)).limit_denominator()
-            clauses.append('w {} {}'.format(' '.join([current_value] + negated_previous + conditions), float(probability)))
-        beginning_of_probabilities += len(values_per_variable[name])
+    for row_index, row in enumerate(rows_of_cpt):
+        conditions = [variables.get_literal_string(parent, parent_value) for parent, parent_value in zip(parents, row)]
+        p = Fraction(probabilities[probability_index]).limit_denominator()
+        clauses.append('w {} {} {}'.format(' '.join([literal] + conditions), float(p), float(negate_probability(p))))
+        probability_index += num_values
+    return clauses
+
+def find_goal_value(variable):
+    if 'true' in values_per_variable[variable]:
+        return values_per_variable[variable].index('true'), variables.get_literal(variable, 'true')
+    return 0, variables.get_min_literal(variable)
+
+def construct_cpt(variable, parents, probabilities):
+    if len(values_per_variable[variable]) == 2:
+        index, literal = find_goal_value(variable)
+        num_values = len(values_per_variable[variable])
+        return construct_weights(literal, num_values, parents, probabilities, index, lambda p: 1 - p)
+    values = [variables.get_literal_string(variable, v) for v in values_per_variable[variable]]
+    clauses = ['{} 0'.format(' '.join(values))] + ['-{} -{} 0'.format(values[i], values[j])
+                                                   for i in range(len(values)) for j in range(i + 1, len(values))]
+    for i, value in enumerate(values):
+        clauses += construct_weights(value, len(values_per_variable[variable]), parents, probabilities, i, lambda p: 1)
     return clauses
 
 def encode_text(text, mode):
@@ -139,13 +144,12 @@ def encode(network, evidence):
 
     evidence_clauses = encode_inst_evidence(evidence)
     if evidence_clauses:
-        num_clauses = len(evidence_clauses)
         clauses += evidence_clauses
     else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
         literal = variables.get_true_or_min_literal(variables.get_last_variable())
         clauses.append('{} 0'.format(literal))
-        num_clauses = 1
 
+    num_clauses = sum([not c.startswith('w') for c in clauses])
     encoding = 'p cnf {} {}\n'.format(len(variables), num_clauses) + '\n'.join(clauses) + '\n'
     with open(network + '.cnf', 'w') as f:
         f.write(encoding)
