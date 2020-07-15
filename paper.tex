@@ -180,11 +180,11 @@
     \end{itemize}
   \item Bayesian networks available with Ace
     \begin{itemize}
-    \item \texttt{2004-pgm} \cite{DBLP:journals/ijar/ChaviraDJ06}
+    \item \texttt{2004-pgm} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
     \item \texttt{2005-ijcai} \cite{DBLP:conf/ijcai/ChaviraD05}. The Genie/Smile
       files have their own citation data that I should probably extract. This is
       the only dataset that has some non-binary networks.
-    \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06}
+    \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
     \end{itemize}
   \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
   \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
@@ -301,6 +301,24 @@ q :: a :- c
   same thing?
 \item For each row in each CPT, we order values by decreasing probabilities.
   Need to check if this makes the solver more accurate.
+\item In the encoding:
+  \begin{itemize}
+  \item We assume that the first literal after `w' is positive.
+  \item The last two numbers are the positive and the negative probabilities,
+    respectively---sometimes they add to one, and sometimes the negative
+    probability is one, regardless of the value of the first probability.
+  \end{itemize}
+\item My encoding for non-binary BNs should still be faster because it doesn't
+  have those `equivalence' clauses.
+\item Guess: what makes the problem easier is:
+  \begin{enumerate}
+  \item short clauses,
+  \item low number of clauses.
+  \end{enumerate}
+  This explains why my first version of encoding non-binary CPTs was too slow.
+\item With all encodings (including mine non-binary encoding), they live on a
+  measure Boolean algebra where the measure is not probabilistic (so $\Pr(\neg
+  A) \ne 1 - \Pr(A)$).
 \end{itemize}
 
 \section{Preliminaries}
