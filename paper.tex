@@ -36,6 +36,7 @@
 \DeclareMathOperator{\nWMC}{NWMC}
 \DeclareMathOperator{\id}{id}
 \DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\im}{im}
 
 \usetikzlibrary{cd}
 \usetikzlibrary{bayesnet}
@@ -1055,6 +1056,51 @@ value $x_n$, if $\Pr(X = x_n) = 0$, then $w(x_n) = 0$. Otherwise, let $I_n = \{ 
 \]
 All of these weights/probabilities may have other conditions that come from the
 structure of the Bayesian network.
+
+\section{Encoding Bayesian networks}
+
+\begin{enumerate}
+\item For $X \in V$:
+  \begin{enumerate}
+  \item Let $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$.
+  \item If $\im X \cong \{ \top, \bot \}$:
+    \begin{enumerate}
+    \item For $(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$:
+      \begin{enumerate}
+      \item Let $p_\top = \Pr(X = \top \mid Y_1 = y_1, \dots, Y_n = y_n)$.
+      \item Let $p_\bot = \Pr(X = \bot \mid Y_1 = y_1, \dots, Y_n = y_n)$.
+      \item Output \texttt{w} $\lambda_{X = \top}$ $\lambda_{Y_1 = y_1}$ $\dots$
+        $\lambda_{Y_n = y_n}$ $p_\top$ $p_\bot$.
+      \end{enumerate}
+    \end{enumerate}
+  \item Else:
+    \begin{enumerate}
+    \item Let $\im X = \{ x_1, \dots, x_m \}$.
+    \item Output $x_1$ $\dots$ $x_m$ $0$.
+    \item For $i = 1, \dots, m$ and $j = i + 1, \dots, m$:
+      \begin{enumerate}
+      \item Output $-x_i$ $-x_j$ $0$.
+      \end{enumerate}
+    \item For $x \in \im X$ and $(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$:
+      \begin{enumerate}
+      \item Let $p_x = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$.
+      \item Output \texttt{w} $\lambda_{X = x}$ $\lambda_{Y_1 = y_1}$ $\dots$
+        $\lambda_{Y_n = y_n}$ $p_x$ $1$.
+      \end{enumerate}
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+% 1. For each X \in V:
+% 1.1. If |im X| = 2, i.e., \im X = \{ \top, \bot \}
+% 1.1.1. For (y_1, ..., y_|pa(X)|) in \prod_{Y \in pa(X)} im Y:
+% 1.1.1.1. w \lambda_{X = \top} y_1 ... y_|pa(X)| Pr(X = \top \mid Y_i = y_i) Pr(X = \bot \mid Y_i = y_i)
+% 1.2. Else
+% 1.2.1. v1 ... vn 0
+% 1.2.2. For i<j
+% 1.2.2.1. -vi -vj 0
+% 1.2.3 For each value
+% 1.2.3.1. For each row of the CPT
+% 1.2.3.1.1. w value [conditions] positive_weight negative_weight
 
 \bibliographystyle{plain}
 \bibliography{paper}

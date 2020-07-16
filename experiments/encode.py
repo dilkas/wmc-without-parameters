@@ -55,17 +55,6 @@ class LiteralDict:
 variables = LiteralDict()
 values_per_variable = {}
 
-# 1. If the variable is binary
-# 1.1. For each row of the CPT
-# 1.1.1. w var [conditions] positive_weight negative_weight
-# 2. Else
-# 2.1. v1 ... vn 0
-# 2.2. For i<j
-# 2.2.1. -vi -vj 0
-# 2.3 For each value
-# 2.3.1. For each row of the CPT
-# 2.3.1.1. w value [conditions] positive_weight negative_weight
-
 def construct_weights(literal, num_values, parents, probabilities, probability_index, negate_probability):
     rows_of_cpt = itertools.product(*[values_per_variable[p] for p in parents])
     clauses = []
