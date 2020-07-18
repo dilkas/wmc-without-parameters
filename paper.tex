@@ -16,6 +16,7 @@
 \usepackage[backgroundcolor=lightgray]{todonotes}
 \usepackage{complexity}
 \usepackage{soul}
+\usepackage[ruled,vlined]{algorithm2e}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -140,6 +141,14 @@
 \item Notation: if $L$ denotes literals, then it doesn't denote a generating
   set.
 \item There is a new version of ADDMC.
+\item Prove that we have an algebra of functions with one additional operation.
+\item The function $\phi$ created by the algorithm can be seen as a measure on
+  the BA $2^U$. Can I at least show that this BA has fewer elements as a measure
+  of compactness w.r.t. the measure?
+\item Note that we're going to use logical notation for BAs. Give an example of
+  the two notations.
+\item Show how the $\phi$ from the algorithm can be encoded in the typical
+  DIMACS CNF format.
 \end{itemize}
 
 \paragraph{Experimental setup.}
@@ -320,6 +329,8 @@ q :: a :- c
 \item With all encodings (including mine non-binary encoding), they live on a
   measure Boolean algebra where the measure is not probabilistic (so $\Pr(\neg
   A) \ne 1 - \Pr(A)$).
+\item We assume that all variables in the Bayesian network have at least two
+  values.
 \end{itemize}
 
 \section{Preliminaries}
@@ -1059,48 +1070,211 @@ structure of the Bayesian network.
 
 \section{Encoding Bayesian networks}
 
-\begin{enumerate}
-\item For $X \in V$:
-  \begin{enumerate}
-  \item Let $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$.
-  \item If $\im X \cong \{ \top, \bot \}$:
-    \begin{enumerate}
-    \item For $(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$:
-      \begin{enumerate}
-      \item Let $p_\top = \Pr(X = \top \mid Y_1 = y_1, \dots, Y_n = y_n)$.
-      \item Let $p_\bot = \Pr(X = \bot \mid Y_1 = y_1, \dots, Y_n = y_n)$.
-      \item Output \texttt{w} $\lambda_{X = \top}$ $\lambda_{Y_1 = y_1}$ $\dots$
-        $\lambda_{Y_n = y_n}$ $p_\top$ $p_\bot$.
-      \end{enumerate}
-    \end{enumerate}
-  \item Else:
-    \begin{enumerate}
-    \item Let $\im X = \{ x_1, \dots, x_m \}$.
-    \item Output $x_1$ $\dots$ $x_m$ $0$.
-    \item For $i = 1, \dots, m$ and $j = i + 1, \dots, m$:
-      \begin{enumerate}
-      \item Output $-x_i$ $-x_j$ $0$.
-      \end{enumerate}
-    \item For $x \in \im X$ and $(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$:
-      \begin{enumerate}
-      \item Let $p_x = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$.
-      \item Output \texttt{w} $\lambda_{X = x}$ $\lambda_{Y_1 = y_1}$ $\dots$
-        $\lambda_{Y_n = y_n}$ $p_x$ $1$.
-      \end{enumerate}
-    \end{enumerate}
-  \end{enumerate}
-\end{enumerate}
-% 1. For each X \in V:
-% 1.1. If |im X| = 2, i.e., \im X = \{ \top, \bot \}
-% 1.1.1. For (y_1, ..., y_|pa(X)|) in \prod_{Y \in pa(X)} im Y:
-% 1.1.1.1. w \lambda_{X = \top} y_1 ... y_|pa(X)| Pr(X = \top \mid Y_i = y_i) Pr(X = \bot \mid Y_i = y_i)
-% 1.2. Else
-% 1.2.1. v1 ... vn 0
-% 1.2.2. For i<j
-% 1.2.2.1. -vi -vj 0
-% 1.2.3 For each value
-% 1.2.3.1. For each row of the CPT
-% 1.2.3.1.1. w value [conditions] positive_weight negative_weight
+Let $V$ denote the set of random variables in a Bayesian network. For any random
+variable $X \in V$, let $\mathrm{pa}(X)$ denote the set of parents of $X$ and
+$\im X$ denote the set of possible values.
+
+\begin{definition}[Indicator variables]
+  Let $X \in V$ be a random variable. If $X$ is binary (i.e., $|\im X| = 2$), we
+  can arbitrary identify one of the values as $1$ and the other one as $0$ (i.e,
+  $\im X \cong \{ 0, 1 \}$). Then $X$ can be represented by a single
+  \emph{indicator variable} $\lambda_{X=1}$. If we interpret
+  $2^{\{\lambda_{X=1}\}}$ as a Boolean algebra, we can let $\lambda_{X=0} =
+  \neg\lambda_{X=1}$ in the algebraic notation, or, equivalently, $\lambda_{X=0}
+  = \emptyset \in 2^{\{\lambda_{X=1}\}}$ in the set-theoretic notation. On the
+  other hand, if $X$ is not binary, we represent $X$ with $|\im X|$ indicator
+  variables, one for each value. We let
+  \[
+    E(X) = \begin{cases}
+      \{ \lambda_{X=1} \} & \text{if } |\im X| = 2 \\
+      \{ \lambda_{X=x} \mid x \in \im X \} & \text{otherwise.}
+    \end{cases}
+  \]
+  denote the set of indicator variables for $X$ and
+  \[
+    E^*(X) = E(X) \cup \bigcup_{Y \in \mathrm{pa}(X)} E(Y).
+  \]
+  denote the set of indicator variables for $X$ and its parents in the Bayesian
+  network. Finally, let
+  \[
+    U = \bigcup_{X \in V} E(X)
+  \]
+  denote the set of all indicator variables for all random variables in the
+  Bayesian network.
+\end{definition}
+
+\begin{definition}[Operations on functions]
+  Let $A\colon 2^X \to [0, 1]$ and $B\colon 2^Y \to [0, 1]$ be Boolean
+  functions, $\alpha \in [0, 1]$, and $x \in X$. We define the following
+  operations:
+  \begin{description}
+  \item[Addition:] $A+B$ is a function $A+B\colon 2^{X \cup Y} \to [0, 1]$ such
+    that
+    \[
+      (A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)
+    \]
+    for all $\tau \in 2^{X \cup Y}$.
+  \item[Inverse:] $\overline{A}$ is a function $\overline{A}\colon 2^X \to [0,
+    1]$ such that
+    \[
+      \overline{A}(\tau) = 1 - A(\tau)
+    \]
+    for all $\tau \in 2^X$.
+  \item[Multiplication:] $A \cdot B$ is a function $A \cdot B\colon 2^{X \cup Y}
+    \to [0, 1]$ such that
+    \[
+      (A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau \cap Y)
+    \]
+    for all $\tau \in 2^{X \cup Y}$.
+  \item[Scalar multiplication:] $\alpha A$ is a function $\alpha A\colon 2^X \to
+    [0, 1]$ such that
+    \[
+      (\alpha A)(\tau) = \alpha \cdot A(\tau)
+    \]
+    for all $\tau \in 2^X$.
+  \item[Projection:] $\exists_xA$ is a function $\exists_xA\colon 2^{X \setminus
+      \{ x \}} \to [0, 1]$ such that
+    \[
+      (\exists_xA)(\tau) = A(\tau) + A(\tau \cup \{ x \})
+    \]
+    for all $\tau \in 2^{X \setminus \{x \}}$.
+  \end{description}
+\end{definition}
+\begin{remark}
+  Note that $A + \overline{A} = 1$.
+\end{remark}
+
+\begin{definition}[Special functions]
+  \phantom{}
+  \begin{itemize}
+  \item unit $1\colon 2^\emptyset \to [0, 1]$, $1(\tau) = 1$.
+  \item zero $0\colon 2^\emptyset \to [0, 1]$, $0(\tau) = 0$.
+  \item constant $[a]\colon 2^{\{a\}} \to [0, 1]$,
+    \[
+      [a](\tau) =
+      \begin{cases}
+        1 & \text{if } a \in \tau \\
+        0 & \text{if } a \not\in \tau.
+      \end{cases}
+    \]
+  \end{itemize}
+\end{definition}
+
+\begin{algorithm}
+  $\phi \gets 1$\;
+  \For{$X \in V$}{
+    \textit{let} $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$\;
+    \eIf{$|\im X| = 2$}{
+      \For{$(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$}{
+        $p_1 \gets \Pr(X = 1 \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
+        $p_0 \gets \Pr(X \ne 1 \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
+        $\phi \gets \phi \cdot \left( p_1[\lambda_{X=1}] \cdot \prod_{i=1}^n
+          [\lambda_{Y_i=y_i}] + p_0 \overline{[\lambda_{X=1}]} \cdot
+          \prod_{i=1}^n [\lambda_{Y_i=y_i}] \right)$\;
+      }
+    }{
+      \textit{let} $\im X = \{ x_1, \dots, x_m \}$\;
+      $\phi \gets \phi \cdot \left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)
+      \cdot \prod_{i=1}^m \prod_{j=i+1}^m (\overline{[\lambda_{X = x_i}]} +
+      \overline{[\lambda_{X = x_j}]})$\;
+      \For{$x \in \im X$ {\rm \textbf{and}} $(y_1, \dots, y_n) \in \prod_{i = 1}^n \im
+        Y_i$}{
+        $p_x \gets \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
+        $\phi \gets \phi \cdot \left( p_x[\lambda_{X=x}] \cdot \prod_{i=1}^n
+          [\lambda_{Y_i=y_i}] + \overline{[\lambda_{X=1}]} \cdot \prod_{i=1}^n
+          [\lambda_{Y_i=y_i}] \right)$\;
+      }
+    }
+  }
+  \Return{$\phi$}\;
+\end{algorithm}
+
+\begin{lemma} \label{lemma:cpt}
+  Let $X \in V$ be a random variable with $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n
+  \}$. Then the iteration of the main loop of the algorithm (when run on $X$)
+  multiplies $\phi$ by a function $\mathrm{CPT}_X\colon 2^{E^*(X)} \to [0, 1]$
+  such that
+  \[
+    \mathrm{CPT}_X(\tau) =
+    \begin{cases}
+      \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n) &
+      \begin{aligned}
+        &\text{if } \textstyle \tau = \lambda_{X=x} \land \bigwedge_{i=1}^n
+        \lambda_{Y_i=y_i} \\
+        &\text{for some } \textstyle (x, y_1, \dots, y_n) \in \im X \times
+        \prod_{i=1}^n \im Y_i
+        \end{aligned} \\
+      0 & \text{otherwise.}
+    \end{cases}
+  \]
+  for all $\tau \in 2^{E^*(X)}$.
+\end{lemma}
+\begin{proof}
+\end{proof}
+
+\begin{proposition} \label{lemma:full_distribution}
+  $\prod_{X \in V} \mathrm{CPT}_X\colon 2^U \to [0, 1]$ represents the full
+  probability distribution of the Bayesian network, i.e., if $V = \{ X_1, \dots,
+  X_n\}$, then
+  \[
+    \left( \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) =
+    \begin{cases}
+      \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } \tau = \bigwedge_{i=1}^n
+      \lambda_{X_i = x_i} \text{ for some } (x_1, \dots, x_n) \in \prod_{i=1}^n
+      \im X_i \\
+      0 & \text{otherwise,}
+    \end{cases}
+  \]
+  for all $\tau \in 2^U$.
+\end{proposition}
+\begin{proof}
+  We have that
+  \[
+    \left( \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) = \prod_{X \in V}
+    \mathrm{CPT}_X(\tau \cap E^*(X)).
+  \]
+  If $\mathrm{CPT}_X(\tau \cap E^*(X)) = 0$ for some $X \in V$, then $\left(
+    \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) = 0$. Otherwise, for each $X
+  \in V$, $\tau \cap E^*(X)$ can be expressed as a conjunction of indicator
+  variables. Moreover, those indicator variables must match, i.e.,
+  \[
+    \tau = \bigwedge_{X \in V} \lambda_{X = v_X}
+  \]
+  for some $(v_X)_{X \in V} \in \prod_{X \in V} \im X$. Then, by
+  \cref{lemma:cpt},
+  \[
+    \left( \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) = \prod_{X \in V} \Pr
+    \left( X=v_X \;\middle|\; \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) =
+    \Pr \left( \bigwedge_{X \in V} X=v_X \right),
+  \]
+  where the last step follows from the definition of a Bayesian network.
+\end{proof}
+
+\begin{theorem}
+  Let $\phi\colon 2^U \to [0, 1]$ be a function generated by the algorithm. Then
+  \[
+    (\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset) = \Pr(X = x).
+  \]
+\end{theorem}
+\begin{proof}
+  Let $V = \{ X, Y_1, \dots, Y_n \}$. Then
+  \begin{align*}
+    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{\tau \in 2^U} (\phi \cdot [\lambda_{X=x}])(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \phi(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \left( \prod_{Y \in V} \mathrm{CPT}_Y \right)(\tau) \\
+    &= \sum_{(y_1, \dots, y_n) \in \prod_{i=1}^n \im Y_i} \Pr(X = x, Y_1 = y_1, \dots, Y_n = y_n) = \Pr(X = x)
+  \end{align*}
+  by the following arguments:
+  \begin{itemize}
+  \item the proof of Theorem~1 in the ADDMC paper \cite{DBLP:conf/aaai/DudekPV20};
+  \item if $\lambda_{X=x} \not\in \tau \in 2^U$, then $(\phi \cdot
+    [\lambda_{X=x}])(\tau) = \phi(\tau) \cdot [\lambda_{X=x}](\tau \cap \{
+    \lambda_{X=x} \}) = \phi(\tau) \cdot 0 = 0$;
+  \item \cref{lemma:full_distribution};
+  \item marginalisation of a probability distribution.
+  \end{itemize}
+\end{proof}
+
+% Acknowledgments. This work has made use of the resources provided by the
+% Edinburgh Compute and Data Facility (ECDF) (http://www.ecdf.ed.ac.uk/).
 
 \bibliographystyle{plain}
 \bibliography{paper}
