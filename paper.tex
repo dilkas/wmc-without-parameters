@@ -17,6 +17,7 @@
 \usepackage{complexity}
 \usepackage{soul}
 \usepackage[ruled,vlined]{algorithm2e}
+\usepackage{subcaption}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -82,17 +83,7 @@
 \item Have an example of how the ADDs function in this situation. If not for the
   paper, then at least for slides. Use the framework to check its correctness.
 \item[F] Give a concrete example of something impossible to represent using WMC.
-\item Describe the changes to the Cachet DIMACS CNF format (and mention that, if
-  needed, the assumption that $\Pr(A) + \Pr(\neg A) = 1$ can be discarded).
-  Instead of \texttt{w 1 0.1}, we have \texttt{w 1 2 0.1} and \texttt{w 1 -2
-    0.5}. This provides half of the information; the remaining half can be
-  deduced, but the algorithm itself can support weights that are not necessarily
-  probabilities. Ditto for non-binary values (the shorter version).
-\item Give some examples (and/or a proof) of why this is correct when combined
-  with arbitrary clauses (i.e., conjunctions of disjunctions).
 \item Turn the saved PDFs into citations.
-\item Add a mini theorem: my model can express any probability distribution on
-  the BA (just like BNs can express any discrete distribution).
 \item[F] What are the main claims, what are the main takeaways, intuitive [???]
   of theorems to follow. To do this, we appeal to algebraic constructions to
   define the main concepts for introducing measures on Boolean algebras.
@@ -133,22 +124,24 @@
   \item[F2] You need to explain the significance of this result.
   \end{itemize}
 \item Make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x, y$?).
-\item Decide on terminology: coproducts/pushouts vs (amalgamated) free products.
-  Probably the former.
 \item Terminology: `with generating set $S$' $\to$ `over $S$'.
 \item Perhaps reorder the section of preliminaries into paragraphs, i.e., a
   paragraph for order, for homomorphisms, etc. This would take up less space.
 \item Notation: if $L$ denotes literals, then it doesn't denote a generating
   set.
-\item There is a new version of ADDMC.
-\item Prove that we have an algebra of functions with one additional operation.
+\item Prove that we have an algebra of functions with two (?) additional
+  operations. Or maybe just cite the original paper for this.
 \item The function $\phi$ created by the algorithm can be seen as a measure on
   the BA $2^U$. Can I at least show that this BA has fewer elements as a measure
   of compactness w.r.t. the measure?
 \item Note that we're going to use logical notation for BAs. Give an example of
   the two notations.
-\item Show how the $\phi$ from the algorithm can be encoded in the typical
-  DIMACS CNF format.
+\item Could clarify why $[\lambda_{X=0}] = \overline{[\lambda_{X=1}]}$. This
+  follows from the definition. Or should I avoid the overline notation?
+\item After the experiments are finished, note the processor, memory per thread,
+  and add the following acknowledgment. This work has made use of the resources
+  provided by the Edinburgh Compute and Data Facility (ECDF)
+  (\url{http://www.ecdf.ed.ac.uk/}).
 \end{itemize}
 
 \paragraph{Experimental setup.}
@@ -331,6 +324,8 @@ q :: a :- c
   A) \ne 1 - \Pr(A)$).
 \item We assume that all variables in the Bayesian network have at least two
   values.
+\item Remark: for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A +
+  \overline{A} = 1$.
 \end{itemize}
 
 \section{Preliminaries}
@@ -1104,52 +1099,50 @@ $\im X$ denote the set of possible values.
 \end{definition}
 
 \begin{definition}[Operations on functions]
-  Let $A\colon 2^X \to [0, 1]$ and $B\colon 2^Y \to [0, 1]$ be Boolean
-  functions, $\alpha \in [0, 1]$, and $x \in X$. We define the following
-  operations:
+  Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
+    0}$ be Boolean functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We
+  define the following operations:
   \begin{description}
-  \item[Addition:] $A+B$ is a function $A+B\colon 2^{X \cup Y} \to [0, 1]$ such
-    that
+  \item[Addition:] $A+B$ is a function $A+B\colon 2^{X \cup Y} \to
+    \mathbb{R}_{\ge 0}$ such that
     \[
       (A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)
     \]
     for all $\tau \in 2^{X \cup Y}$.
-  \item[Inverse:] $\overline{A}$ is a function $\overline{A}\colon 2^X \to [0,
-    1]$ such that
+  \item[Inverse:] $\overline{A}$ is a function $\overline{A}\colon 2^X \to
+    \mathbb{R}_{\ge 0}$ such that
     \[
       \overline{A}(\tau) = 1 - A(\tau)
     \]
     for all $\tau \in 2^X$.
   \item[Multiplication:] $A \cdot B$ is a function $A \cdot B\colon 2^{X \cup Y}
-    \to [0, 1]$ such that
+    \to \mathbb{R}_{\ge 0}$ such that
     \[
       (A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau \cap Y)
     \]
     for all $\tau \in 2^{X \cup Y}$.
   \item[Scalar multiplication:] $\alpha A$ is a function $\alpha A\colon 2^X \to
-    [0, 1]$ such that
+    \mathbb{R}_{\ge 0}$ such that
     \[
       (\alpha A)(\tau) = \alpha \cdot A(\tau)
     \]
     for all $\tau \in 2^X$.
   \item[Projection:] $\exists_xA$ is a function $\exists_xA\colon 2^{X \setminus
-      \{ x \}} \to [0, 1]$ such that
+      \{ x \}} \to \mathbb{R}_{\ge 0}$ such that
     \[
       (\exists_xA)(\tau) = A(\tau) + A(\tau \cup \{ x \})
     \]
     for all $\tau \in 2^{X \setminus \{x \}}$.
   \end{description}
 \end{definition}
-\begin{remark}
-  Note that $A + \overline{A} = 1$.
-\end{remark}
+Note that both addition and multiplication commute.
 
 \begin{definition}[Special functions]
   \phantom{}
   \begin{itemize}
-  \item unit $1\colon 2^\emptyset \to [0, 1]$, $1(\tau) = 1$.
-  \item zero $0\colon 2^\emptyset \to [0, 1]$, $0(\tau) = 0$.
-  \item constant $[a]\colon 2^{\{a\}} \to [0, 1]$,
+  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\tau) = 1$.
+  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\tau) = 0$.
+  \item constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$,
     \[
       [a](\tau) =
       \begin{cases}
@@ -1160,64 +1153,81 @@ $\im X$ denote the set of possible values.
   \end{itemize}
 \end{definition}
 
+Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
+$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
+
 \begin{algorithm}
   $\phi \gets 1$\;
   \For{$X \in V$}{
     \textit{let} $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$\;
+    $\mathrm{CPT}_X \gets 0$\;
     \eIf{$|\im X| = 2$}{
       \For{$(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$}{
         $p_1 \gets \Pr(X = 1 \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
         $p_0 \gets \Pr(X \ne 1 \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
-        $\phi \gets \phi \cdot \left( p_1[\lambda_{X=1}] \cdot \prod_{i=1}^n
-          [\lambda_{Y_i=y_i}] + p_0 \overline{[\lambda_{X=1}]} \cdot
-          \prod_{i=1}^n [\lambda_{Y_i=y_i}] \right)$\;
+        $\mathrm{CPT}_X \gets \mathrm{CPT}_X + p_1[\lambda_{X=1}] \cdot
+        \prod_{i=1}^n [\lambda_{Y_i=y_i}] + p_0 \overline{[\lambda_{X=1}]} \cdot
+        \prod_{i=1}^n [\lambda_{Y_i=y_i}]$\;
       }
     }{
       \textit{let} $\im X = \{ x_1, \dots, x_m \}$\;
-      $\phi \gets \phi \cdot \left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)
-      \cdot \prod_{i=1}^m \prod_{j=i+1}^m (\overline{[\lambda_{X = x_i}]} +
-      \overline{[\lambda_{X = x_j}]})$\;
-      \For{$x \in \im X$ {\rm \textbf{and}} $(y_1, \dots, y_n) \in \prod_{i = 1}^n \im
-        Y_i$}{
+      \For{$x \in \im X$ {\rm \textbf{and}} $(y_1, \dots, y_n) \in \prod_{i =
+          1}^n \im Y_i$}{
         $p_x \gets \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
-        $\phi \gets \phi \cdot \left( p_x[\lambda_{X=x}] \cdot \prod_{i=1}^n
-          [\lambda_{Y_i=y_i}] + \overline{[\lambda_{X=1}]} \cdot \prod_{i=1}^n
-          [\lambda_{Y_i=y_i}] \right)$\;
+        $\mathrm{CPT}_X \gets \mathrm{CPT}_X + p_x[\lambda_{X=x}] \cdot
+        \prod_{i=1}^n [\lambda_{Y_i=y_i}] + \overline{[\lambda_{X=1}]} \cdot
+        \prod_{i=1}^n [\lambda_{Y_i=y_i}]$\;
       }
+      $\mathrm{CPT}_X \gets \mathrm{CPT}_X \cdot \left( \sum_{i=1}^m [\lambda_{X
+          = x_i}] \right) \cdot \prod_{i=1}^m \prod_{j=i+1}^m
+      (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})$\;
     }
+    $\phi \gets \phi \cdot \mathrm{CPT}_X$\;
   }
   \Return{$\phi$}\;
 \end{algorithm}
 
 \begin{lemma} \label{lemma:cpt}
-  Let $X \in V$ be a random variable with $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n
-  \}$. Then the iteration of the main loop of the algorithm (when run on $X$)
-  multiplies $\phi$ by a function $\mathrm{CPT}_X\colon 2^{E^*(X)} \to [0, 1]$
-  such that
+  Let $X \in V$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
+  \dots, Y_n \}$. Then $\mathrm{CPT}_X\colon 2^{E^*(X)} \to \mathbb{R}_{\ge 0}$
+  is such that for any $x \in \im X$ and $(y_1, \dots, y_n) \in \prod_{i=1}^n
+  \im Y_i$,
   \[
-    \mathrm{CPT}_X(\tau) =
-    \begin{cases}
-      \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n) &
-      \begin{aligned}
-        &\text{if } \textstyle \tau = \lambda_{X=x} \land \bigwedge_{i=1}^n
-        \lambda_{Y_i=y_i} \\
-        &\text{for some } \textstyle (x, y_1, \dots, y_n) \in \im X \times
-        \prod_{i=1}^n \im Y_i
-        \end{aligned} \\
-      0 & \text{otherwise.}
-    \end{cases}
+    \mathrm{CPT}_X \left( \lambda_{X=x} \land \bigwedge_{i=1}^n
+      \lambda_{Y_i=y_i} \right) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
   \]
-  for all $\tau \in 2^{E^*(X)}$.
 \end{lemma}
 \begin{proof}
+  Let
+  \[
+    \tau = \lambda_{X=x} \land \bigwedge_{i=1}^n \lambda_{Y_i=y_i}.
+  \]
+  If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im Y_i|$
+  terms, one for each possible assignment of values to variables $X, Y_1, \dots,
+  Y_n$. Exactly one of these terms is nonzero when applied to $\tau$, and it is
+  equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
+
+  If $X$ is not binary, then
+  \[
+    \left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(\tau) = 1,
+  \]
+  and
+  \[
+    \left( \prod_{i=1}^m \prod_{j=i+1}^m (\overline{[\lambda_{X = x_i}]} +
+      \overline{[\lambda_{X = x_j}]}) \right)(\tau) = 1,
+  \]
+  so, by a similar argument as before,
+  \[
+    \mathrm{CPT}_X(\tau) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
+  \]
 \end{proof}
 
 \begin{proposition} \label{lemma:full_distribution}
-  $\prod_{X \in V} \mathrm{CPT}_X\colon 2^U \to [0, 1]$ represents the full
-  probability distribution of the Bayesian network, i.e., if $V = \{ X_1, \dots,
-  X_n\}$, then
+  $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ represents the full probability
+  distribution of the Bayesian network, i.e., if $V = \{ X_1, \dots, X_n\}$,
+  then
   \[
-    \left( \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) =
+    \phi(\tau) =
     \begin{cases}
       \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } \tau = \bigwedge_{i=1}^n
       \lambda_{X_i = x_i} \text{ for some } (x_1, \dots, x_n) \in \prod_{i=1}^n
@@ -1228,30 +1238,34 @@ $\im X$ denote the set of possible values.
   for all $\tau \in 2^U$.
 \end{proposition}
 \begin{proof}
-  We have that
-  \[
-    \left( \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) = \prod_{X \in V}
-    \mathrm{CPT}_X(\tau \cap E^*(X)).
-  \]
-  If $\mathrm{CPT}_X(\tau \cap E^*(X)) = 0$ for some $X \in V$, then $\left(
-    \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) = 0$. Otherwise, for each $X
-  \in V$, $\tau \cap E^*(X)$ can be expressed as a conjunction of indicator
-  variables. Moreover, those indicator variables must match, i.e.,
+  If
   \[
     \tau = \bigwedge_{X \in V} \lambda_{X = v_X}
   \]
-  for some $(v_X)_{X \in V} \in \prod_{X \in V} \im X$. Then, by
-  \cref{lemma:cpt},
+  for some $(v_X)_{X \in V} \in \prod_{X \in V} \im X$, then
   \[
-    \left( \prod_{X \in V} \mathrm{CPT}_X \right)(\tau) = \prod_{X \in V} \Pr
-    \left( X=v_X \;\middle|\; \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) =
-    \Pr \left( \bigwedge_{X \in V} X=v_X \right),
+    \phi(\tau) = \prod_{X \in V} \Pr \left( X=v_X \;\middle|\; \bigwedge_{Y \in
+        \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X \in V} X=v_X
+    \right)
   \]
-  where the last step follows from the definition of a Bayesian network.
+  by \cref{lemma:cpt} and the definition of a Bayesian network. Otherwise there
+  must be some non-binary random variable $X \in V$ such that $|E(X) \cap \tau|
+  \ne 1$. If $E(X) \cap \tau = \emptyset$, then
+  \[
+    \left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(\tau) = 0,
+  \]
+  and so $\mathrm{CPT}_X(\tau) = 0$, and $\phi(\tau) = 0$. If $|E(X) \cap
+  \tau| > 1$, then we must have two different values $x_1, x_2 \in \im X$ such
+  that $\{\lambda_{X=x_1}, \lambda_{X=x_2} \} \subseteq \tau$ which means that
+  \[
+    (\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(\tau) = 0,
+  \]
+  and so, again, $\mathrm{CPT}_X(\tau) = 0$, and $\phi(\tau) = 0$.
 \end{proof}
 
 \begin{theorem}
-  Let $\phi\colon 2^U \to [0, 1]$ be a function generated by the algorithm. Then
+  Let $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ be a function generated by the
+  algorithm. Then
   \[
     (\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset) = \Pr(X = x).
   \]
@@ -1273,8 +1287,94 @@ $\im X$ denote the set of possible values.
   \end{itemize}
 \end{proof}
 
-% Acknowledgments. This work has made use of the resources provided by the
-% Edinburgh Compute and Data Facility (ECDF) (http://www.ecdf.ed.ac.uk/).
+\begin{example}
+  \begin{figure}
+    \centering
+    \begin{subfigure}{0.2\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node[latent] (W) {W};
+        \node[latent, below right=of W] (T) {T};
+        \node[latent, below left=of W] (F) {F};
+        \edge {W} {F};
+        \edge {W} {T};
+      \end{tikzpicture}
+    \end{subfigure}%
+    \begin{subfigure}{0.8\textwidth}
+      \centering
+      \begin{tabular}[t]{cc}
+        \toprule
+        $w$ & $\Pr(W = w)$ \\
+        \midrule
+        1 & 0.5 \\
+        0 & 0.5 \\
+        \bottomrule
+      \end{tabular}
+      \begin{tabular}[t]{ccc}
+        \toprule
+        $w$ & $f$ & $\Pr(F = f \mid W = w)$ \\
+        \midrule
+        1 & 1 & 0.6 \\
+        1 & 0 & 0.4 \\
+        0 & 1 & 0.1 \\
+        0 & 0 & 0.9 \\
+        \bottomrule
+      \end{tabular}
+      \begin{tabular}[t]{ccc}
+        \toprule
+        $w$ & $t$ & $\Pr(T = t \mid W = w)$ \\
+        \midrule
+        1 & $l$ & 0.2 \\
+        1 & $m$ & 0.4 \\
+        1 & $h$ & 0.4 \\
+        0 & $l$ & 0.6 \\
+        0 & $m$ & 0.3 \\
+        0 & $h$ & 0.1 \\
+        \bottomrule
+      \end{tabular}
+    \end{subfigure}
+    \caption{An example Bayesian network with its CPTs}
+    \label{fig:example_bn}
+  \end{figure}
+
+  The Bayesian network in \cref{fig:example_bn} has
+  \begin{align*}
+    V &= \{ W, F, T \}, \\
+    \mathrm{pa}(W) &= \emptyset, \\
+    \mathrm{pa}(F) &= \mathrm{pa}(T) = \{ W \}, \\
+    \im W &= \im F = \{ 0, 1 \}, \\
+    \im T &= \{ l, m, h \}, \\
+    E(W) &= \{ \lambda_{W=1} \}, \\
+    E(F) &= \{ \lambda_{F=1} \}, \\
+    E(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
+    E^*(W) &= \{ \lambda_{W=1} \}, \\
+    E^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
+    E^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}, \\
+    \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
+    \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
+      &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
+    \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots),
+  \end{align*}
+  and can be encoded in a DIMACS-like CNF format as
+  \[
+    \begin{array}{l r r l l}
+      \lambda\sb{T=l} &\lambda\sb{T=m} &\lambda\sb{T=h} & &0 \\
+                      &-\lambda\sb{T=l} &-\lambda\sb{T=m} & &0 \\
+                      &-\lambda\sb{T=l} &-\lambda\sb{T=h} & &0 \\
+                      &-\lambda\sb{T=m} &-\lambda\sb{T=h} & &0 \\
+      w &\lambda\sb{W=1} & &0.5 &0.5 \\
+      w &\lambda\sb{F=1} &\lambda\sb{W=1} &0.6 &0.4 \\
+      w &\lambda\sb{F=1} &-\lambda\sb{W=1} &0.1 &0.9 \\
+      w &\lambda\sb{T=l} &\lambda\sb{W=1} &0.2 &1 \\
+      w &\lambda\sb{T=m} &\lambda\sb{W=1} &0.4 &1 \\
+      w &\lambda\sb{T=h} &\lambda\sb{W=1} &0.4 &1 \\
+      w &\lambda\sb{T=l} &\lambda\sb{W=0} &0.6 &1 \\
+      w &\lambda\sb{T=m} &\lambda\sb{W=0} &0.3 &1 \\
+      w &\lambda\sb{T=h} &\lambda\sb{W=0} &0.1 &1
+    \end{array}
+  \]
+  with each $\lambda$ replaced with a unique positive integer.
+\end{example}
 
 \bibliographystyle{plain}
 \bibliography{paper}
