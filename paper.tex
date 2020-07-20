@@ -20,13 +20,13 @@
 \usepackage{subcaption}
 
 \newtheorem{theorem}{Theorem}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{conjecture}{Conjecture}
 \theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{example}[theorem]{Example}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
@@ -52,7 +52,7 @@
   }
 }
 
-\title{Weighted Model Counting with Conditional Probabilities}
+\title{Weighted Model Counting with Conditional Measures}
 \author{Paulius Dilkas}
 
 \begin{document}
@@ -60,92 +60,28 @@
 
 \section{Introduction}
 
-\paragraph{Legend.}
-\begin{description}
-\item[F] Feedback (round 1).
-\item[F2] Feedback (round 2).
-\item[FP] Feedback from the review panel.
-\item[\textbullet] My own idea.
-\end{description}
-
-\paragraph{The big TODO list.}
 \begin{itemize}
-\item Look into ways to theoretically justify the performance benefits. Some
-  suggestions:
+\item Thesis: many important computational problems are solved by encoding them
+  as WMC. But if the weight function is extended to `conditional probabilities',
+  the problem becomes easier because current approaches need workarounds in
+  order to be independent.
+\item Shorter thesis: many important problems are encoded as WMC, but they can
+  be encoded in a better way if we allow for conditional probabilities.
+\item The claim behind this paper is that allowing for conditional probabilities
+  in the context of weighted model counting seems to be a good idea. Bayesian
+  networks and ADDMC are only particular examples. This should also work with
+  Cachet.
+\item Potential criticism may be that this is a step backwards and doesn't allow
+  us to use SAT-based techniques for probabilistic inference. However, they can
+  still be used for the 'theory+query' part.
   \begin{itemize}
-  \item the number of variables,
-  \item the number of clauses/CPTs/lines in CPTs,
-  \item the proportion of edges that exist,
-  \item average degree,
-  \item average number of clauses that a variable is in,
-  \item the number of clusters in the linear/tree-like decomposition.
+  \item Zero-probability weights and one-probability weights can be interpreted
+    as logical clauses. This doesn't affect ADDMC but could be useful for other
+    solvers.
   \end{itemize}
-\item Have an example of how the ADDs function in this situation. If not for the
-  paper, then at least for slides. Use the framework to check its correctness.
-\item[F] Give a concrete example of something impossible to represent using WMC.
-\item Turn the saved PDFs into citations.
 \item[F] What are the main claims, what are the main takeaways, intuitive [???]
   of theorems to follow. To do this, we appeal to algebraic constructions to
   define the main concepts for introducing measures on Boolean algebras.
-\item[F] Can you say something here about factorized vs non-factorized
-  weight function definitions? That is, factorized is when $w$ maps literals to
-  $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
-  \begin{itemize}
-  \item come up with nice example when non-factorized weights are intuitive;
-  \item clarify that the factorized definition have is w.r.t. models, in case some
-    one gets confused. [It doesn't have to be, if the BA is not free---P.]
-  \end{itemize}
-\item[F2] The paper at this stage is very technical---the danger is that WMC/SRL
-  people may not be able to follow it and so would be hard to get accepted.
-  Without clear target audience, [???] get work accepted. My main high level
-  suggestion is that let us tease apart what you have and see if a story
-  emerges. That is, let us attempt to write a paper {\bf with examples} and
-  see whether with significant motivation, we have a story emerging. Below,
-  sample text needed to adequately motivate [???] for WMC/SRL community.
-\item[FP] Clear up questions about independence between literals.
-\item[F2] Preliminaries: explain with examples: models $=$ elements [atoms] of
-  algebra.
-\item WMC as a Measure
-  \begin{itemize}
-  \item[F2] Need to explain how WMC and NWMC connects to standard definitions of
-    WMC and $\Pr(\phi \mid e) = \WMC(\phi \land e)/\WMC(e)$.
-  \item[F2] You need to explain what precisely these mean in logic and models
-    and weight functions are usually defined and understood.
-  \item Be careful about mentioning ideals, filters, and quotients.
-  \end{itemize}
-\item What Measures are WMC-Definable: proofs need to be updated and
-  propositions could be phrased in a better way, but the gist should be the
-  same.
-\item Extending the Algebra.
-  \begin{itemize}
-  \item[F2] If you prove (b) above, you could motivate why weights on literals
-    is attractive and whether there is a way to augment the expressivity of WMC
-    while still maintaining literal level weights. Hence this action.
-  \item[F2] You need to explain the significance of this result.
-  \end{itemize}
-\item Make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x, y$?).
-\item Terminology: `with generating set $S$' $\to$ `over $S$'.
-\item Perhaps reorder the section of preliminaries into paragraphs, i.e., a
-  paragraph for order, for homomorphisms, etc. This would take up less space.
-\item Notation: if $L$ denotes literals, then it doesn't denote a generating
-  set.
-\item Prove that we have an algebra of functions with two (?) additional
-  operations. Or maybe just cite the original paper for this.
-\item The function $\phi$ created by the algorithm can be seen as a measure on
-  the BA $2^U$. Can I at least show that this BA has fewer elements as a measure
-  of compactness w.r.t. the measure?
-\item Note that we're going to use logical notation for BAs. Give an example of
-  the two notations.
-\item Could clarify why $[\lambda_{X=0}] = \overline{[\lambda_{X=1}]}$. This
-  follows from the definition. Or should I avoid the overline notation?
-\item After the experiments are finished, note the processor, memory per thread,
-  and add the following acknowledgment. This work has made use of the resources
-  provided by the Edinburgh Compute and Data Facility (ECDF)
-  (\url{http://www.ecdf.ed.ac.uk/}).
-\end{itemize}
-
-\paragraph{Experimental setup.}
-\begin{itemize}
 \item
   Algorithms\footnote{\url{http://beyondnp.org/pages/solvers/model-counters-exact/}}
   \begin{itemize}
@@ -156,179 +92,55 @@
   \item d4 \cite{DBLP:conf/ijcai/LagniezM17} (closed source, boo!)
   \item miniC2D  \cite{DBLP:conf/ijcai/OztokD15}
   \end{itemize}
-\item Encodings:
+\item Contributions
   \begin{itemize}
-  \item \texttt{-d02} \cite{DBLP:conf/kr/Darwiche02}
-  \item \texttt{-sbk05} \cite{DBLP:conf/aaai/SangBK05}
-  \item \texttt{-cd05} \cite{DBLP:conf/ijcai/ChaviraD05}
-  \item \texttt{-cd06} \cite{DBLP:conf/sat/ChaviraD06} (supposed to be the best)
-  \item mine
+  \item WMC defines a measure over a BA.
+  \item WMC with weights on literals imposes an independence assumption.
+    (Measures are `slightly' more expressive than WMC with weights on models
+    because they apply to non-atomic BAs.)
+  \item A BA can be augmented with new literals in order to support any measure.
+  \item (Maybe) a lower bound on the number of new literals needed in order to
+    support any measure.
+  \item This results in a smaller problem for WMC algorithms (w.r.t. both the
+    number of literals and the length of the theory) and thus faster inference.
   \end{itemize}
-  All except mine are from Ace
-  3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and should be compiled
-  with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC) and
-  \texttt{-noEclause} (i.e., only use standard syntax) flags.
-\item Datasets\footnote{There might be more at
-    \url{https://meelgroup.github.io/}.}
+\item Notable previous/related work
   \begin{itemize}
-  \item binary Bayesian networks from Sang et
-    al.\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}
-    \cite{DBLP:conf/aaai/SangBK05}
+  \item Hailperin's approach to probability logic
+    \cite{DBLP:journals/ndjfl/Hailperin84}
+  \item Nilsson's (somewhat successful) probabilistic logic
+    \cite{DBLP:journals/ai/Nilsson86,DBLP:journals/ai/Nilsson93}
+  \item Logical induction: a big paper with a good overview of previous attempts
+    to assign probabilities to logical sentences in a sensible way
+    \cite{DBLP:journals/eccc/GarrabrantBCST16}
+  \item Measures on Boolean algebras
     \begin{itemize}
-    \item Grid (networks) (ratio 75 means that 75\% of the nodes are
-      deterministic),
-    \item Plan recognition (problems),
-    \item Deterministic quick medical reference (what do the numbers mean? the
-      README doesn't say).
+    \item On possibility and probability measures in finite Boolean algebras
+      \cite{DBLP:journals/soco/CastineiraCT02}
+    \item Representation of conditional probability measures
+      \cite{krauss1968representation}
     \end{itemize}
-  \item Bayesian networks available with Ace
-    \begin{itemize}
-    \item \texttt{2004-pgm} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
-    \item \texttt{2005-ijcai} \cite{DBLP:conf/ijcai/ChaviraD05}. The Genie/Smile
-      files have their own citation data that I should probably extract. This is
-      the only dataset that has some non-binary networks.
-    \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
-    \end{itemize}
-  \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
-  \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
   \end{itemize}
-\end{itemize}
-
-\paragraph{Contributions.}
-\begin{itemize}
-\item WMC defines a measure over a BA.
-\item WMC with weights on literals imposes an independence assumption. (Measures
-  are `slightly' more expressive than WMC with weights on models because they
-  apply to non-atomic BAs.)
-\item A BA can be augmented with new literals in order to support any measure.
-\item (Maybe) a lower bound on the number of new literals needed in order to
-  support any measure.
-\item Alternatively, one can use coproducts and pushouts to define a BA with
-  precisely the right independence and conditional independence conditions.
-  (This requires a relaxed version of WMC.)
-\item This results in a smaller problem for WMC algorithms (w.r.t. both the
-  number of literals and the length of the theory) and is optimal for, e.g.,
-  Bayesian networks.
-\item (Maybe) this results in faster inference (?)
-\end{itemize}
-
-\paragraph{Notable previous/related work.}
-\begin{itemize}
-\item Hailperin's approach to probability logic
-  \cite{DBLP:journals/ndjfl/Hailperin84}
-\item Nilsson's (somewhat successful) probabilistic logic
-  \cite{DBLP:journals/ai/Nilsson86}
-\item Logical induction: a big paper with a good overview of previous attempts
-  to assign probabilities to logical sentences in a sensible way
-  \cite{DBLP:journals/eccc/GarrabrantBCST16}
-\item Measures on Boolean algebras
-  \begin{itemize}
-  \item On possibility and probability measures in finite Boolean algebras
-    \cite{DBLP:journals/soco/CastineiraCT02}
-  \item Representation of conditional probability measures
-    \cite{krauss1968representation}
-  \end{itemize}
-\end{itemize}
-
-\paragraph{Notes.}
-\begin{itemize}
-\item Thesis: many important computational problems are solved by encoding them
-  as WMC. But if the weight function is extended to `conditional probabilities',
-  the problem becomes easier because current approaches need workarounds in
-  order to be independent.
-\item Shorter thesis: many important problems are encoded as WMC, but they can
-  be encoded in a better way if we allow for conditional probabilities.
-\item We extend the Gaifman graph to add edges when two variables occur in the
-  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
-  B)$).
-\item Extra benefit: one does not need to come up with a way to turn some probability
-distribution to into a fully independent one.
-\item Trivial CPTs such as $\Pr(A \mid B) = \Pr(\neg A \mid B) = 0.5$, the ADDs
-  of which simplify to a single number, are put in the first cluster.
-\item Observation: by inspecting the BN, we could identify CPTs that could be
-  completely ignored, but maybe good heuristics take care of that anyway.
-\item Observation: ADDs have a restrict command. I'm not going to use it, but it
-  could be nice.
-\item Alternative scenario to consider for future work: \#\SAT{} solver
-  generates solutions which are then used to restrict the ADDs that calculate
-  probabilities.
-\item Important future work: replacing ADDs with
-  AADDs\footnote{\url{https://github.com/ssanner/dd-inference}} is likely to
-  bring performance benefits. Other extensions:
-  \begin{itemize}
-  \item FOADDs can represent first order statements;
-  \item XADDs can replace WMI for continuous variables;
-  \item ADDs with intervals can do approximations.
-  \end{itemize}
-\item cd06 is supposed to be the fastest, but seems to be one of the slowest
-  (along with cd05). Perhaps the best encoding for arithmetic circuits has very
-  little to do with the best encoding for CNF WMC solvers?
-\item When the Bayesian network has an evidence file, we compute the probability
-  of evidence. Otherwise, let $X$ denote the last-mentioned node in the Bayesian
-  network. If $\mathsf{true}$ is a valid value of $X$, we compute the marginal
-  probability of $X = \mathsf{true}$. Otherwise, we pick the first value of $X$
-  and calculate its marginal probability. This applies to the Grid data set (as
-  intended) and also to two instances of Plan Reconstruction and roughly half of
-  the instances from 2004-PGM that have empty evidence files.
-\item Bayesian networks are often solved in a compile once, query many times
-  fashion. This can be achieved using ADDMC by selecting a subset $S$ of
-  variable we may want to query over and running ADDMC while excluding $S$ from
-  variable elimination/projection/$\exists$.
-\item \texttt{cd05} relaxes the encoding so much that extra models become
-  possible. They are supposed to be filtered out by the algorithm, but mine
-  can't do that because it doesn't deal with models. Same for \texttt{cd06}
-  because it's based on \texttt{cd05}.
-\item For ground ProbLog, we can encode a program
-\begin{verbatim}
-p :: a :- b
-q :: a :- c
-\end{verbatim}
-  into $P(a \mid b)=p$, $P(a \mid c)=q$ instead of having clauses $b \Rightarrow
-  a$, $c \Rightarrow a$. Some logical structure is likely to remain.
-\item Potential criticism may be that this is a step backwards and doesn't allow
-  us to use SAT-based techniques for probabilistic inference. However, they can
-  still be used for the 'theory+query' part.
-\item We don't compare 'compile times' because our encoding time is linear, so
-  we would easily beat everyone else.
-\item The claim behind this paper is that allowing for conditional probabilities
-  in the context of weighted model counting seems to be a good idea. Bayesian
-  networks and ADDMC are only particular examples. This should also work with
-  Cachet.
-\item For the ProbLog $\to$ WMC conversion, check out this
-  guy.\footnote{\url{https://users.ics.aalto.fi/ttj/}}
-\item Zero-probability weights and one-probability weights can be interpreted as
-  logical clauses. This doesn't affect ADDMC but could be useful for other
-  solvers.
-\item Filtering out ADDs that have nothing to do with the answer helps
-  tremendously, but I'm not sure if I should do that. Could a heuristic do the
-  same thing?
-\item For each row in each CPT, we order values by decreasing probabilities.
-  Need to check if this makes the solver more accurate.
-\item In the encoding:
-  \begin{itemize}
-  \item We assume that the first literal after `w' is positive.
-  \item The last two numbers are the positive and the negative probabilities,
-    respectively---sometimes they add to one, and sometimes the negative
-    probability is one, regardless of the value of the first probability.
-  \end{itemize}
-\item My encoding for non-binary BNs should still be faster because it doesn't
-  have those `equivalence' clauses.
-\item Guess: what makes the problem easier is:
-  \begin{enumerate}
-  \item short clauses,
-  \item low number of clauses.
-  \end{enumerate}
-  This explains why my first version of encoding non-binary CPTs was too slow.
-\item With all encodings (including mine non-binary encoding), they live on a
-  measure Boolean algebra where the measure is not probabilistic (so $\Pr(\neg
-  A) \ne 1 - \Pr(A)$).
-\item We assume that all variables in the Bayesian network have at least two
-  values.
-\item Remark: for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A +
-  \overline{A} = 1$.
+\item[F2] The paper at this stage is very technical---the danger is that WMC/SRL
+  people may not be able to follow it and so would be hard to get accepted.
+  Without clear target audience, [???] get work accepted. My main high level
+  suggestion is that let us tease apart what you have and see if a story
+  emerges. That is, let us attempt to write a paper {\bf with examples} and
+  see whether with significant motivation, we have a story emerging. Below,
+  sample text needed to adequately motivate [???] for WMC/SRL community.
 \end{itemize}
 
 \section{Preliminaries}
+
+\begin{itemize}
+\item[F2] Explain with examples: models $=$ elements [atoms] of algebra.
+\item Perhaps reorder the section of preliminaries into paragraphs, i.e., a
+  paragraph for order, for homomorphisms, etc. This would take up less space.
+\item Make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x, y$?).
+\item Terminology: `with generating set $S$' $\to$ `over $S$'.
+\item Notation: if $L$ denotes literals, then it doesn't denote a generating
+  set. Literals should be $U$.
+\end{itemize}
 
 \begin{definition} \label{def:ba}
   A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
@@ -447,7 +259,20 @@ are \emph{disjoint} if $a \land b = 0$.
   \mathbb{N}$. It then has $2^n$ atoms and $n$ generators.
 \end{lemma}
 
-\section{WMC as a Measure}
+\section{Weighted Model Counting as a Measure}
+
+\begin{itemize}
+\item Any function $2^U \to \mathbb{R}_{\ge 0}$ induces a measure on
+  $2^{2^U}$---the full Boolean algebra. This measure is not necessarily
+  probabilistic.
+\item[F2] Need to explain how WMC and NWMC connects to standard definitions of
+  WMC and $\Pr(\phi \mid e) = \WMC(\phi \land e)/\WMC(e)$.
+\item[F2] You need to explain what precisely these mean in logic and models
+  and weight functions are usually defined and understood.
+\item Be careful about mentioning ideals, filters, and quotients.
+\item Note that we're going to use logical notation for BAs. Give an example of
+  the two notations.
+\end{itemize}
 
 \begin{definition} \label{def:algebra_from_logic}
   Let $\mathcal{L}$ be a propositional (or first-order) logic, and let
@@ -596,7 +421,22 @@ In our algebraic formulation, this can be computed in two different ways:
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
-\section{What Measures Are WMC-Definable?}
+\section{Limitations of Literal-Based Weighted Model Counting}
+
+\begin{itemize}
+\item[F] Give a concrete example of something impossible to represent using WMC.
+\item[F] Can you say something here about factorized vs non-factorized
+  weight function definitions? That is, factorized is when $w$ maps literals to
+  $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
+  \begin{itemize}
+  \item come up with nice example when non-factorized weights are intuitive;
+  \item clarify that the factorized definition have is w.r.t. models, in case some
+    one gets confused. [It doesn't have to be, if the BA is not free---P.]
+  \end{itemize}
+\item What Measures are WMC-Definable: proofs need to be updated and
+  propositions could be phrased in a better way, but the gist should be the
+  same.
+\end{itemize}
 
 \subsection{WMC Requires Independent Literals}
 
@@ -708,6 +548,13 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 \end{proof}
 
 \subsection{Extending the Algebra}
+
+\begin{itemize}
+\item[F2] If you prove (b) above, you could motivate why weights on literals
+  is attractive and whether there is a way to augment the expressivity of WMC
+  while still maintaining literal level weights. Hence this action.
+\item[F2] You need to explain the significance of this result.
+\end{itemize}
 
 Given this requirement for independence, a well-known way to represent
 probability distributions that do not consist entirely of independent variables
@@ -873,197 +720,40 @@ variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
 \]
 variables would suffice.
 
-\section{Representing Independence and Conditional Independence}
+\section{Previous Work}
 
-\subsection{Preliminaries}
+\subsection{Bayesian Network Encodings}
 
-\begin{definition}
-  Given a BA $\mathbf{A}$, a \emph{subalgebra} is a subset $\mathbf{B} \subseteq
-  \mathbf{A}$ that, together with the operations, zero, and one of $\mathbf{A}$,
-  is a BA.
-\end{definition}
+\begin{itemize}
+\item All encodings (including my non-binary encoding) live on a measure Boolean
+  algebra where the measure is not probabilistic (so $\Pr(\neg A) \ne 1 -
+  \Pr(A)$).
+\item \texttt{cd05} relaxes the encoding so much that extra models become
+  possible. They are supposed to be filtered out by the algorithm, but mine
+  can't do that because it doesn't deal with models. Same for \texttt{cd06}
+  because it's based on \texttt{cd05}.
+\item \texttt{sbk05} uses my trick with dividing probabilities. That could
+  explain small inaccuracies in its answers.
+\item Encodings:
+  \begin{itemize}
+  \item \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}
+  \item \texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05}
+  \item \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05}
+  \item \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06} (supposed to be the best)
+  \item \texttt{db20} (mine)
+  \end{itemize}
+\end{itemize}
 
-\begin{definition}[\cite{givant2008introduction}]
-  Let $\mathbf{A},$ $\mathbf{B}$, and $\mathbf{C}$ be BAs such that $\mathbf{B}$
-  is a subalgebra of $\mathbf{A}$. Let $f\colon \mathbf{A} \to \mathbf{C}$ and
-  $g\colon \mathbf{B} \to \mathbf{C}$ be homomorphisms. Then $f$ is an
-  \emph{extension} of $g$ if $f(x) = g(x)$ for all $x \in \mathbf{B}$. If $f$ is
-  an extension of each member of a family $\{ g_i \}_{i \in I}$ of
-  homomorphisms, then $f$ is called a \emph{common extension} of $\{ g_i \}_{i
-    \in I}$.
-\end{definition}
+\subsection{Algebraic Decision Diagrams and ADDMC}
 
-\begin{definition}[\cite{givant2008introduction}]
-  Let $\{ \mathbf{A}_i \}_{i \in I}$ be a family of subalgebras of a BA
-  $\mathbf{A}$. If for any BA $\mathbf{B}$ with a family of homomorphisms $\{
-  f_i\colon \mathbf{A}_i \to \mathbf{B} \}_{i \in I}$ there exists a unique
-  common extension of $\{ f_i\colon \mathbf{A}_i \to \mathbf{B} \}_{i \in I}$
-  ($f\colon \mathbf{A} \to \mathbf{B}$ in the diagram),
-  \[
-    \begin{tikzcd}
-      \mathbf{A}_i \ar[r,hookrightarrow] \arrow{rd}[swap]{f_i} & \mathbf{A}
-      \arrow[d,dashed,"f"] \\
-      & \mathbf{B}
-    \end{tikzcd}
-  \]
-  then $\mathbf{A}$ is the \emph{internal sum}\footnote{A slightly more general
-    version of this definition is also known as the free product, the Boolean
-    product, and the coproduct in the category of BAs
-    \cite{givant2008introduction,koppelberg1989handbook,sikorski1969boolean}.}
-  of $\{\mathbf{A}_i \}_{i \in I}$. We will denote it as $\bigoplus_{i \in I}
-  \mathbf{A}_i$.
-\end{definition}
+\section{The Algebra of Functions on Boolean Algebras}
 
-\begin{proposition}[\cite{sikorski1969boolean}]
-  Let $\mathbf{A}$ be the internal sum of a family of BAs $\{ \mathbf{A}_i \}_{i
-    \in I}$, and let $\{m_i\colon \mathbf{A}_i \to \mathbb{R}_{\ge 0} \}_{i \in
-    I}$ be a family of measures. Then there exists a unique measure $m\colon
-  \mathbf{A} \to \mathbb{R}_{\ge 0}$ such that, for any finite subset $J
-  \subseteq I$ and family of elements $\{ x_j \in \mathbf{A}_j \}_{j \in J}$,
-  \[
-    m \left( \bigwedge_{j \in J} x_j \right) = \prod_{j \in J} m_j(x_j).
-  \]
-\end{proposition}
-
-\begin{definition}[\cite{koppelberg1989handbook}]
-  Let $\mathbf{A}$ be a BA. Let $\mathbf{B}$ be a subalgebra of $\mathbf{A}$,
-  and let $\{ \mathbf{A}_i\}_{i \in I}$ be a family of subalgebras of $\mathbf{A}$
-  such that $\mathbf{A}_i \cap \mathbf{A}_j = \mathbf{B}$ for all $i \ne j$ in
-  $I$. Let $\{ \iota_i \colon \mathbf{B} \to \mathbf{A}_i \}$ be a family of
-  inclusion homomorphisms. Then $\mathbf{A}$ is the \emph{amalgamated free
-    product\footnote{Also known as a (wide) pushout in the category of BAs.} of
-    $\{\mathbf{A}_{i} \}_{i \in I}$ over $\mathbf{B}$} if, for any Boolean
-  algebra $\mathbf{C}$ with a family of homomorphisms $\{ f_i\colon \mathbf{A}_i
-  \to \mathbf{C} \}_{i \in I}$ such that $f_i \circ \iota_i = f_j \circ \iota_j$
-  for all $i, j \in I$, there is a unique homomorphism $f\colon \mathbf{A} \to
-  \mathbf{C}$ such that the triangle in
-  \[
-    \begin{tikzcd}
-      \mathbf{B} \ar[r,hookrightarrow,"\iota_i"] & \mathbf{A}_i
-      \ar[r,hookrightarrow] \ar[d,swap,"f_i"] & \mathbf{A} \ar[ld,dashed,"f"] \\
-      & \mathbf{C}
-    \end{tikzcd}
-  \]
-  commutes for all $i \in I$. We will denote this product as
-  \[
-    \mathbf{A} = \bigoplus_{\substack{\mathbf{B}\\ i \in I}} \mathbf{A}_i.
-  \]
-\end{definition}
-
-\subsection{New Results}
-
-\todo[inline]{Make sure that this is enough to guarantee a pushout.}
-\begin{theorem}
-  Let $\{ S_i \}_{i=0}^n$ be a finite set of finite sets for some $n > 1$ such
-  that for all distinct positive integers $i$ and $j$, $S_i \cap S_j = S_0$, and
-  let
-  \[
-    \mathbf{A} = \bigoplus_{\substack{\mathcal{F}(S_0)\\ 1 \le i \le n}}
-    \mathcal{F}(S_i).
-  \]
-  Let $(m_i\colon \mathcal{F}(S_i) \to \mathbb{R}_{\ge 0})_{i=1}^n$ be arbitrary
-  measures. Then there is a unique measure $m\colon \mathbf{A} \to
-  \mathbb{R}_{\ge 0}$ such that, for any element $b \in \mathcal{F}(S_0)$,
-  subset $J \subseteq \{ 1, 2, \dots, n \}$, and elements $\{ a_j \in
-  \mathcal{F}(S_j \setminus S_0) \}_{j \in J}$,
-  \[
-    m \left(b \land \bigwedge_{j \in J} a_j \right) = \prod_{j \in J} m_j(b
-    \land a_j).
-  \]
-\end{theorem}
-
-\begin{theorem}
-  The number of weights needed to encode a Bayesian network using
-  coproducts and pushouts is equal to the number of entries in the tables of the
-  network (and the resulting theory is shorter).
-\end{theorem}
-
-\begin{theorem}[Pushouts of free BAs are free]
-  Let
-  \[
-    \mathbf{A} = \bigoplus_{\substack{\mathbf{B}\\ i \in I}} \mathbf{A}_i
-  \]
-  be an amalgamated free product such that $\{ \mathbf{A}_{i} \}_{i \in I}$ are
-  free BAs with $\{ S_i \}_{i \in I}$ as their respective sets of generators.
-  Let $S = \bigcup_{i \in I} S_i$. Then $\mathbf{A}$ is a free BA with
-  generating set $S$.
-\end{theorem}
-\begin{proof}
-  Suppose we have a map from $S$ to an arbitrary BA $\mathbf{C}$, as in
-  \[
-    \begin{tikzcd}
-      S_i \ar[r,hookrightarrow] \ar[d,hookrightarrow] & S \ar[d,hookrightarrow]
-      \ar[ddr,bend left] & \\
-      \mathbf{A}_i \ar[r,hookrightarrow] \ar[rrd,dashed,bend right] & \mathbf{A}
-      \ar[rd,dashed]& \\
-      & & \mathbf{C}.
-    \end{tikzcd}
-  \]
-  We want to show that there exists a unique homomorphism $\mathbf{A} \to
-  \mathbf{C}$. For all $i \in I$, from $S_i \hookrightarrow S$ and $S \to
-  \mathbf{C}$ we get a map $S_i \to \mathbf{C}$, so---by the definition of a
-  free BA---there is a unique homomorphism $\mathbf{A}_i \to \mathbf{C}$.
-  Furthermore, a family of homomorphisms $\{ \mathbf{A}_i \to \mathbf{C} \}_{i
-    \in I}$ uniquely determine a homomorphism $\mathbf{A} \to \mathbf{C}$ by the
-  universal mapping property of a (wide) pushout. Thus $\mathbf{A}$ is a free BA
-  with generating set $S$.
-\end{proof}
-
-\begin{corollary}
-  Similarly, coproducts of free BAs are free.
-\end{corollary}
-
-\section{Representation of conditional probability tables}
-
-The probability of a variable with $n$ values $x_1, \dots, x_n$ (whether
-conditioned on something or not) can be represented with an ADD of size
-$\Theta(n^2)$ by representing each of $\Pr(x_1), \Pr(x_2 \mid x_1), \dots,
-\Pr(x_n \mid x_1, \dots, x_{n-1})$ by a separate ADD. For example, if $n=3$, the
-last of the three ADDs would look like this
-\[
-  \begin{tikzpicture}
-    \node[ellipse,draw] (x3) {$x_3$};
-    \node[ellipse,draw,below left = of x3] (x21) {$x_2$};
-    \node[ellipse,draw,below right = of x3] (x22) {$x_2$};
-    \node[ellipse,draw,below = of x21] (x11) {$x_1$};
-    \node[ellipse,draw,below = of x22] (x12) {$x_1$};
-    \node[rectangle,draw,below = of x11] (n2) {$0.7$};
-    \node[rectangle,draw,left = of n2] (n1) {$0$};
-    \node[rectangle,draw,below = of x12] (n3) {$0.3$};
-    \node[rectangle,draw,right = of n3] (n4) {$1$};
-
-    \draw (x3) edge (x21);
-    \draw (x21) edge (n1);
-    \draw (x11) edge (n1);
-    \draw[dashed] (x21) edge (x11);
-    \draw[dashed] (x11) edge (n2);
-
-    \draw[dashed] (x3) edge (x22);
-    \draw[dashed] (x22) edge (x12);
-    \draw[dashed] (x12) edge (n3);
-    \draw (x22) edge (n4);
-    \draw (x12) edge (n4);
-  \end{tikzpicture}
-\]
-Such an ADD for $x_n$ has $2n+3$ nodes and $4n-2$ edges. The same information
-can be represented in textual form as
-\begin{align*}
-  &\texttt{w 3 1 0} \\
-  &\texttt{w 3 2 0} \\
-  &\texttt{w 3 -1 -2 0.7}
-\end{align*}
-The encoding weights depend on the probabilities in the CPT as follows. For each
-value $x_n$, if $\Pr(X = x_n) = 0$, then $w(x_n) = 0$. Otherwise, let $I_n = \{ 1
-\le i \le n - 1 \mid \Pr(X = x_i) \ne 0 \}$. Then
-\[
-  w \left( x_n \;\middle|\; \bigwedge_{i \in I_n} \neg x_i \right) = \Pr(X =
-  x_n) \prod_{i \in I_n} \frac{1}{1 - w \left( x_i \;\middle|\; \bigwedge_{j \in
-        I_i} \neg x_j \right)}.
-\]
-All of these weights/probabilities may have other conditions that come from the
-structure of the Bayesian network.
-
-\section{Encoding Bayesian networks}
+\begin{itemize}
+\item Could clarify why $[\lambda_{X=0}] = \overline{[\lambda_{X=1}]}$. This
+  follows from the definition. Or should I avoid the overline notation?
+\item Prove that we have an algebra of functions with two (?) additional
+  operations. Or maybe just cite the original paper for this.
+\end{itemize}
 
 Let $V$ denote the set of random variables in a Bayesian network. For any random
 variable $X \in V$, let $\mathrm{pa}(X)$ denote the set of parents of $X$ and
@@ -1153,8 +843,30 @@ Note that both addition and multiplication commute.
   \end{itemize}
 \end{definition}
 
+\begin{remark}
+  For any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A + \overline{A} = 1$.
+\end{remark}
+
 Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
 $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
+
+\section{Encoding Bayesian Networks Using Conditional Measures}
+
+\begin{itemize}
+\item We assume that the first literal after `w' is positive.
+\item The last two numbers are the positive and the negative probabilities,
+  respectively---sometimes they add to one, and sometimes the negative
+  probability is one, regardless of the value of the first probability.
+\item We assume that all variables in the Bayesian network have at least two
+  values.
+\item Have an example of how the ADDs function in this situation. If not for the
+  paper, then at least for slides. Use the framework to check its correctness.
+\item The function $\phi$ created by the algorithm can be seen as a measure on
+  the BA $2^U$.
+\item We extend the Gaifman graph to add edges when two variables occur in the
+  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
+  B)$).
+\end{itemize}
 
 \begin{algorithm}
   $\phi \gets 1$\;
@@ -1375,6 +1087,166 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   \]
   with each $\lambda$ replaced with a unique positive integer.
 \end{example}
+
+\section{Experimental Comparison}
+
+\begin{itemize}
+\item We don't compare 'compile times' because our encoding time is linear, so
+  we would easily beat everyone else.
+\item When the Bayesian network has an evidence file, we compute the probability
+  of evidence. Otherwise, let $X$ denote the last-mentioned node in the Bayesian
+  network. If $\mathsf{true}$ is a valid value of $X$, we compute the marginal
+  probability of $X = \mathsf{true}$. Otherwise, we pick the first value of $X$
+  and calculate its marginal probability. This applies to the Grid data set (as
+  intended) and also to two instances of Plan Reconstruction and roughly half of
+  the instances from 2004-PGM that have empty evidence files.
+\item After the experiments are finished, note the processor, memory per thread,
+  and add the following acknowledgment.
+\item All other encodings are implemented in
+  Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and should be
+  compiled with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC)
+  and \texttt{-noEclause} (i.e., only use standard syntax) flags.
+\item Datasets
+  \begin{itemize}
+  \item binary Bayesian networks from Sang et
+    al.\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}
+    \cite{DBLP:conf/aaai/SangBK05}
+    \begin{itemize}
+    \item Grid (networks) (ratio 75 means that 75\% of the nodes are
+      deterministic),
+    \item Plan recognition (problems),
+    \item Deterministic quick medical reference (what do the numbers mean? the
+      README doesn't say).
+    \end{itemize}
+  \item Bayesian networks available with Ace
+    \begin{itemize}
+    \item \texttt{2004-pgm} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
+    \item \texttt{2005-ijcai} \cite{DBLP:conf/ijcai/ChaviraD05}. The Genie/Smile
+      files have their own citation data that I should probably extract. This is
+      the only dataset that has some non-binary networks.
+    \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\section{Explaining The Performance Benefits}
+
+\begin{itemize}
+\item \texttt{d02} has
+  \[
+    \sum_{X \in V} |\im X| + |\im X|\prod_{Y \in \mathrm{pa}(X)}|\im Y|
+  \]
+  variables and
+  \[
+    \sum_{X \in V} 1 + \binom{|\im X|}{2} + |\im X|(2 +
+    |\mathrm{pa}(X)|)\prod_{Y \in \mathrm{pa}(X)} |\im Y|
+  \]
+  clauses (along with one ADD per variable to encode the weights).
+\item \texttt{sbk05} is a bit harder to evaluate due to a handful of small
+  optimisations in the encoding. Could find an upper bound anyway.
+\item \texttt{db20} (my encoding) has
+  \[
+    \sum_{X \in V} |\im X|
+  \]
+  variables (less for binary) and
+  \[
+    \sum_{X \in V} |\im X| + 1 + \binom{|\im X|}{2}
+  \]
+  ADDs.
+\item Let:
+  \begin{itemize}
+  \item $N = |V|$ (i.e., the number of nodes in the Bayesian network),
+  \item $D = \max_{X \in V} |\mathrm{pa}(X)|$ (i.e., the maximum in-degree or
+    the number of parents),
+  \item $V = \max_{X \in V} |\im X|$ (i.e., the maximum number of values per
+    variables).
+  \end{itemize}
+\item Then my encoding has $\mathcal{O}(NV)$ variables and $\mathcal{O}(NV^2)$
+  ADDs while \texttt{d02} has $\mathcal{O}(NV^{D+1})$ variables and
+  $\mathcal{O}(NDV^{D+1})$ ADDs.
+\end{itemize}
+
+\todo[inline]{Calculate numVariables/numClauses (or the other way around) for
+  each instance and plot this ratio vs runtime (for each encoding, or at least
+  mine and D02)}
+
+\section{Conclusion and Future Work}
+
+\begin{itemize}
+\item Extra benefit: one does not need to come up with a way to turn some
+  probability distribution to into a fully independent one.
+\item Important future work: replacing ADDs with
+  AADDs\footnote{\url{https://github.com/ssanner/dd-inference}} is likely to
+  bring performance benefits. Other extensions:
+  \begin{itemize}
+  \item FOADDs can represent first order statements;
+  \item XADDs can replace WMI for continuous variables;
+  \item ADDs with intervals can do approximations.
+  \end{itemize}
+\item Filtering out ADDs that have nothing to do with the answer helps
+  tremendously, but I'm purposefully not doing that. Perhaps a heuristic could
+  do the same thing?
+\item Encodings for everything else
+  \begin{itemize}
+  \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
+  \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
+    \begin{itemize}
+    \item For the ProbLog to WMC conversion, check out this guy:
+      \url{https://users.ics.aalto.fi/ttj/}.
+    \item proof-based \cite{DBLP:conf/iclp/MantadelisJ10}
+    \item rule-based \cite{DBLP:conf/ecai/Janhunen04}
+    \item For ground ProbLog, we can encode a program
+\begin{verbatim}
+p :: a :- b
+q :: a :- c
+\end{verbatim}
+      into $P(a \mid b)=p$, $P(a \mid c)=q$ instead of having clauses $b
+      \Rightarrow a$, $c \Rightarrow a$. Some logical structure is likely to
+      remain.
+    \end{itemize}
+  \end{itemize}
+\item Bayesian networks are often solved in a compile once, query many times
+  fashion. This can be achieved using ADDMC by selecting a subset $S$ of
+  variable we may want to query over and running ADDMC while excluding $S$ from
+  variable elimination/projection/$\exists$.
+\item More references
+  \begin{itemize}
+  \item Measures on/in Boolean algebras: Horn and Tarski
+    \cite{horn1948measures}, Jech \cite{jech2017measures}
+  \item On Boolean algebras and their role in analysis \cite{winkowska1996boolean}
+  \item Infinite domains
+    \begin{itemize}
+    \item Markov Logic in Infinite Domains (Singla and Domingos)
+      \cite{DBLP:conf/uai/SinglaD07}
+    \item Objective Bayesian probabilistic logic (Williamson)
+      \cite{DBLP:journals/jal/Williamson08}
+    \item Unifying Logic and Probability (Russell)
+      \cite{DBLP:journals/cacm/Russell15}
+    \end{itemize}
+  \item Logical induction \cite{DBLP:journals/eccc/GarrabrantBCST16}
+  \item Quantum probabilistic logic programming \cite{balu2015quantum}
+  \item WMC
+    \begin{itemize}
+    \item algebraic model counting \cite{DBLP:journals/japll/KimmigBR17}
+    \item Explanation-Based Approximate Weighted Model Counting for
+      Probabilistic Logics \cite{DBLP:conf/aaai/RenkensKBR14}
+    \item OUWMC \cite{DBLP:conf/aaai/Belle17}
+    \item Formula-Based Probabilistic Inference \cite{DBLP:conf/uai/GogateD10}
+    \item Parallel Probabilistic Inference by WMC \cite{DBLP:conf/pgm/DalLL18}
+    \item Semiring Programming \cite{DBLP:journals/corr/BelleR16}
+    \item theoretical extension: WMC beyond two-variable logic
+      \cite{DBLP:conf/lics/KuusistoL18}
+    \item from weighted to unweighted model counting
+      \cite{DBLP:conf/ijcai/ChakrabortyFMV15}
+    \item theory behind WMC algorithms: solving \#\SAT{} and Bayesian inference
+      with backtracking search \cite{DBLP:journals/jair/BacchusDP09}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\paragraph{Acknowledgements.} This work has made use of the resources provided
+by the Edinburgh Compute and Data Facility (ECDF)
+(\url{http://www.ecdf.ed.ac.uk/}).
 
 \bibliographystyle{plain}
 \bibliography{paper}
