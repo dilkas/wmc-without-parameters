@@ -122,7 +122,6 @@
   \end{itemize}
 \item Intuitively, a measure is just like a probability, except it's in
   $\mathbb{R}_{\ge 0}$ instead of $[0, 1]$.
-\item ADDMC should probably be in textsc mode.
 \end{itemize}
 
 \section{Preliminaries}
@@ -132,10 +131,15 @@
 \item Terminology: `with generating set $S$' $\to$ `over $S$'.
 \item Notation: if $L$ denotes literals, then it doesn't denote a generating
   set. Literals should be $U$.
+\item Describe the parallel between BAs and powersets.
+\item Describe \cref{tbl:notation_example} as an example. We will use
+  set-theoretic notation for $2^U$ and Boolean-algebraic notation for $2^{2^U}$
+  (except for atoms).
 \end{itemize}
 
 \begin{table}
   \caption{(in the same order)}
+  \label{tbl:notation_example}
   \centering
   \begin{tabular}{lcc}
     \toprule
@@ -154,50 +158,18 @@
   \end{tabular}
 \end{table}
 
-\begin{definition} \label{def:ba}
-  A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
-  1)$ consisting of a set $\mathbf{B}$ with binary operations \emph{meet}
-  $\land$ and \emph{join} $\lor$, unary operation $\neg$ and elements $0, 1 \in
-  \mathbf{B}$ such that the following axioms hold for all $a, b, \in
-  \mathbf{B}$:
-  \begin{itemize}
-  \item both $\land$ and $\lor$ are associative and commutative;
-  \item $a \lor (a \land b) = a$, and $a \land (a \lor b) = a$;
-  \item $0$ is the identity of $\lor$, and $1$ is the identity of $\land$;
-  \item $\lor$ distributes over $\land$ and vice versa;
-  \item $a \lor \neg a = 1$, and $a \land \neg a = 0$.
-  \end{itemize}
-\end{definition}
-
-For clarity and succinctness, we will occasionally use three other operations
-that can be defined using the original three\footnote{We use $+$ to denote
-  symmetric difference because it is the additive operation of a Boolean ring.}:
-\begin{align*}
-  a \to b &= \neg a \lor b, \\
-  a \leftrightarrow b &= (a \land b) \lor (\neg a \land \neg b), \\
-  a + b &= (a \land \neg b) \lor (\neg a \land b).
-\end{align*}
-We can also define a partial order $\le$ on $\mathbf{B}$ as $a \le b$ if $a = b
-\land a$ (or, equivalently, $a \lor b = b$) for all $a, b \in \mathbf{B}$.
-Furthermore, let $a < b$ denote $a \le b$ and $a \ne b$. For the rest of this
-paper, let $\mathbf{B}$ refer to the BA $(\mathbf{B}, \land, \lor, \neg, 0, 1)$.
-For any $S \subseteq \mathbf{B}$, we write $\bigvee S$ for $\bigvee_{x \in S} x$
-and call it the \emph{supremum} of $S$. Similarly, $\bigwedge S = \bigwedge_{x
-  \in S} x$ is the \emph{infimum}. By convention, $\bigwedge \emptyset = 1$ and
-$\bigvee \emptyset = 0$. For any $a, b \in \mathbf{B}$, we say that $a$ and $b$
-are \emph{disjoint} if $a \land b = 0$.
+Consider the Boolean algebra $(2^{2^U}, \land, \lor, \neg, \bot, \top)$. A
+partial order $\le$ on $2^{2^U}$ is defined by $a \le b$ if $a = b \land a$ (or,
+equivalently, $a \lor b = b$) for all $a, b \in 2^{2^U}$.
 
 \begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
-  An element $a \ne 0$ of $\mathbf{B}$ is an \emph{atom} if, for all $x \in
-  \mathbf{B}$, either $x \land a = a$ or $x \land a = 0$. Equivalently, $a \ne
-  0$ is an atom if there is no $x \in \mathbf{B}$ such that $0 < x < a$. We say
-  that $\mathbf{B}$ is \emph{atomic} if for every $a \in \mathbf{B} \setminus \{0
-  \}$, there is an atom $x$ such that $x \le a$.
+  An element $a \ne 0$ of $2^{2^U}$ is an \emph{atom} if, for all $x \in
+  2^{2^U}$, either $x \land a = a$ or $x \land a = 0$. Equivalently, $a \ne 0$
+  is an atom if there is no $x \in \mathbf{B}$ such that $0 < x < a$.
+  Equivalently, $a \ne 0$ is an atom if $|a| = 1$, i.e., $a = \{ u \}$ for some
+  $u \in 2^U$ (this is how we will denote atoms in the remainder of the paper).
+  Note that atoms in Boolean algebras correspond to models.
 \end{definition}
-
-\begin{lemma}[\cite{ganesh2006introduction}]
-  For any two distinct atoms $a$, $b \in \mathbf{B}$, $a \land b = 0$.
-\end{lemma}
 
 \begin{lemma}[\cite{givant2008introduction}] \label{thm:representation}
   The following are equivalent:
@@ -206,10 +178,6 @@ are \emph{disjoint} if $a \land b = 0$.
   \item For any $x \in \mathbf{B}$, $x = \bigvee_{\text{atoms } a \le x} a$.
   \item $1$ is the supremum of all atoms.
   \end{itemize}
-\end{lemma}
-
-\begin{lemma}[\cite{givant2008introduction}] \label{lemma:atomic}
-  All finite BAs are atomic.
 \end{lemma}
 
 \begin{definition}[\cite{gaifman1964concerning,DBLP:books/daglib/0090259}] \label{def:measure}
@@ -309,12 +277,33 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
 \begin{itemize}
 \item[F2] Explain with examples: models $=$ elements [atoms] of algebra.
 \item Be careful about mentioning ideals and quotients.
-\item Note that we're going to use logical notation for BAs. Give an example of
-  the two notations.
 \end{itemize}
 
+\begin{definition} \label{def:wmc}
+  Let $U$ be an arbitrary set. Then
+  \begin{itemize}
+  \item a \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$,
+  \item a \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
+      0}$.
+  \item a weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
+    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$.
+  \item every weight function induces a measure:
+    \[
+      M_W(x) = \begin{cases}
+        0 & \text{if } x = \bot \\
+        W(u) & \text{if } x = \{ u \} \\
+        \sum_{\{u\} \le x} W(u) & \text{otherwise.}
+      \end{cases}
+    \]
+    The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$
+    with a given definition of $W$ is known as \emph{weighted model counting}.
+  \item A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
+    \emph{factorable} if there exists a factored weight function $W\colon 2^U
+    \to \mathbb{R}_{\ge 0}$ that induces $M$.
+  \end{itemize}
+\end{definition}
+
 \begin{example} \label{example:construction}
-  % TODO: keep this, but might need a lot of editing.
   Let $\mathcal{L}$ be a propositional logic with $p$ and $q$ as its only atoms.
   Then $L = \{ p, q, \neg p, \neg q \}$ is its set of literals. Let $w : L \to
   \mathbb{R}_{\ge 0}$ be the \emph{weight function} defined by
@@ -364,27 +353,6 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   \end{itemize}
 }
 
-\begin{definition} \label{def:wmc}
-  Let $U$ be an arbitrary set. Then
-  \begin{itemize}
-  \item a \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$,
-  \item a \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
-      0}$.
-  \item a weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
-    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$.
-  \item every weight function induces a measure:
-    \[
-      M_W(x) = \begin{cases}
-        0 & \text{if } x = \emptyset \\
-        W(u) & \text{if } x = \{ u \} \\
-        \sum_{\{u\} \le x} W(u) & \text{otherwise.}
-      \end{cases}
-    \]
-    The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$
-    with a given definition of $W$ is known as \emph{weighted model counting}.
-  \end{itemize}
-\end{definition}
-
 Given a theory $\Delta$ in a logic $\mathcal{L}$, the usual way of using WMC to
 compute the probability of a query $q$ is
 \cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
@@ -398,7 +366,7 @@ In our algebraic formulation, this can be computed in two different ways:
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
-\section{Limitations of Factored Weighted Model Counting}
+\section{Limitations of Factorable Measures}
 
 \begin{itemize}
 \item[F] Give a concrete example of something impossible to represent using WMC.
@@ -413,38 +381,38 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 \end{itemize}
 
 \begin{lemma} \label{lemma:before_theorem}
-  For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
-  \in \mathbf{B}$,
+  For any measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
+  \in 2^{2^U}$,
   \begin{equation} \label{eq:to_prove}
-    m(a \land b) = m(a)m(b)
+    M(a \land b) = M(a)M(b)
   \end{equation}
   if and only if
   \begin{equation} \label{eq:to_prove2}
-    m(a \land b) \cdot m(\neg a \land \neg b) = m(a \land \neg b)
-    \cdot m(\neg a \land b).
+    M(a \land b) \cdot M(\neg a \land \neg b) = M(a \land \neg b)
+    \cdot M(\neg a \land b).
   \end{equation}
 \end{lemma}
 \begin{proof}
   First, note that $a = (a \land b) \lor (a \land \neg b)$ and $(a \land b)
   \land (a \land \neg b) = 0$, so, by properties of a measure,
   \begin{equation} \label{eq:temp}
-    m(a) = m(a \land b) + m(a \land \neg b).
+    M(a) = M(a \land b) + M(a \land \neg b).
   \end{equation}
-  Applying \cref{eq:temp} and the equivalent expression for $m(b)$ allows us
+  Applying \cref{eq:temp} and the equivalent expression for $M(b)$ allows us
   to rewrite \cref{eq:to_prove} as
   \[
-    m(a \land b) = [m(a \land b) + m(a \land \neg b)][m(a \land b) + m(\neg a
+    M(a \land b) = [M(a \land b) + M(a \land \neg b)][M(a \land b) + M(\neg a
     \land b)]
   \]
   which is equivalent to
   \begin{equation} \label{eq:temp6}
-    m(a \land b)[1 - m(a \land b) - m(a \land \neg b) - m(\neg a \land b)] = m(a
-    \land \neg b)m(\neg a \land b).
+    M(a \land b)[1 - M(a \land b) - M(a \land \neg b) - M(\neg a \land b)] = M(a
+    \land \neg b)M(\neg a \land b).
   \end{equation}
   Since $a \land b$, $a \land \neg b$, $\neg a \land b$, $\neg a \land \neg b$
   are pairwise disjoint and their supremum is $1$,
   \[
-    m(a \land b) + m(a \land \neg b) + m(\neg a \land b) + m(\neg a \land \neg
+    M(a \land b) + M(a \land \neg b) + M(\neg a \land b) + M(\neg a \land \neg
     b) = 1,
   \]
   and this allows us to rewrite \cref{eq:temp6} into \cref{eq:to_prove2}. As all
@@ -453,68 +421,64 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
 \todo[inline]{This theorem needs a special case for zero weights.}
 \begin{theorem}
-  Let $\mathbf{B}$ be a free BA over $\{ l_i \}_{i=1}^n$ (for some $n \in
-  \mathbb{N}$) with measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$, and let
-  $L = \{ l_i \}_{i = 1}^n \cup \{ \neg l_i \}_{i = 1}^n$. Then there exists a
-  weight function $w\colon L \to \mathbb{R}_{\ge 0}$ such that $m = \WMC_w$ if
-  and only if
+  A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is factorable if and only
+  if
   \begin{equation} \label{eq:wmccondition}
-  m(l \land l') = m(l)m(l')
+  M(u \land v) = M(u)M(v)
   \end{equation}
-  for all distinct $l, l' \in L$ such that $l \ne \neg l'$.
+  for all distinct $u, v \in U \cup \{ \neg w \mid w \in U \}$ such that $u \ne
+  \neg v$.
 \end{theorem}
-
-\begin{remark}
-  Note that if $n = 1$, then \cref{eq:wmccondition} is vacuously satisfied and
-  so any valid measure can be expressed as WMC.
-\end{remark}
-
 \begin{proof}
-  ($\Leftarrow$) Let $w\colon L \to \mathbb{R}_{\ge 0}$ be defined by
-  \begin{equation} \label{eq:assumption}
-    w(l) = m(l)
-  \end{equation}
-  for all $l \in L$. We are going to show that $\WMC_w = m$. First, note that
-  $\WMC_w(0) = 0 = m(0)$ by the definitions of both $\WMC_w$ and $m$. Second,
-  let
-  \begin{equation} \label{eq:def_of_a}
-    a = \bigwedge_{i=1}^n a_i
-  \end{equation}
-  be an atom in $\mathbf{B}$ such that $a_i \in \{ l_i, \neg l_i \}$ for all $i
-  \in [n]$. Then
+  ($\Leftarrow$) For each $x \in U$, let $W_x\colon 2^{\{x\}} \to
+  \mathbb{R}_{\ge 0}$ be defined by $W_x(\{ x \}) = M(x)$ and $W_x(\emptyset) =
+  M(\neg x)$. Let $M_W$ be the measure induced by
   \[
-    \WMC(a) = \prod_{i=1}^n w(a_i) = \prod_{i=1}^n m(a_i) = m
-    \left(\bigwedge_{i=1}^n a_i \right) = m(a)
+    W = \prod_{x \in U} W_x.
   \]
-  by \cref{def:wmc,eq:assumption,eq:wmccondition,eq:def_of_a}. Finally, note
-  that if $\WMC$ and $m$ agree on all atoms, then they must also agree on all
-  other non-zero elements of the Boolean algebra.
+  We will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by the
+  definitions of both $M_w$ and $M$. Second, let
+  \begin{equation} \label{eq:def_of_a}
+    a = \bigwedge_{u \in U} a_u
+  \end{equation}
+  be an atom in $2^{2^U}$ such that $a_u \in \{ u, \neg u \}$ for all $u \in U$.
+  Then
+  \[
+    M_W(a) = \prod_{u \in U} W_u(a_u) = \prod_{u \in U} M(a_u) = M
+    \left(\bigwedge_{u \in U} a_u \right) = M(a)
+  \] % TODO: by what?
+  by \cref{def:wmc,eq:wmccondition,eq:def_of_a}. Finally, note that if $M_W$ and
+  $M$ agree on all atoms, then they must also agree on all other non-zero
+  elements of the Boolean algebra.
 
-  ($\Rightarrow$) For the other direction, we are given a weight function
-  $w\colon L \to \mathbb{R}_{\ge 0}$ that induces a measure $m = \WMC_w\colon
-  \mathbf{B} \to \mathbb{R}_{\ge 0}$, and we want to show that
-  \cref{eq:wmccondition} is satisfied. Let $k_i, k_j \in L$ be such that $k_i
-  \in \{ l_i, \neg l_i \}$, $k_j \in \{ l_j, \neg l_j \}$, and $i \ne j$ for
-  some $i, j \in [n]$. We then want to show that
+  ($\Rightarrow$) For the other direction, we are given a factored weight
+  function
+  \[
+    W = \prod_{x \in U} W_x,
+  \]
+  and we want to show that its induced measure $M_W$ satisfies
+  \cref{eq:wmccondition}. Let $k_u, k_v \in U \cup \{ \neg w \mid w \in U \}$ be
+  such that $k_u \in \{ u, \neg u \}$, $k_v \in \{ v, \neg v \}$, and $u \ne v$.
+  We then want to show that
   \begin{equation} \label{eq:to_prove3}
-    m(k_i \land k_j) = m(k_i)m(k_j)
+    M_W(k_u \land k_v) = M_W(k_u)M_W(k_v)
   \end{equation}
   which is equivalent to
   \begin{equation} \label{eq:to_prove4}
-    m(k_i \land k_j) \cdot m(\neg k_i \land \neg k_j) = m(k_i \land \neg k_j)
-    \cdot m(\neg k_i \land k_j)
+    M_W(k_u \land k_v) \cdot M_W(\neg k_u \land \neg k_v) = M_W(k_u \land \neg k_v) \cdot M_w(\neg k_u \land k_v)
   \end{equation}
   by \cref{lemma:before_theorem}. Then
   \begin{align*}
-    \WMC(k_i \land k_j) &= \sum_{\text{atoms } a \le k_i \land k_j} \WMC(a) = \sum_{\text{atoms } a \le k_i \land k_j} \prod_{m \in [n]} w(a_m) \\
-                        &= \sum_{\text{atoms } a \le k_i \land k_j} w(a_i)w(a_j) \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) = \sum_{\text{atoms } a \le k_i \land k_j} w(k_i)w(k_j) \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) \\
-    &= w(k_i)w(k_j) \sum_{\text{atoms } a \le k_i \land k_j} \prod_{m \in [n] \setminus \{ i, j \}} w(a_m) = w(k_i)w(k_j)C,
+    M_W(k_u \land k_v) &= \sum_{\{a\} \le k_u \land k_v} W(a) = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U} W_x(a) \\
+                        &= \sum_{\{a\} \le k_u \land k_v} W_u(a_u)W_v(a_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) = \sum_{\{a\} \le k_u \land k_v} W_u(k_u)W_v(k_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) \\
+    &= W_u(k_u)W_v(k_v) \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} W_x(a) = W_u(k_u)W_v(k_v)C,
   \end{align*}
-  where $C$ denotes the part of $\WMC(k_i \land k_j)$ that will be the same for
-  $\WMC(\neg k_i \land k_j)$, $\WMC(k_i \land \neg k_j)$, and $\WMC(\neg k_i
-  \land \neg k_j)$ as well. But then \cref{eq:to_prove4} becomes
+  where $C$ denotes the part of $M_W(k_u \land k_v)$ that will be the same for
+  $M_W(\neg k_u \land k_v)$, $M_W(k_u \land \neg k_v)$, and $M_W(\neg k_u \land
+  \neg k_v)$ as well. But then \cref{eq:to_prove4} becomes
   \[
-    w(k_i)w(k_j)w(\neg k_i)w(\neg k_j)C^2 = w(k_i)w(\neg k_j)w(\neg k_i)w(k_j)C^2
+    W_u(k_u)W_v(k_v)W_u(\neg k_u)W_v(\neg k_v)C^2 = W_u(k_u)W_v(\neg
+    k_v)W_u(\neg k_u)W_v(k_v)C^2
   \]
   which is trivially true.
 \end{proof}
