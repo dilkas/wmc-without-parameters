@@ -11,15 +11,17 @@
 \usepackage[capitalise]{cleveref}
 \usepackage{bm}
 \usepackage{booktabs}
+\usepackage[table]{xcolor}
 \usepackage{tikz}
-\usepackage{xcolor}
 \usepackage[backgroundcolor=lightgray]{todonotes}
 \usepackage{complexity}
 \usepackage{soul}
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{subcaption}
+\usepackage{multirow}
 
 \newtheorem{theorem}{Theorem}
+\newtheorem{observation}{Observation}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
@@ -61,16 +63,25 @@
 \section{Introduction}
 
 \begin{itemize}
-\item Thesis: many important computational problems are solved by encoding them
-  as WMC. But if the weight function is extended to `conditional probabilities',
-  the problem becomes easier because current approaches need workarounds in
-  order to be independent.
-\item Shorter thesis: many important problems are encoded as WMC, but they can
-  be encoded in a better way if we allow for conditional probabilities.
-\item The claim behind this paper is that allowing for conditional probabilities
-  in the context of weighted model counting seems to be a good idea. Bayesian
-  networks and ADDMC are only particular examples. This should also work with
-  Cachet.
+\item The Main Narrative
+  \begin{enumerate}
+  \item When weights are defined on literals, the measure on the free BA is
+    fully independent.
+  \item This means that the BA itself must be larger (i.e., have additional
+    `meaningless' literals) to turn any probability distribution into an
+    independent one.
+  \item We show how we can define conditional weights on literals, allowing us
+    to encode any probability distribution into a Boolean algebra that's not
+    necessarily independent and thus can be smaller.
+  \item We demonstrate a specific example of this by presenting a new way to
+    encode Bayesian networks into instances of WMC and adapting a WMC algorithm
+    (ADDMC) to run on the new format.
+  \item We show that this results in significantly faster inference.
+  \item We show that our encoding results in asymptotically fewer literals and
+    fewer ADDs, and thus a simpler problem.
+  \item (Maybe) we experimentally demonstrate a phase transition based on the
+    number of variables per ADD.
+  \end{enumerate}
 \item Potential criticism may be that this is a step backwards and doesn't allow
   us to use SAT-based techniques for probabilistic inference. However, they can
   still be used for the 'theory+query' part.
@@ -92,18 +103,6 @@
   \item d4 \cite{DBLP:conf/ijcai/LagniezM17} (closed source, boo!)
   \item miniC2D  \cite{DBLP:conf/ijcai/OztokD15}
   \end{itemize}
-\item Contributions
-  \begin{itemize}
-  \item WMC defines a measure over a BA.
-  \item WMC with weights on literals imposes an independence assumption.
-    (Measures are `slightly' more expressive than WMC with weights on models
-    because they apply to non-atomic BAs.)
-  \item A BA can be augmented with new literals in order to support any measure.
-  \item (Maybe) a lower bound on the number of new literals needed in order to
-    support any measure.
-  \item This results in a smaller problem for WMC algorithms (w.r.t. both the
-    number of literals and the length of the theory) and thus faster inference.
-  \end{itemize}
 \item Notable previous/related work
   \begin{itemize}
   \item Hailperin's approach to probability logic
@@ -121,26 +120,39 @@
       \cite{krauss1968representation}
     \end{itemize}
   \end{itemize}
-\item[F2] The paper at this stage is very technical---the danger is that WMC/SRL
-  people may not be able to follow it and so would be hard to get accepted.
-  Without clear target audience, [???] get work accepted. My main high level
-  suggestion is that let us tease apart what you have and see if a story
-  emerges. That is, let us attempt to write a paper {\bf with examples} and
-  see whether with significant motivation, we have a story emerging. Below,
-  sample text needed to adequately motivate [???] for WMC/SRL community.
+\item Intuitively, a measure is just like a probability, except it's in
+  $\mathbb{R}_{\ge 0}$ instead of $[0, 1]$.
+\item ADDMC should probably be in textsc mode.
 \end{itemize}
 
 \section{Preliminaries}
 
 \begin{itemize}
-\item[F2] Explain with examples: models $=$ elements [atoms] of algebra.
-\item Perhaps reorder the section of preliminaries into paragraphs, i.e., a
-  paragraph for order, for homomorphisms, etc. This would take up less space.
 \item Make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x, y$?).
 \item Terminology: `with generating set $S$' $\to$ `over $S$'.
 \item Notation: if $L$ denotes literals, then it doesn't denote a generating
   set. Literals should be $U$.
 \end{itemize}
+
+\begin{table}
+  \caption{(in the same order)}
+  \centering
+  \begin{tabular}{lcc}
+    \toprule
+    & Set-theoretic notation & Boolean-algebraic notation \\
+    \midrule
+    Atoms (elements of $U$) & $a, b$ & $a, b$ \\
+    \rowcolor{gray!10} Models (elements of $2^U$) & $\emptyset, \{a\}, \{b\}, \{a, b\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
+    & $\{ \emptyset, \{a\}, \{b\}, \{a, b\} \}$ & $\top$ \\
+    & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{a\}, \{a, b\} \}$ & $\neg a \lor \neg b, a \to b$ \\
+    & $\{ \emptyset, \{b\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ & $b \to a, a \lor b$ \\
+    & $\{\emptyset, \{a\}\}, \{\emptyset, \{b\}\}, \{\emptyset, \{a, b\}\}$ & $\neg b, \neg a, a \leftrightarrow b$ \\
+    & $\{\{a\}, \{b\}\}, \{\{a\}, \{a, b\}\}, \{\{b\}, \{a, b\}\}$ & $(a \land \neg b) \lor (b \land \neg a), a, b$ \\
+    & $\{\emptyset\}, \{\{a\}\}, \{\{b\}\}, \{\{a, b\}\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
+    \multirow{-7}{*}{Formulas (elements of $2^{2^U}$)} & $\emptyset$ & $\bot$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \begin{definition} \label{def:ba}
   A \emph{Boolean algebra} (BA) is a tuple $(\mathbf{B}, \land, \lor, \neg, 0,
@@ -212,25 +224,6 @@ are \emph{disjoint} if $a \land b = 0$.
   for all $x \ne 0$, then $m$ is \emph{strictly positive}.
 \end{definition}
 
-\begin{definition}[\cite{givant2008introduction}]
-  Let $\mathbf{A}$ and $\mathbf{B}$ be BAs. A \emph{(Boolean) homomorphism} from
-  $\mathbf{A}$ to $\mathbf{B}$ is a map $f\colon \mathbf{A} \to \mathbf{B}$ such
-  that:
-  \begin{itemize}
-  \item $f(x \land y) = f(x) \land f(y)$,
-  \item $f(x \lor y) = f(x) \lor f(y)$,
-  \item $f(\neg x) = \neg f(x)$
-  \end{itemize}
-  for all $x, y \in \mathbf{A}$.
-\end{definition}
-
-\begin{lemma}[Homomorphisms preserve order
-  \cite{givant2008introduction}] \label{lemma:homomorphisms_and_order}
-  Let $f\colon \mathbf{A} \to \mathbf{B}$ be a homomorphism between two BAs
-  $\mathbf{A}$ and $\mathbf{B}$. Then, for any $x, y \in \mathbf{A}$, if $x \le
-  y$, then $f(x) \le f(y)$.
-\end{lemma}
-
 \begin{lemma}[\cite{sikorski1969boolean}] \label{lemma:order}
   For any $a, b \in \mathbf{B}$, $a \le b$ if and only if $a \land \neg b = 0$.
 \end{lemma}
@@ -240,65 +233,88 @@ are \emph{disjoint} if $a \land b = 0$.
   b \in \mathbf{B}$, if $a \le b$, then $m(a) \le m(b)$.
 \end{lemma}
 
-\begin{definition}[\cite{koppelberg1989handbook}]
-  Let $S$ be a set, and let $\mathbf{B}$ be a BA. Then $\mathbf{B}$ is a
-  \emph{free BA over $S$} if there is a map $S \to \mathbf{B}$ such that for any
-  BA $\mathbf{C}$ and map $S \to \mathbf{C}$, there is a unique homomorphism
-  $\mathbf{B} \to \mathbf{C}$ that makes
-  \[
-    \begin{tikzcd}
-      S \ar[rd] \ar[r] & \mathbf{B} \ar[d,dashed] \\
-      & \mathbf{C}.
-    \end{tikzcd}
-  \]
-  commute. A BA $\mathbf{B}$ is \emph{free} if $S$ exists.
+\subsection{The Space of Functions on Boolean Algebras}
+
+\begin{definition}[Operations on functions]
+  Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
+    0}$ be Boolean functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We
+  define the following operations:
+  \begin{description}
+  \item[Addition:] $A+B$ is a function $A+B\colon 2^{X \cup Y} \to
+    \mathbb{R}_{\ge 0}$ such that
+    \[
+      (A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)
+    \]
+    for all $\tau \in 2^{X \cup Y}$.
+  \item[Inverse:] $\overline{A}$ is a function $\overline{A}\colon 2^X \to
+    \mathbb{R}_{\ge 0}$ such that
+    \[
+      \overline{A}(\tau) = 1 - A(\tau)
+    \]
+    for all $\tau \in 2^X$.
+  \item[Multiplication:] $A \cdot B$ is a function $A \cdot B\colon 2^{X \cup Y}
+    \to \mathbb{R}_{\ge 0}$ such that
+    \[
+      (A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau \cap Y)
+    \]
+    for all $\tau \in 2^{X \cup Y}$.
+  \item[Scalar multiplication:] $\alpha A$ is a function $\alpha A\colon 2^X \to
+    \mathbb{R}_{\ge 0}$ such that
+    \[
+      (\alpha A)(\tau) = \alpha \cdot A(\tau)
+    \]
+    for all $\tau \in 2^X$.
+  \item[Projection:] $\exists_xA$ is a function $\exists_xA\colon 2^{X \setminus
+      \{ x \}} \to \mathbb{R}_{\ge 0}$ such that
+    \[
+      (\exists_xA)(\tau) = A(\tau) + A(\tau \cup \{ x \})
+    \]
+    for all $\tau \in 2^{X \setminus \{x \}}$.
+  \end{description}
 \end{definition}
 
-\begin{lemma}[\cite{sikorski1969boolean}] \label{lemma:finite_and_free}
-  A finite BA is free if and only if it has $2^{2^n}$ elements for some $n \in
-  \mathbb{N}$. It then has $2^n$ atoms and $n$ generators.
-\end{lemma}
+\begin{observation}
+  Let $\mathcal{V} = \{ A\colon 2^X \to \mathbb{R}_{\ge 0} \mid X \subseteq U
+  \}$. Then $\mathcal{V}$ is a semi-vector space with three additional
+  operations: inverse, (non-scalar) multiplication, and projection.
+  Specifically, note that both addition and multiplication are both associative
+  and commutative.
+\end{observation}
+
+\begin{definition}[Special functions]
+  \phantom{}
+  \begin{itemize}
+  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\tau) = 1$.
+  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\tau) = 0$.
+  \item constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$,
+    \[
+      [a](\tau) =
+      \begin{cases}
+        1 & \text{if } a \in \tau \\
+        0 & \text{if } a \not\in \tau.
+      \end{cases}
+    \]
+  \end{itemize}
+\end{definition}
+
+\begin{remark}
+  For any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A + \overline{A} = 1$.
+\end{remark}
+
+Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
+$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
 
 \section{Weighted Model Counting as a Measure}
 
 \begin{itemize}
-\item Any function $2^U \to \mathbb{R}_{\ge 0}$ induces a measure on
-  $2^{2^U}$---the full Boolean algebra. This measure is not necessarily
-  probabilistic.
-\item[F2] Need to explain how WMC and NWMC connects to standard definitions of
-  WMC and $\Pr(\phi \mid e) = \WMC(\phi \land e)/\WMC(e)$.
-\item[F2] You need to explain what precisely these mean in logic and models
-  and weight functions are usually defined and understood.
-\item Be careful about mentioning ideals, filters, and quotients.
+\item[F2] Explain with examples: models $=$ elements [atoms] of algebra.
+\item Be careful about mentioning ideals and quotients.
 \item Note that we're going to use logical notation for BAs. Give an example of
   the two notations.
 \end{itemize}
 
-\begin{definition} \label{def:algebra_from_logic}
-  Let $\mathcal{L}$ be a propositional (or first-order) logic, and let
-  $\Delta$ be a theory in $\mathcal{L}$. We can define an equivalence
-  relation on formulas in $\mathcal{L}$ as
-  \[
-    \alpha \sim \beta \quad \text{if and only if} \quad \Delta \vdash \alpha
-    \leftrightarrow \beta
-  \]
-  for all $\alpha, \beta \in \mathcal{L}$. Let $[\alpha]$ denote the equivalence
-  class of $\alpha \in \mathcal{L}$ with respect to $\sim$. We can then let
-  $B(\Delta) = \{ [\alpha] \mid \alpha \in \mathcal{L} \}$ and define the
-  structure of a BA on $B(\Delta)$ as
-  \begin{align*}
-    [\alpha] \lor [\beta] &= [\alpha \lor \beta], \\
-    [\alpha] \land [\beta] &= [\alpha \land \beta], \\
-    \neg[\alpha] &= [\neg\alpha], \\
-    1 &= [\alpha \to \alpha], \\
-    0 &= [\alpha \land \neg\alpha]
-  \end{align*}
-  for all $\alpha, \beta \in \mathcal{L}$. Then $B(\Delta)$ is the
-  \emph{Lindenbaum-Tarski algebra} of $\Delta$
-  \cite{koppelberg1989handbook,tarski1983logic}.
-\end{definition}
-
 \begin{example} \label{example:construction}
+  % TODO: keep this, but might need a lot of editing.
   Let $\mathcal{L}$ be a propositional logic with $p$ and $q$ as its only atoms.
   Then $L = \{ p, q, \neg p, \neg q \}$ is its set of literals. Let $w : L \to
   \mathbb{R}_{\ge 0}$ be the \emph{weight function} defined by
@@ -317,8 +333,8 @@ are \emph{disjoint} if $a \land b = 0$.
     w(p)w(q) + w(p)w(\neg q) = 0.3.
   \]
 
-  The corresponding BA $B(\Delta)$ can then be constructed using
-  \cref{def:algebra_from_logic}. Alternatively, one can first construct the free
+  The corresponding BA $B(\Delta)$ can then be constructed as a
+  Lindenbaum-Tarski algebra. Alternatively, one can first construct the free
   BA generated by the set $\{ p, q \}$ and then take a quotient with respect to
   either the filter generated by $p$ or the ideal\footnote{More details on these
     concepts can be found in many books on BAs
@@ -345,68 +361,29 @@ are \emph{disjoint} if $a \land b = 0$.
   \item Why is Step 1 always possible?
   \item Clarify what $B(L)$ means and whether $B(\Delta)$ is even necessary.
   \item Find a reference for the set/subset thing.
-  \item This should be replaced with inner sums (a.k.a. free products).
-  \item Mention that the subsequent definition can be reduced to a single
-    formula (i.e., without cases).
-  \item Any measure is a WMC measure if all atoms are in $L$.
   \end{itemize}
 }
 
 \begin{definition} \label{def:wmc}
-  Let $\mathbf{B}$ be an atomic BA, and let $M \subset \mathbf{B}$ be its set of
-  atoms. Let $L \subset \mathbf{B}$ be such that every atom $m \in M$ can be
-  uniquely expressed as $m = \bigwedge L'$ for some $L' \subseteq L$, and let
-  $w\colon L \to \mathbb{R}_{\ge 0}$ be arbitrary. The \emph{weighted model
-    count} $\WMC_w\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ is defined as
-  \[
-    \WMC_w(x) = \begin{cases}
-      0 & \text{if } x = 0 \\
-      \prod_{l \in L'} w(l) & \text{if } M \ni x = \bigwedge L' \\
-      \sum_{\text{atoms } a \le x} \WMC_w(a) & \text{otherwise}
-    \end{cases}
-  \]
-  for any $x \in \mathbf{B}$. Furthermore, we define the \emph{normalised
-    weighted model count} $\nWMC_w\colon \mathbf{B} \to [0, 1]$ as $\nWMC_w(x) =
-  \frac{\WMC_w(x)}{\WMC_w(1)}$ for all $x \in \mathbf{B}$. For both $\WMC_w$ and
-  $\nWMC_w$, we will drop the subscript when doing so results in no potential
-  confusion. Finally, we say that a measure $m\colon \mathbf{B} \to
-  \mathbb{R}_{\ge 0}$ is a \emph{WMC measure} (or is \emph{WMC-definable}) if
-  there exists a subset $L \subset \mathbf{B}$ and a weight function $w\colon L
-  \to \mathbb{R}_{\ge 0}$ such that $m = \WMC_w$.
+  Let $U$ be an arbitrary set. Then
+  \begin{itemize}
+  \item a \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$,
+  \item a \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
+      0}$.
+  \item a weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
+    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$.
+  \item every weight function induces a measure:
+    \[
+      M_W(x) = \begin{cases}
+        0 & \text{if } x = \emptyset \\
+        W(u) & \text{if } x = \{ u \} \\
+        \sum_{\{u\} \le x} W(u) & \text{otherwise.}
+      \end{cases}
+    \]
+    The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$
+    with a given definition of $W$ is known as \emph{weighted model counting}.
+  \end{itemize}
 \end{definition}
-
-\begin{theorem}
-  $\WMC$ is a measure, and $\nWMC$ is a probability measure.
-\end{theorem}
-\begin{proof}
-  First, note that $\WMC$ is non-negative and $\WMC(0) = 0$ by definition. Next,
-  let $x, y \in \mathbf{B}$ be such that $x \land y = 0$. We want to show that
-  \begin{equation} \label{eq:additivity_proof}
-    \WMC(x \lor y) = \WMC(x) + \WMC(y).
-  \end{equation}
-  If, say, $x = 0$, then \cref{eq:additivity_proof} becomes
-  \[
-    \WMC(y) = \WMC(0) + \WMC(y) = \WMC(y)
-  \]
-  (and likewise for $y = 0$). Thus we can assume that $x \ne 0 \ne y$ and use
-  \cref{thm:representation} to write
-  \[
-    x = \bigvee_{i \in I} x_i \quad \text{and} \quad y = \bigvee_{j \in J} y_j
-  \]
-  for some sequences of atoms $(x_i)_{i \in I}$ and $(y_j)_{j \in J}$. If
-  $x_{i'} = y_{j'}$ for some $i' \in I$ and $j' \in J$, then
-  \[
-    x \land y = \bigvee_{i \in I} \bigvee_{j \in J} x_i \land y_j = x_{i'} \land
-    y_{j'} \ne 0,
-  \]
-  contradicting the assumption. This is enough to show that
-  \begin{align*}
-    \WMC(x \lor y) &= \WMC\left( \left( \bigvee_{i \in I} x_i \right) \lor \left(\bigvee_{j \in J} y_j \right) \right) = \sum_{i \in I} \WMC(x_i) + \sum_{j \in J} \WMC(y_j) \\
-                   &= \WMC(x) + \WMC(y),
-  \end{align*}
-  finishing the proof that $\WMC$ is a measure. This immediately shows that
-  $\nWMC$ is a probability measure since, by definition, $\nWMC(1) = 1$.
-\end{proof}
 
 Given a theory $\Delta$ in a logic $\mathcal{L}$, the usual way of using WMC to
 compute the probability of a query $q$ is
@@ -421,7 +398,7 @@ In our algebraic formulation, this can be computed in two different ways:
 \end{itemize}
 But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
 
-\section{Limitations of Literal-Based Weighted Model Counting}
+\section{Limitations of Factored Weighted Model Counting}
 
 \begin{itemize}
 \item[F] Give a concrete example of something impossible to represent using WMC.
@@ -433,12 +410,7 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   \item clarify that the factorized definition have is w.r.t. models, in case some
     one gets confused. [It doesn't have to be, if the BA is not free---P.]
   \end{itemize}
-\item What Measures are WMC-Definable: proofs need to be updated and
-  propositions could be phrased in a better way, but the gist should be the
-  same.
 \end{itemize}
-
-\subsection{WMC Requires Independent Literals}
 
 \begin{lemma} \label{lemma:before_theorem}
   For any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ and elements $a, b
@@ -547,49 +519,11 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   which is trivially true.
 \end{proof}
 
-\subsection{Extending the Algebra}
-
-\begin{itemize}
-\item[F2] If you prove (b) above, you could motivate why weights on literals
-  is attractive and whether there is a way to augment the expressivity of WMC
-  while still maintaining literal level weights. Hence this action.
-\item[F2] You need to explain the significance of this result.
-\end{itemize}
-
 Given this requirement for independence, a well-known way to represent
 probability distributions that do not consist entirely of independent variables
 is by adding more literals \cite{DBLP:journals/ai/ChaviraD08}, i.e., extending
 the set $L$ covered by the WMC weight function $w\colon L \to \mathbb{R}_{\ge
-  0}$. Let us translate this idea to the language of BAs.
-
-\begin{theorem} \label{thm:extension}
-  Let $\mathbf{B}$ be a free BA over a finite set $S$, and let $m\colon
-  \mathbf{B} \to \mathbb{R}_{\ge 0}$ be an arbitrary measure. Let $L = \{ s \mid
-  s \in S \} \cup \{ \neg s \mid s \in S \}$. By \cref{lemma:finite_and_free},
-  we know that $\mathbf{B}$ has $n = 2^{|S|}$ atoms. Let $\{a_i\}_{i=1}^n$
-  denote those atoms in some arbitrary order. Let $L' = L \cup \{ \phi_i
-  \}_{i=1}^n \cup \{\neg \phi_i \}_{i=1}^n$ be the set $L$ extended with $2n$
-  new elements. Let $\mathbf{B'}$ be the unique Boolean algebra with $\{ \phi_i
-  \land a_i \}_{i=1}^n \cup \{ \neg \phi_i \land a_i \}_{i=1}^n$ as its set of
-  atoms. Let $\iota\colon \mathbf{B} \hookrightarrow \mathbf{B'}$ be the
-  inclusion homomorphism. Let $w\colon L' \to \mathbb{R}_{\ge 0}$ be defined by
-  \[
-    w(l) = \begin{cases}
-      m(a_i)/2 & \text{if } l = \phi_i \text{ or } l = \neg\phi_i \text{ for
-        some } i \in [n] \\
-      1 & \text{otherwise}
-    \end{cases}
-  \]
-  for all $l \in L'$, and note that this defines a WMC measure $m' =
-  \WMC_{w}\colon \mathbf{B'} \to \mathbb{R}_{\ge 0}$. Then
-  \[
-    m(a) = (m' \circ \iota)(a)
-  \]
-  for all $a \in \mathbf{B}$.
-\end{theorem}
-
-In other words, any measure can be computed using WMC by extending the BA with
-more literals. More precisely, we are given the left-hand column in
+  0}$. More precisely, we are given the left-hand column in
 \[
   \begin{tikzcd}
     \textcolor{red}{\mathbb{R}_{\ge 0}} & & \\
@@ -601,133 +535,13 @@ more literals. More precisely, we are given the left-hand column in
 \]
 and construct the remaining part in such a way that the triangle commutes.
 
-\todo[inline,caption={}]{
-  \begin{itemize}
-  \item Make $J$ depend on $i$.
-  \item Find a reference for this first claim in the following proof.
-  \end{itemize}
-}
-\begin{proof}
-  Since $\mathbf{B}$ is free over $S$, each atom $a_i \in \mathbf{B}$ is an
-  infimum of elements in $L$, i.e.,
-  \[
-    a_i = \bigwedge_{j \in J} a_{i,j}
-  \]
-  for some $\{ a_{i,j} \}_{j \in J} \subset L$. Moreover, each atom $b \in
-  \mathbf{B'}$ can be represented as either $b = \phi_i \land a_i$ or $b =
-  \neg\phi_i \land a_i$ for some atom $a_i \in \mathbf{B}$, also making it an
-  infimum over a subset of $L'$. Then, for any $b \in \mathbf{B}$,
-  \[
-    (m' \circ \iota)(b) = \sum_{\substack{\text{atoms } a_i \in \mathbf{B}:\\
-        \phi_i \land a_i \le \iota(b)}} (w(\phi_i) + w(\neg\phi_i)) \prod_{j \in
-    J} w(a_{i,j}),
-  \]
-  recognising that, for any $\iota(b)$, any atom $a_i \in \mathbf{B}$ satisfies
-  $\phi_i \land a_i \le \iota(b)$ if and only if it satisfies $\neg\phi_i \land
-  a_i \le \iota(b)$. Then, according to the definition of $w$,
-  \[
-    (m' \circ \iota)(b) = \sum_{\substack{\text{atoms } a_i \in \mathbf{B}:\\
-        \phi_i \land a_i \le \iota(b)}} (w(\phi_i) + w(\neg\phi_i)) =
-    \sum_{\substack{\text{atoms } a_i \in \mathbf{B}:\\ \phi_i \land a_i \le
-        \iota(b)}} m(a_i) = m(b),
-  \]
-  provided that
-  \[
-    \phi_i \land a_i \le \iota(b) \quad \text{if and only if} \quad a_i \le b,
-  \]
-  but this is equivalent to
-  \[
-    \phi_i \land a_i = \phi_i \land a_i \land b \quad \text{if and only if}
-    \quad a_i = a_i \land b
-  \]
-  which is true because $\phi_i \not\in L$.
-\end{proof}
-
-Now we can show that the construction in \cref{thm:extension} is smallest
-possible.
-
-\begin{conjecture}
-  Let $\mathbf{B}$ and $\mathbf{B'}$ be Boolean algebras, and $\iota\colon
-  \mathbf{B} \hookrightarrow \mathbf{B'}$ be the inclusion map such that
-  $\mathbf{B}$ is free over $L$, all atoms of $\mathbf{B'}$ can be
-  expressed as meets of elements of $L'$, and the following subset relations are
-  satisfied:
-  \[
-    \begin{tikzcd}
-      \mathbf{B} \ar[r,hookrightarrow,"\iota"] & \mathbf{B'} \\
-      L \arrow[Subset]{u}{} \arrow[Subset]{r}{} & L' \arrow[Subset]{u}{}
-    \end{tikzcd}
-  \]
-  If, for any measure $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$, one can
-  construct a weight function $w\colon L' \to \mathbb{R}_{\ge 0}$ such that the WMC
-  measure $\WMC\colon \mathbf{B'} \to \mathbb{R}_{\ge 0}$ with respect to $w$
-  satisfies
-  \[
-    m = \WMC \circ \iota,
-  \]
-  then $|L' \setminus L| \ge 2^{|L|+1}$.
-\end{conjecture}
-% \begin{proof}
-%   % 1. An atom in B' must have more than just elements of L.
-%   Let $a$ be an atom in $\mathbf{B}$, and let $b$ be an atom in $\mathbf{B'}$
-%   such that $b \le a$. First, let us notice that as long as $|L| \ge
-%   4$\footnote{Note that $|L|$ has to be an even number.}, $b \ne a$. Indeed, let
-%   $p, r, \neg p, \neg r \in L$. Then
-%   \begin{align*}
-%     (\WMC \circ \iota)(p \land r) &= w(p)w(r), \\
-%     (\WMC \circ \iota)(p \land \neg r) &= w(p)w(\neg r), \\
-%     (\WMC \circ \iota)(\neg p \land r) &= w(\neg p)w(r), \\
-%     (\WMC \circ \iota)(\neg p \land \neg r) &= w(\neg p)w(\neg r), \\
-%   \end{align*}
-%   But then we have that
-%   \[
-%     \frac{m(p \land r)}{m(\neg p \land r)} = \frac{w(p)}{w(\neg p)} =
-%     \frac{m(p \land \neg r)}{m(\neg p \land \neg r)}.
-%   \]
-%   This places a condition on $m$, contradicting the assumption that the
-%   construction works for an arbitrary $m$. Hence $b < a$.
-
-%   Second, we can show that if $b = a \land \bigwedge_{i = 1}^k \phi_i$ for some
-%   positive integer $k$, then there must also be $2^k - 1$ other atoms in
-%   $\mathbf{B'}$ that correspond to every possible way to negate a subset of
-%   $\phi_i$'s, i.e., ranging from
-
-%   % 2. If we add phi, then we must also add -phi.
-%   % 3. Extension to multiple literals: we must have all (2^n) combinations of
-%   % added literals).
-%   % 4. Profit
-% \end{proof}
-
-Let us note how our lower bound on the number of added literals compares to two
-methods of translating a discrete probability distribution into a WMC problem
-over a propositional knowledge base proposed by Darwiche
-\cite{DBLP:conf/kr/Darwiche02} and Sang et al. \cite{DBLP:conf/aaai/SangBK05}.
-Suppose we have a discrete probability distribution with  $n$ variables, and the
-$i$th variable has $v_i$ values, for each $i \in [n]$. Interpreted as a logical
-system, it has $\prod_{i=1}^n v_i$ models. My expansion would then use
-\[
-  \sum_{i=1}^n v_i + 2\prod_{i=1}^n v_i
-\]
-variables, i.e., a variable for each possible variable-value assignment, and two
-additional variables for each model. Without making any independence
-assumptions, the encoding by Darwiche \cite{DBLP:conf/kr/Darwiche02} would use
-\[
-  \sum_{i=1}^n v_i + \sum_{i=1}^n \prod_{j=1}^i v_j
-\]
-variables, while for the encoding by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
-\[
-  \sum_{i=1}^n v_i + \sum_{i=1}^n (v_i - 1) \prod_{j=1}^{i-1} v_j
-\]
-variables would suffice.
+\todo[inline]{Must quotient the BA w.r.t. some rules.}
 
 \section{Previous Work}
 
 \subsection{Bayesian Network Encodings}
 
 \begin{itemize}
-\item All encodings (including my non-binary encoding) live on a measure Boolean
-  algebra where the measure is not probabilistic (so $\Pr(\neg A) \ne 1 -
-  \Pr(A)$).
 \item \texttt{cd05} relaxes the encoding so much that extra models become
   possible. They are supposed to be filtered out by the algorithm, but mine
   can't do that because it doesn't deal with models. Same for \texttt{cd06}
@@ -746,13 +560,31 @@ variables would suffice.
 
 \subsection{Algebraic Decision Diagrams and ADDMC}
 
-\section{The Algebra of Functions on Boolean Algebras}
+References
+\begin{itemize}
+\item ADDs \cite{DBLP:journals/fmsd/BaharFGHMPS97}
+\item background reading
+  \begin{itemize}
+  \item Compiling Bayesian Networks Using Variable Elimination (Chavira and
+    Darwiche) \cite{DBLP:conf/ijcai/ChaviraD07}
+  \item On the Relationship between Sum-Product Networks and Bayesian Networks
+    (Zhao et al.) \cite{DBLP:conf/icml/ZhaoMP15}
+  \end{itemize}
+\end{itemize}
+
+\section{Encoding Bayesian Networks Using Conditional Weights}
 
 \begin{itemize}
-\item Could clarify why $[\lambda_{X=0}] = \overline{[\lambda_{X=1}]}$. This
-  follows from the definition. Or should I avoid the overline notation?
-\item Prove that we have an algebra of functions with two (?) additional
-  operations. Or maybe just cite the original paper for this.
+
+\item We assume that all variables in the Bayesian network have at least two
+  values.
+\item Have an example of how the ADDs function in this situation. If not for the
+  paper, then at least for slides. Use the framework to check its correctness.
+\item The function $\phi$ created by the algorithm can be seen as a measure on
+  the BA $2^{2^U}$.
+\item We extend the Gaifman graph to add edges when two variables occur in the
+  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
+  B)$).
 \end{itemize}
 
 Let $V$ denote the set of random variables in a Bayesian network. For any random
@@ -763,12 +595,12 @@ $\im X$ denote the set of possible values.
   Let $X \in V$ be a random variable. If $X$ is binary (i.e., $|\im X| = 2$), we
   can arbitrary identify one of the values as $1$ and the other one as $0$ (i.e,
   $\im X \cong \{ 0, 1 \}$). Then $X$ can be represented by a single
-  \emph{indicator variable} $\lambda_{X=1}$. If we interpret
-  $2^{\{\lambda_{X=1}\}}$ as a Boolean algebra, we can let $\lambda_{X=0} =
-  \neg\lambda_{X=1}$ in the algebraic notation, or, equivalently, $\lambda_{X=0}
-  = \emptyset \in 2^{\{\lambda_{X=1}\}}$ in the set-theoretic notation. On the
-  other hand, if $X$ is not binary, we represent $X$ with $|\im X|$ indicator
-  variables, one for each value. We let
+  \emph{indicator variable} $\lambda_{X=1}$. For notational simplicity, for any
+  set $S$, whenever we write $\lambda_{X=0} \in S$ or $S = \{ \lambda_{X=0},
+  \dots \}$, we actually mean $\lambda_{X=1} \not\in S$,
+
+  On the other hand, if $X$ is not binary, we represent $X$ with $|\im X|$
+  indicator variables, one for each value. We let
   \[
     E(X) = \begin{cases}
       \{ \lambda_{X=1} \} & \text{if } |\im X| = 2 \\
@@ -787,86 +619,6 @@ $\im X$ denote the set of possible values.
   denote the set of all indicator variables for all random variables in the
   Bayesian network.
 \end{definition}
-
-\begin{definition}[Operations on functions]
-  Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
-    0}$ be Boolean functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We
-  define the following operations:
-  \begin{description}
-  \item[Addition:] $A+B$ is a function $A+B\colon 2^{X \cup Y} \to
-    \mathbb{R}_{\ge 0}$ such that
-    \[
-      (A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)
-    \]
-    for all $\tau \in 2^{X \cup Y}$.
-  \item[Inverse:] $\overline{A}$ is a function $\overline{A}\colon 2^X \to
-    \mathbb{R}_{\ge 0}$ such that
-    \[
-      \overline{A}(\tau) = 1 - A(\tau)
-    \]
-    for all $\tau \in 2^X$.
-  \item[Multiplication:] $A \cdot B$ is a function $A \cdot B\colon 2^{X \cup Y}
-    \to \mathbb{R}_{\ge 0}$ such that
-    \[
-      (A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau \cap Y)
-    \]
-    for all $\tau \in 2^{X \cup Y}$.
-  \item[Scalar multiplication:] $\alpha A$ is a function $\alpha A\colon 2^X \to
-    \mathbb{R}_{\ge 0}$ such that
-    \[
-      (\alpha A)(\tau) = \alpha \cdot A(\tau)
-    \]
-    for all $\tau \in 2^X$.
-  \item[Projection:] $\exists_xA$ is a function $\exists_xA\colon 2^{X \setminus
-      \{ x \}} \to \mathbb{R}_{\ge 0}$ such that
-    \[
-      (\exists_xA)(\tau) = A(\tau) + A(\tau \cup \{ x \})
-    \]
-    for all $\tau \in 2^{X \setminus \{x \}}$.
-  \end{description}
-\end{definition}
-Note that both addition and multiplication commute.
-
-\begin{definition}[Special functions]
-  \phantom{}
-  \begin{itemize}
-  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\tau) = 1$.
-  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\tau) = 0$.
-  \item constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$,
-    \[
-      [a](\tau) =
-      \begin{cases}
-        1 & \text{if } a \in \tau \\
-        0 & \text{if } a \not\in \tau.
-      \end{cases}
-    \]
-  \end{itemize}
-\end{definition}
-
-\begin{remark}
-  For any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A + \overline{A} = 1$.
-\end{remark}
-
-Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
-$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
-
-\section{Encoding Bayesian Networks Using Conditional Measures}
-
-\begin{itemize}
-\item We assume that the first literal after `w' is positive.
-\item The last two numbers are the positive and the negative probabilities,
-  respectively---sometimes they add to one, and sometimes the negative
-  probability is one, regardless of the value of the first probability.
-\item We assume that all variables in the Bayesian network have at least two
-  values.
-\item Have an example of how the ADDs function in this situation. If not for the
-  paper, then at least for slides. Use the framework to check its correctness.
-\item The function $\phi$ created by the algorithm can be seen as a measure on
-  the BA $2^U$.
-\item We extend the Gaifman graph to add edges when two variables occur in the
-  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
-  B)$).
-\end{itemize}
 
 \begin{algorithm}
   $\phi \gets 1$\;
@@ -905,19 +657,16 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   is such that for any $x \in \im X$ and $(y_1, \dots, y_n) \in \prod_{i=1}^n
   \im Y_i$,
   \[
-    \mathrm{CPT}_X \left( \lambda_{X=x} \land \bigwedge_{i=1}^n
-      \lambda_{Y_i=y_i} \right) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
+    \mathrm{CPT}_X (\{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1,
+    \dots, n \}) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
   \]
 \end{lemma}
 \begin{proof}
-  Let
-  \[
-    \tau = \lambda_{X=x} \land \bigwedge_{i=1}^n \lambda_{Y_i=y_i}.
-  \]
-  If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im Y_i|$
-  terms, one for each possible assignment of values to variables $X, Y_1, \dots,
-  Y_n$. Exactly one of these terms is nonzero when applied to $\tau$, and it is
-  equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
+  Let $\tau = \{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1, \dots, n
+  \}$. If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im
+  Y_i|$ terms, one for each possible assignment of values to variables $X, Y_1,
+  \dots, Y_n$. Exactly one of these terms is nonzero when applied to $\tau$, and
+  it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
 
   If $X$ is not binary, then
   \[
@@ -941,20 +690,17 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   \[
     \phi(\tau) =
     \begin{cases}
-      \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } \tau = \bigwedge_{i=1}^n
-      \lambda_{X_i = x_i} \text{ for some } (x_1, \dots, x_n) \in \prod_{i=1}^n
-      \im X_i \\
+      \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } \tau = \{ \lambda_{X_i=x_i}
+      \mid i = 1, \dots, n \} \text{ for some } (x_1, \dots, x_n) \in
+      \prod_{i=1}^n \im X_i \\
       0 & \text{otherwise,}
     \end{cases}
   \]
   for all $\tau \in 2^U$.
 \end{proposition}
 \begin{proof}
-  If
-  \[
-    \tau = \bigwedge_{X \in V} \lambda_{X = v_X}
-  \]
-  for some $(v_X)_{X \in V} \in \prod_{X \in V} \im X$, then
+  If $\tau = \{ \lambda_{X=v_X} \mid X \in V \}$ for some $(v_X)_{X \in V} \in
+  \prod_{X \in V} \im X$, then
   \[
     \phi(\tau) = \prod_{X \in V} \Pr \left( X=v_X \;\middle|\; \bigwedge_{Y \in
         \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X \in V} X=v_X
@@ -1088,6 +834,10 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   with each $\lambda$ replaced with a unique positive integer.
 \end{example}
 
+The last two numbers are the positive and the negative probabilities,
+respectively---sometimes they add to one, and sometimes the negative probability
+is one, regardless of the value of the first probability.
+
 \section{Experimental Comparison}
 
 \begin{itemize}
@@ -1173,11 +923,14 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
 \section{Conclusion and Future Work}
 
 \begin{itemize}
+\item Bayesian networks and ADDMC are only particular examples. This should also
+  work with Cachet.
 \item Extra benefit: one does not need to come up with a way to turn some
   probability distribution to into a fully independent one.
 \item Important future work: replacing ADDs with
-  AADDs\footnote{\url{https://github.com/ssanner/dd-inference}} is likely to
-  bring performance benefits. Other extensions:
+  AADDs\footnote{\url{https://github.com/ssanner/dd-inference}}
+  \cite{DBLP:conf/ijcai/SannerM05} is likely to bring performance benefits.
+  Other extensions:
   \begin{itemize}
   \item FOADDs can represent first order statements;
   \item XADDs can replace WMI for continuous variables;
