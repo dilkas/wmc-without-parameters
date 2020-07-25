@@ -124,89 +124,43 @@
   $\mathbb{R}_{\ge 0}$ instead of $[0, 1]$.
 \end{itemize}
 
-\section{Preliminaries}
+\section{Boolean Algebras and Power Sets}
 
-\begin{itemize}
-\item Make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x, y$?).
-\item Terminology: `with generating set $S$' $\to$ `over $S$'.
-\item Notation: if $L$ denotes literals, then it doesn't denote a generating
-  set. Literals should be $U$.
-\item Describe the parallel between BAs and powersets.
-\item Describe \cref{tbl:notation_example} as an example. We will use
-  set-theoretic notation for $2^U$ and Boolean-algebraic notation for $2^{2^U}$
-  (except for atoms).
-\end{itemize}
+\todo[inline]{
+  Notation: make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x,
+  y$?).
+}
 
 \begin{table}
-  \caption{(in the same order)}
-  \label{tbl:notation_example}
   \centering
-  \begin{tabular}{lcc}
+  \caption{A comparison of Boolean-algebraic (BA) and set-theoretic (ST)
+    concepts for $2^X$ for some set $X$}
+  \label{tbl:notation}
+  \begin{tabular}{lccl}
     \toprule
-    & Set-theoretic notation & Boolean-algebraic notation \\
+    BA name & BA symbol & ST symbol & ST name \\
     \midrule
-    Atoms (elements of $U$) & $a, b$ & $a, b$ \\
-    \rowcolor{gray!10} Models (elements of $2^U$) & $\emptyset, \{a\}, \{b\}, \{a, b\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
-    & $\{ \emptyset, \{a\}, \{b\}, \{a, b\} \}$ & $\top$ \\
-    & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{a\}, \{a, b\} \}$ & $\neg a \lor \neg b, a \to b$ \\
-    & $\{ \emptyset, \{b\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ & $b \to a, a \lor b$ \\
-    & $\{\emptyset, \{a\}\}, \{\emptyset, \{b\}\}, \{\emptyset, \{a, b\}\}$ & $\neg b, \neg a, a \leftrightarrow b$ \\
-    & $\{\{a\}, \{b\}\}, \{\{a\}, \{a, b\}\}, \{\{b\}, \{a, b\}\}$ & $(a \land \neg b) \lor (b \land \neg a), a, b$ \\
-    & $\{\emptyset\}, \{\{a\}\}, \{\{b\}\}, \{\{a, b\}\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
-    \multirow{-7}{*}{Formulas (elements of $2^{2^U}$)} & $\emptyset$ & $\bot$ \\
+    bottom & $\bot$ & $\emptyset$ & empty set \\
+    top & $\top$ & $X$ & \\
+    meet, and & $\land$ & $\cap$ & intersection \\
+    join, or & $\lor$ & $\cup$ & union \\
+    complement, not & $\neg$ & $^c$ & complement \\
+            & $\le$ & $\subseteq$ & subset relation, set inclusion \\
+    atom & & & singleton, unit set \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Consider the Boolean algebra $(2^{2^U}, \land, \lor, \neg, \bot, \top)$. A
-partial order $\le$ on $2^{2^U}$ is defined by $a \le b$ if $a = b \land a$ (or,
-equivalently, $a \lor b = b$) for all $a, b \in 2^{2^U}$.
-
-\begin{definition}[\cite{DBLP:books/daglib/0090259,levasseur2012applied}]
-  An element $a \ne 0$ of $2^{2^U}$ is an \emph{atom} if, for all $x \in
-  2^{2^U}$, either $x \land a = a$ or $x \land a = 0$. Equivalently, $a \ne 0$
-  is an atom if there is no $x \in \mathbf{B}$ such that $0 < x < a$.
-  Equivalently, $a \ne 0$ is an atom if $|a| = 1$, i.e., $a = \{ u \}$ for some
-  $u \in 2^U$ (this is how we will denote atoms in the remainder of the paper).
-  Note that atoms in Boolean algebras correspond to models.
-\end{definition}
-
-\begin{lemma}[\cite{givant2008introduction}] \label{thm:representation}
-  The following are equivalent:
-  \begin{itemize}
-  \item $\mathbf{B}$ is atomic.
-  \item For any $x \in \mathbf{B}$, $x = \bigvee_{\text{atoms } a \le x} a$.
-  \item $1$ is the supremum of all atoms.
-  \end{itemize}
-\end{lemma}
-
-\begin{definition}[\cite{gaifman1964concerning,DBLP:books/daglib/0090259}] \label{def:measure}
-  A \emph{measure} on $\mathbf{B}$ is a function $m\colon
-  \mathbf{B} \to \mathbb{R}_{\ge 0}$ such that:
-  \begin{itemize}
-  \item $m(0) = 0$;
-  \item $m(a \lor b) = m(a) + m(b)$ for all $a, b \in \mathbf{B}$ whenever $a
-    \land b = 0$.
-  \end{itemize}
-  If $m(1) = 1$, we call $m$ a \emph{probability measure}. Also, if $m(x) > 0$
-  for all $x \ne 0$, then $m$ is \emph{strictly positive}.
-\end{definition}
-
-\begin{lemma}[\cite{sikorski1969boolean}] \label{lemma:order}
-  For any $a, b \in \mathbf{B}$, $a \le b$ if and only if $a \land \neg b = 0$.
-\end{lemma}
-
-\begin{lemma}[\cite{givant2008introduction}] \label{lemma:measure_and_order}
-  Let $m\colon \mathbf{B} \to \mathbb{R}_{\ge 0}$ be a measure. Then for all $a,
-  b \in \mathbf{B}$, if $a \le b$, then $m(a) \le m(b)$.
-\end{lemma}
+Let $X$ be a set and let $2^X$ be its power set. We can equivalently interpret
+$2^X$ as a Boolean algebra. See \cref{tbl:notation} for a summary of the
+differences in terminology and notation. We will use both.
 
 \subsection{The Space of Functions on Boolean Algebras}
 
 \begin{definition}[Operations on functions]
   Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
-    0}$ be Boolean functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We
-  define the following operations:
+    0}$ be arbitrary functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$.
+  We define the following operations:
   \begin{description}
   \item[Addition:] $A+B$ is a function $A+B\colon 2^{X \cup Y} \to
     \mathbb{R}_{\ge 0}$ such that
@@ -242,9 +196,9 @@ equivalently, $a \lor b = b$) for all $a, b \in 2^{2^U}$.
 \end{definition}
 
 \begin{observation}
-  Let $\mathcal{V} = \{ A\colon 2^X \to \mathbb{R}_{\ge 0} \mid X \subseteq U
-  \}$. Then $\mathcal{V}$ is a semi-vector space with three additional
-  operations: inverse, (non-scalar) multiplication, and projection.
+  Let $U$ be a set, and $\mathcal{V} = \{ A\colon 2^X \to \mathbb{R}_{\ge 0}
+  \mid X \subseteq U \}$. Then $\mathcal{V}$ is a semi-vector space with three
+  additional operations: inverse, (non-scalar) multiplication, and projection.
   Specifically, note that both addition and multiplication are both associative
   and commutative.
 \end{observation}
@@ -252,119 +206,129 @@ equivalently, $a \lor b = b$) for all $a, b \in 2^{2^U}$.
 \begin{definition}[Special functions]
   \phantom{}
   \begin{itemize}
-  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\tau) = 1$.
-  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\tau) = 0$.
-  \item constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$,
-    \[
-      [a](\tau) =
-      \begin{cases}
-        1 & \text{if } a \in \tau \\
-        0 & \text{if } a \not\in \tau.
-      \end{cases}
-    \]
+  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\emptyset) = 1$.
+  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\emptyset) = 0$.
+  \item constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$, $[a](\emptyset) =
+    0$, $[a](\{a\}) = 1$.
   \end{itemize}
 \end{definition}
+
+Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
+$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
 
 \begin{remark}
   For any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A + \overline{A} = 1$.
 \end{remark}
 
-Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
-$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
-
 \section{Weighted Model Counting as a Measure}
 
 \begin{itemize}
-\item[F2] Explain with examples: models $=$ elements [atoms] of algebra.
-\item Be careful about mentioning ideals and quotients.
+\item Describe \cref{tbl:notation_example} as an example.
+\item[F] Feedback: explain with examples: models $=$ atoms of algebra, formulas
+  $=$ all elements.
 \end{itemize}
 
 \begin{definition} \label{def:wmc}
-  Let $U$ be an arbitrary set. Then
+  Let $U$ be a set.
   \begin{itemize}
-  \item a \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$,
-  \item a \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
-      0}$.
-  \item a weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
-    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$.
-  \item every weight function induces a measure:
+  \item A \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$
+    such that $M(\bot) = 0$ and
     \[
-      M_W(x) = \begin{cases}
-        0 & \text{if } x = \bot \\
-        W(u) & \text{if } x = \{ u \} \\
-        \sum_{\{u\} \le x} W(u) & \text{otherwise.}
-      \end{cases}
+      M(a \lor b) = M(a) + M(b)
     \]
-    The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$
-    with a given definition of $W$ is known as \emph{weighted model counting}.
+    for all $a, b \in 2^{2^U}$ whenever $a \land b = \bot$.
+  \item A \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
+      0}$.
+  \item A weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
+    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$.
   \item A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
     \emph{factorable} if there exists a factored weight function $W\colon 2^U
     \to \mathbb{R}_{\ge 0}$ that induces $M$.
   \end{itemize}
 \end{definition}
 
-\begin{example} \label{example:construction}
-  Let $\mathcal{L}$ be a propositional logic with $p$ and $q$ as its only atoms.
-  Then $L = \{ p, q, \neg p, \neg q \}$ is its set of literals. Let $w : L \to
-  \mathbb{R}_{\ge 0}$ be the \emph{weight function} defined by
+\begin{proposition}
+  Every weight function induces a measure:
+  \[
+    M_W(x) = \begin{cases}
+      0 & \text{if } x = \bot \\
+      W(u) & \text{if } x = \{ u \} \\
+      \sum_{\{u\} \le x} W(u) & \text{otherwise.}
+    \end{cases}
+  \]
+\end{proposition}
+The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$ with a
+given definition of $W$ is known as \emph{weighted model counting}.
+\begin{proof}
+  \todo[inline]{Prove that $M_W$ satisfies the definition of a measure.}
+\end{proof}
+
+\begin{table}
+  \caption{(in the same order)}
+  \label{tbl:notation_example}
+  \centering
+  \begin{tabular}{lcc}
+    \toprule
+    & Set-theoretic notation & Boolean-algebraic notation \\
+    \midrule
+    Atoms (elements of $U$) & $a, b$ & $a, b$ \\
+    \rowcolor{gray!10} Models (elements of $2^U$) & $\emptyset, \{a\}, \{b\}, \{a, b\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
+    & $\{ \emptyset, \{a\}, \{b\}, \{a, b\} \}$ & $\top$ \\
+    & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{a\}, \{a, b\} \}$ & $\neg a \lor \neg b, a \to b$ \\
+    & $\{ \emptyset, \{b\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ & $b \to a, a \lor b$ \\
+    & $\{\emptyset, \{a\}\}, \{\emptyset, \{b\}\}, \{\emptyset, \{a, b\}\}$ & $\neg b, \neg a, a \leftrightarrow b$ \\
+    & $\{\{a\}, \{b\}\}, \{\{a\}, \{a, b\}\}, \{\{b\}, \{a, b\}\}$ & $(a \land \neg b) \lor (b \land \neg a), a, b$ \\
+    & $\{\emptyset\}, \{\{a\}\}, \{\{b\}\}, \{\{a, b\}\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
+    \multirow{-7}{*}{Formulas (elements of $2^{2^U}$)} & $\emptyset$ & $\bot$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{example}[Relation to the classical view of WMC] \label{example:construction}
+  Let $\mathcal{L}$ be a propositional logic with a set of atoms $U = \{ p, q
+  \}$. Let $w : \{ p, q, \neg p, \neg q \} \to \mathbb{R}_{\ge 0}$ be the
+  \emph{weight function} defined by
   \begin{align*}
-    w(p) = 0.3, \\
-    w(\neg p) = 0.7, \\
-    w(q) = 0.2, \\
-    w(\neg q) = 0.8.
+    w(p) = 0.3, \quad w(\neg p) = 0.7, \quad w(q) = 0.2, \quad w(\neg q) = 0.8.
   \end{align*}
   Let $\Delta$ be a theory in $\mathcal{L}$ with a sole axiom $p$. Then
   $\Delta$ has two models, i.e., $\{ p, q \}$ and $\{ p, \neg q \}$. The
-  \emph{weighted model count} (WMC) \cite{DBLP:journals/ai/ChaviraD08} of $\Delta$ is
-  then
-  \[
+  \emph{weighted model count} (WMC) \cite{DBLP:journals/ai/ChaviraD08} of
+  $\Delta$ is then
+  \begin{equation} \label{eq:wmc_example}
     \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) =
     w(p)w(q) + w(p)w(\neg q) = 0.3.
+  \end{equation}
+
+  Alternatively, we can define $W_p\colon 2^{\{p\}} \to \mathbb{R}_{\ge 0}$ as
+  \[
+    W_p(\{ p \}) = 0.3, \quad W_p(\emptyset) = 0.7
   \]
-
-  The corresponding BA $B(\Delta)$ can then be constructed as a
-  Lindenbaum-Tarski algebra. Alternatively, one can first construct the free
-  BA generated by the set $\{ p, q \}$ and then take a quotient with respect to
-  either the filter generated by $p$ or the ideal\footnote{More details on these
-    concepts can be found in many books on BAs
-    \cite{givant2008introduction,koppelberg1989handbook}.} generated by $\neg
-  p$.
-
-  Each element of $B(\mathcal{L})$ can also be seen as a subset of the set of
-  all models of $\mathcal{L}$, with $0$ representing $\emptyset$, $1$
-  representing the set of all (four) models, each atom representing a single
-  model, and each edge going upward representing a subset relation. Thus,
-  the Boolean-algebraic way of calculating the WMC of $\Delta$ consists of:
-  \begin{enumerate}
-  \item Identifying an element $a \in B(\mathcal{L})$ that corresponds to
-    $\Delta$.
-  \item Finding all atoms of $B(\mathcal{L})$ that are `dominated' by $a$
-    according to the partial order.
-  \item Using $w$ to calculate the weight of each such atom.
-  \item Adding the weights of these atoms.
-  \end{enumerate}
-  This motivates the following definition of WMC generalised to BAs.
+  and $W_q\colon 2^{\{q\}} \to \mathbb{R}_{\ge 0}$ as
+  \[
+    W_q(\{ q \}) = 0.2, \quad W_q(\emptyset) = 0.8.
+  \]
+  Let $M$ be the measure on $2^{2^U}$ induced by $W = W_p \cdot W_q$. Then,
+  equivalently to \cref{eq:wmc_example}, we can write
+  \[
+    M(p) = W(\{ p, q \}) + W(\{ p, \neg q \}) = W_p(\{p\})W_q(\{q\}) +
+    W_p(\{p\})W_q(\{\neg q\}) = 0.3.
+  \]
 \end{example}
-\todo[inline,caption={}]{
-  \begin{itemize}
-  \item Why is Step 1 always possible?
-  \item Clarify what $B(L)$ means and whether $B(\Delta)$ is even necessary.
-  \item Find a reference for the set/subset thing.
-  \end{itemize}
-}
 
+For the rest of the paper, we let $U$ be the set of (logical) atoms. We use
+set-theoretic notation for $2^U$ and Boolean-algebraic notation for $2^{2^U}$,
+except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some
+model $x \in 2^U$.
+
+\todo[inline]{Include this in the example.}
 Given a theory $\Delta$ in a logic $\mathcal{L}$, the usual way of using WMC to
 compute the probability of a query $q$ is
 \cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
 \[
   \Pr_{\Delta, w}(q) = \frac{\WMC_w(\Delta \land q)}{\WMC_w(\Delta)}.
 \]
-In our algebraic formulation, this can be computed in two different ways:
-\begin{itemize}
-\item as $\frac{\WMC_w(\Delta \land q)}{\WMC_w(\Delta)}$ in $B(\mathcal{L})$,
-\item and as $\nWMC_w([q])$ in $B(\Delta)$.
-\end{itemize}
-But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
+In our algebraic formulation, this can be computed...
 
 \section{Limitations of Factorable Measures}
 
@@ -446,7 +410,8 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   \[
     M_W(a) = \prod_{u \in U} W_u(a_u) = \prod_{u \in U} M(a_u) = M
     \left(\bigwedge_{u \in U} a_u \right) = M(a)
-  \] % TODO: by what?
+  \]
+  \todo{by what?}
   by \cref{def:wmc,eq:wmccondition,eq:def_of_a}. Finally, note that if $M_W$ and
   $M$ agree on all atoms, then they must also agree on all other non-zero
   elements of the Boolean algebra.
@@ -483,35 +448,11 @@ But how does the measure defined on $B(\mathcal{L})$ transfer to $B(\Delta)$?
   which is trivially true.
 \end{proof}
 
-Given this requirement for independence, a well-known way to represent
-probability distributions that do not consist entirely of independent variables
-is by adding more literals \cite{DBLP:journals/ai/ChaviraD08}, i.e., extending
-the set $L$ covered by the WMC weight function $w\colon L \to \mathbb{R}_{\ge
-  0}$. More precisely, we are given the left-hand column in
-\[
-  \begin{tikzcd}
-    \textcolor{red}{\mathbb{R}_{\ge 0}} & & \\
-    \textcolor{red}{\mathbf{B}} \arrow[red]{u}{m} \ar[r,hookrightarrow,"\iota"]
-    & \mathbf{B'} \arrow{lu}[swap]{m'} & \\
-    \textcolor{red}{L} \ar[u,red,hookrightarrow] \ar[r,hookrightarrow] & L'
-    \ar[u,hookrightarrow] \arrow{r}{w} & \mathbb{R}_{\ge 0}
-  \end{tikzcd}
-\]
-and construct the remaining part in such a way that the triangle commutes.
-
-\todo[inline]{Must quotient the BA w.r.t. some rules.}
-
 \section{Previous Work}
 
 \subsection{Bayesian Network Encodings}
 
 \begin{itemize}
-\item \texttt{cd05} relaxes the encoding so much that extra models become
-  possible. They are supposed to be filtered out by the algorithm, but mine
-  can't do that because it doesn't deal with models. Same for \texttt{cd06}
-  because it's based on \texttt{cd05}.
-\item \texttt{sbk05} uses my trick with dividing probabilities. That could
-  explain small inaccuracies in its answers.
 \item Encodings:
   \begin{itemize}
   \item \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}
@@ -520,6 +461,12 @@ and construct the remaining part in such a way that the triangle commutes.
   \item \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06} (supposed to be the best)
   \item \texttt{db20} (mine)
   \end{itemize}
+\item \texttt{cd05} relaxes the encoding so much that extra models become
+  possible. They are supposed to be filtered out by the algorithm, but mine
+  can't do that because it doesn't deal with models. Same for \texttt{cd06}
+  because it's based on \texttt{cd05}.
+\item \texttt{sbk05} uses my trick with dividing probabilities. That could
+  explain small inaccuracies in its answers.
 \end{itemize}
 
 \subsection{Algebraic Decision Diagrams and ADDMC}
@@ -882,7 +829,7 @@ is one, regardless of the value of the first probability.
 
 \todo[inline]{Calculate numVariables/numClauses (or the other way around) for
   each instance and plot this ratio vs runtime (for each encoding, or at least
-  mine and D02)}
+  mine and D02). The new CP paper kind of beat me to it...}
 
 \section{Conclusion and Future Work}
 
