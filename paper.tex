@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{hyperref}
+\usepackage[ruled,vlined]{algorithm2e}
 \usepackage[capitalise]{cleveref}
 \usepackage{bm}
 \usepackage{booktabs}
@@ -16,7 +17,6 @@
 \usepackage[backgroundcolor=lightgray]{todonotes}
 \usepackage{complexity}
 \usepackage{soul}
-\usepackage[ruled,vlined]{algorithm2e}
 \usepackage{subcaption}
 \usepackage{multirow}
 
@@ -222,11 +222,9 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
 
 \section{Weighted Model Counting as a Measure}
 
-\begin{itemize}
-\item Describe \cref{tbl:notation_example} as an example.
-\item[F] Feedback: explain with examples: models $=$ atoms of algebra, formulas
-  $=$ all elements.
-\end{itemize}
+\todo[inline]{Describe \cref{tbl:notation_example} as an example.}
+\todo[inline]{Feedback: explain with examples: models $=$ atoms of algebra,
+  formulas $=$ all elements.}
 
 \begin{definition} \label{def:wmc}
   Let $U$ be a set.
@@ -247,21 +245,25 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   \end{itemize}
 \end{definition}
 
-\begin{proposition}
-  Every weight function induces a measure:
+\begin{proposition} \label{prop:measure}
+  Every weight function induces a measure, i.e, for any weight function $W\colon
+  2^U \to \mathbb{R}_{\ge 0}$, the function $M_W\colon 2^{2^U} \to
+  \mathbb{R}_{\ge 0}$, defined as
   \[
     M_W(x) = \begin{cases}
       0 & \text{if } x = \bot \\
       W(u) & \text{if } x = \{ u \} \\
-      \sum_{\{u\} \le x} W(u) & \text{otherwise.}
+      \sum_{\{u\} \le x} W(u) & \text{otherwise,}
     \end{cases}
   \]
+  is a measure.
 \end{proposition}
-The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$ with a
-given definition of $W$ is known as \emph{weighted model counting}.
 \begin{proof}
   \todo[inline]{Prove that $M_W$ satisfies the definition of a measure.}
 \end{proof}
+
+The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$ with a
+given definition of $W$ is known as \emph{weighted model counting}.
 
 \begin{table}
   \caption{(in the same order)}
@@ -296,8 +298,7 @@ given definition of $W$ is known as \emph{weighted model counting}.
   \emph{weighted model count} (WMC) \cite{DBLP:journals/ai/ChaviraD08} of
   $\Delta$ is then
   \begin{equation} \label{eq:wmc_example}
-    \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) =
-    w(p)w(q) + w(p)w(\neg q) = 0.3.
+    \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) = w(p)w(q) + w(p)w(\neg q) = 0.3.
   \end{equation}
 
   Alternatively, we can define $W_p\colon 2^{\{p\}} \to \mathbb{R}_{\ge 0}$ as
@@ -311,24 +312,23 @@ given definition of $W$ is known as \emph{weighted model counting}.
   Let $M$ be the measure on $2^{2^U}$ induced by $W = W_p \cdot W_q$. Then,
   equivalently to \cref{eq:wmc_example}, we can write
   \[
-    M(p) = W(\{ p, q \}) + W(\{ p, \neg q \}) = W_p(\{p\})W_q(\{q\}) +
-    W_p(\{p\})W_q(\{\neg q\}) = 0.3.
+    M(p) = W(\{ p, q \}) + W(\{ p \}) = W_p(\{p\})W_q(\{q\}) +
+    W_p(\{p\})W_q(\emptyset) = 0.3.
   \]
+
+  Given the theory $\Delta$, we can compute the probability of a query $q$ as
+  \cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
+  \[
+    \Pr_{\Delta, w}(q) = \frac{\WMC(\Delta \land q)}{\WMC(\Delta)}.
+  \]
+  The same thing can be accomplished using the algebraic formulation, with $M$
+  replacing $\mathrm{WMC}$.
 \end{example}
 
 For the rest of the paper, we let $U$ be the set of (logical) atoms. We use
 set-theoretic notation for $2^U$ and Boolean-algebraic notation for $2^{2^U}$,
 except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some
 model $x \in 2^U$.
-
-\todo[inline]{Include this in the example.}
-Given a theory $\Delta$ in a logic $\mathcal{L}$, the usual way of using WMC to
-compute the probability of a query $q$ is
-\cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
-\[
-  \Pr_{\Delta, w}(q) = \frac{\WMC_w(\Delta \land q)}{\WMC_w(\Delta)}.
-\]
-In our algebraic formulation, this can be computed...
 
 \section{Limitations of Factorable Measures}
 
@@ -383,7 +383,6 @@ In our algebraic formulation, this can be computed...
   transformations are invertible, the two expressions are equivalent.
 \end{proof}
 
-\todo[inline]{This theorem needs a special case for zero weights.}
 \begin{theorem}
   A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is factorable if and only
   if
@@ -394,25 +393,26 @@ In our algebraic formulation, this can be computed...
   \neg v$.
 \end{theorem}
 \begin{proof}
+  \todo[inline]{Check if the proof is valid for zero weights.}
   ($\Leftarrow$) For each $x \in U$, let $W_x\colon 2^{\{x\}} \to
   \mathbb{R}_{\ge 0}$ be defined by $W_x(\{ x \}) = M(x)$ and $W_x(\emptyset) =
   M(\neg x)$. Let $M_W$ be the measure induced by
   \[
     W = \prod_{x \in U} W_x.
   \]
-  We will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by the
-  definitions of both $M_w$ and $M$. Second, let
-  \begin{equation} \label{eq:def_of_a}
+  We will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by
+  \cref{def:wmc,prop:measure}. Second, let
+  \[
     a = \bigwedge_{u \in U} a_u
-  \end{equation}
+  \]
   be an atom in $2^{2^U}$ such that $a_u \in \{ u, \neg u \}$ for all $u \in U$.
   Then
   \[
-    M_W(a) = \prod_{u \in U} W_u(a_u) = \prod_{u \in U} M(a_u) = M
-    \left(\bigwedge_{u \in U} a_u \right) = M(a)
+    M_W(a) = W(\{ a_u \mid u \in U \}) = \prod_{u \in U} W_u(\{a_u\}) = \prod_{u
+      \in U} M(a_u) = M \left(\bigwedge_{u \in U} a_u \right) = M(a)
   \]
-  \todo{by what?}
-  by \cref{def:wmc,eq:wmccondition,eq:def_of_a}. Finally, note that if $M_W$ and
+
+  Finally, note that if $M_W$ and
   $M$ agree on all atoms, then they must also agree on all other non-zero
   elements of the Boolean algebra.
 
@@ -465,15 +465,15 @@ In our algebraic formulation, this can be computed...
   possible. They are supposed to be filtered out by the algorithm, but mine
   can't do that because it doesn't deal with models. Same for \texttt{cd06}
   because it's based on \texttt{cd05}.
-\item \texttt{sbk05} uses my trick with dividing probabilities. That could
-  explain small inaccuracies in its answers.
 \end{itemize}
 
-\subsection{Algebraic Decision Diagrams and ADDMC}
+\subsection{Algebraic Decision Diagrams and Their Use in Probabilistic
+  Inference}
 
-References
+Cover:
 \begin{itemize}
-\item ADDs \cite{DBLP:journals/fmsd/BaharFGHMPS97}
+\item ADDs provide an efficient way to manipulate functions from BAs/power sets
+  \cite{DBLP:journals/fmsd/BaharFGHMPS97}.
 \item background reading
   \begin{itemize}
   \item Compiling Bayesian Networks Using Variable Elimination (Chavira and
@@ -484,19 +484,6 @@ References
 \end{itemize}
 
 \section{Encoding Bayesian Networks Using Conditional Weights}
-
-\begin{itemize}
-
-\item We assume that all variables in the Bayesian network have at least two
-  values.
-\item Have an example of how the ADDs function in this situation. If not for the
-  paper, then at least for slides. Use the framework to check its correctness.
-\item The function $\phi$ created by the algorithm can be seen as a measure on
-  the BA $2^{2^U}$.
-\item We extend the Gaifman graph to add edges when two variables occur in the
-  same CPT (e.g., including the edge from $A$ to $B$ when the CPT is $\Pr(A \mid
-  B)$).
-\end{itemize}
 
 Let $V$ denote the set of random variables in a Bayesian network. For any random
 variable $X \in V$, let $\mathrm{pa}(X)$ denote the set of parents of $X$ and
@@ -532,6 +519,12 @@ $\im X$ denote the set of possible values.
 \end{definition}
 
 \begin{algorithm}
+  \caption{Encoding a Bayesian network as a function $2^U \to \mathbb{R}_{\ge
+      0}$}
+  \label{alg:encoding}
+  \KwData{a Bayesian network with vertices $V$ and probability distribution
+    $\Pr$}
+  \KwResult{a function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$}
   $\phi \gets 1$\;
   \For{$X \in V$}{
     \textit{let} $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$\;
@@ -561,6 +554,10 @@ $\im X$ denote the set of possible values.
   }
   \Return{$\phi$}\;
 \end{algorithm}
+
+\todo[inline]{Describe \cref{alg:encoding}}
+
+\subsection{Proof of Correctness}
 
 \begin{lemma} \label{lemma:cpt}
   Let $X \in V$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
@@ -656,98 +653,118 @@ $\im X$ denote the set of possible values.
   \end{itemize}
 \end{proof}
 
-\begin{example}
-  \begin{figure}
+\subsection{An Example}
+
+\todo[inline]{Reformulate this as a running example throughout the section.}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.2\textwidth}
     \centering
-    \begin{subfigure}{0.2\textwidth}
-      \centering
-      \begin{tikzpicture}
-        \node[latent] (W) {W};
-        \node[latent, below right=of W] (T) {T};
-        \node[latent, below left=of W] (F) {F};
-        \edge {W} {F};
-        \edge {W} {T};
-      \end{tikzpicture}
-    \end{subfigure}%
-    \begin{subfigure}{0.8\textwidth}
-      \centering
-      \begin{tabular}[t]{cc}
-        \toprule
-        $w$ & $\Pr(W = w)$ \\
-        \midrule
-        1 & 0.5 \\
-        0 & 0.5 \\
-        \bottomrule
-      \end{tabular}
-      \begin{tabular}[t]{ccc}
-        \toprule
-        $w$ & $f$ & $\Pr(F = f \mid W = w)$ \\
-        \midrule
-        1 & 1 & 0.6 \\
-        1 & 0 & 0.4 \\
-        0 & 1 & 0.1 \\
-        0 & 0 & 0.9 \\
-        \bottomrule
-      \end{tabular}
-      \begin{tabular}[t]{ccc}
-        \toprule
-        $w$ & $t$ & $\Pr(T = t \mid W = w)$ \\
-        \midrule
-        1 & $l$ & 0.2 \\
-        1 & $m$ & 0.4 \\
-        1 & $h$ & 0.4 \\
-        0 & $l$ & 0.6 \\
-        0 & $m$ & 0.3 \\
-        0 & $h$ & 0.1 \\
-        \bottomrule
-      \end{tabular}
-    \end{subfigure}
-    \caption{An example Bayesian network with its CPTs}
-    \label{fig:example_bn}
-  \end{figure}
+    \begin{tikzpicture}[edge from parent/.style={draw,-latex}]
+      \node[draw,circle] {$W$}
+      child {node[draw,circle] {$F$}}
+      child {node[draw,circle] {$T$}};
+    \end{tikzpicture}
+  \end{subfigure}%
+  \begin{subfigure}{0.8\textwidth}
+    \centering
+    \begin{tabular}[t]{cc}
+      \toprule
+      $w$ & $\Pr(W = w)$ \\
+      \midrule
+      1 & 0.5 \\
+      0 & 0.5 \\
+      \bottomrule
+    \end{tabular}
+    \begin{tabular}[t]{ccc}
+      \toprule
+      $w$ & $f$ & $\Pr(F = f \mid W = w)$ \\
+      \midrule
+      1 & 1 & 0.6 \\
+      1 & 0 & 0.4 \\
+      0 & 1 & 0.1 \\
+      0 & 0 & 0.9 \\
+      \bottomrule
+    \end{tabular}
+    \begin{tabular}[t]{ccc}
+      \toprule
+      $w$ & $t$ & $\Pr(T = t \mid W = w)$ \\
+      \midrule
+      1 & $l$ & 0.2 \\
+      1 & $m$ & 0.4 \\
+      1 & $h$ & 0.4 \\
+      0 & $l$ & 0.6 \\
+      0 & $m$ & 0.3 \\
+      0 & $h$ & 0.1 \\
+      \bottomrule
+    \end{tabular}
+  \end{subfigure}
+  \caption{An example Bayesian network with its CPTs}
+  \label{fig:example_bn}
+\end{figure}
 
-  The Bayesian network in \cref{fig:example_bn} has
-  \begin{align*}
-    V &= \{ W, F, T \}, \\
-    \mathrm{pa}(W) &= \emptyset, \\
-    \mathrm{pa}(F) &= \mathrm{pa}(T) = \{ W \}, \\
-    \im W &= \im F = \{ 0, 1 \}, \\
-    \im T &= \{ l, m, h \}, \\
-    E(W) &= \{ \lambda_{W=1} \}, \\
-    E(F) &= \{ \lambda_{F=1} \}, \\
-    E(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
-    E^*(W) &= \{ \lambda_{W=1} \}, \\
-    E^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
-    E^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}, \\
-    \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
-    \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
-      &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
-    \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots),
-  \end{align*}
-  and can be encoded in a DIMACS-like CNF format as
-  \[
-    \begin{array}{l r r l l}
-      \lambda\sb{T=l} &\lambda\sb{T=m} &\lambda\sb{T=h} & &0 \\
-                      &-\lambda\sb{T=l} &-\lambda\sb{T=m} & &0 \\
-                      &-\lambda\sb{T=l} &-\lambda\sb{T=h} & &0 \\
-                      &-\lambda\sb{T=m} &-\lambda\sb{T=h} & &0 \\
-      w &\lambda\sb{W=1} & &0.5 &0.5 \\
-      w &\lambda\sb{F=1} &\lambda\sb{W=1} &0.6 &0.4 \\
-      w &\lambda\sb{F=1} &-\lambda\sb{W=1} &0.1 &0.9 \\
-      w &\lambda\sb{T=l} &\lambda\sb{W=1} &0.2 &1 \\
-      w &\lambda\sb{T=m} &\lambda\sb{W=1} &0.4 &1 \\
-      w &\lambda\sb{T=h} &\lambda\sb{W=1} &0.4 &1 \\
-      w &\lambda\sb{T=l} &\lambda\sb{W=0} &0.6 &1 \\
-      w &\lambda\sb{T=m} &\lambda\sb{W=0} &0.3 &1 \\
-      w &\lambda\sb{T=h} &\lambda\sb{W=0} &0.1 &1
-    \end{array}
-  \]
-  with each $\lambda$ replaced with a unique positive integer.
-\end{example}
+The Bayesian network in \cref{fig:example_bn} has
+\begin{align*}
+  V &= \{ W, F, T \}, \\
+  \mathrm{pa}(W) &= \emptyset, \\
+  \mathrm{pa}(F) &= \mathrm{pa}(T) = \{ W \}, \\
+  \im W &= \im F = \{ 0, 1 \}, \\
+  \im T &= \{ l, m, h \}, \\
+  E(W) &= \{ \lambda_{W=1} \}, \\
+  E(F) &= \{ \lambda_{F=1} \}, \\
+  E(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
+  E^*(W) &= \{ \lambda_{W=1} \}, \\
+  E^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
+  E^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}, \\
+  \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
+  \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
+    &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
+  \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots),
+\end{align*}
+and can be represented in a textual format as
+\[
+  \begin{array}{l r r l l}
+    \lambda\sb{T=l} &\lambda\sb{T=m} &\lambda\sb{T=h} & &0 \\
+                    &-\lambda\sb{T=l} &-\lambda\sb{T=m} & &0 \\
+                    &-\lambda\sb{T=l} &-\lambda\sb{T=h} & &0 \\
+                    &-\lambda\sb{T=m} &-\lambda\sb{T=h} & &0 \\
+    w &\lambda\sb{W=1} & &0.5 &0.5 \\
+    w &\lambda\sb{F=1} &\lambda\sb{W=1} &0.6 &0.4 \\
+    w &\lambda\sb{F=1} &-\lambda\sb{W=1} &0.1 &0.9 \\
+    w &\lambda\sb{T=l} &\lambda\sb{W=1} &0.2 &1 \\
+    w &\lambda\sb{T=m} &\lambda\sb{W=1} &0.4 &1 \\
+    w &\lambda\sb{T=h} &\lambda\sb{W=1} &0.4 &1 \\
+    w &\lambda\sb{T=l} &\lambda\sb{W=0} &0.6 &1 \\
+    w &\lambda\sb{T=m} &\lambda\sb{W=0} &0.3 &1 \\
+    w &\lambda\sb{T=h} &\lambda\sb{W=0} &0.1 &1
+  \end{array}
+\]
+with each $\lambda$ replaced with a unique positive integer. This format is
+based on the format used by the Cachet solver \cite{DBLP:conf/sat/SangBBKP04}
+to encode WMC problems, which extends the DIMACS format for CNF formulas with
+weight clauses. Subsequently, we extend it in two ways:
+\begin{itemize}
+\item a single weight clause now supports an arbitrary number of literals,
+\item and each weight clause has two probabilities instead of one (i.e., we no
+  longer assume that $\Pr(v) + \Pr(\neg v) = 1$ for all variables $v \in U$).
+\end{itemize}
+The way we use this encoding, it is always the case that either both
+probabilities sum to one, or the second probability (i.e., the probability for
+the complement of the variable) is equal to one.
 
-The last two numbers are the positive and the negative probabilities,
-respectively---sometimes they add to one, and sometimes the negative probability
-is one, regardless of the value of the first probability.
+\subsection{Adjusting ADDMC to Work with the New Format}
+
+ADDMC constructs the \emph{Gaifman graph} of the input CNF formula as an aid for
+the algorithm's heuristics. This graph has as vertices the variables of the
+formula, and there is an edge between two variables $u$ and $v$ if there is a
+clause in the formula that contains both $u$ and $v$. We extend this definition
+to functions on Boolean algebras, i.e., the factors of $\phi$. For any pair of
+distinct variables $u, v \in U$, we draw an edge between them in the Gaifman
+graph if there is a function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ that is a
+factor of $\phi$ such that $u \in X$ and $v \in X$. For instance, a factor such
+as $\mathrm{CPT}_X$ will enable edges between all distinct pairs of variables in
+$E^*(X)$.
 
 \section{Experimental Comparison}
 
