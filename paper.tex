@@ -19,6 +19,7 @@
 \usepackage{soul}
 \usepackage{subcaption}
 \usepackage{multirow}
+\usepackage[binary-units]{siunitx}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{observation}{Observation}
@@ -122,6 +123,7 @@
   \end{itemize}
 \item Intuitively, a measure is just like a probability, except it's in
   $\mathbb{R}_{\ge 0}$ instead of $[0, 1]$.
+\item Somewhere: explain things line CNF, CPT, etc.
 \end{itemize}
 
 \section{Boolean Algebras and Power Sets}
@@ -336,15 +338,18 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 
 \section{Limitations of Factorable Measures}
 
-\begin{itemize}
-\item[F] Give a concrete example of something impossible to represent using WMC.
-\item[F] Can you say something here about factorized vs non-factorized
-  weight function definitions? That is, factorized is when $w$ maps literals to
-  $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
+\todo[inline,caption={}]{
   \begin{itemize}
-  \item come up with nice example when non-factorized weights are intuitive;
+  \item[F] Give a concrete example of something impossible to represent
+    using WMC.
+  \item[F] Can you say something here about factorized vs non-factorized weight
+    function definitions? That is, factorized is when $w$ maps literals to
+    $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
+    \begin{itemize}
+    \item come up with nice example when non-factorized weights are intuitive;
+    \end{itemize}
   \end{itemize}
-\end{itemize}
+}
 
 \begin{lemma} \label{lemma:before_theorem}
   For any measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
@@ -454,10 +459,6 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 
 \subsection{Using WMC to Perform Inference on Bayesian Networks}
 
-\todo[inline]{Provide a reference (and an explanation) for d-DNNF.}
-\todo[inline]{If I'm citing Cachet, then maybe I should also mention what
-  compilation tools they're using in their experiments.}
-
 Hitherto, four techniques have been proposed for encoding Bayesian networks into
 instances of WMC. We will identify them based on the initials of authors as well
 as publications years: \texttt{d02} \cite{DBLP:conf/kr/Darwiche02},
@@ -474,21 +475,23 @@ time). The more recent encoding \texttt{cd05} always compiles faster and results
 in a smaller arithmetic circuit (as measured by the number of edges). In their
 subsequent paper, the same authors perform two sets of experiments (that are
 relevant to this summary) \cite{DBLP:conf/sat/ChaviraD06}. First, they compile
-\texttt{cd05} and \texttt{cd06} encodings into d-DNNF, measuring both
-compilation time and numbers of edges in the d-DNNF diagram. The results are
-mostly in favour of \texttt{cd06}. Second, they compare the inference time of
-\texttt{sbk05} run with Cachet \cite{DBLP:conf/sat/SangBBKP04} with the compile
-times of \texttt{cd05} and \texttt{cd06}, but only on five (types of) instances.
-In these experiments, \texttt{cd06} is always faster than \texttt{cd05}, while
-the comparison with \texttt{sbk05} is mixed. Sometimes \texttt{cd06} is orders
-of magnitude faster than \texttt{sbk05}, sometimes slightly slower. The
-performance difference between \texttt{sbk05} and \texttt{cd05} is even harder
-to judge: \texttt{sbk05} is better on three out of five instances and worse on
-the remaining two. Based on this description, one would expect \texttt{cd06} to
-be faster than both \texttt{cd05} and \texttt{sbk05}, both of which should be
-faster than \texttt{d02}. The experiments in \cref{sec:experiments}, however,
-strongly disagree with this prediction, showing that the quality of an encoding
-depends strongly on the underlying search algorithm or compilation technique.
+\texttt{cd05} and \texttt{cd06} encodings into d-DNNF (i.e., deterministic
+decomposable negation normal form \cite{DBLP:journals/jancl/Darwiche01}),
+measuring both compilation time and numbers of edges in the d-DNNF diagram. The
+results are mostly in favour of \texttt{cd06}. Second, they compare the
+inference time of \texttt{sbk05} run with Cachet \cite{DBLP:conf/sat/SangBBKP04}
+with the compile times of \texttt{cd05} and \texttt{cd06}, but only on five
+(types of) instances. In these experiments, \texttt{cd06} is always faster than
+\texttt{cd05}, while the comparison with \texttt{sbk05} is mixed. Sometimes
+\texttt{cd06} is orders of magnitude faster than \texttt{sbk05}, sometimes
+slightly slower. The performance difference between \texttt{sbk05} and
+\texttt{cd05} is even harder to judge: \texttt{sbk05} is better on three out of
+five instances and worse on the remaining two. Based on this description, one
+would expect \texttt{cd06} to be faster than both \texttt{cd05} and
+\texttt{sbk05}, both of which should be faster than \texttt{d02}. The
+experiments in \cref{sec:experiments}, however, strongly disagree with this
+prediction, showing that the quality of an encoding depends strongly on the
+underlying search algorithm or compilation technique.
 
 \subsection{Algebraic Decision Diagrams and Their Use in Probabilistic
   Inference}
@@ -512,9 +515,66 @@ Cover:
 
 \section{Encoding Bayesian Networks Using Conditional Weights}
 
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.2\textwidth}
+    \centering
+    \begin{tikzpicture}[edge from parent/.style={draw,-latex}]
+      \node[draw,circle] {$W$}
+      child {node[draw,circle] {$F$}}
+      child {node[draw,circle] {$T$}};
+    \end{tikzpicture}
+  \end{subfigure}%
+  \begin{subfigure}{0.8\textwidth}
+    \centering
+    \begin{tabular}[t]{cc}
+      \toprule
+      $w$ & $\Pr(W = w)$ \\
+      \midrule
+      1 & 0.5 \\
+      0 & 0.5 \\
+      \bottomrule
+    \end{tabular}
+    \begin{tabular}[t]{ccc}
+      \toprule
+      $w$ & $f$ & $\Pr(F = f \mid W = w)$ \\
+      \midrule
+      1 & 1 & 0.6 \\
+      1 & 0 & 0.4 \\
+      0 & 1 & 0.1 \\
+      0 & 0 & 0.9 \\
+      \bottomrule
+    \end{tabular}
+    \begin{tabular}[t]{ccc}
+      \toprule
+      $w$ & $t$ & $\Pr(T = t \mid W = w)$ \\
+      \midrule
+      1 & $l$ & 0.2 \\
+      1 & $m$ & 0.4 \\
+      1 & $h$ & 0.4 \\
+      0 & $l$ & 0.6 \\
+      0 & $m$ & 0.3 \\
+      0 & $h$ & 0.1 \\
+      \bottomrule
+    \end{tabular}
+  \end{subfigure}
+  \caption{An example Bayesian network with its CPTs}
+  \label{fig:example_bn}
+\end{figure}
+
 Let $V$ denote the set of random variables in a Bayesian network. For any random
 variable $X \in V$, let $\mathrm{pa}(X)$ denote the set of parents of $X$ and
-$\im X$ denote the set of possible values.
+$\im X$ denote the set of possible values. We will use the Bayesian network in
+\cref{fig:example_bn} (loosely based on an example by Sang et al.
+\cite{DBLP:conf/aaai/SangBK05}) as a running example throughout this section.
+For the Bayesian network in \cref{fig:example_bn}, we have:
+\begin{align*}
+  V &= \{ W, F, T \}, \\
+  \mathrm{pa}(W) &= \emptyset, \\
+  \mathrm{pa}(F) &= \mathrm{pa}(T) = \{ W \}, \\
+  \im W &= \im F = \{ 0, 1 \}, \\
+  \im T &= \{ l, m, h \}.
+\end{align*}
 
 \begin{definition}[Indicator variables]
   Let $X \in V$ be a random variable. If $X$ is binary (i.e., $|\im X| = 2$), we
@@ -544,6 +604,17 @@ $\im X$ denote the set of possible values.
   denote the set of all indicator variables for all random variables in the
   Bayesian network.
 \end{definition}
+
+\todo[inline]{Come up with a less repetitive wording.}
+For the Bayesian network in \cref{fig:example_bn}, we have:
+\begin{align*}
+  E(W) &= \{ \lambda_{W=1} \}, \\
+  E(F) &= \{ \lambda_{F=1} \}, \\
+  E(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
+  E^*(W) &= \{ \lambda_{W=1} \}, \\
+  E^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
+  E^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}.
+\end{align*}
 
 \begin{algorithm}
   \caption{Encoding a Bayesian network as a function $2^U \to \mathbb{R}_{\ge
@@ -581,6 +652,15 @@ $\im X$ denote the set of possible values.
   }
   \Return{$\phi$}\;
 \end{algorithm}
+
+\todo[inline]{Ditto.}
+For the Bayesian network in \cref{fig:example_bn}, we have:
+\begin{align*}
+  \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
+  \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
+    &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
+  \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots).
+\end{align*}
 
 \todo[inline]{Describe \cref{alg:encoding}}
 
@@ -680,76 +760,10 @@ $\im X$ denote the set of possible values.
   \end{itemize}
 \end{proof}
 
-\subsection{An Example}
+\subsection{Textual Representation}
 
-\todo[inline]{Reformulate this as a running example throughout the section.}
-
-\begin{figure}
-  \centering
-  \begin{subfigure}{0.2\textwidth}
-    \centering
-    \begin{tikzpicture}[edge from parent/.style={draw,-latex}]
-      \node[draw,circle] {$W$}
-      child {node[draw,circle] {$F$}}
-      child {node[draw,circle] {$T$}};
-    \end{tikzpicture}
-  \end{subfigure}%
-  \begin{subfigure}{0.8\textwidth}
-    \centering
-    \begin{tabular}[t]{cc}
-      \toprule
-      $w$ & $\Pr(W = w)$ \\
-      \midrule
-      1 & 0.5 \\
-      0 & 0.5 \\
-      \bottomrule
-    \end{tabular}
-    \begin{tabular}[t]{ccc}
-      \toprule
-      $w$ & $f$ & $\Pr(F = f \mid W = w)$ \\
-      \midrule
-      1 & 1 & 0.6 \\
-      1 & 0 & 0.4 \\
-      0 & 1 & 0.1 \\
-      0 & 0 & 0.9 \\
-      \bottomrule
-    \end{tabular}
-    \begin{tabular}[t]{ccc}
-      \toprule
-      $w$ & $t$ & $\Pr(T = t \mid W = w)$ \\
-      \midrule
-      1 & $l$ & 0.2 \\
-      1 & $m$ & 0.4 \\
-      1 & $h$ & 0.4 \\
-      0 & $l$ & 0.6 \\
-      0 & $m$ & 0.3 \\
-      0 & $h$ & 0.1 \\
-      \bottomrule
-    \end{tabular}
-  \end{subfigure}
-  \caption{An example Bayesian network with its CPTs}
-  \label{fig:example_bn}
-\end{figure}
-
-The Bayesian network in \cref{fig:example_bn} has
-\begin{align*}
-  V &= \{ W, F, T \}, \\
-  \mathrm{pa}(W) &= \emptyset, \\
-  \mathrm{pa}(F) &= \mathrm{pa}(T) = \{ W \}, \\
-  \im W &= \im F = \{ 0, 1 \}, \\
-  \im T &= \{ l, m, h \}, \\
-  E(W) &= \{ \lambda_{W=1} \}, \\
-  E(F) &= \{ \lambda_{F=1} \}, \\
-  E(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
-  E^*(W) &= \{ \lambda_{W=1} \}, \\
-  E^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
-  E^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}, \\
-  \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
-  \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
-    &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
-  \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots),
-\end{align*}
-and can be represented in a textual format as
+The Bayesian network in \cref{fig:example_bn} can be represented in a textual
+format as
 \[
   \begin{array}{l r r l l}
     \lambda\sb{T=l} &\lambda\sb{T=m} &\lambda\sb{T=h} & &0 \\
@@ -782,19 +796,16 @@ the complement of the variable) is equal to one.
 
 \subsection{Adjusting ADDMC to Work with the New Format}
 
-\todo[inline]{Even though a lot of papers don't do this, I want a reference and
-  a bit of a (historical/contextual) description here.}
-
-ADDMC constructs the \emph{Gaifman graph} of the input CNF formula as an aid for
-the algorithm's heuristics. This graph has as vertices the variables of the
-formula, and there is an edge between two variables $u$ and $v$ if there is a
-clause in the formula that contains both $u$ and $v$. We extend this definition
-to functions on Boolean algebras, i.e., the factors of $\phi$. For any pair of
-distinct variables $u, v \in U$, we draw an edge between them in the Gaifman
-graph if there is a function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ that is a
-factor of $\phi$ such that $u \in X$ and $v \in X$. For instance, a factor such
-as $\mathrm{CPT}_X$ will enable edges between all distinct pairs of variables in
-$E^*(X)$.
+ADDMC constructs the \emph{Gaifman graph} \cite{gaifman1982local} of the input
+CNF formula as an aid for the algorithm's heuristics. This graph has as vertices
+the variables of the formula, and there is an edge between two variables $u$ and
+$v$ if there is a clause in the formula that contains both $u$ and $v$. We
+extend this definition to functions on Boolean algebras, i.e., the factors of
+$\phi$. For any pair of distinct variables $u, v \in U$, we draw an edge between
+them in the Gaifman graph if there is a function $A\colon 2^X \to
+\mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v \in
+X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges between
+all distinct pairs of variables in $E^*(X)$.
 
 \section{Experimental Comparison} \label{sec:experiments}
 
@@ -808,12 +819,14 @@ $E^*(X)$.
   and calculate its marginal probability. This applies to the Grid data set (as
   intended) and also to two instances of Plan Reconstruction and roughly half of
   the instances from 2004-PGM that have empty evidence files.
-\item After the experiments are finished, note the processor, memory per thread,
-  and add the following acknowledgment.
+\item After the experiments are finished, note the processor, memory per thread.
+\item The experiments were run on Intel Xeon Gold 6138 processor with an
+  \SI{8}{\giga\byte} memory limit.
+\item I will call my encoding \texttt{db20}.
 \item All other encodings are implemented in
-  Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and should be
-  compiled with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC)
-  and \texttt{-noEclause} (i.e., only use standard syntax) flags.
+  Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and were compiled
+  with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC) and
+  \texttt{-noEclause} (i.e., only use standard syntax) flags.
 \item Datasets
   \begin{itemize}
   \item binary Bayesian networks from Sang et
