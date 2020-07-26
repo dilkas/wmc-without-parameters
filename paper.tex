@@ -126,11 +126,6 @@
 
 \section{Boolean Algebras and Power Sets}
 
-\todo[inline]{
-  Notation: make up my mind about $a, b$ vs. $x, y$ and stick to it (maybe $x,
-  y$?).
-}
-
 \begin{table}
   \centering
   \caption{A comparison of Boolean-algebraic (BA) and set-theoretic (ST)
@@ -216,17 +211,9 @@ differences in terminology and notation. We will use both.
 Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
 $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
 
-\begin{remark}
-  For any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$, $A + \overline{A} = 1$.
-\end{remark}
-
 \section{Weighted Model Counting as a Measure}
 
-\todo[inline]{Describe \cref{tbl:notation_example} as an example.}
-\todo[inline]{Feedback: explain with examples: models $=$ atoms of algebra,
-  formulas $=$ all elements.}
-
-\begin{definition} \label{def:wmc}
+\begin{definition}[Measures and weight functions] \label{def:wmc}
   Let $U$ be a set.
   \begin{itemize}
   \item A \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$
@@ -238,40 +225,51 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   \item A \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
       0}$.
   \item A weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
-    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$.
+    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$, $x \in U$.
+  \item We say that a weight function $W\colon 2^U \to \mathbb{R}_{\ge 0}$
+    \emph{induces} a measure $M_W\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if
+    \begin{equation} \label{eq:induced_measure}
+      M_W(x) = \sum_{\{u\} \le x} W(u).
+    \end{equation}
   \item A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
     \emph{factorable} if there exists a factored weight function $W\colon 2^U
     \to \mathbb{R}_{\ge 0}$ that induces $M$.
   \end{itemize}
 \end{definition}
 
-\begin{proposition} \label{prop:measure}
-  Every weight function induces a measure, i.e, for any weight function $W\colon
-  2^U \to \mathbb{R}_{\ge 0}$, the function $M_W\colon 2^{2^U} \to
-  \mathbb{R}_{\ge 0}$, defined as
-  \[
-    M_W(x) = \begin{cases}
-      0 & \text{if } x = \bot \\
-      W(u) & \text{if } x = \{ u \} \\
-      \sum_{\{u\} \le x} W(u) & \text{otherwise,}
-    \end{cases}
-  \]
-  is a measure.
-\end{proposition}
+\begin{lemma} \label{prop:measure}
+  The function $M_W$, as defined by \cref{eq:induced_measure}, is a measure.
+\end{lemma}
 \begin{proof}
-  \todo[inline]{Prove that $M_W$ satisfies the definition of a measure.}
+  Note that $M_W(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b \in
+  2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
+  Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
+  $b$. Moreover, none of them can be below both $a$ and $b$ because then they
+  would have to be below $a \land b = \bot$. Thus
+  \[
+    M_W(a \lor b) = \sum_{\{u\} \le a \lor b} W(u) = \sum_{\{u\} \le a} W(u) +
+    \sum_{\{u\} \le b} = M_W(a) + M_W(b)
+  \]
+  as required.
 \end{proof}
 
-The process of calculating the value of $M_W(x)$ for some $x \in 2^{2^U}$ with a
-given definition of $W$ is known as \emph{weighted model counting}.
+In this formulation, the process of calculating the value of $M_W(x)$ for some
+$x \in 2^{2^U}$ with a given definition of $W$ is known as \emph{weighted model
+  counting}.
+
+\subsection{Relation to the Classical (Logic-Based) View of WMC}
+
+\todo[inline]{Would it be more accurate to replace the word `model' with
+  `interpretation' in most situations?}
 
 \begin{table}
-  \caption{(in the same order)}
+  \caption{An overview of notation for a logic defined over two atoms. The
+    elements in both columns are listed in the same order.}
   \label{tbl:notation_example}
   \centering
   \begin{tabular}{lcc}
     \toprule
-    & Set-theoretic notation & Boolean-algebraic notation \\
+    Name in logic & Set-theoretic notation & Boolean-algebraic notation \\
     \midrule
     Atoms (elements of $U$) & $a, b$ & $a, b$ \\
     \rowcolor{gray!10} Models (elements of $2^U$) & $\emptyset, \{a\}, \{b\}, \{a, b\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
@@ -286,49 +284,55 @@ given definition of $W$ is known as \emph{weighted model counting}.
   \end{tabular}
 \end{table}
 
-\begin{example}[Relation to the classical view of WMC] \label{example:construction}
-  Let $\mathcal{L}$ be a propositional logic with a set of atoms $U = \{ p, q
-  \}$. Let $w : \{ p, q, \neg p, \neg q \} \to \mathbb{R}_{\ge 0}$ be the
-  \emph{weight function} defined by
-  \begin{align*}
-    w(p) = 0.3, \quad w(\neg p) = 0.7, \quad w(q) = 0.2, \quad w(\neg q) = 0.8.
-  \end{align*}
-  Let $\Delta$ be a theory in $\mathcal{L}$ with a sole axiom $p$. Then
-  $\Delta$ has two models, i.e., $\{ p, q \}$ and $\{ p, \neg q \}$. The
-  \emph{weighted model count} (WMC) \cite{DBLP:journals/ai/ChaviraD08} of
-  $\Delta$ is then
-  \begin{equation} \label{eq:wmc_example}
-    \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) = w(p)w(q) + w(p)w(\neg q) = 0.3.
-  \end{equation}
+Let $\mathcal{L}$ be a propositional logic with atoms $U = \{ a, b \}$. See
+\cref{tbl:notation_example} for an overview of the models and formulas in
+$\mathcal{L}$ as well as their set-theoretic and Boolean-algebraic
+representations. Note the differences in the meaning of the word `atom' between
+the logical and the Boolean-theoretic interpretations. In the Boolean algebra
+$2^{2^U}$, an atom is a set with a single element which corresponds to a model
+of $\mathcal{L}$ (also known as an element of $2^U$); whereas an atom of
+$\mathcal{L}$ is an atomic formula, i.e., an element of $U$. We will primarily
+use the term `atom' to mean the former.
 
-  Alternatively, we can define $W_p\colon 2^{\{p\}} \to \mathbb{R}_{\ge 0}$ as
-  \[
-    W_p(\{ p \}) = 0.3, \quad W_p(\emptyset) = 0.7
-  \]
-  and $W_q\colon 2^{\{q\}} \to \mathbb{R}_{\ge 0}$ as
-  \[
-    W_q(\{ q \}) = 0.2, \quad W_q(\emptyset) = 0.8.
-  \]
-  Let $M$ be the measure on $2^{2^U}$ induced by $W = W_p \cdot W_q$. Then,
-  equivalently to \cref{eq:wmc_example}, we can write
-  \[
-    M(p) = W(\{ p, q \}) + W(\{ p \}) = W_p(\{p\})W_q(\{q\}) +
-    W_p(\{p\})W_q(\emptyset) = 0.3.
-  \]
+Let $w\colon \{ a, b, \neg a, \neg b \} \to \mathbb{R}_{\ge 0}$
+be the \emph{weight function} defined by
+\begin{align*}
+  w(a) = 0.3, \quad w(\neg a) = 0.7, \quad w(b) = 0.2, \quad w(\neg b) = 0.8.
+\end{align*}
+Let $\Delta$ be a theory in $\mathcal{L}$ with a sole axiom $a$. Then
+$\Delta$ has two models, i.e., $\{ a, b \}$ and $\{ a, \neg b \}$. The
+\emph{weighted model count} (WMC) \cite{DBLP:journals/ai/ChaviraD08} of
+$\Delta$ is then
+\begin{equation} \label{eq:wmc_example}
+  \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) = w(a)w(b) + w(a)w(\neg b) = 0.3.
+\end{equation}
 
-  Given the theory $\Delta$, we can compute the probability of a query $q$ as
-  \cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
-  \[
-    \Pr_{\Delta, w}(q) = \frac{\WMC(\Delta \land q)}{\WMC(\Delta)}.
-  \]
-  The same thing can be accomplished using the algebraic formulation, with $M$
-  replacing $\mathrm{WMC}$.
-\end{example}
+Alternatively, we can define $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ as
+\[
+  W_a(\{ a \}) = 0.3, \quad W_a(\emptyset) = 0.7
+\]
+and $W_b\colon 2^{\{q\}} \to \mathbb{R}_{\ge 0}$ as
+\[
+  W_b(\{ b \}) = 0.2, \quad W_b(\emptyset) = 0.8.
+\]
+Let $M$ be the measure on $2^{2^U}$ induced by $W = W_a \cdot W_b$. Then,
+equivalently to \cref{eq:wmc_example}, we can write
+\[
+  M(a) = W(\{ a, b \}) + W(\{ a \}) = W_a(\{a\})W_b(\{b\}) +
+  W_a(\{a\})W_b(\emptyset) = 0.3.
+\]
 
-For the rest of the paper, we let $U$ be the set of (logical) atoms. We use
-set-theoretic notation for $2^U$ and Boolean-algebraic notation for $2^{2^U}$,
-except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some
-model $x \in 2^U$.
+Given the theory $\Delta$, we can also compute the probability of a query $b$ as
+\cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
+\[
+  \Pr_{\Delta, w}(b) = \frac{\WMC(\Delta \land b)}{\WMC(\Delta)}.
+\]
+The same thing can be accomplished using the algebraic formulation, with $M$
+replacing $\mathrm{WMC}$.
+
+In the rest of the paper, for any set $U$, we will use set-theoretic notation
+for $2^U$ and Boolean-algebraic notation for $2^{2^U}$, except for (Boolean)
+atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 
 \section{Limitations of Factorable Measures}
 
@@ -339,8 +343,6 @@ model $x \in 2^U$.
   $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
   \begin{itemize}
   \item come up with nice example when non-factorized weights are intuitive;
-  \item clarify that the factorized definition have is w.r.t. models, in case some
-    one gets confused. [It doesn't have to be, if the BA is not free---P.]
   \end{itemize}
 \end{itemize}
 
@@ -450,22 +452,43 @@ model $x \in 2^U$.
 
 \section{Previous Work}
 
-\subsection{Bayesian Network Encodings}
+\subsection{Using WMC to Perform Inference on Bayesian Networks}
 
-\begin{itemize}
-\item Encodings:
-  \begin{itemize}
-  \item \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}
-  \item \texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05}
-  \item \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05}
-  \item \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06} (supposed to be the best)
-  \item \texttt{db20} (mine)
-  \end{itemize}
-\item \texttt{cd05} relaxes the encoding so much that extra models become
-  possible. They are supposed to be filtered out by the algorithm, but mine
-  can't do that because it doesn't deal with models. Same for \texttt{cd06}
-  because it's based on \texttt{cd05}.
-\end{itemize}
+\todo[inline]{Provide a reference (and an explanation) for d-DNNF.}
+\todo[inline]{If I'm citing Cachet, then maybe I should also mention what
+  compilation tools they're using in their experiments.}
+
+Hitherto, four techniques have been proposed for encoding Bayesian networks into
+instances of WMC. We will identify them based on the initials of authors as well
+as publications years: \texttt{d02} \cite{DBLP:conf/kr/Darwiche02},
+\texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05}, \texttt{cd05}
+\cite{DBLP:conf/ijcai/ChaviraD05}, and \texttt{cd06}
+\cite{DBLP:conf/sat/ChaviraD06}. Below we friendly summarise the observed
+performance differences among them. Sang et al. \cite{DBLP:conf/aaai/SangBK05}
+claim that \texttt{sbk05} is a smaller encoding than \texttt{d02} with respect
+to both the number of clauses and the number of variables but provide no
+experimental comparison. Chavira and Darwiche \cite{DBLP:conf/ijcai/ChaviraD05}
+compare \texttt{cd05} with \texttt{d02} by measuring the time it takes to
+compile either encoding into an arithmetic circuit (but do not measure inference
+time). The more recent encoding \texttt{cd05} always compiles faster and results
+in a smaller arithmetic circuit (as measured by the number of edges). In their
+subsequent paper, the same authors perform two sets of experiments (that are
+relevant to this summary) \cite{DBLP:conf/sat/ChaviraD06}. First, they compile
+\texttt{cd05} and \texttt{cd06} encodings into d-DNNF, measuring both
+compilation time and numbers of edges in the d-DNNF diagram. The results are
+mostly in favour of \texttt{cd06}. Second, they compare the inference time of
+\texttt{sbk05} run with Cachet \cite{DBLP:conf/sat/SangBBKP04} with the compile
+times of \texttt{cd05} and \texttt{cd06}, but only on five (types of) instances.
+In these experiments, \texttt{cd06} is always faster than \texttt{cd05}, while
+the comparison with \texttt{sbk05} is mixed. Sometimes \texttt{cd06} is orders
+of magnitude faster than \texttt{sbk05}, sometimes slightly slower. The
+performance difference between \texttt{sbk05} and \texttt{cd05} is even harder
+to judge: \texttt{sbk05} is better on three out of five instances and worse on
+the remaining two. Based on this description, one would expect \texttt{cd06} to
+be faster than both \texttt{cd05} and \texttt{sbk05}, both of which should be
+faster than \texttt{d02}. The experiments in \cref{sec:experiments}, however,
+strongly disagree with this prediction, showing that the quality of an encoding
+depends strongly on the underlying search algorithm or compilation technique.
 
 \subsection{Algebraic Decision Diagrams and Their Use in Probabilistic
   Inference}
@@ -479,7 +502,11 @@ Cover:
   \item Compiling Bayesian Networks Using Variable Elimination (Chavira and
     Darwiche) \cite{DBLP:conf/ijcai/ChaviraD07}
   \item On the Relationship between Sum-Product Networks and Bayesian Networks
-    (Zhao et al.) \cite{DBLP:conf/icml/ZhaoMP15}
+    \cite{DBLP:conf/icml/ZhaoMP15}
+  \item Using ROBDDs for Inference in Bayesian Networks with Troubleshooting as
+    an Example \cite{DBLP:conf/uai/NielsenWJK00}
+  \item SPUDD: Stochastic Planning using Decision Diagrams
+    \cite{DBLP:conf/uai/HoeySHB99}
   \end{itemize}
 \end{itemize}
 
@@ -755,6 +782,9 @@ the complement of the variable) is equal to one.
 
 \subsection{Adjusting ADDMC to Work with the New Format}
 
+\todo[inline]{Even though a lot of papers don't do this, I want a reference and
+  a bit of a (historical/contextual) description here.}
+
 ADDMC constructs the \emph{Gaifman graph} of the input CNF formula as an aid for
 the algorithm's heuristics. This graph has as vertices the variables of the
 formula, and there is an edge between two variables $u$ and $v$ if there is a
@@ -766,7 +796,7 @@ factor of $\phi$ such that $u \in X$ and $v \in X$. For instance, a factor such
 as $\mathrm{CPT}_X$ will enable edges between all distinct pairs of variables in
 $E^*(X)$.
 
-\section{Experimental Comparison}
+\section{Experimental Comparison} \label{sec:experiments}
 
 \begin{itemize}
 \item We don't compare 'compile times' because our encoding time is linear, so
@@ -805,6 +835,10 @@ $E^*(X)$.
     \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
     \end{itemize}
   \end{itemize}
+\item \texttt{cd05} relaxes the encoding so much that extra models become
+  possible. They are supposed to be filtered out by the algorithm, but mine
+  can't do that because it doesn't deal with models. Same for \texttt{cd06}
+  because it's based on \texttt{cd05}.
 \end{itemize}
 
 \section{Explaining The Performance Benefits}
