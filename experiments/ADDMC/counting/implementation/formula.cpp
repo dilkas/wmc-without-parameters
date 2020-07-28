@@ -342,7 +342,8 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
     util::showError("miniC2D weight line not found");
   }
 
-  if (weightFormat == WeightFormat::UNWEIGHTED) { /* populates literalWeights with 1s */
+  /* populates literalWeights with 1s */
+  if (weightFormat == WeightFormat::UNWEIGHTED || weightFormat == WeightFormat::CONDITIONAL) {
      for (int_t var = 1; var <= declaredVarCount; var++) {
        literalWeights[var] = 1;
        literalWeights[-var] = 1;

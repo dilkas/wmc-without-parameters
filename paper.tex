@@ -205,8 +205,8 @@ differences in terminology and notation. We will use both.
   \begin{itemize}
   \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\emptyset) = 1$.
   \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\emptyset) = 0$.
-  \item constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$, $[a](\emptyset) =
-    0$, $[a](\{a\}) = 1$.
+  \item logical constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$,
+    $[a](\emptyset) = 0$, $[a](\{a\}) = 1$.
   \end{itemize}
 \end{definition}
 
@@ -400,7 +400,6 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
   \neg v$.
 \end{theorem}
 \begin{proof}
-  \todo[inline]{Check if the proof is valid for zero weights.}
   ($\Leftarrow$) For each $x \in U$, let $W_x\colon 2^{\{x\}} \to
   \mathbb{R}_{\ge 0}$ be defined by $W_x(\{ x \}) = M(x)$ and $W_x(\emptyset) =
   M(\neg x)$. Let $M_W$ be the measure induced by
@@ -445,9 +444,12 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
                         &= \sum_{\{a\} \le k_u \land k_v} W_u(a_u)W_v(a_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) = \sum_{\{a\} \le k_u \land k_v} W_u(k_u)W_v(k_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) \\
     &= W_u(k_u)W_v(k_v) \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} W_x(a) = W_u(k_u)W_v(k_v)C,
   \end{align*}
-  where $C$ denotes the part of $M_W(k_u \land k_v)$ that will be the same for
-  $M_W(\neg k_u \land k_v)$, $M_W(k_u \land \neg k_v)$, and $M_W(\neg k_u \land
-  \neg k_v)$ as well. But then \cref{eq:to_prove4} becomes
+  where
+  \[
+    C = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} W_x(a),
+  \]
+  and is the same for $M_W(\neg k_u \land k_v)$, $M_W(k_u \land \neg k_v)$, and
+  $M_W(\neg k_u \land \neg k_v)$ as well. But then \cref{eq:to_prove4} becomes
   \[
     W_u(k_u)W_v(k_v)W_u(\neg k_u)W_v(\neg k_v)C^2 = W_u(k_u)W_v(\neg
     k_v)W_u(\neg k_u)W_v(k_v)C^2
@@ -794,7 +796,7 @@ The way we use this encoding, it is always the case that either both
 probabilities sum to one, or the second probability (i.e., the probability for
 the complement of the variable) is equal to one.
 
-\subsection{Adjusting ADDMC to Work with the New Format}
+\subsection{Changes to ADDMC}
 
 ADDMC constructs the \emph{Gaifman graph} \cite{gaifman1982local} of the input
 CNF formula as an aid for the algorithm's heuristics. This graph has as vertices
@@ -806,6 +808,22 @@ them in the Gaifman graph if there is a function $A\colon 2^X \to
 \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v \in
 X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges between
 all distinct pairs of variables in $E^*(X)$.
+
+\todo[inline]{This needs rewriting.}
+ADDMC multiplies the final answer by $w(u)+w(-u)$ for every $u \in U$ that was
+`simplified out' of the ADD for $\phi$ and so is not featured in the $\exists_U$
+projection. In our format, for every such $u \in U$, we multiply the answer by
+two. Each such $u \in U$ must satisfy two properties:
+\begin{itemize}
+\item all the probabilities/weights associated with $u$ are equal to $0.5$
+  (otherwise the corresponding CPT would depend on $u$),
+\item and all other CPTs are independent of $u$ (or they may have a trivial
+  dependence, where the probability stays the same if $u$ is replaced with its
+  complement).
+\end{itemize}
+Thus, the CPT that corresponds to $u$ still multiplies every model by $0.5$, but
+the number of models being considered by the ADDMC is halved. To correct for
+this, we need to perform this multiplication.
 
 \section{Experimental Comparison} \label{sec:experiments}
 

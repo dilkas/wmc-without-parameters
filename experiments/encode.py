@@ -145,8 +145,8 @@ def encode(network, evidence):
 
 def run_ace(network, evidence, encoding):
     command = ACE + ['-' + encoding, network]
-    if evidence and encoding != 'sbk05':
-        command += ['-e', evidence]
+#    if evidence and encoding not in 'sbk05':
+#        command += ['-e', evidence]
     subprocess.run(command)
 
 def identify_goal(text, mode):
@@ -188,7 +188,7 @@ def encode_using_ace(network, evidence_file, encoding):
     evidence = ''
     if evidence_file_is_empty(evidence_file):
         evidence = '{} 0\n'.format(goal_literal)
-    elif encoding == 'sbk05':
+    else:
         evidence = '\n'.join(encode_inst_evidence(evidence_file))
 
     weight_encoding = 'c weights ' + ' '.join(l for literal in range(1, max_literal + 1)

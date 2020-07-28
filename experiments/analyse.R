@@ -4,7 +4,7 @@ require(dplyr)
 require(maditr)
 require(purrr)
 
-TIMEOUT <- 600
+TIMEOUT <- 1000
 df0 <- read.csv("results.csv", header = TRUE, sep = ",")
 df0$time[df0$time > TIMEOUT] <- TIMEOUT
 df0$time[is.na(df0$time)] <- TIMEOUT
@@ -19,7 +19,7 @@ df$major.dataset[df$dataset == "Grid-75"] <- "Grid"
 df$major.dataset[df$dataset == "Grid-90"] <- "Grid"
 
 # Where answers don't match
-interesting <- df[abs(df$answer_db20 - df$answer_d02) > 0.01,]
+interesting <- df[abs(df$answer_db20 - df$answer_sbk05) > 0.01,]
 
 # Proportion of instances where my encoding is the best
 #time$min <- apply(time, 1, min)
@@ -47,8 +47,17 @@ ggplot(df[df$time_d02 > 0,], aes(x = time_db20, y = time_d02, col = major.datase
 # 2. Adjust the alpha value.
 # 3. Make sure that the PDF output is square.
 
+ggplot(df, aes(x = time_db20, y = time_sbk05, col = major.dataset)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(slope = 1, intercept = 0) +
+  scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
+  scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
+  xlab("db20 time (s)") +
+  ylab("sbk05 time (s)") +
+  scale_color_brewer(palette = "Dark2", name = "Data set")
+
 # Scatter plot: for a specific dataset
-ggplot(df[df$dataset == "2005-IJCAI"], aes(x = time_db20, y = time_d02)) +
+ggplot(df[df$dataset == "2004-PGM"], aes(x = time_db20, y = time_sbk05)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0) +
   xlim(0, TIMEOUT) +
