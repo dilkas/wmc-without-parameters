@@ -20,6 +20,8 @@ df$major.dataset[df$dataset == "DQMR-100"] <- "DQMR"
 df$major.dataset[df$dataset == "Grid-50"] <- "Grid"
 df$major.dataset[df$dataset == "Grid-75"] <- "Grid"
 df$major.dataset[df$dataset == "Grid-90"] <- "Grid"
+df$major.dataset[df$dataset == "2006-IJAR"] <- "Friends and smokers"
+df$major.dataset[df$dataset == "Plan Recognition"] <- "Plan recognition"
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row["time_cd05"], row["time_cd06"],
                                                           row["time_d02"], row["time_db20"], row["time_sbk05"])))
 # ============ Numerical investigations ================
@@ -62,7 +64,7 @@ sum(!is.na(df$answer_sbk05))
 # 1. Shapes as well as colors (set manually).
 # 2. Adjust the alpha value.
 
-min.time <- min(df0$time) + 0.001
+min.time <- min(df0$time)
 p1 <- ggplot(df[df$time_d02 > 0,], aes(x = time_d02, y = time_db20, col = major.dataset)) +
   geom_point(alpha = 0.5, size = 1) +
   geom_abline(slope = 1, intercept = 0, colour = "#989898") +

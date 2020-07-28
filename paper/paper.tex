@@ -20,6 +20,7 @@
 \usepackage{subcaption}
 \usepackage{multirow}
 \usepackage[binary-units]{siunitx}
+\usepackage[inline]{enumitem}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{observation}{Observation}
@@ -877,32 +878,37 @@ this, we need to perform this multiplication.
   significant bugs (and the code is closed-source). Ace's implementation
   (depending on the exact encoding) is supposed to perform some simplifications
   when encoding evidence. We just do the trivial thing---no simplifications.
-\item Datasets
-  \begin{itemize}
-  \item binary Bayesian networks from Sang et
-    al.\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}
-    \cite{DBLP:conf/aaai/SangBK05}
-    \begin{itemize}
-    \item Grid (networks) (ratio 75 means that 75\% of the nodes are
-      deterministic),
-    \item Plan recognition (problems),
-    \item Deterministic quick medical reference (what do the numbers mean? the
-      README doesn't say).
-    \end{itemize}
-  \item Bayesian networks available with Ace
-    \begin{itemize}
-    \item \texttt{2004-pgm} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
-    \item \texttt{2005-ijcai} \cite{DBLP:conf/ijcai/ChaviraD05}. The Genie/Smile
-      files have their own citation data that I should probably extract. This is
-      the only dataset that has some non-binary networks.
-    \item \texttt{2006-ijar} \cite{DBLP:journals/ijar/ChaviraDJ06} (binary)
-    \end{itemize}
-  \end{itemize}
 \item \texttt{cd05} relaxes the encoding so much that extra models become
   possible. They are supposed to be filtered out by the algorithm, but mine
   can't do that because it doesn't deal with models. Same for \texttt{cd06}
   because it's based on \texttt{cd05}.
 \end{itemize}
+
+\paragraph{Data.} For experiments, we use the Bayesian networks available
+with Ace\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and
+Cachet\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}, most of
+which happen to be binary. We classify them into the following seven categories:
+\begin{itemize*}
+\item DQMR and
+\item grid networks as described by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
+\item friends and smokers,
+\item mastermind, and
+\item random blocks from the work of Chavira et al.
+  \cite{DBLP:journals/ijar/ChaviraDJ06},
+\item remaining binary Bayesian networks that include plan recognition
+  \cite{DBLP:conf/aaai/SangBK05}, students and professors
+  \cite{DBLP:journals/ijar/ChaviraDJ06}, and \texttt{tcc4f}, and
+\item non-binary classic Bayesian networks (\texttt{alarm}, \texttt{diabetes},
+  \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
+  \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
+\end{itemize*}
+% DQMR
+% Friends and smokers (2006)
+% Grid
+% Mastermind (2004 & some of 2005)
+% Random blocks (2004 & some of 2005)
+% Non-binary: most of 2005
+% Other binary (whatever remains, including Plan Recognition)
 
 \section{Explaining The Performance Benefits}
 
