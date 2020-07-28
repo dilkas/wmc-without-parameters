@@ -33,6 +33,11 @@ sum(is.na(df$answer_db20))/nrow(df)
 sum(is.na(df$answer_sbk05))/nrow(df)
 
 # Scatter plot: by dataset
+# Consider:
+# 1. Shapes as well as colors (set manually).
+# 2. Adjust the alpha value.
+
+# D02
 min.time <- min(df0$time) + 0.001
 ggplot(df[df$time_d02 > 0,], aes(x = time_db20, y = time_d02, col = major.dataset)) +
   geom_point(alpha = 0.5) +
@@ -41,11 +46,8 @@ ggplot(df[df$time_d02 > 0,], aes(x = time_db20, y = time_d02, col = major.datase
   scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
   xlab("db20 time (s)") +
   ylab("d02 time (s)") +
-  scale_color_brewer(palette = "Dark2", name = "Data set")
-# Consider:
-# 1. Shapes as well as colors (set manually).
-# 2. Adjust the alpha value.
-# 3. Make sure that the PDF output is square.
+  scale_color_brewer(palette = "Dark2", name = "Data set") +
+  coord_fixed()
 
 ggplot(df, aes(x = time_db20, y = time_sbk05, col = major.dataset)) +
   geom_point(alpha = 0.5) +
@@ -54,7 +56,8 @@ ggplot(df, aes(x = time_db20, y = time_sbk05, col = major.dataset)) +
   scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
   xlab("db20 time (s)") +
   ylab("sbk05 time (s)") +
-  scale_color_brewer(palette = "Dark2", name = "Data set")
+  scale_color_brewer(palette = "Dark2", name = "Data set") +
+  coord_fixed()
 
 # Scatter plot: for a specific dataset
 ggplot(df[df$dataset == "2004-PGM"], aes(x = time_db20, y = time_sbk05)) +
