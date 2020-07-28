@@ -845,6 +845,10 @@ this, we need to perform this multiplication.
   Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and were compiled
   with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC) and
   \texttt{-noEclause} (i.e., only use standard syntax) flags.
+\item We don't use Ace's evidence-encoding mechanism because it has multiple
+  significant bugs (and the code is closed-source). Ace's implementation
+  (depending on the exact encoding) is supposed to perform some simplifications
+  when encoding evidence. We just do the trivial thing---no simplifications.
 \item Datasets
   \begin{itemize}
   \item binary Bayesian networks from Sang et

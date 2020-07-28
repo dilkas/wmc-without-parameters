@@ -2,7 +2,7 @@
 #$ -N cwmc
 #$ -cwd
 #$ -pe sharedmem 16
-#$ -l h_rt=33:00:00
+#$ -l h_rt=70:00:00
 #$ -l h_vmem=8G
 
 . /etc/profile.d/modules.sh
