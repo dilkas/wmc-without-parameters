@@ -827,6 +827,41 @@ this, we need to perform this multiplication.
 
 \section{Experimental Comparison} \label{sec:experiments}
 
+\begin{figure}
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \input{scatter_d02.tex}
+    \caption{\texttt{d02}}
+  \end{subfigure}
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \input{scatter_sbk05.tex}
+    \caption{\texttt{sbk05}}
+  \end{subfigure}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \input{cumulative.tex}
+  \caption{Cumulative plot}
+\end{figure}
+
+\begin{table}
+  \caption{Out of 1216 instances}
+  \centering
+  \begin{tabular}{lrrr}
+    \toprule
+    Encoding & Unique & Fastest & Solved \\
+    \midrule
+    \texttt{cd05} & 2 & 3 & 372 \\
+    \texttt{cd06} & 0 & 1 & 351 \\
+    \texttt{d02} & 41 & 99 & 726 \\
+    \texttt{db20} & 228 & 871 & 901 \\
+    \texttt{sbk05} & 6 & 36 & 687 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \begin{itemize}
 \item We don't compare 'compile times' because our encoding time is linear, so
   we would easily beat everyone else.
