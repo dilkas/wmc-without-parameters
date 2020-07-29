@@ -12,18 +12,19 @@ df0$time[df0$time > TIMEOUT] <- TIMEOUT
 df0$time[is.na(df0$time)] <- TIMEOUT
 df0$memory[is.na(df0$memory)] <- max(df0$memory)
 df <- dcast(data = df0, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = c("answer", "time", "memory"))
-df$major.dataset <- df$dataset
-df$major.dataset[df$dataset == "DQMR-50"] <- "DQMR"
-df$major.dataset[df$dataset == "DQMR-60"] <- "DQMR"
-df$major.dataset[df$dataset == "DQMR-70"] <- "DQMR"
-df$major.dataset[df$dataset == "DQMR-100"] <- "DQMR"
-df$major.dataset[df$dataset == "Grid-50"] <- "Grid"
-df$major.dataset[df$dataset == "Grid-75"] <- "Grid"
-df$major.dataset[df$dataset == "Grid-90"] <- "Grid"
-df$major.dataset[df$dataset == "2006-IJAR"] <- "Friends and smokers"
-df$major.dataset[df$dataset == "Plan Recognition"] <- "Plan recognition"
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row["time_cd05"], row["time_cd06"],
                                                           row["time_d02"], row["time_db20"], row["time_sbk05"])))
+
+df$major.dataset <- "Non-binary"
+df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
+df$major.dataset[grepl("Grid", df$instance, fixed = TRUE)] <- "Grid"
+df$major.dataset[grepl("mastermind", df$instance, fixed = TRUE)] <- "Mastermind"
+df$major.dataset[grepl("blockmap", df$instance, fixed = TRUE)] <- "Random blocks"
+df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Friends and smokers"
+df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other binary"
+df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
+df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
+
 # ============ Numerical investigations ================
 
 # Where answers don't match
@@ -87,8 +88,8 @@ p2 <- ggplot(df[df$time_sbk05 > 0,], aes(x = time_sbk05, y = time_db20, col = ma
   coord_fixed() +
   annotation_logticks(colour = "#b3b3b3") +
   theme_light()
-tikz(file = "paper/scatter.tex", width = 4.8, height = 3)
-ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "bottom")
+tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
+ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Scatter plot: for a specific data set
@@ -111,7 +112,7 @@ cumulative$time <- as.numeric(cumulative$time)
 cumulative$count <- as.numeric(cumulative$count)
 cumulative <- cumulative[cumulative$time < TIMEOUT, ]
 
-tikz(file = "paper/cumulative.tex", width = 4.8, height = 2.4)
+tikz(file = "paper/cumulative.tex", width = 3.85, height = 2.5)
 ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
   geom_line() +
   scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +

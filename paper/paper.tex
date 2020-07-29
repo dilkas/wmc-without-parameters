@@ -830,31 +830,33 @@ this, we need to perform this multiplication.
 
 \begin{figure}
   \centering
-  \input{scatter.tex}
-  \caption{Scatter plots}
+  \begin{minipage}{0.59\textwidth}
+    \centering
+    \input{cumulative.tex}%
+    \captionof{figure}{Cumulative plot}
+  \end{minipage}
+  \begin{minipage}{0.39\textwidth}
+    \centering
+    \captionof{table}{Out of 1216 instances}%
+    \begin{tabular}{lrrr}
+      \toprule
+      Encoding & Unique & Fastest & Solved \\
+      \midrule
+      \texttt{cd05} & 2 & 3 & 372 \\
+      \texttt{cd06} & 0 & 1 & 351 \\
+      \texttt{d02} & 41 & 99 & 726 \\
+      \texttt{db20} & 228 & 871 & 901 \\
+      \texttt{sbk05} & 6 & 36 & 687 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
 \end{figure}
 
 \begin{figure}
   \centering
-  \input{cumulative.tex}
-  \caption{Cumulative plot}
+  \input{scatter.tex}%
+  \caption{Scatter plots}
 \end{figure}
-
-\begin{table}
-  \caption{Out of 1216 instances}
-  \centering
-  \begin{tabular}{lrrr}
-    \toprule
-    Encoding & Unique & Fastest & Solved \\
-    \midrule
-    \texttt{cd05} & 2 & 3 & 372 \\
-    \texttt{cd06} & 0 & 1 & 351 \\
-    \texttt{d02} & 41 & 99 & 726 \\
-    \texttt{db20} & 228 & 871 & 901 \\
-    \texttt{sbk05} & 6 & 36 & 687 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 \begin{itemize}
 \item We don't compare 'compile times' because our encoding time is linear, so
@@ -866,7 +868,6 @@ this, we need to perform this multiplication.
   and calculate its marginal probability. This applies to the Grid data set (as
   intended) and also to two instances of Plan Reconstruction and roughly half of
   the instances from 2004-PGM that have empty evidence files.
-\item After the experiments are finished, note the processor, memory per thread.
 \item The experiments were run on Intel Xeon Gold 6138 processor with an
   \SI{8}{\giga\byte} memory limit.
 \item I will call my encoding \texttt{db20}.
@@ -882,6 +883,20 @@ this, we need to perform this multiplication.
   possible. They are supposed to be filtered out by the algorithm, but mine
   can't do that because it doesn't deal with models. Same for \texttt{cd06}
   because it's based on \texttt{cd05}.
+\item Observations
+  \begin{itemize}
+  \item The order of the encodings from best to worst is exactly the opposite of
+    that in the previous literature.
+  \item Our encoding is particularly promising on instances of Grid networks.
+    They are set up so that the entire Bayesian network is relevant to the
+    query.
+  \item However, \texttt{db20} struggles with instances from Mastermind and
+    Random Blocks domains (but so does \texttt{sbk05}). We conjecture that this
+    is so either because the particular structure of these problems confuse the
+    algorithm's heuristics or because these instances allow for significant
+    simplifications that are exploited by $\mathtt{d02}$ but not
+    $\mathtt{db20}$.
+  \end{itemize}
 \end{itemize}
 
 \paragraph{Data.} For experiments, we use the Bayesian networks available
@@ -890,25 +905,18 @@ Cachet\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}, most of
 which happen to be binary. We classify them into the following seven categories:
 \begin{itemize*}
 \item DQMR and
-\item grid networks as described by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
-\item friends and smokers,
-\item mastermind, and
-\item random blocks from the work of Chavira et al.
+\item Grid networks as described by Sang et al. \cite{DBLP:conf/aaai/SangBK05},
+\item Friends and Smokers,
+\item Mastermind, and
+\item Random Blocks from the work of Chavira et al.
   \cite{DBLP:journals/ijar/ChaviraDJ06},
-\item remaining binary Bayesian networks that include plan recognition
-  \cite{DBLP:conf/aaai/SangBK05}, students and professors
+\item remaining binary Bayesian networks that include Plan Recognition
+  \cite{DBLP:conf/aaai/SangBK05}, Students and Professors
   \cite{DBLP:journals/ijar/ChaviraDJ06}, and \texttt{tcc4f}, and
 \item non-binary classic Bayesian networks (\texttt{alarm}, \texttt{diabetes},
   \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
   \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
 \end{itemize*}
-% DQMR
-% Friends and smokers (2006)
-% Grid
-% Mastermind (2004 & some of 2005)
-% Random blocks (2004 & some of 2005)
-% Non-binary: most of 2005
-% Other binary (whatever remains, including Plan Recognition)
 
 \section{Explaining The Performance Benefits}
 
