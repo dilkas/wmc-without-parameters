@@ -56,7 +56,7 @@
   }
 }
 
-\title{Weighted Model Counting with Conditional Measures}
+\title{Weighted Model Counting with Conditional Weights}
 \author{Paulius Dilkas}
 
 \begin{document}
@@ -93,10 +93,9 @@
     solvers.
   \end{itemize}
 \item[F] What are the main claims, what are the main takeaways, intuitive [???]
-  of theorems to follow. To do this, we appeal to algebraic constructions to
-  define the main concepts for introducing measures on Boolean algebras.
+  of theorems to follow.
 \item
-  Algorithms\footnote{\url{http://beyondnp.org/pages/solvers/model-counters-exact/}}
+  Algorithms
   \begin{itemize}
   \item ADDMC \cite{DBLP:conf/aaai/DudekPV20} (rediscovered the
     multiplicativity of BAs in different words) (with optimal settings)
@@ -111,9 +110,6 @@
     \cite{DBLP:journals/ndjfl/Hailperin84}
   \item Nilsson's (somewhat successful) probabilistic logic
     \cite{DBLP:journals/ai/Nilsson86,DBLP:journals/ai/Nilsson93}
-  \item Logical induction: a big paper with a good overview of previous attempts
-    to assign probabilities to logical sentences in a sensible way
-    \cite{DBLP:journals/eccc/GarrabrantBCST16}
   \item Measures on Boolean algebras
     \begin{itemize}
     \item On possibility and probability measures in finite Boolean algebras
@@ -124,7 +120,6 @@
   \end{itemize}
 \item Intuitively, a measure is just like a probability, except it's in
   $\mathbb{R}_{\ge 0}$ instead of $[0, 1]$.
-\item Somewhere: explain things line CNF, CPT, etc.
 \end{itemize}
 
 \section{Boolean Algebras and Power Sets}
@@ -340,16 +335,13 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 \section{Limitations of Factorable Measures}
 
 \todo[inline,caption={}]{
+  Examples (must):
   \begin{itemize}
-  \item[F] Give a concrete example of something impossible to represent
-    using WMC.
-  \item[F] Can you say something here about factorized vs non-factorized weight
-    function definitions? That is, factorized is when $w$ maps literals to
-    $R_{\ge 0}$, non-factorized is when $w$ maps models to $R_{\ge 0}$ and
-    \begin{itemize}
-    \item come up with nice example when non-factorized weights are intuitive;
-    \end{itemize}
+  \item an example of a measure that cannot be expressed using a factored weight
+    function,
+  \item an example of how to express it using conditional weight functions.
   \end{itemize}
+  Also, define `conditional weight function'.
 }
 
 \begin{lemma} \label{lemma:before_theorem}
@@ -565,27 +557,24 @@ Cover:
   \label{fig:example_bn}
 \end{figure}
 
-Let $V$ denote the set of random variables in a Bayesian network. For any random
-variable $X \in V$, let $\mathrm{pa}(X)$ denote the set of parents of $X$ and
-$\im X$ denote the set of possible values. We will use the Bayesian network in
-\cref{fig:example_bn} (loosely based on an example by Sang et al.
-\cite{DBLP:conf/aaai/SangBK05}) as a running example throughout this section.
-For the Bayesian network in \cref{fig:example_bn}, we have:
-\begin{align*}
-  V &= \{ W, F, T \}, \\
-  \mathrm{pa}(W) &= \emptyset, \\
-  \mathrm{pa}(F) &= \mathrm{pa}(T) = \{ W \}, \\
-  \im W &= \im F = \{ 0, 1 \}, \\
-  \im T &= \{ l, m, h \}.
-\end{align*}
+\todo[inline]{Define 'CPT'}
+
+In line with the names of previous encodings, we shall call this encoding
+\texttt{db20}. Let $V$ denote the set of random variables in a Bayesian network.
+For any random variable $X \in V$, let $\mathrm{pa}(X)$ denote the set of
+parents of $X$ and $\im X$ denote the set of possible values. We will use the
+Bayesian network in \cref{fig:example_bn} as a running example throughout this
+section. For this network, $V = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$,
+$\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and
+$\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in V$ be a random variable. If $X$ is binary (i.e., $|\im X| = 2$), we
   can arbitrary identify one of the values as $1$ and the other one as $0$ (i.e,
   $\im X \cong \{ 0, 1 \}$). Then $X$ can be represented by a single
   \emph{indicator variable} $\lambda_{X=1}$. For notational simplicity, for any
-  set $S$, whenever we write $\lambda_{X=0} \in S$ or $S = \{ \lambda_{X=0},
-  \dots \}$, we actually mean $\lambda_{X=1} \not\in S$,
+  set $S$, we write $\lambda_{X=0} \in S$ or $S = \{ \lambda_{X=0}, \dots \}$ to
+  mean $\lambda_{X=1} \not\in S$,
 
   On the other hand, if $X$ is not binary, we represent $X$ with $|\im X|$
   indicator variables, one for each value. We let
@@ -608,8 +597,7 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   Bayesian network.
 \end{definition}
 
-\todo[inline]{Come up with a less repetitive wording.}
-For the Bayesian network in \cref{fig:example_bn}, we have:
+For the Bayesian network in \cref{fig:example_bn}, this gives us:
 \begin{align*}
   E(W) &= \{ \lambda_{W=1} \}, \\
   E(F) &= \{ \lambda_{F=1} \}, \\
@@ -656,7 +644,8 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   \Return{$\phi$}\;
 \end{algorithm}
 
-\todo[inline]{Ditto.}
+\todo[inline]{Describe the algorithm and the CPT functions.}
+
 For the Bayesian network in \cref{fig:example_bn}, we have:
 \begin{align*}
   \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
@@ -664,8 +653,6 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
     &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
   \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots).
 \end{align*}
-
-\todo[inline]{Describe \cref{alg:encoding}}
 
 \subsection{Proof of Correctness}
 
@@ -763,7 +750,10 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   \end{itemize}
 \end{proof}
 
-\subsection{Textual Representation}
+\subsection{Textual Representation} \label{sec:textual_representation}
+
+\todo[inline]{Describe how this is an intermediate step before we get the $\phi$
+from the algorithm. Each CPT is treated as a clause.}
 
 The Bayesian network in \cref{fig:example_bn} can be represented in a textual
 format as
@@ -786,8 +776,9 @@ format as
 \]
 with each $\lambda$ replaced with a unique positive integer. This format is
 based on the format used by the Cachet solver \cite{DBLP:conf/sat/SangBBKP04}
-to encode WMC problems, which extends the DIMACS format for CNF formulas with
-weight clauses. Subsequently, we extend it in two ways:
+to encode WMC problems, which extends the DIMACS format for conjunctive normal
+form (CNF) formulas with weight clauses. Subsequently, we extend it in two
+ways:
 \begin{itemize}
 \item a single weight clause now supports an arbitrary number of literals,
 \item and each weight clause has two probabilities instead of one (i.e., we no
@@ -859,48 +850,40 @@ this, we need to perform this multiplication.
 \end{figure}
 
 \begin{itemize}
-\item We don't compare 'compile times' because our encoding time is linear, so
-  we would easily beat everyone else.
-\item When the Bayesian network has an evidence file, we compute the probability
-  of evidence. Otherwise, let $X$ denote the last-mentioned node in the Bayesian
-  network. If $\mathsf{true}$ is a valid value of $X$, we compute the marginal
-  probability of $X = \mathsf{true}$. Otherwise, we pick the first value of $X$
-  and calculate its marginal probability. This applies to the Grid data set (as
-  intended) and also to two instances of Plan Reconstruction and roughly half of
-  the instances from 2004-PGM that have empty evidence files.
+\item We chose not to measure or compare encoding time because of different
+  languages of implementation and the fact that our encoding algorithm (i.e.,
+  the process that converts a Bayesian network into a textual encoding such as
+  in \cref{sec:textual_representation}) is linear in the total number of CPT
+  rows and so is unlikely to be slower than, e.g., \texttt{cd06}, which relies
+  on solving $\NP$-complete problems as part of the encoding process
+  \cite{DBLP:conf/sat/ChaviraD06}.
+\item Whenever a Bayesian network comes with an evidence file, we compute the
+  probability of evidence. Otherwise, let $X$ denote the last-mentioned node in
+  the Bayesian network. If $\mathsf{true}$ is a valid value of $X$, we compute
+  the marginal probability of $X = \mathsf{true}$. Otherwise, we pick the value
+  of $X$ which is listed first and calculate its marginal probability.
 \item The experiments were run on Intel Xeon Gold 6138 processor with an
   \SI{8}{\giga\byte} memory limit.
-\item I will call my encoding \texttt{db20}.
-\item All other encodings are implemented in
-  Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and were compiled
-  with \texttt{-encodeOnly} (i.e., don't compile the CNF into an AC) and
-  \texttt{-noEclause} (i.e., only use standard syntax) flags.
-\item We don't use Ace's evidence-encoding mechanism because it has multiple
-  significant bugs (and the code is closed-source). Ace's implementation
-  (depending on the exact encoding) is supposed to perform some simplifications
-  when encoding evidence. We just do the trivial thing---no simplifications.
-\item \texttt{cd05} relaxes the encoding so much that extra models become
-  possible. They are supposed to be filtered out by the algorithm, but mine
-  can't do that because it doesn't deal with models. Same for \texttt{cd06}
-  because it's based on \texttt{cd05}.
-\item Observations
-  \begin{itemize}
-  \item The order of the encodings from best to worst is exactly the opposite of
-    that in the previous literature.
-  \item Our encoding is particularly promising on instances of Grid networks.
-    They are set up so that the entire Bayesian network is relevant to the
-    query.
-  \item However, \texttt{db20} struggles with instances from Mastermind and
-    Random Blocks domains (but so does \texttt{sbk05}). We conjecture that this
-    is so either because the particular structure of these problems confuse the
-    algorithm's heuristics or because these instances allow for significant
-    simplifications that are exploited by $\mathtt{d02}$ but not
-    $\mathtt{db20}$.
-  \end{itemize}
+\item For all other encodings, we use their implementation in
+  Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} with
+  \texttt{-encodeOnly} and \texttt{-noEclause} flags. However, Ace was not used
+  to encode evidence, as preliminary experiments revealed that the
+  evidence-encoding implementation contains bugs that can lead to incorrect
+  answers or a Java exception being thrown on some instances of the data set
+  (and the source code is not publicly available). Instead, we simply list all
+  the evidence as additional clauses in the encoding (regardless of which
+  encoding is used).
+\item Note that \texttt{cd05} and \texttt{cd06} purposefully produce overly
+  relaxed encodings that contain extra models and thus yield incorrect
+  probabilities \cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}.
+  These additional models are supposed to be filtered out during circuit
+  compilation \cite{DBLP:conf/ijcai/ChaviraD05}, but this is not easily
+  achievable with ADDMC. Nonetheless, we include both encodings in our timing
+  experiments.
 \end{itemize}
 
 \paragraph{Data.} For experiments, we use the Bayesian networks available
-with Ace\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} and
+with Ace and
 Cachet\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}, most of
 which happen to be binary. We classify them into the following seven categories:
 \begin{itemize*}
@@ -917,6 +900,21 @@ which happen to be binary. We classify them into the following seven categories:
   \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
   \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
 \end{itemize*}
+
+\paragraph{Observations.}
+\begin{itemize}
+\item The order of the encodings from best to worst is exactly the opposite of
+  that in the previous literature.
+\item Our encoding is particularly promising on instances of Grid networks.
+  They are set up so that the entire Bayesian network is relevant to the
+  query.
+\item However, \texttt{db20} struggles with instances from Mastermind and
+  Random Blocks domains (but so does \texttt{sbk05}). We conjecture that this
+  is so either because the particular structure of these problems confuse the
+  algorithm's heuristics or because these instances allow for significant
+  simplifications that are exploited by $\mathtt{d02}$ but not
+  $\mathtt{db20}$.
+\end{itemize}
 
 \section{Explaining The Performance Benefits}
 
