@@ -10,7 +10,7 @@ TIMEOUT <- 1000
 df0 <- read.csv("results.csv", header = TRUE, sep = ",")
 df0$time[df0$time > TIMEOUT] <- TIMEOUT
 df0$time[is.na(df0$time)] <- TIMEOUT
-df0$memory[is.na(df0$memory)] <- max(df0$memory)
+df0$memory[is.na(df0$memory)] <- max(df0$memory, na.rm = TRUE)
 df <- dcast(data = df0, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = c("answer", "time", "memory"))
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row["time_cd05"], row["time_cd06"],
                                                           row["time_d02"], row["time_db20"], row["time_sbk05"])))
@@ -61,12 +61,8 @@ sum(!is.na(df$answer_sbk05))
 # ================ Plots ==========================
 
 # Scatter plot: by dataset
-# Consider:
-# 1. Shapes as well as colors (set manually).
-# 2. Adjust the alpha value.
-
 min.time <- min(df0$time)
-p1 <- ggplot(df[df$time_d02 > 0,], aes(x = time_d02, y = time_db20, col = major.dataset)) +
+p1 <- ggplot(df[df$time_d02 > 0,], aes(x = time_d02, y = time_db20, col = major.dataset, shape = major.dataset)) +
   geom_point(alpha = 0.5, size = 1) +
   geom_abline(slope = 1, intercept = 0, colour = "#989898") +
   scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
@@ -76,8 +72,9 @@ p1 <- ggplot(df[df$time_d02 > 0,], aes(x = time_d02, y = time_db20, col = major.
   scale_color_brewer(palette = "Dark2", name = "Data set") +
   coord_fixed() +
   annotation_logticks(colour = "#b3b3b3") +
-  theme_light()
-p2 <- ggplot(df[df$time_sbk05 > 0,], aes(x = time_sbk05, y = time_db20, col = major.dataset)) +
+  theme_light() +
+  labs(color = "Data set", shape = "Data set")
+p2 <- ggplot(df[df$time_sbk05 > 0,], aes(x = time_sbk05, y = time_db20, col = major.dataset, shape = major.dataset)) +
   geom_point(alpha = 0.5, size = 1) +
   geom_abline(slope = 1, intercept = 0, colour = "#989898") +
   scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
@@ -87,7 +84,8 @@ p2 <- ggplot(df[df$time_sbk05 > 0,], aes(x = time_sbk05, y = time_db20, col = ma
   scale_color_brewer(palette = "Dark2", name = "Data set") +
   coord_fixed() +
   annotation_logticks(colour = "#b3b3b3") +
-  theme_light()
+  theme_light() +
+  labs(color = "Data set", shape = "Data set")
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
@@ -114,14 +112,16 @@ cumulative <- cumulative[cumulative$time < TIMEOUT, ]
 
 tikz(file = "paper/cumulative.tex", width = 3.85, height = 2.5)
 ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
-  geom_line() +
+  geom_line(aes(linetype = encoding)) +
   scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
   xlab("Time (s)") +
   ylab("Instances solved") +
-  labs(color = "Encoding") +
   scale_colour_brewer(palette = "Dark2") +
+  scale_linetype_manual(breaks = c("\\texttt{cd05}", "\\texttt{cd06}", "\\texttt{d02}", "\\texttt{db20}",
+                                   "\\texttt{sbk05}"), values = c(4, 3, 5, 1, 2)) +
   annotation_logticks(sides = "b", colour = "#989898") +
-  theme_light()
+  theme_light() +
+  labs(color = "Encoding", linetype = "Encoding")
 dev.off()
 
 # Scatter plot for memory usage (not interesting)
@@ -133,3 +133,26 @@ ggplot(df, aes(x = memory_db20, y = memory_cd06, col = major.dataset)) +
   xlab("db20 memory usage") +
   ylab("d02 memory usage") +
   scale_color_brewer(palette = "Dark2", name = "Data set")
+
+# Cumulative plot for memory usage
+times <- unique(df0$memory)
+cumulative <- rbind.data.frame(
+      cbind(times, "cd05", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "cd05" & !is.na(df0$answer)] <= x)))),
+      cbind(times, "cd06", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "cd06" & !is.na(df0$answer)] <= x)))),
+      cbind(times, "d02", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "d02" & !is.na(df0$answer)] <= x)))),
+      cbind(times, "db20", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "db20" & !is.na(df0$answer)] <= x)))),
+      cbind(times, "sbk05", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "sbk05" & !is.na(df0$answer)] <= x)))))
+names(cumulative) <- c("memory", "encoding", "count")
+cumulative$encoding <- as.factor(paste("\\texttt{", cumulative$encoding, "}", sep = ""))
+cumulative$memory <- as.numeric(cumulative$memory)
+cumulative$count <- as.numeric(cumulative$count)
+
+ggplot(cumulative, aes(x = memory/1024, y = count, color = encoding)) +
+  geom_line() +
+  scale_x_continuous(trans = log10_trans()) +
+  xlab("Peak memory usage (MiB)") +
+  ylab("Instances solved") +
+  labs(color = "Encoding") +
+  scale_colour_brewer(palette = "Dark2") +
+  annotation_logticks(sides = "b", colour = "#989898") +
+  theme_light()

@@ -80,13 +80,11 @@
     (ADDMC) to run on the new format.
   \item We show that this results in significantly faster inference.
   \item We show that our encoding results in asymptotically fewer literals and
-    fewer ADDs, and thus a simpler problem.
-  \item (Maybe) we experimentally demonstrate a phase transition based on the
-    number of variables per ADD.
+    fewer ADDs.
   \end{enumerate}
-\item Potential criticism may be that this is a step backwards and doesn't allow
-  us to use SAT-based techniques for probabilistic inference. However, they can
-  still be used for the 'theory+query' part.
+\item Potential criticism may be that this doesn't allow us to use SAT-based
+  techniques for probabilistic inference. However, they can still be used for a
+  significant part of the encoding.
   \begin{itemize}
   \item Zero-probability weights and one-probability weights can be interpreted
     as logical clauses. This doesn't affect ADDMC but could be useful for other
@@ -199,11 +197,8 @@ $\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
   Let $U$ be a set.
   \begin{itemize}
   \item A \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$
-    such that $M(\bot) = 0$ and
-    \[
-      M(a \lor b) = M(a) + M(b)
-    \]
-    for all $a, b \in 2^{2^U}$ whenever $a \land b = \bot$.
+    such that $M(\bot) = 0$, and $M(a \lor b) = M(a) + M(b)$ for all $a, b \in
+    2^{2^U}$ whenever $a \land b = \bot$.
   \item A \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
       0}$.
   \item A weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
@@ -251,17 +246,17 @@ $x \in 2^{2^U}$ with a given definition of $W$ is known as \emph{weighted model
   \centering
   \begin{tabular}{lcc}
     \toprule
-    Name in logic & Set-theoretic notation & Boolean-algebraic notation \\
+    Name in logic & Boolean-algebraic notation & Set-theoretic notation \\
     \midrule
     Atoms (elements of $U$) & $a, b$ & $a, b$ \\
-    \rowcolor{gray!10} Models (elements of $2^U$) & $\emptyset, \{a\}, \{b\}, \{a, b\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
-    & $\{ \emptyset, \{a\}, \{b\}, \{a, b\} \}$ & $\top$ \\
-    & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{a\}, \{a, b\} \}$ & $\neg a \lor \neg b, a \to b$ \\
-    & $\{ \emptyset, \{b\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ & $b \to a, a \lor b$ \\
-    & $\{\emptyset, \{a\}\}, \{\emptyset, \{b\}\}, \{\emptyset, \{a, b\}\}$ & $\neg b, \neg a, a \leftrightarrow b$ \\
-    & $\{\{a\}, \{b\}\}, \{\{a\}, \{a, b\}\}, \{\{b\}, \{a, b\}\}$ & $(a \land \neg b) \lor (b \land \neg a), a, b$ \\
-    & $\{\emptyset\}, \{\{a\}\}, \{\{b\}\}, \{\{a, b\}\}$ & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ \\
-    \multirow{-7}{*}{Formulas (elements of $2^{2^U}$)} & $\emptyset$ & $\bot$ \\
+    \rowcolor{gray!10} Models (elements of $2^U$) & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ & $\emptyset, \{a\}, \{b\}, \{a, b\}$ \\
+    & $\top$ & $\{ \emptyset, \{a\}, \{b\}, \{a, b\} \}$ \\
+    & $\neg a \lor \neg b, a \to b$ & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{a\}, \{a, b\} \}$ \\
+    & $b \to a, a \lor b$ & $\{ \emptyset, \{b\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ \\
+    & $\neg b, \neg a, a \leftrightarrow b$ & $\{\emptyset, \{a\}\}, \{\emptyset, \{b\}\}, \{\emptyset, \{a, b\}\}$ \\
+    & $(a \land \neg b) \lor (b \land \neg a), a, b$ & $\{\{a\}, \{b\}\}, \{\{a\}, \{a, b\}\}, \{\{b\}, \{a, b\}\}$ \\
+    & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ & $\{\emptyset\}, \{\{a\}\}, \{\{b\}\}, \{\{a, b\}\}$ \\
+    \multirow{-7}{*}{Formulas (elements of $2^{2^U}$)} & $\bot$ & $\emptyset$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -305,7 +300,7 @@ equivalently to \cref{eq:wmc_example}, we can write
 \]
 
 Given the theory $\Delta$, we can also compute the probability of a query $b$ as
-\cite{DBLP:conf/uai/Belle17,DBLP:conf/aaai/SangBK05}
+\cite{DBLP:conf/aaai/SangBK05}
 \[
   \Pr_{\Delta, w}(b) = \frac{\WMC(\Delta \land b)}{\WMC(\Delta)}.
 \]
@@ -316,17 +311,51 @@ In the rest of the paper, for any set $U$, we will use set-theoretic notation
 for $2^U$ and Boolean-algebraic notation for $2^{2^U}$, except for (Boolean)
 atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 
-\section{Limitations of Factorable Measures}
+\subsection{Limitations of Factorable Measures}
 
 \todo[inline,caption={}]{
-  Examples (must):
-  \begin{itemize}
-  \item an example of a measure that cannot be expressed using a factored weight
-    function,
-  \item an example of how to express it using conditional weight functions.
-  \end{itemize}
-  Also, define `conditional weight function'.
+  Clarify what is meant by`conditional weight function'.
 }
+
+\begin{example}
+  Let $U = \{a, b\}$ be a set of atoms and $M\colon 2^{2^U} \to \mathbb{R}_{\ge
+    0}$ a measure defined as:\footnote{The value of $M$ on any other element of
+    the Boolean algebra can be deduced using the definition.}
+  \begin{align*}
+    M(a \land b) &= 0.72, \\
+    M(a \land \neg b) &= 0.18, \\
+    M(\neg a \land b) &= 0.07, \\
+    M(\neg a \land \neg b) &= 0.03.
+  \end{align*}
+  If $M$ could be represented using traditional (factored) WMC, we would have to
+  find two weight functions $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and
+  $W_b\colon 2^{\{b\}} \to \mathbb{R}_{\ge 0}$ such that $W = W_a \cdot W_b$
+  induces $M$, i.e., $W_a$ and $W_b$ would have to satisfy this system of
+  equations:
+  \begin{align*}
+    W_a(\{a\}) \cdot W_b(\{b\}) &= 0.72 \\
+    W_a(\{a\}) \cdot W_b(\emptyset) &= 0.18 \\
+    W_a(\emptyset) \cdot W_b(\{b\}) &= 0.07 \\
+    W_a(\emptyset) \cdot W_b(\emptyset) &= 0.03,
+  \end{align*}
+  which has no solutions.
+
+  Alternatively, we can let $b$ depend on $a$ and consider weight functions
+  $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and $W_b\colon 2^{\{a, b\}} \to
+  \mathbb{R}_{\ge 0}$ defined as
+  \begin{align*}
+    W_a(\{a\}) &= 0.9, \\
+    W_a(\emptyset) &= 0.1,
+  \end{align*}
+  and
+  \begin{align*}
+    W_b(\{a, b\}) &= 0.8, \\
+    W_b(\{a\}) &= 0.2, \\
+    W_b(\{b\}) &= 0.7, \\
+    W_b(\emptyset) &= 0.3.
+  \end{align*}
+  One can easily check that with these definitions $W$ indeed induces $M$.
+\end{example}
 
 \begin{lemma} \label{lemma:before_theorem}
   For any measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
@@ -379,17 +408,10 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 \begin{proof}
   ($\Leftarrow$) For each $x \in U$, let $W_x\colon 2^{\{x\}} \to
   \mathbb{R}_{\ge 0}$ be defined by $W_x(\{ x \}) = M(x)$ and $W_x(\emptyset) =
-  M(\neg x)$. Let $M_W$ be the measure induced by
-  \[
-    W = \prod_{x \in U} W_x.
-  \]
-  We will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by
-  \cref{def:wmc,prop:measure}. Second, let
-  \[
-    a = \bigwedge_{u \in U} a_u
-  \]
-  be an atom in $2^{2^U}$ such that $a_u \in \{ u, \neg u \}$ for all $u \in U$.
-  Then
+  M(\neg x)$. Let $M_W$ be the measure induced by $W = \prod_{x \in U} W_x$. We
+  will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by
+  \cref{def:wmc,prop:measure}. Second, let $a = \bigwedge_{u \in U} a_u$ be an
+  atom in $2^{2^U}$ such that $a_u \in \{ u, \neg u \}$ for all $u \in U$. Then
   \[
     M_W(a) = W(\{ a_u \mid u \in U \}) = \prod_{u \in U} W_u(\{a_u\}) = \prod_{u
       \in U} M(a_u) = M \left(\bigwedge_{u \in U} a_u \right) = M(a)
@@ -400,14 +422,10 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
   elements of the Boolean algebra.
 
   ($\Rightarrow$) For the other direction, we are given a factored weight
-  function
-  \[
-    W = \prod_{x \in U} W_x,
-  \]
-  and we want to show that its induced measure $M_W$ satisfies
-  \cref{eq:wmccondition}. Let $k_u, k_v \in U \cup \{ \neg w \mid w \in U \}$ be
-  such that $k_u \in \{ u, \neg u \}$, $k_v \in \{ v, \neg v \}$, and $u \ne v$.
-  We then want to show that
+  function $W = \prod_{x \in U} W_x$, and we want to show that its induced
+  measure $M_W$ satisfies \cref{eq:wmccondition}. Let $k_u, k_v \in U \cup \{
+  \neg w \mid w \in U \}$ be such that $k_u \in \{ u, \neg u \}$, $k_v \in \{ v,
+  \neg v \}$, and $u \ne v$. We then want to show that
   \begin{equation} \label{eq:to_prove3}
     M_W(k_u \land k_v) = M_W(k_u)M_W(k_v)
   \end{equation}
@@ -421,12 +439,10 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
                         &= \sum_{\{a\} \le k_u \land k_v} W_u(a_u)W_v(a_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) = \sum_{\{a\} \le k_u \land k_v} W_u(k_u)W_v(k_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) \\
     &= W_u(k_u)W_v(k_v) \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} W_x(a) = W_u(k_u)W_v(k_v)C,
   \end{align*}
-  where
-  \[
-    C = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} W_x(a),
-  \]
-  and is the same for $M_W(\neg k_u \land k_v)$, $M_W(k_u \land \neg k_v)$, and
-  $M_W(\neg k_u \land \neg k_v)$ as well. But then \cref{eq:to_prove4} becomes
+  where $C = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}}
+  W_x(a)$, and is the same for $M_W(\neg k_u \land k_v)$, $M_W(k_u \land \neg
+  k_v)$, and $M_W(\neg k_u \land \neg k_v)$ as well. But then
+  \cref{eq:to_prove4} becomes
   \[
     W_u(k_u)W_v(k_v)W_u(\neg k_u)W_v(\neg k_v)C^2 = W_u(k_u)W_v(\neg
     k_v)W_u(\neg k_u)W_v(k_v)C^2
@@ -545,29 +561,29 @@ Cover:
   encoding \texttt{db20}.}
 
 A \emph{Bayesian network} is a directed acyclic graph with random variables as
-vertices that defines a probability distribution over them. Let $V$ denote the
-set of random variables and $X \in V$ be a random variable. Let $\im X$ denote
-the set of possible values of $X$ and $\mathrm{pa}(X)$ denote the set of its
-parents. The full probability distribution is then equal to
+vertices that defines a probability distribution over them. Let $\mathcal{V}$
+denote the set of random variables and $X \in \mathcal{V}$ be a random variable.
+Let $\im X$ denote the set of possible values of $X$ and $\mathrm{pa}(X)$ denote
+the set of its parents. The full probability distribution is then equal to
 \begin{equation} \label{eq:factorisation}
-  \prod_{X \in V} \Pr(X \mid \mathrm{pa}(X)).
+  \prod_{X \in \mathcal{V}} \Pr(X \mid \mathrm{pa}(X)).
 \end{equation}
 If all random variables are discrete (and we only consider discrete Bayesian
 networks in this paper), the probabilities contained in each factor of
 \cref{eq:factorisation} can be summarised in a table known as a
 \emph{conditional probability table} (CPT). See \cref{fig:example_bn} for an
 example Bayesian network which we will refer to throughout this section. For
-this network, $V = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F)
-= \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m,
-h \}$.
+this network, $\mathcal{V} = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$,
+$\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and
+$\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
-  Let $X \in V$ be a random variable. If $X$ is binary (i.e., $|\im X| = 2$), we
-  can arbitrary identify one of the values as $1$ and the other one as $0$ (i.e,
-  $\im X \cong \{ 0, 1 \}$). Then $X$ can be represented by a single
+  Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
+  = 2$), we can arbitrary identify one of the values as $1$ and the other one as
+  $0$ (i.e, $\im X \cong \{ 0, 1 \}$). Then $X$ can be represented by a single
   \emph{indicator variable} $\lambda_{X=1}$. For notational simplicity, for any
   set $S$, we write $\lambda_{X=0} \in S$ or $S = \{ \lambda_{X=0}, \dots \}$ to
-  mean $\lambda_{X=1} \not\in S$,
+  mean $\lambda_{X=1} \not\in S$.
 
   On the other hand, if $X$ is not binary, we represent $X$ with $|\im X|$
   indicator variables, one for each value. We let
@@ -577,17 +593,11 @@ h \}$.
       \{ \lambda_{X=x} \mid x \in \im X \} & \text{otherwise.}
     \end{cases}
   \]
-  denote the set of indicator variables for $X$ and
-  \[
-    E^*(X) = E(X) \cup \bigcup_{Y \in \mathrm{pa}(X)} E(Y).
-  \]
-  denote the set of indicator variables for $X$ and its parents in the Bayesian
-  network. Finally, let
-  \[
-    U = \bigcup_{X \in V} E(X)
-  \]
-  denote the set of all indicator variables for all random variables in the
-  Bayesian network.
+  denote the set of indicator variables for $X$ and $E^*(X) = E(X) \cup
+  \bigcup_{Y \in \mathrm{pa}(X)} E(Y)$ denote the set of indicator variables for
+  $X$ and its parents in the Bayesian network. Finally, let $U = \bigcup_{X \in
+    \mathcal{V}} E(X)$ denote the set of all indicator variables for all random
+  variables in the Bayesian network.
 \end{definition}
 
 For the Bayesian network in \cref{fig:example_bn}, this gives us:
@@ -604,11 +614,11 @@ For the Bayesian network in \cref{fig:example_bn}, this gives us:
   \caption{Encoding a Bayesian network as a function $2^U \to \mathbb{R}_{\ge
       0}$}
   \label{alg:encoding}
-  \KwData{a Bayesian network with vertices $V$ and probability distribution
-    $\Pr$}
+  \KwData{a Bayesian network with vertices $\mathcal{V}$ and probability
+    distribution $\Pr$}
   \KwResult{a function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$}
   $\phi \gets 1$\;
-  \For{$X \in V$}{
+  \For{$X \in \mathcal{V}$}{
     \textit{let} $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$\;
     $\mathrm{CPT}_X \gets 0$\;
     \eIf{$|\im X| = 2$}{
@@ -650,7 +660,7 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
 \subsection{Proof of Correctness}
 
 \begin{lemma} \label{lemma:cpt}
-  Let $X \in V$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
+  Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
   \dots, Y_n \}$. Then $\mathrm{CPT}_X\colon 2^{E^*(X)} \to \mathbb{R}_{\ge 0}$
   is such that for any $x \in \im X$ and $(y_1, \dots, y_n) \in \prod_{i=1}^n
   \im Y_i$,
@@ -666,25 +676,20 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   \dots, Y_n$. Exactly one of these terms is nonzero when applied to $\tau$, and
   it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
 
-  If $X$ is not binary, then
-  \[
-    \left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(\tau) = 1,
-  \]
-  and
+  If $X$ is not binary, then $\left( \sum_{i=1}^m [\lambda_{X = x_i}]
+  \right)(\tau) = 1$, and
   \[
     \left( \prod_{i=1}^m \prod_{j=i+1}^m (\overline{[\lambda_{X = x_i}]} +
       \overline{[\lambda_{X = x_j}]}) \right)(\tau) = 1,
   \]
-  so, by a similar argument as before,
-  \[
-    \mathrm{CPT}_X(\tau) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
-  \]
+  so $\mathrm{CPT}_X(\tau) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by a
+  similar argument as before.
 \end{proof}
 
 \begin{proposition} \label{lemma:full_distribution}
   $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ represents the full probability
-  distribution of the Bayesian network, i.e., if $V = \{ X_1, \dots, X_n\}$,
-  then
+  distribution of the Bayesian network, i.e., if $\mathcal{V} = \{ X_1, \dots,
+  X_n\}$, then
   \[
     \phi(\tau) =
     \begin{cases}
@@ -697,39 +702,33 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   for all $\tau \in 2^U$.
 \end{proposition}
 \begin{proof}
-  If $\tau = \{ \lambda_{X=v_X} \mid X \in V \}$ for some $(v_X)_{X \in V} \in
-  \prod_{X \in V} \im X$, then
+  If $\tau = \{ \lambda_{X=v_X} \mid X \in \mathcal{V} \}$ for some $(v_X)_{X
+    \in \mathcal{V}} \in \prod_{X \in \mathcal{V}} \im X$, then
   \[
-    \phi(\tau) = \prod_{X \in V} \Pr \left( X=v_X \;\middle|\; \bigwedge_{Y \in
-        \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X \in V} X=v_X
-    \right)
+    \phi(\tau) = \prod_{X \in \mathcal{V}} \Pr \left( X=v_X \;\middle|\;
+      \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X
+        \in \mathcal{V}} X=v_X \right)
   \]
   by \cref{lemma:cpt} and the definition of a Bayesian network. Otherwise there
-  must be some non-binary random variable $X \in V$ such that $|E(X) \cap \tau|
-  \ne 1$. If $E(X) \cap \tau = \emptyset$, then
-  \[
-    \left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(\tau) = 0,
-  \]
-  and so $\mathrm{CPT}_X(\tau) = 0$, and $\phi(\tau) = 0$. If $|E(X) \cap
-  \tau| > 1$, then we must have two different values $x_1, x_2 \in \im X$ such
-  that $\{\lambda_{X=x_1}, \lambda_{X=x_2} \} \subseteq \tau$ which means that
-  \[
-    (\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(\tau) = 0,
-  \]
-  and so, again, $\mathrm{CPT}_X(\tau) = 0$, and $\phi(\tau) = 0$.
+  must be some non-binary random variable $X \in \mathcal{V}$ such that $|E(X)
+  \cap \tau| \ne 1$. If $E(X) \cap \tau = \emptyset$, then $\left( \sum_{i=1}^m
+    [\lambda_{X = x_i}] \right)(\tau) = 0$, and so $\mathrm{CPT}_X(\tau) = 0$,
+  and $\phi(\tau) = 0$. If $|E(X) \cap \tau| > 1$, then we must have two
+  different values $x_1, x_2 \in \im X$ such that $\{\lambda_{X=x_1},
+  \lambda_{X=x_2} \} \subseteq \tau$ which means that
+  $(\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(\tau) = 0$, and
+  so, again, $\mathrm{CPT}_X(\tau) = 0$, and $\phi(\tau) = 0$.
 \end{proof}
 
 \begin{theorem}
-  Let $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ be a function generated by the
-  algorithm. Then
-  \[
-    (\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset) = \Pr(X = x).
-  \]
+  Let $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ be the function generated by
+  \cref{alg:encoding}. Then $(\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset)
+  = \Pr(X = x)$.
 \end{theorem}
 \begin{proof}
-  Let $V = \{ X, Y_1, \dots, Y_n \}$. Then
+  Let $\mathcal{V} = \{ X, Y_1, \dots, Y_n \}$. Then
   \begin{align*}
-    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{\tau \in 2^U} (\phi \cdot [\lambda_{X=x}])(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \phi(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \left( \prod_{Y \in V} \mathrm{CPT}_Y \right)(\tau) \\
+    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{\tau \in 2^U} (\phi \cdot [\lambda_{X=x}])(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \phi(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \left( \prod_{Y \in \mathcal{V}} \mathrm{CPT}_Y \right)(\tau) \\
     &= \sum_{(y_1, \dots, y_n) \in \prod_{i=1}^n \im Y_i} \Pr(X = x, Y_1 = y_1, \dots, Y_n = y_n) = \Pr(X = x)
   \end{align*}
   by the following arguments:
@@ -817,14 +816,17 @@ this, we need to perform this multiplication.
   \begin{minipage}{0.59\textwidth}
     \centering
     \input{cumulative.tex}%
-    \captionof{figure}{Cumulative plot}
+    \captionof{figure}{Cumulative number of instances solved by ADDMC over time
+      using each encoding}
   \end{minipage}
   \begin{minipage}{0.39\textwidth}
     \centering
-    \captionof{table}{Out of 1216 instances}%
+    \captionof{table}{The numbers of instances solved by ADDMC with each
+      encoding (uniquely, faster than with others, and in total) under the
+      described time and memory constraints (out of 1216 instances)}%
     \begin{tabular}{lrrr}
       \toprule
-      Encoding & Unique & Fastest & Solved \\
+      Encoding & Unique & Fastest & Total \\
       \midrule
       \texttt{cd05} & 2 & 3 & 372 \\
       \texttt{cd06} & 0 & 1 & 351 \\
@@ -839,7 +841,9 @@ this, we need to perform this multiplication.
 \begin{figure}
   \centering
   \input{scatter.tex}%
-  \caption{Scatter plots}
+  \caption{ADDMC inference time using \texttt{db20} compared to \texttt{d02}
+    (left) and \texttt{sbk05} (right) on an instance-by-instance basis across
+    all data sets.}
 \end{figure}
 
 \begin{itemize}
@@ -851,10 +855,10 @@ this, we need to perform this multiplication.
   on solving $\NP$-complete problems as part of the encoding process
   \cite{DBLP:conf/sat/ChaviraD06}.
 \item Whenever a Bayesian network comes with an evidence file, we compute the
-  probability of evidence. Otherwise, let $X$ denote the last-mentioned node in
-  the Bayesian network. If $\mathsf{true}$ is a valid value of $X$, we compute
-  the marginal probability of $X = \mathsf{true}$. Otherwise, we pick the value
-  of $X$ which is listed first and calculate its marginal probability.
+  probability of evidence. Otherwise, let $X$ denote the last-mentioned vertex
+  in the Bayesian network. If $\mathsf{true}$ is a valid value of $X$, we
+  compute the marginal probability of $X = \mathsf{true}$. Otherwise, we pick
+  the value of $X$ which is listed first and calculate its marginal probability.
 \item The experiments were run on Intel Xeon Gold 6138 processor with an
   \SI{8}{\giga\byte} memory limit.
 \item For all other encodings, we use their implementation in
@@ -904,51 +908,39 @@ which happen to be binary. We classify them into the following seven categories:
 \item However, \texttt{db20} struggles with instances from Mastermind and
   Random Blocks domains (but so does \texttt{sbk05}). We conjecture that this
   is so either because the particular structure of these problems confuse the
-  algorithm's heuristics or because these instances allow for significant
+  heuristics used by ADDMC or because these instances allow for significant
   simplifications that are exploited by $\mathtt{d02}$ but not
   $\mathtt{db20}$.
+\item Everything \texttt{d02} can do in \SI{1000}{\second}, \texttt{db20} can do
+  in \SI{10}{\second} (find the exact number).
 \end{itemize}
 
-\section{Explaining The Performance Benefits}
+\begin{table}
+  \centering
+  \caption{Asymptotic upper bounds on the numbers of variables and clauses/ADDs
+    for each encoding}
+  \label{tbl:asymptotes}
+  \begin{tabular}{lcc}
+    \toprule
+    Encoding(s) & Variables & Clauses/ADDs \\
+    \midrule
+    \texttt{cd05}, \texttt{cd06}, \texttt{sbk05} & $\mathcal{O}(nv^{d+1})$ & $\mathcal{O}(nv^{d+1})$ \\
+    \texttt{d02} & $\mathcal{O}(nv^{d+1})$ & $\mathcal{O}(ndv^{d+1})$ \\
+    \texttt{db20} & $\mathcal{O}(nv)$ & $\mathcal{O}(nv^2)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
-\begin{itemize}
-\item \texttt{d02} has
-  \[
-    \sum_{X \in V} |\im X| + |\im X|\prod_{Y \in \mathrm{pa}(X)}|\im Y|
-  \]
-  variables and
-  \[
-    \sum_{X \in V} 1 + \binom{|\im X|}{2} + |\im X|(2 +
-    |\mathrm{pa}(X)|)\prod_{Y \in \mathrm{pa}(X)} |\im Y|
-  \]
-  clauses (along with one ADD per variable to encode the weights).
-\item \texttt{sbk05} is a bit harder to evaluate due to a handful of small
-  optimisations in the encoding. Could find an upper bound anyway.
-\item \texttt{db20} (my encoding) has
-  \[
-    \sum_{X \in V} |\im X|
-  \]
-  variables (less for binary) and
-  \[
-    \sum_{X \in V} |\im X| + 1 + \binom{|\im X|}{2}
-  \]
-  ADDs.
-\item Let:
-  \begin{itemize}
-  \item $N = |V|$ (i.e., the number of nodes in the Bayesian network),
-  \item $D = \max_{X \in V} |\mathrm{pa}(X)|$ (i.e., the maximum in-degree or
-    the number of parents),
-  \item $V = \max_{X \in V} |\im X|$ (i.e., the maximum number of values per
-    variables).
-  \end{itemize}
-\item Then my encoding has $\mathcal{O}(NV)$ variables and $\mathcal{O}(NV^2)$
-  ADDs while \texttt{d02} has $\mathcal{O}(NV^{D+1})$ variables and
-  $\mathcal{O}(NDV^{D+1})$ ADDs.
-\end{itemize}
+\paragraph{Explaining The Performance Benefits.} Let $n = |\mathcal{V}|$ be the
+number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
+|\mathrm{pa}(X)|$ the maximum in-degree (i.e., number of parents), and $v =
+\max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
+Then... \cref{tbl:asymptotes}.
 
-\todo[inline]{Calculate numVariables/numClauses (or the other way around) for
-  each instance and plot this ratio vs runtime (for each encoding, or at least
-  mine and D02). The new CP paper kind of beat me to it...}
+\todo[inline]{Remember that these are upper bounds! Some of these encoding have
+  a lot of optimisations that are not captured by three parameters!}
+
+\todo[inline]{Explain why clauses and ADDs are alike.}
 
 \section{Conclusion and Future Work}
 
@@ -958,8 +950,8 @@ which happen to be binary. We classify them into the following seven categories:
 \item Extra benefit: one does not need to come up with a way to turn some
   probability distribution to into a fully independent one.
 \item Important future work: replacing ADDs with
-  AADDs\footnote{\url{https://github.com/ssanner/dd-inference}}
-  \cite{DBLP:conf/ijcai/SannerM05} is likely to bring performance benefits.
+  AADDs \cite{DBLP:conf/ijcai/SannerM05} is likely to bring performance
+  benefits.
   Other extensions:
   \begin{itemize}
   \item FOADDs can represent first order statements;
@@ -974,57 +966,16 @@ which happen to be binary. We classify them into the following seven categories:
   \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
   \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
     \begin{itemize}
-    \item For the ProbLog to WMC conversion, check out this guy:
-      \url{https://users.ics.aalto.fi/ttj/}.
     \item proof-based \cite{DBLP:conf/iclp/MantadelisJ10}
     \item rule-based \cite{DBLP:conf/ecai/Janhunen04}
-    \item For ground ProbLog, we can encode a program
-\begin{verbatim}
-p :: a :- b
-q :: a :- c
-\end{verbatim}
-      into $P(a \mid b)=p$, $P(a \mid c)=q$ instead of having clauses $b
-      \Rightarrow a$, $c \Rightarrow a$. Some logical structure is likely to
-      remain.
     \end{itemize}
   \end{itemize}
 \item Bayesian networks are often solved in a compile once, query many times
   fashion. This can be achieved using ADDMC by selecting a subset $S$ of
   variable we may want to query over and running ADDMC while excluding $S$ from
   variable elimination/projection/$\exists$.
-\item More references
-  \begin{itemize}
-  \item Measures on/in Boolean algebras: Horn and Tarski
-    \cite{horn1948measures}, Jech \cite{jech2017measures}
-  \item On Boolean algebras and their role in analysis \cite{winkowska1996boolean}
-  \item Infinite domains
-    \begin{itemize}
-    \item Markov Logic in Infinite Domains (Singla and Domingos)
-      \cite{DBLP:conf/uai/SinglaD07}
-    \item Objective Bayesian probabilistic logic (Williamson)
-      \cite{DBLP:journals/jal/Williamson08}
-    \item Unifying Logic and Probability (Russell)
-      \cite{DBLP:journals/cacm/Russell15}
-    \end{itemize}
-  \item Logical induction \cite{DBLP:journals/eccc/GarrabrantBCST16}
-  \item Quantum probabilistic logic programming \cite{balu2015quantum}
-  \item WMC
-    \begin{itemize}
-    \item algebraic model counting \cite{DBLP:journals/japll/KimmigBR17}
-    \item Explanation-Based Approximate Weighted Model Counting for
-      Probabilistic Logics \cite{DBLP:conf/aaai/RenkensKBR14}
-    \item OUWMC \cite{DBLP:conf/aaai/Belle17}
-    \item Formula-Based Probabilistic Inference \cite{DBLP:conf/uai/GogateD10}
-    \item Parallel Probabilistic Inference by WMC \cite{DBLP:conf/pgm/DalLL18}
-    \item Semiring Programming \cite{DBLP:journals/corr/BelleR16}
-    \item theoretical extension: WMC beyond two-variable logic
-      \cite{DBLP:conf/lics/KuusistoL18}
-    \item from weighted to unweighted model counting
-      \cite{DBLP:conf/ijcai/ChakrabortyFMV15}
-    \item theory behind WMC algorithms: solving \#\SAT{} and Bayesian inference
-      with backtracking search \cite{DBLP:journals/jair/BacchusDP09}
-    \end{itemize}
-  \end{itemize}
+\item I could also add a memory usage cumulative plot, but it doesn't add any
+  extra info except for the fact that inference is memory-intensive.
 \end{itemize}
 
 \paragraph{Acknowledgements.} This work has made use of the resources provided
