@@ -16,45 +16,27 @@
 \usepackage{tikz}
 \usepackage[backgroundcolor=lightgray]{todonotes}
 \usepackage{complexity}
-\usepackage{soul}
 \usepackage{subcaption}
 \usepackage{multirow}
 \usepackage[binary-units]{siunitx}
 \usepackage[inline]{enumitem}
+
+\usetikzlibrary{cd}
+\usetikzlibrary{bayesnet}
+\usetikzlibrary{calc}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{observation}{Observation}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
-\newtheorem{conjecture}{Conjecture}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 \newtheorem{example}{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
-\Crefname{property}{Property}{Properties}
-\Crefname{condition}{Condition}{Conditions}
-\creflabelformat{condition}{#2(#1)#3}
-
-\DeclareMathOperator{\WMC}{WMC}
-\DeclareMathOperator{\nWMC}{NWMC}
-\DeclareMathOperator{\id}{id}
-\DeclareMathOperator{\End}{End}
 \DeclareMathOperator{\im}{im}
-
-\usetikzlibrary{cd}
-\usetikzlibrary{bayesnet}
-\usetikzlibrary{calc}
-
-\tikzset{
-  Subset/.style={
-    draw=none,
-    every to/.append style={
-      edge node={node [sloped, allow upside down, auto=false]{$\subset$}}}
-  }
-}
 
 \title{Weighted Model Counting with Conditional Weights}
 \author{Paulius Dilkas}
@@ -82,26 +64,21 @@
   \item We show that our encoding results in asymptotically fewer literals and
     fewer ADDs.
   \end{enumerate}
-\item Potential criticism may be that this doesn't allow us to use SAT-based
-  techniques for probabilistic inference. However, they can still be used for a
-  significant part of the encoding.
+\item Introduce
   \begin{itemize}
-  \item Zero-probability weights and one-probability weights can be interpreted
-    as logical clauses. This doesn't affect ADDMC but could be useful for other
-    solvers.
+  \item WMC
+  \item ADDMC \cite{DBLP:conf/aaai/DudekPV20} and ADDs
+    \cite{DBLP:journals/fmsd/BaharFGHMPS97}
+  \item A Bayesian network is a directed acyclic graph with random variables as
+    vertices that defines a probability distribution over them. The full
+    probability distribution can be expressed as the product of the conditional
+    probability distributions of all random variables. For discrete Bayesian
+    networks (and we only consider discrete networks in this paper), each such
+    distribution can be represented by a table known as a conditional
+    probability table (CPT).
   \end{itemize}
 \item[F] What are the main claims, what are the main takeaways, intuitive [???]
   of theorems to follow.
-\item
-  Algorithms
-  \begin{itemize}
-  \item ADDMC \cite{DBLP:conf/aaai/DudekPV20} (rediscovered the
-    multiplicativity of BAs in different words) (with optimal settings)
-  \item Cachet \cite{DBLP:conf/sat/SangBBKP04}
-  \item c2d \cite{DBLP:conf/ecai/Darwiche04}
-  \item d4 \cite{DBLP:conf/ijcai/LagniezM17} (closed source, boo!)
-  \item miniC2D  \cite{DBLP:conf/ijcai/OztokD15}
-  \end{itemize}
 \item Notable previous/related work
   \begin{itemize}
   \item Hailperin's approach to probability logic
@@ -116,11 +93,65 @@
       \cite{krauss1968representation}
     \end{itemize}
   \end{itemize}
-\item Intuitively, a measure is just like a probability, except it's in
-  $\mathbb{R}_{\ge 0}$ instead of $[0, 1]$.
+\item Our work is, in spirit, similar to... using ROBDDs for Inference in
+  Bayesian Networks with Troubleshooting as an Example
+  \cite{DBLP:conf/uai/NielsenWJK00}: this is an interesting approach where
+  deterministic parts of a BN are expressed as Boolean functions, i.e.,
+  extracting the logical from the probabilistic. Maybe I can make a case that my
+  encoding (the textual version) kind of does the same, even though the
+  algorithm doesn't.
 \end{itemize}
 
-\section{Boolean Algebras and Power Sets}
+\section{Related Work}
+
+\paragraph{Using WMC to perform inference on Bayesian networks.} Hitherto, four
+techniques have been proposed for encoding Bayesian networks into instances of
+WMC. We will identify them based on the initials of authors as well as
+publications years: \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}, \texttt{sbk05}
+\cite{DBLP:conf/aaai/SangBK05}, \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05},
+and \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06}. Below we friendly summarise
+the observed performance differences among them. Sang et al.
+\cite{DBLP:conf/aaai/SangBK05} claim that \texttt{sbk05} is a smaller encoding
+than \texttt{d02} with respect to both the number of clauses and the number of
+variables but provide no experimental comparison. Chavira and Darwiche
+\cite{DBLP:conf/ijcai/ChaviraD05} compare \texttt{cd05} with \texttt{d02} by
+measuring the time it takes to compile either encoding into an arithmetic
+circuit (but do not measure inference time). The more recent encoding
+\texttt{cd05} always compiles faster and results in a smaller arithmetic circuit
+(as measured by the number of edges). In their subsequent paper, the same
+authors perform two sets of experiments (that are relevant to this summary)
+\cite{DBLP:conf/sat/ChaviraD06}. First, they compile \texttt{cd05} and
+\texttt{cd06} encodings into d-DNNF (i.e., deterministic decomposable negation
+normal form \cite{DBLP:journals/jancl/Darwiche01}), measuring both compilation
+time and numbers of edges in the d-DNNF diagram. The results are mostly in
+favour of \texttt{cd06}. Second, they compare the inference time of
+\texttt{sbk05} run with Cachet \cite{DBLP:conf/sat/SangBBKP04} with the compile
+times of \texttt{cd05} and \texttt{cd06}, but only on five (types of) instances.
+In these experiments, \texttt{cd06} is always faster than \texttt{cd05}, while
+the comparison with \texttt{sbk05} is mixed. Sometimes \texttt{cd06} is orders
+of magnitude faster than \texttt{sbk05}, sometimes slightly slower. The
+performance difference between \texttt{sbk05} and \texttt{cd05} is even harder
+to judge: \texttt{sbk05} is better on three out of five instances and worse on
+the remaining two. Based on this description, one would expect \texttt{cd06} to
+be faster than both \texttt{cd05} and \texttt{sbk05}, both of which should be
+faster than \texttt{d02}. The experiments in \cref{sec:experiments}, however,
+strongly disagree with this prediction, showing that the quality of an encoding
+depends strongly on the underlying search algorithm or compilation technique.
+
+\paragraph{ADDs and their use in probabilistic inference.} ADDs provide an
+efficient way to manipulate functions from a Boolean algebra to any algebraic
+structure (most commonly $\mathbb{R}$) \cite{DBLP:journals/fmsd/BaharFGHMPS97}.
+They have been used to represent value functions in Markov decision processes
+\cite{DBLP:conf/uai/HoeySHB99} and, for Bayesian network inference, to represent
+each CPT as an ADD \cite{DBLP:conf/icml/ZhaoMP15} as well as by combining ADDs
+and arithmetic circuits into a  single representation
+\cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous in this
+situation because of their ability to fully exploit context-specific
+independence, i.e., observable structure within a CPT that is not inherited from
+the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
+
+\section{Boolean Algebras, Power Sets, and Propositional
+  Logic} \label{sec:prelims}
 
 \begin{table}
   \centering
@@ -142,106 +173,9 @@
   \end{tabular}
 \end{table}
 
-Let $X$ be a set and let $2^X$ be its power set. We can equivalently interpret
-$2^X$ as a Boolean algebra. See \cref{tbl:notation} for a summary of the
-differences in terminology and notation. We will use both.
-
-\subsection{The Space of Functions on Boolean Algebras}
-
-\begin{definition}[Operations on functions]
-  Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
-    0}$ be functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We define
-  the following operations:
-  \begin{description}
-  \item[Addition:] $A+B\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$ is a function
-    such that $(A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)$ for all $\tau \in
-    2^{X \cup Y}$.
-  \item[Inverse:] $\overline{A}\colon 2^X \to \mathbb{R}_{\ge 0}$ is a function
-    such that $\overline{A}(\tau) = 1 - A(\tau)$ for all $\tau \in 2^X$.
-  \item[Multiplication:] $A \cdot B\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$
-    is a function such that $(A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau
-    \cap Y)$ for all $\tau \in 2^{X \cup Y}$.
-  \item[Scalar multiplication:] $\alpha A\colon 2^X \to \mathbb{R}_{\ge 0}$ is a
-    function such that $(\alpha A)(\tau) = \alpha \cdot A(\tau)$ for all $\tau
-    \in 2^X$.
-  \item[Projection:] $\exists_xA\colon 2^{X \setminus \{ x \}} \to
-    \mathbb{R}_{\ge 0}$ is a function such that $(\exists_xA)(\tau) = A(\tau) +
-    A(\tau \cup \{ x \})$ for all $\tau \in 2^{X \setminus \{x \}}$.
-  \end{description}
-\end{definition}
-
-\begin{observation}
-  Let $U$ be a set, and $\mathcal{V} = \{ A\colon 2^X \to \mathbb{R}_{\ge 0}
-  \mid X \subseteq U \}$. Then $\mathcal{V}$ is a semi-vector space with three
-  additional operations: inverse, (non-scalar) multiplication, and projection.
-  Specifically, note that both addition and multiplication are both associative
-  and commutative.
-\end{observation}
-
-\begin{definition}[Special functions]
-  \phantom{}
-  \begin{itemize}
-  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\emptyset) = 1$.
-  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\emptyset) = 0$.
-  \item logical constant $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$,
-    $[a](\emptyset) = 0$, $[a](\{a\}) = 1$.
-  \end{itemize}
-\end{definition}
-
-Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
-$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
-
-\section{Weighted Model Counting as a Measure}
-
-\begin{definition}[Measures and weight functions] \label{def:wmc}
-  Let $U$ be a set.
-  \begin{itemize}
-  \item A \emph{measure} is a function $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$
-    such that $M(\bot) = 0$, and $M(a \lor b) = M(a) + M(b)$ for all $a, b \in
-    2^{2^U}$ whenever $a \land b = \bot$.
-  \item A \emph{weight function} is a function $W\colon 2^U \to \mathbb{R}_{\ge
-      0}$.
-  \item A weight function is \emph{factored} if $W = \prod_{x \in U} W_x$ for
-    some functions $W_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$, $x \in U$.
-  \item We say that a weight function $W\colon 2^U \to \mathbb{R}_{\ge 0}$
-    \emph{induces} a measure $M_W\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if
-    \begin{equation} \label{eq:induced_measure}
-      M_W(x) = \sum_{\{u\} \le x} W(u).
-    \end{equation}
-  \item A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
-    \emph{factorable} if there exists a factored weight function $W\colon 2^U
-    \to \mathbb{R}_{\ge 0}$ that induces $M$.
-  \end{itemize}
-\end{definition}
-
-\begin{lemma} \label{prop:measure}
-  The function $M_W$, as defined by \cref{eq:induced_measure}, is a measure.
-\end{lemma}
-\begin{proof}
-  Note that $M_W(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b \in
-  2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
-  Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
-  $b$. Moreover, none of them can be below both $a$ and $b$ because then they
-  would have to be below $a \land b = \bot$. Thus
-  \[
-    M_W(a \lor b) = \sum_{\{u\} \le a \lor b} W(u) = \sum_{\{u\} \le a} W(u) +
-    \sum_{\{u\} \le b} = M_W(a) + M_W(b)
-  \]
-  as required.
-\end{proof}
-
-In this formulation, the process of calculating the value of $M_W(x)$ for some
-$x \in 2^{2^U}$ with a given definition of $W$ is known as \emph{weighted model
-  counting}.
-
-\subsection{Relation to the Classical (Logic-Based) View of WMC}
-
-\todo[inline]{Would it be more accurate to replace the word `model' with
-  `interpretation' in most situations?}
-
 \begin{table}
-  \caption{An overview of notation for a logic defined over two atoms. The
-    elements in both columns are listed in the same order.}
+  \caption{Notation for a logic with two atoms. The elements in both columns are
+    listed in the same order.}
   \label{tbl:notation_example}
   \centering
   \begin{tabular}{lcc}
@@ -261,6 +195,15 @@ $x \in 2^{2^U}$ with a given definition of $W$ is known as \emph{weighted model
   \end{tabular}
 \end{table}
 
+\todo[inline]{Completely rewrite this section. It needs to be very clear and
+  introduce all relevant terminology.}
+\todo[inline]{Would it be more accurate to replace the word `model' with
+  `interpretation' in most situations?}
+
+For any set $X$, we can interpret $2^X$ as either a power set or a Boolean
+algebra---see \cref{tbl:notation} for a summary of the differences in
+terminology and notation.
+
 Let $\mathcal{L}$ be a propositional logic with atoms $U = \{ a, b \}$. See
 \cref{tbl:notation_example} for an overview of the models and formulas in
 $\mathcal{L}$ as well as their set-theoretic and Boolean-algebraic
@@ -271,51 +214,119 @@ of $\mathcal{L}$ (also known as an element of $2^U$); whereas an atom of
 $\mathcal{L}$ is an atomic formula, i.e., an element of $U$. We will primarily
 use the term `atom' to mean the former.
 
-Let $w\colon \{ a, b, \neg a, \neg b \} \to \mathbb{R}_{\ge 0}$
-be the \emph{weight function} defined by
-\begin{align*}
-  w(a) = 0.3, \quad w(\neg a) = 0.7, \quad w(b) = 0.2, \quad w(\neg b) = 0.8.
-\end{align*}
-Let $\Delta$ be a theory in $\mathcal{L}$ with a sole axiom $a$. Then
-$\Delta$ has two models, i.e., $\{ a, b \}$ and $\{ a, \neg b \}$. The
-\emph{weighted model count} (WMC) \cite{DBLP:journals/ai/ChaviraD08} of
-$\Delta$ is then
+In the rest of the paper, for any set $U$, we will use set-theoretic notation
+for $2^U$ and Boolean-algebraic notation for $2^{2^U}$, except for (Boolean)
+atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
+
+\subsection{The Space of Functions on Boolean Algebras}
+
+We build on the definitions of multiplication and projection in the ADDMC paper
+\cite{DBLP:conf/aaai/DudekPV20} and define more operations that can be used to
+manipulate functions from Boolean algebras to non-negative reals. All of these
+operations have efficient implementations in the CUDD \cite{somenzi1998cudd}
+package for manipulating ADDs (among other things) that is used by ADDMC
+{\cite{DBLP:conf/aaai/DudekPV20}.
+
+\begin{definition}[Operations on functions]
+  Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
+    0}$ be functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We define
+  the following operations:
+  \begin{description}
+  \item[Addition:] $A+B\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$ is
+    such that $(A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)$ for all $\tau \in
+    2^{X \cup Y}$.
+  \item[Multiplication:] $A \cdot B\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$
+    is such that $(A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau
+    \cap Y)$ for all $\tau \in 2^{X \cup Y}$.
+  \item[Scalar multiplication:] $\alpha A\colon 2^X \to \mathbb{R}_{\ge 0}$ is
+    such that $(\alpha A)(\tau) = \alpha \cdot A(\tau)$ for all $\tau
+    \in 2^X$.
+  \item[Complement:] $\overline{A}\colon 2^X \to \mathbb{R}_{\ge 0}$ is
+    such that $\overline{A}(\tau) = 1 - A(\tau)$ for all $\tau \in 2^X$.
+  \item[Projection:] $\exists_xA\colon 2^{X \setminus \{ x \}} \to
+    \mathbb{R}_{\ge 0}$ is such that $(\exists_xA)(\tau) = A(\tau) +
+    A(\tau \cup \{ x \})$ for all $\tau \in 2^{X \setminus \{x \}}$.
+  \end{description}
+\end{definition}
+
+\begin{observation}
+  Let $U$ be a set, and $\mathcal{V} = \{ A\colon 2^X \to \mathbb{R}_{\ge 0}
+  \mid X \subseteq U \}$. Then $\mathcal{V}$ is a semi-vector space with three
+  additional operations: inverse, (non-scalar) multiplication, and projection.
+  Specifically, note that both addition and multiplication are both associative
+  and commutative.
+\end{observation}
+
+\begin{definition}[Special functions]
+  We define several special functions:
+  \begin{itemize}
+  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\emptyset) = 1$;
+  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\emptyset) = 0$;
+  \item and $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$, $[a](\emptyset) = 0$,
+    $[a](\{a\}) = 1$ for any $a$.
+  \end{itemize}
+\end{definition}
+
+Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
+$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
+
+\section{WMC as a Measure}
+
+Let $U$ be a set. A \emph{measure} is a function $M\colon 2^{2^U} \to
+\mathbb{R}_{\ge 0}$ such that $M(\bot) = 0$, and $M(a \lor b) = M(a) + M(b)$ for
+all $a, b \in 2^{2^U}$ whenever $a \land b = \bot$. A \emph{weight function} is
+a function $W\colon 2^U \to \mathbb{R}_{\ge 0}$. A weight function is
+\emph{factored} if $W = \prod_{x \in U} W_x$ for some functions $W_x\colon
+2^{\{x\}} \to \mathbb{R}_{\ge 0}$, $x \in U$. We say that a weight function
+$W\colon 2^U \to \mathbb{R}_{\ge 0}$ \emph{induces} a measure $M_W\colon 2^{2^U}
+\to \mathbb{R}_{\ge 0}$ if
+\begin{equation} \label{eq:induced_measure}
+  M_W(x) = \sum_{\{u\} \le x} W(u).
+\end{equation}
+Finally, a measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is \emph{factorable}
+if there exists a factored weight function $W\colon 2^U \to \mathbb{R}_{\ge 0}$
+that induces $M$.
+
+\begin{lemma} \label{prop:measure}
+  The function $M_W$, as defined by \cref{eq:induced_measure}, is a measure.
+\end{lemma}
+\begin{proof}
+  Note that $M_W(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b \in
+  2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
+  Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
+  $b$. Moreover, none of them can be below both $a$ and $b$ because then they
+  would have to be below $a \land b = \bot$. Thus
+  \[
+    M_W(a \lor b) = \sum_{\{u\} \le a \lor b} W(u) = \sum_{\{u\} \le a} W(u) +
+    \sum_{\{u\} \le b} = M_W(a) + M_W(b)
+  \]
+  as required.
+\end{proof}
+
+In this formulation, the process of calculating the value of $M_W(x)$ for some
+$x \in 2^{2^U}$ with a given definition of $W$ is known as WMC.
+
+\paragraph{Relation to the classical (logic-based) view of WMC.} Let
+$\mathcal{L}$ be a propositional logic with two atoms $a$ and $b$ as in
+\cref{sec:prelims} and $w\colon \{ a, b, \neg a, \neg b \} \to \mathbb{R}_{\ge
+  0}$ a \emph{weight function} defined as $w(a) = 0.3$, $w(\neg a) = 0.7$, $w(b)
+= 0.2$, $w(\neg b) = 0.8$. Furthermore, let $\Delta$ be a theory in
+$\mathcal{L}$ with a sole axiom $a$. Then $\Delta$ has two models: $\{ a, b \}$
+and $\{ a, \neg b \}$ and its WMC \cite{DBLP:journals/ai/ChaviraD08} is
 \begin{equation} \label{eq:wmc_example}
   \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) = w(a)w(b) + w(a)w(\neg b) = 0.3.
 \end{equation}
-
 Alternatively, we can define $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ as
-\[
-  W_a(\{ a \}) = 0.3, \quad W_a(\emptyset) = 0.7
-\]
-and $W_b\colon 2^{\{q\}} \to \mathbb{R}_{\ge 0}$ as
-\[
-  W_b(\{ b \}) = 0.2, \quad W_b(\emptyset) = 0.8.
-\]
-Let $M$ be the measure on $2^{2^U}$ induced by $W = W_a \cdot W_b$. Then,
-equivalently to \cref{eq:wmc_example}, we can write
+$W_a(\{ a \}) = 0.3$, $W_a(\emptyset) = 0.7$ and $W_b\colon 2^{\{q\}} \to
+\mathbb{R}_{\ge 0}$ as $W_b(\{ b \}) = 0.2$, $W_b(\emptyset) = 0.8$. Let $M$ be
+the measure on $2^{2^U}$ induced by $W = W_a \cdot W_b$. Then, equivalently to
+\cref{eq:wmc_example}, we can write
 \[
   M(a) = W(\{ a, b \}) + W(\{ a \}) = W_a(\{a\})W_b(\{b\}) +
   W_a(\{a\})W_b(\emptyset) = 0.3.
 \]
 
-Given the theory $\Delta$, we can also compute the probability of a query $b$ as
-\cite{DBLP:conf/aaai/SangBK05}
-\[
-  \Pr_{\Delta, w}(b) = \frac{\WMC(\Delta \land b)}{\WMC(\Delta)}.
-\]
-The same thing can be accomplished using the algebraic formulation, with $M$
-replacing $\mathrm{WMC}$.
-
-In the rest of the paper, for any set $U$, we will use set-theoretic notation
-for $2^U$ and Boolean-algebraic notation for $2^{2^U}$, except for (Boolean)
-atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
-
 \subsection{Limitations of Factorable Measures}
-
-\todo[inline,caption={}]{
-  Clarify what is meant by`conditional weight function'.
-}
 
 \begin{example}
   Let $U = \{a, b\}$ be a set of atoms and $M\colon 2^{2^U} \to \mathbb{R}_{\ge
@@ -342,20 +353,18 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
 
   Alternatively, we can let $b$ depend on $a$ and consider weight functions
   $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and $W_b\colon 2^{\{a, b\}} \to
-  \mathbb{R}_{\ge 0}$ defined as
-  \begin{align*}
-    W_a(\{a\}) &= 0.9, \\
-    W_a(\emptyset) &= 0.1,
-  \end{align*}
-  and
-  \begin{align*}
-    W_b(\{a, b\}) &= 0.8, \\
-    W_b(\{a\}) &= 0.2, \\
-    W_b(\{b\}) &= 0.7, \\
-    W_b(\emptyset) &= 0.3.
-  \end{align*}
-  One can easily check that with these definitions $W$ indeed induces $M$.
+  \mathbb{R}_{\ge 0}$ defined as $W_a(\{a\}) = 0.9$, $W_a(\emptyset) = 0.1$, and
+  $W_b(\{a, b\}) = 0.8$, $W_b(\{a\}) = 0.2$, $W_b(\{b\}) = 0.7$, $W_b(\emptyset)
+  = 0.3$. One can easily check that with these definitions $W$ indeed induces
+  $M$.
 \end{example}
+
+Note that in this case we chose to interpret $W_b$ as $\Pr(B \mid A)$
+while---with a different definition of $W_b$ that represents the joint
+probability distribution $\Pr(A, B)$---$W_b$ by itself could induce $M$. In
+general, however, factorising the full weight function into several smaller
+functions often results in weight functions with smaller domains which leads to
+increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
 
 \begin{lemma} \label{lemma:before_theorem}
   For any measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
@@ -410,8 +419,9 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
   \mathbb{R}_{\ge 0}$ be defined by $W_x(\{ x \}) = M(x)$ and $W_x(\emptyset) =
   M(\neg x)$. Let $M_W$ be the measure induced by $W = \prod_{x \in U} W_x$. We
   will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by
-  \cref{def:wmc,prop:measure}. Second, let $a = \bigwedge_{u \in U} a_u$ be an
-  atom in $2^{2^U}$ such that $a_u \in \{ u, \neg u \}$ for all $u \in U$. Then
+  \cref{prop:measure} and the definition of a measure. Second, let $a =
+  \bigwedge_{u \in U} a_u$ be an atom in $2^{2^U}$ such that $a_u \in \{ u, \neg
+  u \}$ for all $u \in U$. Then
   \[
     M_W(a) = W(\{ a_u \mid u \in U \}) = \prod_{u \in U} W_u(\{a_u\}) = \prod_{u
       \in U} M(a_u) = M \left(\bigwedge_{u \in U} a_u \right) = M(a)
@@ -449,64 +459,6 @@ atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
   \]
   which is trivially true.
 \end{proof}
-
-\section{Previous Work}
-
-\subsection{Using WMC to Perform Inference on Bayesian Networks}
-
-Hitherto, four techniques have been proposed for encoding Bayesian networks into
-instances of WMC. We will identify them based on the initials of authors as well
-as publications years: \texttt{d02} \cite{DBLP:conf/kr/Darwiche02},
-\texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05}, \texttt{cd05}
-\cite{DBLP:conf/ijcai/ChaviraD05}, and \texttt{cd06}
-\cite{DBLP:conf/sat/ChaviraD06}. Below we friendly summarise the observed
-performance differences among them. Sang et al. \cite{DBLP:conf/aaai/SangBK05}
-claim that \texttt{sbk05} is a smaller encoding than \texttt{d02} with respect
-to both the number of clauses and the number of variables but provide no
-experimental comparison. Chavira and Darwiche \cite{DBLP:conf/ijcai/ChaviraD05}
-compare \texttt{cd05} with \texttt{d02} by measuring the time it takes to
-compile either encoding into an arithmetic circuit (but do not measure inference
-time). The more recent encoding \texttt{cd05} always compiles faster and results
-in a smaller arithmetic circuit (as measured by the number of edges). In their
-subsequent paper, the same authors perform two sets of experiments (that are
-relevant to this summary) \cite{DBLP:conf/sat/ChaviraD06}. First, they compile
-\texttt{cd05} and \texttt{cd06} encodings into d-DNNF (i.e., deterministic
-decomposable negation normal form \cite{DBLP:journals/jancl/Darwiche01}),
-measuring both compilation time and numbers of edges in the d-DNNF diagram. The
-results are mostly in favour of \texttt{cd06}. Second, they compare the
-inference time of \texttt{sbk05} run with Cachet \cite{DBLP:conf/sat/SangBBKP04}
-with the compile times of \texttt{cd05} and \texttt{cd06}, but only on five
-(types of) instances. In these experiments, \texttt{cd06} is always faster than
-\texttt{cd05}, while the comparison with \texttt{sbk05} is mixed. Sometimes
-\texttt{cd06} is orders of magnitude faster than \texttt{sbk05}, sometimes
-slightly slower. The performance difference between \texttt{sbk05} and
-\texttt{cd05} is even harder to judge: \texttt{sbk05} is better on three out of
-five instances and worse on the remaining two. Based on this description, one
-would expect \texttt{cd06} to be faster than both \texttt{cd05} and
-\texttt{sbk05}, both of which should be faster than \texttt{d02}. The
-experiments in \cref{sec:experiments}, however, strongly disagree with this
-prediction, showing that the quality of an encoding depends strongly on the
-underlying search algorithm or compilation technique.
-
-\subsection{Algebraic Decision Diagrams and Their Use in Probabilistic
-  Inference}
-
-Cover:
-\begin{itemize}
-\item ADDs provide an efficient way to manipulate functions from BAs/power sets
-  \cite{DBLP:journals/fmsd/BaharFGHMPS97}.
-\item background reading
-  \begin{itemize}
-  \item Compiling Bayesian Networks Using Variable Elimination (Chavira and
-    Darwiche) \cite{DBLP:conf/ijcai/ChaviraD07}
-  \item On the Relationship between Sum-Product Networks and Bayesian Networks
-    \cite{DBLP:conf/icml/ZhaoMP15}
-  \item Using ROBDDs for Inference in Bayesian Networks with Troubleshooting as
-    an Example \cite{DBLP:conf/uai/NielsenWJK00}
-  \item SPUDD: Stochastic Planning using Decision Diagrams
-    \cite{DBLP:conf/uai/HoeySHB99}
-  \end{itemize}
-\end{itemize}
 
 \section{Encoding Bayesian Networks Using Conditional Weights}
 
@@ -557,25 +509,20 @@ Cover:
   \label{fig:example_bn}
 \end{figure}
 
-\todo[inline]{In line with the names of previous encodings, we shall call this
-  encoding \texttt{db20}.}
+In this section, we describe a way to encode Bayesian networks into WMC without
+restricting oneself to factorable measures and thus having to add extra
+variables to maintain literal independence. In line with the names of previous
+encodings, we shall call this encoding \texttt{db20}.
 
-A \emph{Bayesian network} is a directed acyclic graph with random variables as
-vertices that defines a probability distribution over them. Let $\mathcal{V}$
-denote the set of random variables and $X \in \mathcal{V}$ be a random variable.
-Let $\im X$ denote the set of possible values of $X$ and $\mathrm{pa}(X)$ denote
-the set of its parents. The full probability distribution is then equal to
-\begin{equation} \label{eq:factorisation}
-  \prod_{X \in \mathcal{V}} \Pr(X \mid \mathrm{pa}(X)).
-\end{equation}
-If all random variables are discrete (and we only consider discrete Bayesian
-networks in this paper), the probabilities contained in each factor of
-\cref{eq:factorisation} can be summarised in a table known as a
-\emph{conditional probability table} (CPT). See \cref{fig:example_bn} for an
-example Bayesian network which we will refer to throughout this section. For
-this network, $\mathcal{V} = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$,
-$\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and
-$\im T = \{ l, m, h \}$.
+Recall that a Bayesian network is a directed acyclic graph with random variables
+as vertices. Let $\mathcal{V}$ denote the set of random variables. For any
+random variable $X \in \mathcal{V}$, let $\im X$ denote its set of possible
+values and $\mathrm{pa}(X)$ the set of its parents. The full probability
+distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X \mid
+\mathrm{pa}(X))$. See \cref{fig:example_bn} for an example Bayesian network
+which we will refer to throughout this section. For this network, $\mathcal{V} =
+\{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) =
+\{ W \}$, $\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
@@ -647,7 +594,10 @@ For the Bayesian network in \cref{fig:example_bn}, this gives us:
   \Return{$\phi$}\;
 \end{algorithm}
 
-\todo[inline]{Describe the algorithm and the CPT functions.}
+\todo[inline]{Describe the algorithm and the CPT functions. In fact, we call
+  each CPT function (i.e., a function that represents a CPT) a \emph{conditional
+    weight function} (and this is more of a semantic rather than practical
+  distinction).}
 
 For the Bayesian network in \cref{fig:example_bn}, we have:
 \begin{align*}
@@ -677,19 +627,16 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
 
   If $X$ is not binary, then $\left( \sum_{i=1}^m [\lambda_{X = x_i}]
-  \right)(\tau) = 1$, and
-  \[
-    \left( \prod_{i=1}^m \prod_{j=i+1}^m (\overline{[\lambda_{X = x_i}]} +
-      \overline{[\lambda_{X = x_j}]}) \right)(\tau) = 1,
-  \]
-  so $\mathrm{CPT}_X(\tau) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by a
-  similar argument as before.
+  \right)(\tau) = 1$, and $\left( \prod_{i=1}^m \prod_{j=i+1}^m
+    (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})
+  \right)(\tau) = 1$, so $\mathrm{CPT}_X(\tau) = \Pr(X = x \mid Y_1 = y_1,
+  \dots, Y_n = y_n)$ by a similar argument as before.
 \end{proof}
 
 \begin{proposition} \label{lemma:full_distribution}
-  $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ represents the full probability
-  distribution of the Bayesian network, i.e., if $\mathcal{V} = \{ X_1, \dots,
-  X_n\}$, then
+  The function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ represents the full
+  probability distribution of the Bayesian network, i.e., if $\mathcal{V} = \{
+  X_1, \dots, X_n\}$, then
   \[
     \phi(\tau) =
     \begin{cases}
@@ -915,6 +862,8 @@ which happen to be binary. We classify them into the following seven categories:
   in \SI{10}{\second} (find the exact number).
 \end{itemize}
 
+\todo[inline]{Maybe replace `upper bound' with `worst-case'.}
+
 \begin{table}
   \centering
   \caption{Asymptotic upper bounds on the numbers of variables and clauses/ADDs
@@ -931,14 +880,13 @@ which happen to be binary. We classify them into the following seven categories:
   \end{tabular}
 \end{table}
 
-\paragraph{Explaining The Performance Benefits.} Let $n = |\mathcal{V}|$ be the
+\paragraph{Explaining the performance benefits.} Let $n = |\mathcal{V}|$ be the
 number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
 |\mathrm{pa}(X)|$ the maximum in-degree (i.e., number of parents), and $v =
 \max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
-Then... \cref{tbl:asymptotes}.
-
-\todo[inline]{Remember that these are upper bounds! Some of these encoding have
-  a lot of optimisations that are not captured by three parameters!}
+Then... \cref{tbl:asymptotes}. However, note that these are upper bounds and
+most encodings (including \texttt{db20}) can be smaller in certain situations
+(e.g., with binary random variables or when a CPT has repeating probabilities).
 
 \todo[inline]{Explain why clauses and ADDs are alike.}
 
@@ -946,7 +894,17 @@ Then... \cref{tbl:asymptotes}.
 
 \begin{itemize}
 \item Bayesian networks and ADDMC are only particular examples. This should also
-  work with Cachet.
+  work with Cachet \cite{DBLP:conf/sat/SangBBKP04}.
+  \begin{itemize}
+  \item Potential criticism may be that this doesn't allow us to use SAT-based
+    techniques for probabilistic inference. However, they can still be used for
+    a significant part of the encoding.
+    \begin{itemize}
+    \item Zero-probability weights and one-probability weights can be
+      interpreted as logical clauses. This doesn't affect ADDMC but could be
+      useful for other solvers.
+    \end{itemize}
+  \end{itemize}
 \item Extra benefit: one does not need to come up with a way to turn some
   probability distribution to into a fully independent one.
 \item Important future work: replacing ADDs with
@@ -959,23 +917,10 @@ Then... \cref{tbl:asymptotes}.
   \item ADDs with intervals can do approximations.
   \end{itemize}
 \item Filtering out ADDs that have nothing to do with the answer helps
-  tremendously, but I'm purposefully not doing that. Perhaps a heuristic could
-  do the same thing?
-\item Encodings for everything else
-  \begin{itemize}
-  \item probabilistic programs \cite{DBLP:journals/corr/abs-2005-09089}
-  \item ProbLog \cite{DBLP:conf/uai/FierensBTGR11}
-    \begin{itemize}
-    \item proof-based \cite{DBLP:conf/iclp/MantadelisJ10}
-    \item rule-based \cite{DBLP:conf/ecai/Janhunen04}
-    \end{itemize}
-  \end{itemize}
-\item Bayesian networks are often solved in a compile once, query many times
-  fashion. This can be achieved using ADDMC by selecting a subset $S$ of
-  variable we may want to query over and running ADDMC while excluding $S$ from
-  variable elimination/projection/$\exists$.
-\item I could also add a memory usage cumulative plot, but it doesn't add any
-  extra info except for the fact that inference is memory-intensive.
+  tremendously, but I'm purposefully not doing that.
+\item Other things can be compiled into WMC, e.g., probabilistic programs
+  \cite{DBLP:journals/corr/abs-2005-09089}, ProbLog
+  \cite{DBLP:conf/uai/FierensBTGR11}.
 \end{itemize}
 
 \paragraph{Acknowledgements.} This work has made use of the resources provided
