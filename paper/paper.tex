@@ -66,7 +66,7 @@
   \end{enumerate}
 \item Introduce
   \begin{itemize}
-  \item WMC
+  \item WMC \cite{DBLP:conf/aaai/SangBK05}
   \item ADDMC \cite{DBLP:conf/aaai/DudekPV20} and ADDs
     \cite{DBLP:journals/fmsd/BaharFGHMPS97}
   \item A Bayesian network is a directed acyclic graph with random variables as
@@ -79,20 +79,6 @@
   \end{itemize}
 \item[F] What are the main claims, what are the main takeaways, intuitive [???]
   of theorems to follow.
-\item Notable previous/related work
-  \begin{itemize}
-  \item Hailperin's approach to probability logic
-    \cite{DBLP:journals/ndjfl/Hailperin84}
-  \item Nilsson's (somewhat successful) probabilistic logic
-    \cite{DBLP:journals/ai/Nilsson86,DBLP:journals/ai/Nilsson93}
-  \item Measures on Boolean algebras
-    \begin{itemize}
-    \item On possibility and probability measures in finite Boolean algebras
-      \cite{DBLP:journals/soco/CastineiraCT02}
-    \item Representation of conditional probability measures
-      \cite{krauss1968representation}
-    \end{itemize}
-  \end{itemize}
 \item Our work is, in spirit, similar to... using ROBDDs for Inference in
   Bayesian Networks with Troubleshooting as an Example
   \cite{DBLP:conf/uai/NielsenWJK00}: this is an interesting approach where
@@ -109,8 +95,8 @@ techniques have been proposed for encoding Bayesian networks into instances of
 WMC. We will identify them based on the initials of authors as well as
 publications years: \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}, \texttt{sbk05}
 \cite{DBLP:conf/aaai/SangBK05}, \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05},
-and \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06}. Below we friendly summarise
-the observed performance differences among them. Sang et al.
+and \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06}. Below we summarise the
+observed performance differences among them. Sang et al.
 \cite{DBLP:conf/aaai/SangBK05} claim that \texttt{sbk05} is a smaller encoding
 than \texttt{d02} with respect to both the number of clauses and the number of
 variables but provide no experimental comparison. Chavira and Darwiche
@@ -140,15 +126,16 @@ depends strongly on the underlying search algorithm or compilation technique.
 
 \paragraph{ADDs and their use in probabilistic inference.} ADDs provide an
 efficient way to manipulate functions from a Boolean algebra to any algebraic
-structure (most commonly $\mathbb{R}$) \cite{DBLP:journals/fmsd/BaharFGHMPS97}.
-They have been used to represent value functions in Markov decision processes
-\cite{DBLP:conf/uai/HoeySHB99} and, for Bayesian network inference, to represent
-each CPT as an ADD \cite{DBLP:conf/icml/ZhaoMP15} as well as by combining ADDs
-and arithmetic circuits into a  single representation
-\cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous in this
-situation because of their ability to fully exploit context-specific
-independence, i.e., observable structure within a CPT that is not inherited from
-the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
+structure (most commonly the real numbers)
+\cite{DBLP:journals/fmsd/BaharFGHMPS97}. They have been used to represent value
+functions in Markov decision processes \cite{DBLP:conf/uai/HoeySHB99} and, for
+Bayesian network inference, to represent each CPT as an ADD
+\cite{DBLP:conf/icml/ZhaoMP15} as well as by combining ADDs and arithmetic
+circuits into a  single representation \cite{DBLP:conf/ijcai/ChaviraD07}. ADDs
+are particularly advantageous in this situation because of their ability to
+fully exploit context-specific independence, i.e., observable structure within a
+CPT that is not inherited from the structure of the Bayesian network
+\cite{DBLP:conf/uai/BoutilierFGK96}.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -228,31 +215,30 @@ package for manipulating ADDs (among other things) that is used by ADDMC
 {\cite{DBLP:conf/aaai/DudekPV20}.
 
 \begin{definition}[Operations on functions]
-  Let $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and $B\colon 2^Y \to \mathbb{R}_{\ge
-    0}$ be functions, $\alpha \in \mathbb{R}_{\ge 0}$, and $x \in X$. We define
-  the following operations:
+  Let $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and $\beta\colon 2^Y \to
+  \mathbb{R}_{\ge 0}$ be functions, $p \in \mathbb{R}_{\ge 0}$, and $x \in X$.
+  We define the following operations:
   \begin{description}
-  \item[Addition:] $A+B\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$ is
-    such that $(A+B)(\tau) = A(\tau \cap X) + B(\tau \cap Y)$ for all $\tau \in
-    2^{X \cup Y}$.
-  \item[Multiplication:] $A \cdot B\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$
-    is such that $(A \cdot B)(\tau) = A(\tau \cap X) \cdot B(\tau
-    \cap Y)$ for all $\tau \in 2^{X \cup Y}$.
-  \item[Scalar multiplication:] $\alpha A\colon 2^X \to \mathbb{R}_{\ge 0}$ is
-    such that $(\alpha A)(\tau) = \alpha \cdot A(\tau)$ for all $\tau
-    \in 2^X$.
-  \item[Complement:] $\overline{A}\colon 2^X \to \mathbb{R}_{\ge 0}$ is
-    such that $\overline{A}(\tau) = 1 - A(\tau)$ for all $\tau \in 2^X$.
-  \item[Projection:] $\exists_xA\colon 2^{X \setminus \{ x \}} \to
-    \mathbb{R}_{\ge 0}$ is such that $(\exists_xA)(\tau) = A(\tau) +
-    A(\tau \cup \{ x \})$ for all $\tau \in 2^{X \setminus \{x \}}$.
+  \item[Addition:] $\alpha + \beta\colon 2^{X \cup Y} \to \mathbb{R}_{\ge 0}$ is
+    such that $(\alpha + \beta)(T) = \alpha(T \cap X) + \beta(T \cap Y)$ for all
+    $T \in 2^{X \cup Y}$.
+  \item[Multiplication:] $\alpha \cdot \beta\colon 2^{X \cup Y} \to
+    \mathbb{R}_{\ge 0}$ is such that $(\alpha \cdot \beta)(T) = \alpha(T \cap X)
+    \cdot \beta(T \cap Y)$ for all $T \in 2^{X \cup Y}$.
+  \item[Scalar multiplication:] $p\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ is
+    such that $(p\alpha)(T) = p \cdot \alpha(T)$ for all $T \in 2^X$.
+  \item[Complement:] $\overline{\alpha}\colon 2^X \to \mathbb{R}_{\ge 0}$ is
+    such that $\overline{\alpha}(T) = 1 - \alpha(T)$ for all $T \in 2^X$.
+  \item[Projection:] $\exists_x\alpha\colon 2^{X \setminus \{ x \}} \to
+    \mathbb{R}_{\ge 0}$ is such that $(\exists_x\alpha)(T) = \alpha(T) +
+    \alpha(T \cup \{ x \})$ for all $T \in 2^{X \setminus \{x \}}$.
   \end{description}
 \end{definition}
 
 \begin{observation}
-  Let $U$ be a set, and $\mathcal{V} = \{ A\colon 2^X \to \mathbb{R}_{\ge 0}
+  Let $U$ be a set, and $\mathcal{V} = \{ \alpha\colon 2^X \to \mathbb{R}_{\ge 0}
   \mid X \subseteq U \}$. Then $\mathcal{V}$ is a semi-vector space with three
-  additional operations: inverse, (non-scalar) multiplication, and projection.
+  additional operations: (non-scalar) multiplication, complement, and projection.
   Specifically, note that both addition and multiplication are both associative
   and commutative.
 \end{observation}
@@ -267,44 +253,44 @@ package for manipulating ADDs (among other things) that is used by ADDMC
   \end{itemize}
 \end{definition}
 
-Henceforth, for any function $A\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set
-$\tau$, we will write $A(\tau)$ to mean $A(\tau \cap X)$.
+Henceforth, for any function $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and any
+set $T$, we will write $\alpha(T)$ to mean $\alpha(T \cap X)$.
 
 \section{WMC as a Measure}
 
-Let $U$ be a set. A \emph{measure} is a function $M\colon 2^{2^U} \to
-\mathbb{R}_{\ge 0}$ such that $M(\bot) = 0$, and $M(a \lor b) = M(a) + M(b)$ for
-all $a, b \in 2^{2^U}$ whenever $a \land b = \bot$. A \emph{weight function} is
-a function $W\colon 2^U \to \mathbb{R}_{\ge 0}$. A weight function is
-\emph{factored} if $W = \prod_{x \in U} W_x$ for some functions $W_x\colon
-2^{\{x\}} \to \mathbb{R}_{\ge 0}$, $x \in U$. We say that a weight function
-$W\colon 2^U \to \mathbb{R}_{\ge 0}$ \emph{induces} a measure $M_W\colon 2^{2^U}
-\to \mathbb{R}_{\ge 0}$ if
+Let $U$ be a set. A \emph{measure} is a function $\mu\colon 2^{2^U} \to
+\mathbb{R}_{\ge 0}$ such that $\mu(\bot) = 0$, and $\mu(a \lor b) = \mu(a) +
+\mu(b)$ for all $a, b \in 2^{2^U}$ whenever $a \land b = \bot$. A \emph{weight
+  function} is a function $\nu\colon 2^U \to \mathbb{R}_{\ge 0}$. A weight
+function is \emph{factored} if $\nu = \prod_{x \in U} \nu_x$ for some functions
+$\nu_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$, $x \in U$. We say that a weight
+function $\nu\colon 2^U \to \mathbb{R}_{\ge 0}$ \emph{induces} a measure
+$\mu_\nu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if
 \begin{equation} \label{eq:induced_measure}
-  M_W(x) = \sum_{\{u\} \le x} W(u).
+  \mu_\nu(x) = \sum_{\{u\} \le x} \nu(u).
 \end{equation}
-Finally, a measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is \emph{factorable}
-if there exists a factored weight function $W\colon 2^U \to \mathbb{R}_{\ge 0}$
-that induces $M$.
+Finally, a measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
+\emph{factorable} if there exists a factored weight function $\nu\colon 2^U \to
+\mathbb{R}_{\ge 0}$ that induces $\mu$.
 
 \begin{lemma} \label{prop:measure}
-  The function $M_W$, as defined by \cref{eq:induced_measure}, is a measure.
+  The function $\mu_\nu$, as defined by \cref{eq:induced_measure}, is a measure.
 \end{lemma}
 \begin{proof}
-  Note that $M_W(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b \in
-  2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
+  Note that $\mu_\nu(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b
+  \in 2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
   Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
   $b$. Moreover, none of them can be below both $a$ and $b$ because then they
   would have to be below $a \land b = \bot$. Thus
   \[
-    M_W(a \lor b) = \sum_{\{u\} \le a \lor b} W(u) = \sum_{\{u\} \le a} W(u) +
-    \sum_{\{u\} \le b} = M_W(a) + M_W(b)
+    \mu_\nu(a \lor b) = \sum_{\{u\} \le a \lor b} \nu(u) = \sum_{\{u\} \le a}
+    \nu(u) + \sum_{\{u\} \le b} \nu(u) = \mu_\nu(a) + \mu_\nu(b)
   \]
   as required.
 \end{proof}
 
-In this formulation, the process of calculating the value of $M_W(x)$ for some
-$x \in 2^{2^U}$ with a given definition of $W$ is known as WMC.
+In this formulation, the process of calculating the value of $\mu_\nu(x)$ for
+some $x \in 2^{2^U}$ with a given definition of $\nu$ is known as WMC.
 
 \paragraph{Relation to the classical (logic-based) view of WMC.} Let
 $\mathcal{L}$ be a propositional logic with two atoms $a$ and $b$ as in
@@ -316,146 +302,146 @@ and $\{ a, \neg b \}$ and its WMC \cite{DBLP:journals/ai/ChaviraD08} is
 \begin{equation} \label{eq:wmc_example}
   \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) = w(a)w(b) + w(a)w(\neg b) = 0.3.
 \end{equation}
-Alternatively, we can define $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ as
-$W_a(\{ a \}) = 0.3$, $W_a(\emptyset) = 0.7$ and $W_b\colon 2^{\{q\}} \to
-\mathbb{R}_{\ge 0}$ as $W_b(\{ b \}) = 0.2$, $W_b(\emptyset) = 0.8$. Let $M$ be
-the measure on $2^{2^U}$ induced by $W = W_a \cdot W_b$. Then, equivalently to
-\cref{eq:wmc_example}, we can write
+Alternatively, we can define $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ as
+$\nu_a(\{ a \}) = 0.3$, $\nu_a(\emptyset) = 0.7$ and $\nu_b\colon 2^{\{b\}} \to
+\mathbb{R}_{\ge 0}$ as $\nu_b(\{ b \}) = 0.2$, $\nu_b(\emptyset) = 0.8$. Let
+$\mu$ be the measure on $2^{2^U}$ induced by $\nu = \nu_a \cdot \nu_b$. Then,
+equivalently to \cref{eq:wmc_example}, we can write
 \[
-  M(a) = W(\{ a, b \}) + W(\{ a \}) = W_a(\{a\})W_b(\{b\}) +
-  W_a(\{a\})W_b(\emptyset) = 0.3.
+  \mu(a) = \nu(\{ a, b \}) + \nu(\{ a \}) = \nu_a(\{a\})\nu_b(\{b\}) +
+  \nu_a(\{a\})\nu_b(\emptyset) = 0.3.
 \]
 
 \subsection{Limitations of Factorable Measures}
 
 \begin{example}
-  Let $U = \{a, b\}$ be a set of atoms and $M\colon 2^{2^U} \to \mathbb{R}_{\ge
-    0}$ a measure defined as:\footnote{The value of $M$ on any other element of
-    the Boolean algebra can be deduced using the definition.}
+  Let $U = \{a, b\}$ be a set of atoms and $\mu\colon 2^{2^U} \to
+  \mathbb{R}_{\ge 0}$ a measure defined as:\footnote{The value of $\mu$ on any
+    other element of the Boolean algebra can be deduced using the definition.}
   \begin{align*}
-    M(a \land b) &= 0.72, \\
-    M(a \land \neg b) &= 0.18, \\
-    M(\neg a \land b) &= 0.07, \\
-    M(\neg a \land \neg b) &= 0.03.
+    \mu(a \land b) &= 0.72, \\
+    \mu(a \land \neg b) &= 0.18, \\
+    \mu(\neg a \land b) &= 0.07, \\
+    \mu(\neg a \land \neg b) &= 0.03.
   \end{align*}
-  If $M$ could be represented using traditional (factored) WMC, we would have to
-  find two weight functions $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and
-  $W_b\colon 2^{\{b\}} \to \mathbb{R}_{\ge 0}$ such that $W = W_a \cdot W_b$
-  induces $M$, i.e., $W_a$ and $W_b$ would have to satisfy this system of
-  equations:
+  If $\mu$ could be represented using traditional (factored) WMC, we would have
+  to find two weight functions $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$
+  and $\nu_b\colon 2^{\{b\}} \to \mathbb{R}_{\ge 0}$ such that $\nu = \nu_a
+  \cdot \nu_b$ induces $\mu$, i.e., $\nu_a$ and $\nu_b$ would have to satisfy
+  this system of equations:
   \begin{align*}
-    W_a(\{a\}) \cdot W_b(\{b\}) &= 0.72 \\
-    W_a(\{a\}) \cdot W_b(\emptyset) &= 0.18 \\
-    W_a(\emptyset) \cdot W_b(\{b\}) &= 0.07 \\
-    W_a(\emptyset) \cdot W_b(\emptyset) &= 0.03,
+    \nu_a(\{a\}) \cdot \nu_b(\{b\}) &= 0.72 \\
+    \nu_a(\{a\}) \cdot \nu_b(\emptyset) &= 0.18 \\
+    \nu_a(\emptyset) \cdot \nu_b(\{b\}) &= 0.07 \\
+    \nu_a(\emptyset) \cdot \nu_b(\emptyset) &= 0.03,
   \end{align*}
   which has no solutions.
 
   Alternatively, we can let $b$ depend on $a$ and consider weight functions
-  $W_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and $W_b\colon 2^{\{a, b\}} \to
-  \mathbb{R}_{\ge 0}$ defined as $W_a(\{a\}) = 0.9$, $W_a(\emptyset) = 0.1$, and
-  $W_b(\{a, b\}) = 0.8$, $W_b(\{a\}) = 0.2$, $W_b(\{b\}) = 0.7$, $W_b(\emptyset)
-  = 0.3$. One can easily check that with these definitions $W$ indeed induces
-  $M$.
+  $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and $\nu_b\colon 2^{\{a, b\}}
+  \to \mathbb{R}_{\ge 0}$ defined as $\nu_a(\{a\}) = 0.9$, $\nu_a(\emptyset) =
+  0.1$, and $\nu_b(\{a, b\}) = 0.8$, $\nu_b(\{a\}) = 0.2$, $\nu_b(\{b\}) = 0.7$,
+  $\nu_b(\emptyset) = 0.3$. One can easily check that with these definitions
+  $\nu$ indeed induces $\mu$.
 \end{example}
 
-Note that in this case we chose to interpret $W_b$ as $\Pr(B \mid A)$
-while---with a different definition of $W_b$ that represents the joint
-probability distribution $\Pr(A, B)$---$W_b$ by itself could induce $M$. In
+Note that in this case we chose to interpret $\nu_b$ as $\Pr(b \mid a)$
+while---with a different definition of $\nu_b$ that represents the joint
+probability distribution $\Pr(a, b)$---$\nu_b$ by itself could induce $\mu$. In
 general, however, factorising the full weight function into several smaller
 functions often results in weight functions with smaller domains which leads to
 increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
 
 \begin{lemma} \label{lemma:before_theorem}
-  For any measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
+  For any measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
   \in 2^{2^U}$,
   \begin{equation} \label{eq:to_prove}
-    M(a \land b) = M(a)M(b)
+    \mu(a \land b) = \mu(a)\mu(b)
   \end{equation}
   if and only if
   \begin{equation} \label{eq:to_prove2}
-    M(a \land b) \cdot M(\neg a \land \neg b) = M(a \land \neg b)
-    \cdot M(\neg a \land b).
+    \mu(a \land b) \cdot \mu(\neg a \land \neg b) = \mu(a \land \neg b)
+    \cdot \mu(\neg a \land b).
   \end{equation}
 \end{lemma}
 \begin{proof}
   First, note that $a = (a \land b) \lor (a \land \neg b)$ and $(a \land b)
   \land (a \land \neg b) = 0$, so, by properties of a measure,
   \begin{equation} \label{eq:temp}
-    M(a) = M(a \land b) + M(a \land \neg b).
+    \mu(a) = \mu(a \land b) + \mu(a \land \neg b).
   \end{equation}
-  Applying \cref{eq:temp} and the equivalent expression for $M(b)$ allows us
+  Applying \cref{eq:temp} and the equivalent expression for $\mu(b)$ allows us
   to rewrite \cref{eq:to_prove} as
   \[
-    M(a \land b) = [M(a \land b) + M(a \land \neg b)][M(a \land b) + M(\neg a
-    \land b)]
+    \mu(a \land b) = [\mu(a \land b) + \mu(a \land \neg b)][\mu(a \land b) +
+    \mu(\neg a \land b)]
   \]
   which is equivalent to
   \begin{equation} \label{eq:temp6}
-    M(a \land b)[1 - M(a \land b) - M(a \land \neg b) - M(\neg a \land b)] = M(a
-    \land \neg b)M(\neg a \land b).
+    \mu(a \land b)[1 - \mu(a \land b) - \mu(a \land \neg b) - \mu(\neg a \land b)] = \mu(a \land \neg b)\mu(\neg a \land b).
   \end{equation}
   Since $a \land b$, $a \land \neg b$, $\neg a \land b$, $\neg a \land \neg b$
-  are pairwise disjoint and their supremum is $1$,
+  are pairwise disjoint and their supremum is $\top$,
   \[
-    M(a \land b) + M(a \land \neg b) + M(\neg a \land b) + M(\neg a \land \neg
-    b) = 1,
+    \mu(a \land b) + \mu(a \land \neg b) + \mu(\neg a \land b) + \mu(\neg a
+    \land \neg b) = 1,
   \]
   and this allows us to rewrite \cref{eq:temp6} into \cref{eq:to_prove2}. As all
   transformations are invertible, the two expressions are equivalent.
 \end{proof}
 
+\todo[inline]{The proof is only valid for probability measures!}
+
 \begin{theorem}
-  A measure $M\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is factorable if and only
+  A measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is factorable if and only
   if
   \begin{equation} \label{eq:wmccondition}
-  M(u \land v) = M(u)M(v)
+  \mu(u \land v) = \mu(u)\mu(v)
   \end{equation}
   for all distinct $u, v \in U \cup \{ \neg w \mid w \in U \}$ such that $u \ne
   \neg v$.
 \end{theorem}
 \begin{proof}
-  ($\Leftarrow$) For each $x \in U$, let $W_x\colon 2^{\{x\}} \to
-  \mathbb{R}_{\ge 0}$ be defined by $W_x(\{ x \}) = M(x)$ and $W_x(\emptyset) =
-  M(\neg x)$. Let $M_W$ be the measure induced by $W = \prod_{x \in U} W_x$. We
-  will show that $M = M_W$. First, note that $M_w(\bot) = 0 = M(\bot)$ by
-  \cref{prop:measure} and the definition of a measure. Second, let $a =
-  \bigwedge_{u \in U} a_u$ be an atom in $2^{2^U}$ such that $a_u \in \{ u, \neg
-  u \}$ for all $u \in U$. Then
+  ($\Leftarrow$) For each $x \in U$, let $\nu_x\colon 2^{\{x\}} \to
+  \mathbb{R}_{\ge 0}$ be defined by $\nu_x(\{ x \}) = \mu(x)$ and
+  $\nu_x(\emptyset) = \mu(\neg x)$. Let $\mu_\nu$ be the measure induced by $\nu
+  = \prod_{x \in U} \nu_x$. We will show that $\mu = \mu_\nu$. First, note that
+  $\mu_\nu(\bot) = 0 = \mu(\bot)$ by \cref{prop:measure} and the definition of a
+  measure. Second, let $a = \bigwedge_{u \in U} a_u$ be an atom in $2^{2^U}$
+  such that $a_u \in \{ u, \neg u \}$ for all $u \in U$. Then
   \[
-    M_W(a) = W(\{ a_u \mid u \in U \}) = \prod_{u \in U} W_u(\{a_u\}) = \prod_{u
-      \in U} M(a_u) = M \left(\bigwedge_{u \in U} a_u \right) = M(a)
+    \mu_\nu(a) = \nu(\{ a_u \mid u \in U \}) = \prod_{u \in U} \nu_u(\{a_u\}) =
+    \prod_{u \in U} \mu(a_u) = \mu\left(\bigwedge_{u \in U} a_u \right) = \mu(a)
   \]
 
-  Finally, note that if $M_W$ and
-  $M$ agree on all atoms, then they must also agree on all other non-zero
-  elements of the Boolean algebra.
+  Finally, note that if $\mu_\nu$ and $\mu$ agree on all atoms, then they must
+  also agree on all other non-zero elements of the Boolean algebra.
 
   ($\Rightarrow$) For the other direction, we are given a factored weight
-  function $W = \prod_{x \in U} W_x$, and we want to show that its induced
-  measure $M_W$ satisfies \cref{eq:wmccondition}. Let $k_u, k_v \in U \cup \{
-  \neg w \mid w \in U \}$ be such that $k_u \in \{ u, \neg u \}$, $k_v \in \{ v,
-  \neg v \}$, and $u \ne v$. We then want to show that
+  function $\nu = \prod_{x \in U} \nu_x$, and we want to show that its induced
+  measure $\mu_\nu$ satisfies \cref{eq:wmccondition}. Let $k_u, k_v \in U \cup
+  \{\neg w \mid w \in U \}$ be such that $k_u \in \{ u, \neg u \}$, $k_v \in \{
+  v, \neg v \}$, and $u \ne v$. We then want to show that
   \begin{equation} \label{eq:to_prove3}
-    M_W(k_u \land k_v) = M_W(k_u)M_W(k_v)
+    \mu_\nu(k_u \land k_v) = \mu_\nu(k_u)\mu_\nu(k_v)
   \end{equation}
   which is equivalent to
   \begin{equation} \label{eq:to_prove4}
-    M_W(k_u \land k_v) \cdot M_W(\neg k_u \land \neg k_v) = M_W(k_u \land \neg k_v) \cdot M_w(\neg k_u \land k_v)
+    \mu_\nu(k_u \land k_v) \cdot \mu_\nu(\neg k_u \land \neg k_v) = \mu_\nu(k_u \land \neg k_v) \cdot \mu_\nu(\neg k_u \land k_v)
   \end{equation}
   by \cref{lemma:before_theorem}. Then
   \begin{align*}
-    M_W(k_u \land k_v) &= \sum_{\{a\} \le k_u \land k_v} W(a) = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U} W_x(a) \\
-                        &= \sum_{\{a\} \le k_u \land k_v} W_u(a_u)W_v(a_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) = \sum_{\{a\} \le k_u \land k_v} W_u(k_u)W_v(k_v) \prod_{x \in U \setminus \{ u, v \}} W_x(a) \\
-    &= W_u(k_u)W_v(k_v) \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} W_x(a) = W_u(k_u)W_v(k_v)C,
+    \mu_\nu(k_u \land k_v) &= \sum_{\{a\} \le k_u \land k_v} \nu(a) = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U} \nu_x(a) \\
+                        &= \sum_{\{a\} \le k_u \land k_v} \nu_u(a_u)\nu_v(a_v) \prod_{x \in U \setminus \{ u, v \}} \nu_x(a) = \sum_{\{a\} \le k_u \land k_v} \nu_u(k_u)\nu_v(k_v) \prod_{x \in U \setminus \{ u, v \}} \nu_x(a) \\
+    &= \nu_u(k_u)\nu_v(k_v) \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} \nu_x(a) = \nu_u(k_u)\nu_v(k_v)c,
   \end{align*}
-  where $C = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}}
-  W_x(a)$, and is the same for $M_W(\neg k_u \land k_v)$, $M_W(k_u \land \neg
-  k_v)$, and $M_W(\neg k_u \land \neg k_v)$ as well. But then
+  where $c = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}}
+  \nu_x(a)$, and is the same for $\mu_\nu(\neg k_u \land k_v)$, $\mu_\nu(k_u
+  \land \neg k_v)$, and $\mu_\nu(\neg k_u \land \neg k_v)$ as well. But then
   \cref{eq:to_prove4} becomes
   \[
-    W_u(k_u)W_v(k_v)W_u(\neg k_u)W_v(\neg k_v)C^2 = W_u(k_u)W_v(\neg
-    k_v)W_u(\neg k_u)W_v(k_v)C^2
+    \nu_u(k_u)\nu_v(k_v)\nu_u(\neg k_u)\nu_v(\neg k_v)c^2 = \nu_u(k_u)\nu_v(\neg
+    k_v)\nu_u(\neg k_u)\nu_v(k_v)c^2
   \]
   which is trivially true.
 \end{proof}
@@ -535,26 +521,26 @@ which we will refer to throughout this section. For this network, $\mathcal{V} =
   On the other hand, if $X$ is not binary, we represent $X$ with $|\im X|$
   indicator variables, one for each value. We let
   \[
-    E(X) = \begin{cases}
+    \mathcal{E}(X) = \begin{cases}
       \{ \lambda_{X=1} \} & \text{if } |\im X| = 2 \\
       \{ \lambda_{X=x} \mid x \in \im X \} & \text{otherwise.}
     \end{cases}
   \]
-  denote the set of indicator variables for $X$ and $E^*(X) = E(X) \cup
-  \bigcup_{Y \in \mathrm{pa}(X)} E(Y)$ denote the set of indicator variables for
-  $X$ and its parents in the Bayesian network. Finally, let $U = \bigcup_{X \in
-    \mathcal{V}} E(X)$ denote the set of all indicator variables for all random
-  variables in the Bayesian network.
+  denote the set of indicator variables for $X$ and $\mathcal{E}^*(X) =
+  \mathcal{E}(X) \cup \bigcup_{Y \in \mathrm{pa}(X)} \mathcal{E}(Y)$ denote the
+  set of indicator variables for $X$ and its parents in the Bayesian network.
+  Finally, let $U = \bigcup_{X \in \mathcal{V}} \mathcal{E}(X)$ denote the set
+  of all indicator variables for all random variables in the Bayesian network.
 \end{definition}
 
 For the Bayesian network in \cref{fig:example_bn}, this gives us:
 \begin{align*}
-  E(W) &= \{ \lambda_{W=1} \}, \\
-  E(F) &= \{ \lambda_{F=1} \}, \\
-  E(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
-  E^*(W) &= \{ \lambda_{W=1} \}, \\
-  E^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
-  E^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}.
+  \mathcal{E}(W) &= \{ \lambda_{W=1} \}, \\
+  \mathcal{E}(F) &= \{ \lambda_{F=1} \}, \\
+  \mathcal{E}(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
+  \mathcal{E}^*(W) &= \{ \lambda_{W=1} \}, \\
+  \mathcal{E}^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
+  \mathcal{E}^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}.
 \end{align*}
 
 \begin{algorithm}
@@ -594,12 +580,21 @@ For the Bayesian network in \cref{fig:example_bn}, this gives us:
   \Return{$\phi$}\;
 \end{algorithm}
 
-\todo[inline]{Describe the algorithm and the CPT functions. In fact, we call
-  each CPT function (i.e., a function that represents a CPT) a \emph{conditional
-    weight function} (and this is more of a semantic rather than practical
-  distinction).}
+\Cref{alg:encoding} shows how a Bayesian network with vertices $\mathcal{V}$
+can be represented as a weight function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$.
+The algorithm begins with the unit function and multiplies it by
+$\mathrm{CPT}_X\colon 2^{\mathcal{E}^*(X)} \to \mathbb{R}_{\ge 0}$ for each
+random variable $X \in \mathcal{V}$. We call each such function a
+\emph{conditional weight function} as it represents a conditional probability
+distribution. However, the distinction is primarily a semantic one: a function
+$2^{\{a, b\}} \to \mathbb{R}_{\ge 0}$ can represent $\Pr(a \mid b)$, $\Pr(b \mid
+a)$, or something else entirely.
 
-For the Bayesian network in \cref{fig:example_bn}, we have:
+For a binary random variable $X$, $\mathrm{CPT}_X$ is simply a sum of smaller
+functions, one for each row of the CPT. If $X$ has more than two values, we also
+multiply $\mathrm{CPT}_X$ by some `clause' functions that restrict the value of
+$\phi(T)$ to zero whenever $|\mathcal{E}(X) \cap T| \ne 1$. For the Bayesian
+network in \cref{fig:example_bn}, we get:
 \begin{align*}
   \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
   \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
@@ -609,27 +604,30 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
 
 \subsection{Proof of Correctness}
 
+\todo[inline]{Introduce what this subsection is all about (and each result
+  separately).}
+
 \begin{lemma} \label{lemma:cpt}
   Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
-  \dots, Y_n \}$. Then $\mathrm{CPT}_X\colon 2^{E^*(X)} \to \mathbb{R}_{\ge 0}$
-  is such that for any $x \in \im X$ and $(y_1, \dots, y_n) \in \prod_{i=1}^n
-  \im Y_i$,
+  \dots, Y_n \}$. Then $\mathrm{CPT}_X\colon 2^{\mathcal{E}^*(X)} \to
+  \mathbb{R}_{\ge 0}$ is such that for any $x \in \im X$ and $(y_1, \dots, y_n)
+  \in \prod_{i=1}^n \im Y_i$,
   \[
     \mathrm{CPT}_X (\{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1,
     \dots, n \}) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
   \]
 \end{lemma}
 \begin{proof}
-  Let $\tau = \{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1, \dots, n
+  Let $T = \{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1, \dots, n
   \}$. If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im
   Y_i|$ terms, one for each possible assignment of values to variables $X, Y_1,
-  \dots, Y_n$. Exactly one of these terms is nonzero when applied to $\tau$, and
+  \dots, Y_n$. Exactly one of these terms is nonzero when applied to $T$, and
   it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
 
   If $X$ is not binary, then $\left( \sum_{i=1}^m [\lambda_{X = x_i}]
-  \right)(\tau) = 1$, and $\left( \prod_{i=1}^m \prod_{j=i+1}^m
+  \right)(T) = 1$, and $\left( \prod_{i=1}^m \prod_{j=i+1}^m
     (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})
-  \right)(\tau) = 1$, so $\mathrm{CPT}_X(\tau) = \Pr(X = x \mid Y_1 = y_1,
+  \right)(T) = 1$, so $\mathrm{CPT}_X(T) = \Pr(X = x \mid Y_1 = y_1,
   \dots, Y_n = y_n)$ by a similar argument as before.
 \end{proof}
 
@@ -638,33 +636,33 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
   probability distribution of the Bayesian network, i.e., if $\mathcal{V} = \{
   X_1, \dots, X_n\}$, then
   \[
-    \phi(\tau) =
+    \phi(T) =
     \begin{cases}
-      \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } \tau = \{ \lambda_{X_i=x_i}
+      \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } T = \{ \lambda_{X_i=x_i}
       \mid i = 1, \dots, n \} \text{ for some } (x_1, \dots, x_n) \in
       \prod_{i=1}^n \im X_i \\
       0 & \text{otherwise,}
     \end{cases}
   \]
-  for all $\tau \in 2^U$.
+  for all $T \in 2^U$.
 \end{proposition}
 \begin{proof}
-  If $\tau = \{ \lambda_{X=v_X} \mid X \in \mathcal{V} \}$ for some $(v_X)_{X
+  If $T = \{ \lambda_{X=v_X} \mid X \in \mathcal{V} \}$ for some $(v_X)_{X
     \in \mathcal{V}} \in \prod_{X \in \mathcal{V}} \im X$, then
   \[
-    \phi(\tau) = \prod_{X \in \mathcal{V}} \Pr \left( X=v_X \;\middle|\;
+    \phi(T) = \prod_{X \in \mathcal{V}} \Pr \left( X=v_X \;\middle|\;
       \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X
         \in \mathcal{V}} X=v_X \right)
   \]
   by \cref{lemma:cpt} and the definition of a Bayesian network. Otherwise there
-  must be some non-binary random variable $X \in \mathcal{V}$ such that $|E(X)
-  \cap \tau| \ne 1$. If $E(X) \cap \tau = \emptyset$, then $\left( \sum_{i=1}^m
-    [\lambda_{X = x_i}] \right)(\tau) = 0$, and so $\mathrm{CPT}_X(\tau) = 0$,
-  and $\phi(\tau) = 0$. If $|E(X) \cap \tau| > 1$, then we must have two
-  different values $x_1, x_2 \in \im X$ such that $\{\lambda_{X=x_1},
-  \lambda_{X=x_2} \} \subseteq \tau$ which means that
-  $(\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(\tau) = 0$, and
-  so, again, $\mathrm{CPT}_X(\tau) = 0$, and $\phi(\tau) = 0$.
+  must be some non-binary random variable $X \in \mathcal{V}$ such that
+  $|\mathcal{E}(X) \cap T| \ne 1$. If $\mathcal{E}(X) \cap T = \emptyset$, then
+  $\left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(T) = 0$, and so
+  $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$. If $|\mathcal{E}(X) \cap T| > 1$,
+  then we must have two different values $x_1, x_2 \in \im X$ such that
+  $\{\lambda_{X=x_1}, \lambda_{X=x_2} \} \subseteq T$ which means that
+  $(\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(T) = 0$, and
+  so, again, $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$.
 \end{proof}
 
 \begin{theorem}
@@ -675,15 +673,15 @@ For the Bayesian network in \cref{fig:example_bn}, we have:
 \begin{proof}
   Let $\mathcal{V} = \{ X, Y_1, \dots, Y_n \}$. Then
   \begin{align*}
-    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{\tau \in 2^U} (\phi \cdot [\lambda_{X=x}])(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \phi(\tau) = \sum_{\lambda_{X=x} \in \tau \in 2^U} \left( \prod_{Y \in \mathcal{V}} \mathrm{CPT}_Y \right)(\tau) \\
+    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{T \in 2^U} (\phi \cdot [\lambda_{X=x}])(T) = \sum_{\lambda_{X=x} \in T \in 2^U} \phi(T) = \sum_{\lambda_{X=x} \in T \in 2^U} \left( \prod_{Y \in \mathcal{V}} \mathrm{CPT}_Y \right)(T) \\
     &= \sum_{(y_1, \dots, y_n) \in \prod_{i=1}^n \im Y_i} \Pr(X = x, Y_1 = y_1, \dots, Y_n = y_n) = \Pr(X = x)
   \end{align*}
   by the following arguments:
   \begin{itemize}
   \item the proof of Theorem~1 in the ADDMC paper \cite{DBLP:conf/aaai/DudekPV20};
-  \item if $\lambda_{X=x} \not\in \tau \in 2^U$, then $(\phi \cdot
-    [\lambda_{X=x}])(\tau) = \phi(\tau) \cdot [\lambda_{X=x}](\tau \cap \{
-    \lambda_{X=x} \}) = \phi(\tau) \cdot 0 = 0$;
+  \item if $\lambda_{X=x} \not\in T \in 2^U$, then $(\phi \cdot
+    [\lambda_{X=x}])(T) = \phi(T) \cdot [\lambda_{X=x}](T \cap \{
+    \lambda_{X=x} \}) = \phi(T) \cdot 0 = 0$;
   \item \cref{lemma:full_distribution};
   \item marginalisation of a probability distribution.
   \end{itemize}
@@ -716,16 +714,13 @@ format as
 with each $\lambda$ replaced with a unique positive integer. This format is
 based on the format used by the Cachet solver \cite{DBLP:conf/sat/SangBBKP04}
 to encode WMC problems, which extends the DIMACS format for conjunctive normal
-form (CNF) formulas with weight clauses. Subsequently, we extend it in two
-ways:
-\begin{itemize}
-\item a single weight clause now supports an arbitrary number of literals,
-\item and each weight clause has two probabilities instead of one (i.e., we no
-  longer assume that $\Pr(v) + \Pr(\neg v) = 1$ for all variables $v \in U$).
-\end{itemize}
-The way we use this encoding, it is always the case that either both
-probabilities sum to one, or the second probability (i.e., the probability for
-the complement of the variable) is equal to one.
+form (CNF) formulas with weight clauses. Subsequently, we extend it in two ways:
+a single weight clause now supports an arbitrary number of literals, and each
+weight clause has two probabilities instead of one (i.e., we no longer assume
+that $\Pr(v) + \Pr(\neg v) = 1$ for all $v \in U$). In our use of the encoding,
+it is always the case that either both probabilities sum to one, or the second
+probability (i.e., the probability for the complement of the variable) is equal
+to one.
 
 \subsection{Changes to ADDMC}
 
@@ -738,7 +733,7 @@ $\phi$. For any pair of distinct variables $u, v \in U$, we draw an edge between
 them in the Gaifman graph if there is a function $A\colon 2^X \to
 \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v \in
 X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges between
-all distinct pairs of variables in $E^*(X)$.
+all distinct pairs of variables in $\mathcal{E}^*(X)$.
 
 \todo[inline]{This needs rewriting.}
 ADDMC multiplies the final answer by $w(u)+w(-u)$ for every $u \in U$ that was
@@ -862,6 +857,8 @@ which happen to be binary. We classify them into the following seven categories:
   in \SI{10}{\second} (find the exact number).
 \end{itemize}
 
+\subsection{Explaining the Performance Benefits}
+
 \todo[inline]{Maybe replace `upper bound' with `worst-case'.}
 
 \begin{table}
@@ -880,15 +877,20 @@ which happen to be binary. We classify them into the following seven categories:
   \end{tabular}
 \end{table}
 
-\paragraph{Explaining the performance benefits.} Let $n = |\mathcal{V}|$ be the
-number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
-|\mathrm{pa}(X)|$ the maximum in-degree (i.e., number of parents), and $v =
-\max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
-Then... \cref{tbl:asymptotes}. However, note that these are upper bounds and
-most encodings (including \texttt{db20}) can be smaller in certain situations
-(e.g., with binary random variables or when a CPT has repeating probabilities).
+Let $n = |\mathcal{V}|$ be the number of vertices in the Bayesian network, $d =
+\max_{X \in \mathcal{V}} |\mathrm{pa}(X)|$ the maximum in-degree (i.e., number
+of parents), and $v = \max_{X \in \mathcal{V}} |\im X|$ the maximum number of
+values per variable. Then... \cref{tbl:asymptotes}. However, note that these are
+upper bounds and most encodings (including \texttt{db20}) can be smaller in
+certain situations (e.g., with binary random variables or when a CPT has
+repeating probabilities).
 
-\todo[inline]{Explain why clauses and ADDs are alike.}
+We equate clauses and ADDs (more specifically, factors of the function $\phi$
+from \cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
+encoding as a multiplicative factor of the ADD that represents the entire WMC
+instance \cite{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings, each
+weight is also a factor, but that has no effect on the asymptotic bounds in the
+table.
 
 \section{Conclusion and Future Work}
 
