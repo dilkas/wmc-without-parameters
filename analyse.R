@@ -98,17 +98,28 @@ ggplot(df[df$dataset == "2004-PGM"], aes(x = time_db20, y = time_sbk05)) +
   ylim(0, TIMEOUT)
 
 # Cumulative plot
-times <- unique(df0$time)
-cumulative <- rbind.data.frame(cbind(times, "cd05", unlist(times %>% map(function(x) sum(df0$time[df0$encoding == "cd05"] <= x)))),
-      cbind(times, "cd06", unlist(times %>% map(function(x) sum(df0$time[df0$encoding == "cd06"] <= x)))),
-      cbind(times, "d02", unlist(times %>% map(function(x) sum(df0$time[df0$encoding == "d02"] <= x)))),
-      cbind(times, "db20", unlist(times %>% map(function(x) sum(df0$time[df0$encoding == "db20"] <= x)))),
-      cbind(times, "sbk05", unlist(times %>% map(function(x) sum(df0$time[df0$encoding == "sbk05"] <= x)))))
+cd05.times <- unique(df0$time[df0$encoding == "cd05"])
+cd06.times <- unique(df0$time[df0$encoding == "cd06"])
+d02.times <- unique(df0$time[df0$encoding == "d02"])
+db20.times <- unique(df0$time[df0$encoding == "db20"])
+sbk05.times <- unique(df0$time[df0$encoding == "sbk05"])
+cumulative <- rbind(
+  cbind(cd05.times, "cd05", unlist(cd05.times %>% map(function(x) sum(df0$time[df0$encoding == "cd05"] <= x)))),
+  cbind(cd06.times, "cd06", unlist(cd06.times %>% map(function(x) sum(df0$time[df0$encoding == "cd06"] <= x)))),
+  cbind(d02.times, "d02", unlist(d02.times %>% map(function(x) sum(df0$time[df0$encoding == "d02"] <= x)))),
+  cbind(db20.times, "db20", unlist(db20.times %>% map(function(x) sum(df0$time[df0$encoding == "db20"] <= x)))),
+  cbind(sbk05.times, "sbk05", unlist(sbk05.times %>% map(function(x) sum(df0$time[df0$encoding == "sbk05"] <= x)))))
+cumulative <- as.data.frame(cumulative)
 names(cumulative) <- c("time", "encoding", "count")
 cumulative$encoding <- as.factor(paste("\\texttt{", cumulative$encoding, "}", sep = ""))
 cumulative$time <- as.numeric(cumulative$time)
 cumulative$count <- as.numeric(cumulative$count)
 cumulative <- cumulative[cumulative$time < TIMEOUT, ]
+
+max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
+interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{db20}"],
+                        y = cumulative$time[cumulative$encoding == "\\texttt{db20}"],
+                        xout = max_d02)$y
 
 tikz(file = "paper/cumulative.tex", width = 3.85, height = 2.5)
 ggplot(cumulative, aes(x = time, y = count, color = encoding)) +

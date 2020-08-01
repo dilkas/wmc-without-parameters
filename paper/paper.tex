@@ -47,16 +47,13 @@
 \section{Introduction}
 
 \begin{itemize}
-\item The Main Narrative
+\item The main narrative
   \begin{enumerate}
-  \item When weights are defined on literals, the measure on the free BA is
-    fully independent.
-  \item This means that the BA itself must be larger (i.e., have additional
-    `meaningless' literals) to turn any probability distribution into an
-    independent one.
+  \item Putting weights on literals is restrictive.
+  \item To overcome this, it is common practice to add more literals.
+  \item This is indeed always possible but much slower.
   \item We show how we can define conditional weights on literals, allowing us
-    to encode any probability distribution into a Boolean algebra that's not
-    necessarily independent and thus can be smaller.
+    to encode any measure.
   \item We demonstrate a specific example of this by presenting a new way to
     encode Bayesian networks into instances of WMC and adapting a WMC algorithm
     (ADDMC) to run on the new format.
@@ -143,14 +140,14 @@ CPT that is not inherited from the structure of the Bayesian network
 \begin{table}
   \centering
   \caption{A comparison of Boolean-algebraic (BA) and set-theoretic (ST)
-    concepts for $2^X$ for some set $X$}
+    concepts for $2^U$ for any set $U$}
   \label{tbl:notation}
   \begin{tabular}{lccl}
     \toprule
     BA name & BA symbol & ST symbol & ST name \\
     \midrule
     bottom & $\bot$ & $\emptyset$ & empty set \\
-    top & $\top$ & $X$ & \\
+    top & $\top$ & $U$ & \\
     meet, and & $\land$ & $\cap$ & intersection \\
     join, or & $\lor$ & $\cup$ & union \\
     complement, not & $\neg$ & $^c$ & complement \\
@@ -182,37 +179,31 @@ CPT that is not inherited from the structure of the Bayesian network
   \end{tabular}
 \end{table}
 
-\todo[inline]{Completely rewrite this section. It needs to be very clear and
-  introduce all relevant terminology.}
-\todo[inline]{Would it be more accurate to replace the word `model' with
-  `interpretation' in most situations?}
-
-For any set $X$, we can interpret $2^X$ as either a power set or a Boolean
-algebra---see \cref{tbl:notation} for a summary of the differences in
-terminology and notation.
-
-Let $\mathcal{L}$ be a propositional logic with atoms $U = \{ a, b \}$. See
-\cref{tbl:notation_example} for an overview of the models and formulas in
-$\mathcal{L}$ as well as their set-theoretic and Boolean-algebraic
-representations. Note the differences in the meaning of the word `atom' between
-the logical and the Boolean-theoretic interpretations. In the Boolean algebra
-$2^{2^U}$, an atom is a set with a single element which corresponds to a model
-of $\mathcal{L}$ (also known as an element of $2^U$); whereas an atom of
-$\mathcal{L}$ is an atomic formula, i.e., an element of $U$. We will primarily
-use the term `atom' to mean the former.
-
-In the rest of the paper, for any set $U$, we will use set-theoretic notation
-for $2^U$ and Boolean-algebraic notation for $2^{2^U}$, except for (Boolean)
-atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some model $x \in 2^U$.
+Let $\mathcal{L}$ be a propositional logic with atoms $a$ and $b$, and let $U =
+\{ a, b \}$. Then $2^U$, the power set of $U$, is the set of all models of
+$\mathcal{L}$, and $2^{2^U}$ is the set of all formulas. These sets can also be
+represented as Boolean algebras---see \cref{tbl:notation} for an overview of
+notational differences and \cref{tbl:notation_example} for examples of how
+various elements can be represented in both notations. Most importantly, note
+that the word \emph{atom} has completely different meanings in logic and in
+Boolean algebras. An atom in $\mathcal{L}$ is an atomic formula, i.e., an
+element of $U$, whereas an atom in a Boolean algebra is (in set-theoretic terms)
+a singleton set. For instance, an atom in $2^{2^U}$ corresponds to a model of
+$\mathcal{L}$, i.e., an element of $2^U$. Unless referring specifically to a
+logic, we will use the algebraic definition of an atom while referring to
+logical atoms as \emph{variables}. In the rest of the paper, for any set $U$, we
+will use set-theoretic notation for $2^U$ and Boolean-algebraic notation for
+$2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
+for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
 
 We build on the definitions of multiplication and projection in the ADDMC paper
 \cite{DBLP:conf/aaai/DudekPV20} and define more operations that can be used to
-manipulate functions from Boolean algebras to non-negative reals. All of these
-operations have efficient implementations in the CUDD \cite{somenzi1998cudd}
-package for manipulating ADDs (among other things) that is used by ADDMC
-{\cite{DBLP:conf/aaai/DudekPV20}.
+manipulate functions from Boolean algebras to non-negative real numbers. All of
+these operations have efficient implementations in the CUDD
+\cite{somenzi1998cudd} package for manipulating ADDs (among other things) that
+is used by ADDMC {\cite{DBLP:conf/aaai/DudekPV20}.
 
 \begin{definition}[Operations on functions]
   Let $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and $\beta\colon 2^Y \to
@@ -312,7 +303,7 @@ equivalently to \cref{eq:wmc_example}, we can write
   \nu_a(\{a\})\nu_b(\emptyset) = 0.3.
 \]
 
-\subsection{Limitations of Factorable Measures}
+\subsection{Not All Measures Are Factorable}
 
 \begin{example}
   Let $U = \{a, b\}$ be a set of atoms and $\mu\colon 2^{2^U} \to
@@ -352,99 +343,11 @@ general, however, factorising the full weight function into several smaller
 functions often results in weight functions with smaller domains which leads to
 increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
 
-\begin{lemma} \label{lemma:before_theorem}
-  For any measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ and elements $a, b
-  \in 2^{2^U}$,
-  \begin{equation} \label{eq:to_prove}
-    \mu(a \land b) = \mu(a)\mu(b)
-  \end{equation}
-  if and only if
-  \begin{equation} \label{eq:to_prove2}
-    \mu(a \land b) \cdot \mu(\neg a \land \neg b) = \mu(a \land \neg b)
-    \cdot \mu(\neg a \land b).
-  \end{equation}
-\end{lemma}
-\begin{proof}
-  First, note that $a = (a \land b) \lor (a \land \neg b)$ and $(a \land b)
-  \land (a \land \neg b) = 0$, so, by properties of a measure,
-  \begin{equation} \label{eq:temp}
-    \mu(a) = \mu(a \land b) + \mu(a \land \neg b).
-  \end{equation}
-  Applying \cref{eq:temp} and the equivalent expression for $\mu(b)$ allows us
-  to rewrite \cref{eq:to_prove} as
-  \[
-    \mu(a \land b) = [\mu(a \land b) + \mu(a \land \neg b)][\mu(a \land b) +
-    \mu(\neg a \land b)]
-  \]
-  which is equivalent to
-  \begin{equation} \label{eq:temp6}
-    \mu(a \land b)[1 - \mu(a \land b) - \mu(a \land \neg b) - \mu(\neg a \land b)] = \mu(a \land \neg b)\mu(\neg a \land b).
-  \end{equation}
-  Since $a \land b$, $a \land \neg b$, $\neg a \land b$, $\neg a \land \neg b$
-  are pairwise disjoint and their supremum is $\top$,
-  \[
-    \mu(a \land b) + \mu(a \land \neg b) + \mu(\neg a \land b) + \mu(\neg a
-    \land \neg b) = 1,
-  \]
-  and this allows us to rewrite \cref{eq:temp6} into \cref{eq:to_prove2}. As all
-  transformations are invertible, the two expressions are equivalent.
-\end{proof}
-
-\todo[inline]{The proof is only valid for probability measures!}
-
-\begin{theorem}
-  A measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is factorable if and only
-  if
-  \begin{equation} \label{eq:wmccondition}
-  \mu(u \land v) = \mu(u)\mu(v)
-  \end{equation}
-  for all distinct $u, v \in U \cup \{ \neg w \mid w \in U \}$ such that $u \ne
-  \neg v$.
-\end{theorem}
-\begin{proof}
-  ($\Leftarrow$) For each $x \in U$, let $\nu_x\colon 2^{\{x\}} \to
-  \mathbb{R}_{\ge 0}$ be defined by $\nu_x(\{ x \}) = \mu(x)$ and
-  $\nu_x(\emptyset) = \mu(\neg x)$. Let $\mu_\nu$ be the measure induced by $\nu
-  = \prod_{x \in U} \nu_x$. We will show that $\mu = \mu_\nu$. First, note that
-  $\mu_\nu(\bot) = 0 = \mu(\bot)$ by \cref{prop:measure} and the definition of a
-  measure. Second, let $a = \bigwedge_{u \in U} a_u$ be an atom in $2^{2^U}$
-  such that $a_u \in \{ u, \neg u \}$ for all $u \in U$. Then
-  \[
-    \mu_\nu(a) = \nu(\{ a_u \mid u \in U \}) = \prod_{u \in U} \nu_u(\{a_u\}) =
-    \prod_{u \in U} \mu(a_u) = \mu\left(\bigwedge_{u \in U} a_u \right) = \mu(a)
-  \]
-
-  Finally, note that if $\mu_\nu$ and $\mu$ agree on all atoms, then they must
-  also agree on all other non-zero elements of the Boolean algebra.
-
-  ($\Rightarrow$) For the other direction, we are given a factored weight
-  function $\nu = \prod_{x \in U} \nu_x$, and we want to show that its induced
-  measure $\mu_\nu$ satisfies \cref{eq:wmccondition}. Let $k_u, k_v \in U \cup
-  \{\neg w \mid w \in U \}$ be such that $k_u \in \{ u, \neg u \}$, $k_v \in \{
-  v, \neg v \}$, and $u \ne v$. We then want to show that
-  \begin{equation} \label{eq:to_prove3}
-    \mu_\nu(k_u \land k_v) = \mu_\nu(k_u)\mu_\nu(k_v)
-  \end{equation}
-  which is equivalent to
-  \begin{equation} \label{eq:to_prove4}
-    \mu_\nu(k_u \land k_v) \cdot \mu_\nu(\neg k_u \land \neg k_v) = \mu_\nu(k_u \land \neg k_v) \cdot \mu_\nu(\neg k_u \land k_v)
-  \end{equation}
-  by \cref{lemma:before_theorem}. Then
-  \begin{align*}
-    \mu_\nu(k_u \land k_v) &= \sum_{\{a\} \le k_u \land k_v} \nu(a) = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U} \nu_x(a) \\
-                        &= \sum_{\{a\} \le k_u \land k_v} \nu_u(a_u)\nu_v(a_v) \prod_{x \in U \setminus \{ u, v \}} \nu_x(a) = \sum_{\{a\} \le k_u \land k_v} \nu_u(k_u)\nu_v(k_v) \prod_{x \in U \setminus \{ u, v \}} \nu_x(a) \\
-    &= \nu_u(k_u)\nu_v(k_v) \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}} \nu_x(a) = \nu_u(k_u)\nu_v(k_v)c,
-  \end{align*}
-  where $c = \sum_{\{a\} \le k_u \land k_v} \prod_{x \in U \setminus \{ u, v \}}
-  \nu_x(a)$, and is the same for $\mu_\nu(\neg k_u \land k_v)$, $\mu_\nu(k_u
-  \land \neg k_v)$, and $\mu_\nu(\neg k_u \land \neg k_v)$ as well. But then
-  \cref{eq:to_prove4} becomes
-  \[
-    \nu_u(k_u)\nu_v(k_v)\nu_u(\neg k_u)\nu_v(\neg k_v)c^2 = \nu_u(k_u)\nu_v(\neg
-    k_v)\nu_u(\neg k_u)\nu_v(k_v)c^2
-  \]
-  which is trivially true.
-\end{proof}
+\todo[inline]{Add the proof that one can always go from any measure to a
+  factorable measure by adding more literals and say: Not all measures are
+  factorable but it is common practice to add more literals to make the measure
+  factorable. We show that it's always possible and yet it can be faster not to
+  do it.}
 
 \section{Encoding Bayesian Networks Using Conditional Weights}
 
@@ -686,16 +589,23 @@ network in \cref{fig:example_bn}, we get:
   \item marginalisation of a probability distribution.
   \end{itemize}
 \end{proof}
+\todo[inline]{Need to make the proof nicer.}
 
 \subsection{Textual Representation} \label{sec:textual_representation}
 
-\todo[inline]{Describe how this is an intermediate step before we get the $\phi$
-from the algorithm. Each CPT is treated as a clause.}
-
-The Bayesian network in \cref{fig:example_bn} can be represented in a textual
-format as
+\Cref{alg:encoding} encodes a Bayesian network into a function on a Boolean
+algebra, but how does it relate to the standard interpretation of a WMC encoding
+as a formula in conjunctive normal form (CNF) together with a collection of
+weights? The factors of $\phi$ that restrict the values of indicator variables
+for non-binary random variables are already expressed as a product of sums of
+0/1-valued functions, i.e., a kind of CNF. Disregarding these functions, each
+conditional weight function $\mathrm{CPT}_X$ is represented by a sum with a term
+for every subset of $\mathcal{E}^*(X)$. To encode these terms, we introduce
+\emph{extended weight clauses} to the WMC format used by Cachet
+\cite{DBLP:conf/sat/SangBBKP04}. For instance, here is a representation of the
+Bayesian network from \cref{fig:example_bn}:
 \[
-  \begin{array}{l r r l l}
+  \begin{array}{lrrll}
     \lambda\sb{T=l} &\lambda\sb{T=m} &\lambda\sb{T=h} & &0 \\
                     &-\lambda\sb{T=l} &-\lambda\sb{T=m} & &0 \\
                     &-\lambda\sb{T=l} &-\lambda\sb{T=h} & &0 \\
@@ -706,21 +616,30 @@ format as
     w &\lambda\sb{T=l} &\lambda\sb{W=1} &0.2 &1 \\
     w &\lambda\sb{T=m} &\lambda\sb{W=1} &0.4 &1 \\
     w &\lambda\sb{T=h} &\lambda\sb{W=1} &0.4 &1 \\
-    w &\lambda\sb{T=l} &\lambda\sb{W=0} &0.6 &1 \\
-    w &\lambda\sb{T=m} &\lambda\sb{W=0} &0.3 &1 \\
-    w &\lambda\sb{T=h} &\lambda\sb{W=0} &0.1 &1
+    w &\lambda\sb{T=l} &-\lambda\sb{W=1} &0.6 &1 \\
+    w &\lambda\sb{T=m} &-\lambda\sb{W=1} &0.3 &1 \\
+    w &\lambda\sb{T=h} &-\lambda\sb{W=1} &0.1 &1
   \end{array}
 \]
-with each $\lambda$ replaced with a unique positive integer. This format is
-based on the format used by the Cachet solver \cite{DBLP:conf/sat/SangBBKP04}
-to encode WMC problems, which extends the DIMACS format for conjunctive normal
-form (CNF) formulas with weight clauses. Subsequently, we extend it in two ways:
-a single weight clause now supports an arbitrary number of literals, and each
-weight clause has two probabilities instead of one (i.e., we no longer assume
-that $\Pr(v) + \Pr(\neg v) = 1$ for all $v \in U$). In our use of the encoding,
-it is always the case that either both probabilities sum to one, or the second
-probability (i.e., the probability for the complement of the variable) is equal
-to one.
+where each indicator variable is eventually replaced with a unique positive
+integer. Each line prefixed with a $w$ can be split into four parts: the `main'
+variable (always not negated), conditions (possibly none), and two weights. For
+example, the line
+\[
+  \begin{array}{lrrll}
+    w &\lambda\sb{T=m} &-\lambda\sb{W=1} &0.3 &1
+  \end{array}
+\]
+encodes the function $0.3[\lambda_{T=m}] \cdot \overline{[\lambda_{W=1}]} +
+1\overline{[\lambda_{T=m}]} \cdot \overline{[\lambda_{W=1}]}$ and can be
+interpreted as defining two conditional weights: $\nu(T = m \mid W = 0) = 0.3$,
+and $\nu(T \ne m \mid W = 0) = 1$, the former of which corresponds to a row in
+the CPT of $T$ while the latter is artificially added as part of the encoding.
+In our encoding of Bayesian networks, it is always the case that, in each weight
+clause, either both weights sum to one, or the second weight is equal to one.
+Finally, note that (without any additional restrictions), the measure induced by
+these weight functions is not probabilistic (i.e., $\mu(\top)$ may not be equal
+to one).
 
 \subsection{Changes to ADDMC}
 
@@ -730,26 +649,30 @@ the variables of the formula, and there is an edge between two variables $u$ and
 $v$ if there is a clause in the formula that contains both $u$ and $v$. We
 extend this definition to functions on Boolean algebras, i.e., the factors of
 $\phi$. For any pair of distinct variables $u, v \in U$, we draw an edge between
-them in the Gaifman graph if there is a function $A\colon 2^X \to
+them in the Gaifman graph if there is a function $\alpha\colon 2^X \to
 \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v \in
 X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges between
 all distinct pairs of variables in $\mathcal{E}^*(X)$.
 
-\todo[inline]{This needs rewriting.}
-ADDMC multiplies the final answer by $w(u)+w(-u)$ for every $u \in U$ that was
-`simplified out' of the ADD for $\phi$ and so is not featured in the $\exists_U$
-projection. In our format, for every such $u \in U$, we multiply the answer by
-two. Each such $u \in U$ must satisfy two properties:
-\begin{itemize}
-\item all the probabilities/weights associated with $u$ are equal to $0.5$
-  (otherwise the corresponding CPT would depend on $u$),
-\item and all other CPTs are independent of $u$ (or they may have a trivial
-  dependence, where the probability stays the same if $u$ is replaced with its
-  complement).
-\end{itemize}
+Even though the function $\phi$ produced by \cref{alg:encoding} is constructed
+to have $2^U$ as its domain, sometimes the domain is effectively reduced to
+$2^V$ for some $V \subset U$ by the ADD manipulation algorithms that optimise
+the ADD representation of a function. For a simple example, consider $\alpha:
+2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as $\alpha(\{a\}) = \alpha(\emptyset)
+= 0.5$. Then $\alpha$ can be reduced to $\alpha'\colon 2^{\emptyset} \to
+\mathbb{R}_{\ge 0}$ defined as $\alpha'(\emptyset) = 0.5$. To compensate for
+these reductions, for the original WMC format with a weight function $w\colon U
+\cup \{ \neg u \mid u \in U \} \to \mathbb{R}_{\ge 0}$, ADDMC would multiply its
+computed answer by $\prod_{u \in U \setminus V} w(u) + w(\neg u)$. With the new
+WMC format, we instead multiply the answer by $2^{|U \setminus V|}$. Each
+`excluded' variable $u \in U \setminus V$ satisfies two properties:
+all weights associated with $u$ are equal to $0.5$ (otherwise the corresponding
+CPT would depend on $u$, and $u$ would not be excluded), and all other CPTs are
+independent of $u$ (or they may have a trivial dependence, where the probability
+stays the same if $u$ is replaced with its complement).
 Thus, the CPT that corresponds to $u$ still multiplies every model by $0.5$, but
 the number of models being considered by the ADDMC is halved. To correct for
-this, we need to perform this multiplication.
+this, we multiply the final answer by two for every $u \in U \setminus V$.
 
 \section{Experimental Comparison} \label{sec:experiments}
 
@@ -853,13 +776,10 @@ which happen to be binary. We classify them into the following seven categories:
   heuristics used by ADDMC or because these instances allow for significant
   simplifications that are exploited by $\mathtt{d02}$ but not
   $\mathtt{db20}$.
-\item Everything \texttt{d02} can do in \SI{1000}{\second}, \texttt{db20} can do
-  in \SI{10}{\second} (find the exact number).
+\item An observation from the cumulative plot: \texttt{db20} solves the same
+  number of instances in \SI{6.374}{\second} as \texttt{d02} does in
+  \SI{1000}{\second}.
 \end{itemize}
-
-\subsection{Explaining the Performance Benefits}
-
-\todo[inline]{Maybe replace `upper bound' with `worst-case'.}
 
 \begin{table}
   \centering
@@ -877,22 +797,28 @@ which happen to be binary. We classify them into the following seven categories:
   \end{tabular}
 \end{table}
 
-Let $n = |\mathcal{V}|$ be the number of vertices in the Bayesian network, $d =
-\max_{X \in \mathcal{V}} |\mathrm{pa}(X)|$ the maximum in-degree (i.e., number
-of parents), and $v = \max_{X \in \mathcal{V}} |\im X|$ the maximum number of
-values per variable. Then... \cref{tbl:asymptotes}. However, note that these are
-upper bounds and most encodings (including \texttt{db20}) can be smaller in
-certain situations (e.g., with binary random variables or when a CPT has
-repeating probabilities).
+\todo[inline]{It could be confusing to use the word `variable' here. I'm using
+  it as a synonym to `logical atom'.}
 
-We equate clauses and ADDs (more specifically, factors of the function $\phi$
-from \cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
+\paragraph{Explaining the performance benefits.} Let $n = |\mathcal{V}|$ be the
+number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
+|\mathrm{pa}(X)|$ the maximum in-degree (i.e., number of parents), and $v =
+\max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
+\Cref{tbl:asymptotes} shows how \texttt{db20} has both fewer variables and fewer
+ADDs than any other encoding. However, note that these are upper bounds and most
+encodings (including \texttt{db20}) can be smaller in certain situations (e.g.,
+with binary random variables or when a CPT has repeating probabilities). We
+equate clauses and ADDs (more specifically, factors of the function $\phi$ from
+\cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
 encoding as a multiplicative factor of the ADD that represents the entire WMC
 instance \cite{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings, each
 weight is also a factor, but that has no effect on the asymptotic bounds in the
 table.
 
-\section{Conclusion and Future Work}
+% While some ADDs may be larger as a result, experimental evidence still shows
+% significant performance benefits.
+
+\section{Conclusions and Future Work}
 
 \begin{itemize}
 \item Bayesian networks and ADDMC are only particular examples. This should also
