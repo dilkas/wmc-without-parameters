@@ -13,7 +13,7 @@ df0$time[is.na(df0$time)] <- TIMEOUT
 df0$memory[is.na(df0$memory)] <- max(df0$memory, na.rm = TRUE)
 df <- dcast(data = df0, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = c("answer", "time", "memory"))
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row["time_cd05"], row["time_cd06"],
-                                                          row["time_d02"], row["time_db20"], row["time_sbk05"])))
+                                                          row["time_d02"], row["time_db21"], row["time_sbk05"])))
 
 df$major.dataset <- "Non-binary"
 df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
@@ -28,58 +28,58 @@ df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
 # ============ Numerical investigations ================
 
 # Where answers don't match
-interesting <- df[abs(df$answer_db20 - df$answer_sbk05) > 0.01,]
+interesting <- df[abs(df$answer_db21 - df$answer_sbk05) > 0.01,]
 
 nrow(df)
 
 # Unique
-sum(is.na(df$answer_db20) & !is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+sum(is.na(df$answer_db21) & !is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cd05
-sum(is.na(df$answer_db20) & is.na(df$answer_cd05) & !is.na(df$answer_cd06) &
+sum(is.na(df$answer_db21) & is.na(df$answer_cd05) & !is.na(df$answer_cd06) &
       is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cd06
-sum(is.na(df$answer_db20) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+sum(is.na(df$answer_db21) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       !is.na(df$answer_d02) & is.na(df$answer_sbk05)) # d02
-sum(!is.na(df$answer_db20) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
-      is.na(df$answer_d02) & is.na(df$answer_sbk05)) # db20
-sum(is.na(df$answer_db20) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+sum(!is.na(df$answer_db21) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      is.na(df$answer_d02) & is.na(df$answer_sbk05)) # db21
+sum(is.na(df$answer_db21) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       is.na(df$answer_d02) & !is.na(df$answer_sbk05)) # sbk05
 
 # Fastest
 sum(!is.na(df$answer_cd05) & abs(df$time_cd05 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_cd06) & abs(df$time_cd06 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_d02) & abs(df$time_d02 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_db20) & abs(df$time_db20 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_db21) & abs(df$time_db21 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_sbk05) & abs(df$time_sbk05 - df$time_min) < 1e-5)
 
 # Solved
 sum(!is.na(df$answer_cd05))
 sum(!is.na(df$answer_cd06))
 sum(!is.na(df$answer_d02))
-sum(!is.na(df$answer_db20))
+sum(!is.na(df$answer_db21))
 sum(!is.na(df$answer_sbk05))
 
 # ================ Plots ==========================
 
 # Scatter plot: by dataset
 min.time <- min(df0$time)
-p1 <- ggplot(df[df$time_d02 > 0,], aes(x = time_d02, y = time_db20, col = major.dataset, shape = major.dataset)) +
+p1 <- ggplot(df[df$time_d02 > 0,], aes(x = time_d02, y = time_db21, col = major.dataset, shape = major.dataset)) +
   geom_point(alpha = 0.5, size = 1) +
   geom_abline(slope = 1, intercept = 0, colour = "#989898") +
   scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
   scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
-  ylab("\\texttt{db20} time (s)") +
+  ylab("\\texttt{db21} time (s)") +
   xlab("\\texttt{d02} time (s)") +
   scale_color_brewer(palette = "Dark2", name = "Data set") +
   coord_fixed() +
   annotation_logticks(colour = "#b3b3b3") +
   theme_light() +
   labs(color = "Data set", shape = "Data set")
-p2 <- ggplot(df[df$time_sbk05 > 0,], aes(x = time_sbk05, y = time_db20, col = major.dataset, shape = major.dataset)) +
+p2 <- ggplot(df[df$time_sbk05 > 0,], aes(x = time_sbk05, y = time_db21, col = major.dataset, shape = major.dataset)) +
   geom_point(alpha = 0.5, size = 1) +
   geom_abline(slope = 1, intercept = 0, colour = "#989898") +
   scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
   scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
-  ylab("\\texttt{db20} time (s)") +
+  ylab("\\texttt{db21} time (s)") +
   xlab("\\texttt{sbk05} time (s)") +
   scale_color_brewer(palette = "Dark2", name = "Data set") +
   coord_fixed() +
@@ -91,7 +91,7 @@ ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Scatter plot: for a specific data set
-ggplot(df[df$dataset == "2004-PGM"], aes(x = time_db20, y = time_sbk05)) +
+ggplot(df[df$dataset == "2004-PGM"], aes(x = time_db21, y = time_sbk05)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0) +
   xlim(0, TIMEOUT) +
@@ -101,13 +101,13 @@ ggplot(df[df$dataset == "2004-PGM"], aes(x = time_db20, y = time_sbk05)) +
 cd05.times <- unique(df0$time[df0$encoding == "cd05"])
 cd06.times <- unique(df0$time[df0$encoding == "cd06"])
 d02.times <- unique(df0$time[df0$encoding == "d02"])
-db20.times <- unique(df0$time[df0$encoding == "db20"])
+db21.times <- unique(df0$time[df0$encoding == "db21"])
 sbk05.times <- unique(df0$time[df0$encoding == "sbk05"])
 cumulative <- rbind(
   cbind(cd05.times, "cd05", unlist(cd05.times %>% map(function(x) sum(df0$time[df0$encoding == "cd05"] <= x)))),
   cbind(cd06.times, "cd06", unlist(cd06.times %>% map(function(x) sum(df0$time[df0$encoding == "cd06"] <= x)))),
   cbind(d02.times, "d02", unlist(d02.times %>% map(function(x) sum(df0$time[df0$encoding == "d02"] <= x)))),
-  cbind(db20.times, "db20", unlist(db20.times %>% map(function(x) sum(df0$time[df0$encoding == "db20"] <= x)))),
+  cbind(db21.times, "db21", unlist(db21.times %>% map(function(x) sum(df0$time[df0$encoding == "db21"] <= x)))),
   cbind(sbk05.times, "sbk05", unlist(sbk05.times %>% map(function(x) sum(df0$time[df0$encoding == "sbk05"] <= x)))))
 cumulative <- as.data.frame(cumulative)
 names(cumulative) <- c("time", "encoding", "count")
@@ -117,8 +117,8 @@ cumulative$count <- as.numeric(cumulative$count)
 cumulative <- cumulative[cumulative$time < TIMEOUT, ]
 
 max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
-interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{db20}"],
-                        y = cumulative$time[cumulative$encoding == "\\texttt{db20}"],
+interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{db21}"],
+                        y = cumulative$time[cumulative$encoding == "\\texttt{db21}"],
                         xout = max_d02)$y
 
 tikz(file = "paper/cumulative.tex", width = 3.85, height = 2.5)
@@ -128,7 +128,7 @@ ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
   xlab("Time (s)") +
   ylab("Instances solved") +
   scale_colour_brewer(palette = "Dark2") +
-  scale_linetype_manual(breaks = c("\\texttt{cd05}", "\\texttt{cd06}", "\\texttt{d02}", "\\texttt{db20}",
+  scale_linetype_manual(breaks = c("\\texttt{cd05}", "\\texttt{cd06}", "\\texttt{d02}", "\\texttt{db21}",
                                    "\\texttt{sbk05}"), values = c(4, 3, 5, 1, 2)) +
   annotation_logticks(sides = "b", colour = "#989898") +
   theme_light() +
@@ -136,12 +136,12 @@ ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
 dev.off()
 
 # Scatter plot for memory usage (not interesting)
-ggplot(df, aes(x = memory_db20, y = memory_cd06, col = major.dataset)) +
+ggplot(df, aes(x = memory_db21, y = memory_cd06, col = major.dataset)) +
   geom_point(alpha = 0.5) +
   geom_abline(slope = 1, intercept = 0) +
   scale_x_continuous(trans = log10_trans(), limits = c(min(df0$memory), max(df0$memory))) +
   scale_y_continuous(trans = log10_trans(), limits = c(min(df0$memory), max(df0$memory))) +
-  xlab("db20 memory usage") +
+  xlab("db21 memory usage") +
   ylab("d02 memory usage") +
   scale_color_brewer(palette = "Dark2", name = "Data set")
 
@@ -151,7 +151,7 @@ cumulative <- rbind.data.frame(
       cbind(times, "cd05", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "cd05" & !is.na(df0$answer)] <= x)))),
       cbind(times, "cd06", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "cd06" & !is.na(df0$answer)] <= x)))),
       cbind(times, "d02", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "d02" & !is.na(df0$answer)] <= x)))),
-      cbind(times, "db20", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "db20" & !is.na(df0$answer)] <= x)))),
+      cbind(times, "db21", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "db21" & !is.na(df0$answer)] <= x)))),
       cbind(times, "sbk05", unlist(times %>% map(function(x) sum(df0$memory[df0$encoding == "sbk05" & !is.na(df0$answer)] <= x)))))
 names(cumulative) <- c("memory", "encoding", "count")
 cumulative$encoding <- as.factor(paste("\\texttt{", cumulative$encoding, "}", sep = ""))

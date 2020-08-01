@@ -200,10 +200,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of weighted model counting (WMC)')
     parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
-    parser.add_argument('encoding', choices=['d02', 'sbk05', 'cd05', 'cd06', 'db20'], help='a WMC encoding')
+    parser.add_argument('encoding', choices=['d02', 'sbk05', 'cd05', 'cd06', 'db21'], help='a WMC encoding')
     parser.add_argument('-e', dest='evidence', help="evidence file (in the INST format)")
     args = parser.parse_args()
-    if args.encoding == 'db20':
+    if args.encoding == 'db21':
         encode(args.network, args.evidence)
     else:
         encode_using_ace(args.network, args.evidence, args.encoding)

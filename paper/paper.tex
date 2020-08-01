@@ -222,7 +222,9 @@ is used by ADDMC {\cite{DBLP:conf/aaai/DudekPV20}.
     such that $\overline{\alpha}(T) = 1 - \alpha(T)$ for all $T \in 2^X$.
   \item[Projection:] $\exists_x\alpha\colon 2^{X \setminus \{ x \}} \to
     \mathbb{R}_{\ge 0}$ is such that $(\exists_x\alpha)(T) = \alpha(T) +
-    \alpha(T \cup \{ x \})$ for all $T \in 2^{X \setminus \{x \}}$.
+    \alpha(T \cup \{ x \})$ for all $T \in 2^{X \setminus \{x \}}$. For any $Z =
+    \{ z_1, \dots, z_n \} \subseteq X$, we write $\exists_Z$ to mean
+    $\exists_{z_1}\dots\exists_{z_n}$.
   \end{description}
 \end{definition}
 
@@ -234,18 +236,13 @@ is used by ADDMC {\cite{DBLP:conf/aaai/DudekPV20}.
   and commutative.
 \end{observation}
 
-\begin{definition}[Special functions]
-  We define several special functions:
-  \begin{itemize}
-  \item unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $1(\emptyset) = 1$;
-  \item zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$, $0(\emptyset) = 0$;
-  \item and $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$, $[a](\emptyset) = 0$,
-    $[a](\{a\}) = 1$ for any $a$.
-  \end{itemize}
-\end{definition}
-
-Henceforth, for any function $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and any
-set $T$, we will write $\alpha(T)$ to mean $\alpha(T \cap X)$.
+We end the discussion on function spaces by defining several special functions:
+unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$ defined as $1(\emptyset) = 1$,
+zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$ defined as $0(\emptyset) = 0$,
+and function $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as
+$[a](\emptyset) = 0$, $[a](\{a\}) = 1$ for any $a$. Henceforth, for any function
+$\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set $T$, we will write
+$\alpha(T)$ to mean $\alpha(T \cap X)$.
 
 \section{WMC as a Measure}
 
@@ -304,6 +301,8 @@ equivalently to \cref{eq:wmc_example}, we can write
 \]
 
 \subsection{Not All Measures Are Factorable}
+
+\todo[inline]{Introduce the subsection and give it some context.}
 
 \begin{example}
   Let $U = \{a, b\}$ be a set of atoms and $\mu\colon 2^{2^U} \to
@@ -401,17 +400,16 @@ increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
 In this section, we describe a way to encode Bayesian networks into WMC without
 restricting oneself to factorable measures and thus having to add extra
 variables to maintain literal independence. In line with the names of previous
-encodings, we shall call this encoding \texttt{db20}.
-
-Recall that a Bayesian network is a directed acyclic graph with random variables
-as vertices. Let $\mathcal{V}$ denote the set of random variables. For any
-random variable $X \in \mathcal{V}$, let $\im X$ denote its set of possible
-values and $\mathrm{pa}(X)$ the set of its parents. The full probability
-distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X \mid
-\mathrm{pa}(X))$. See \cref{fig:example_bn} for an example Bayesian network
-which we will refer to throughout this section. For this network, $\mathcal{V} =
-\{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) =
-\{ W \}$, $\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
+encodings, we shall call this encoding \texttt{db21}. Recall that a Bayesian
+network is a directed acyclic graph with random variables as vertices. Let
+$\mathcal{V}$ denote the set of random variables. For any random variable $X \in
+\mathcal{V}$, let $\im X$ denote its set of possible values and $\mathrm{pa}(X)$
+the set of its parents. The full probability distribution is then equal to
+$\prod_{X \in \mathcal{V}} \Pr(X \mid \mathrm{pa}(X))$. See
+\cref{fig:example_bn} for an example Bayesian network which we will refer to
+throughout this section. For this network, $\mathcal{V} = \{ W, F, T \}$,
+$\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im
+W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
@@ -507,8 +505,24 @@ network in \cref{fig:example_bn}, we get:
 
 \subsection{Proof of Correctness}
 
-\todo[inline]{Introduce what this subsection is all about (and each result
-  separately).}
+\Cref{alg:encoding} produces a function with a Boolean algebra as its domain.
+This function can be represented by an ADD. The core of ADDMC works by taking an
+ADD $\psi\colon 2^{U} \to \mathbb{R}_{\ge 0}$ (expressed as a product of smaller
+ADDs) and returning $(\exists_U\psi)(\emptyset)$
+\cite{DBLP:conf/aaai/DudekPV20}. In this section, we prove that the function
+$\phi$ produced by \cref{alg:encoding} can be used by ADDMC to correctly compute
+any marginal probability of the Bayesian network that was encoded as
+$\phi$.\footnote{It can just as well compute any probability expressed using the
+random variables in $\mathcal{V}$, but we focus mostly on marginal probabilities
+in our experiments.} First, \cref{lemma:cpt} shows that any conditional weight function
+produces the right answer when given an appropriate encoding of
+variable-value assignments for a conditional probability in the Bayesian
+network. Then, \cref{lemma:full_distribution} shows that $\phi$ represents the
+full probability distribution of the Bayesian network, i.e., it gives the right
+probabilities for the right inputs and zero otherwise. We end with
+\cref{thm:correctness} that shows how $\phi$ can be combined with an encoding of
+a single variable-value assignment so that ADDMC would compute its marginal
+probability.
 
 \begin{lemma} \label{lemma:cpt}
   Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
@@ -535,9 +549,7 @@ network in \cref{fig:example_bn}, we get:
 \end{proof}
 
 \begin{proposition} \label{lemma:full_distribution}
-  The function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ represents the full
-  probability distribution of the Bayesian network, i.e., if $\mathcal{V} = \{
-  X_1, \dots, X_n\}$, then
+  Let $\mathcal{V} = \{X_1, \dots, X_n\}$. Then
   \[
     \phi(T) =
     \begin{cases}
@@ -568,10 +580,9 @@ network in \cref{fig:example_bn}, we get:
   so, again, $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$.
 \end{proof}
 
-\begin{theorem}
-  Let $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$ be the function generated by
-  \cref{alg:encoding}. Then $(\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset)
-  = \Pr(X = x)$.
+\begin{theorem} \label{thm:correctness}
+  For any $X \in \mathcal{V}$ and $x \in \im X$, $(\exists_U(\phi \cdot
+  [\lambda_{X=x}]))(\emptyset) = \Pr(X = x)$.
 \end{theorem}
 \begin{proof}
   Let $\mathcal{V} = \{ X, Y_1, \dots, Y_n \}$. Then
@@ -696,7 +707,7 @@ this, we multiply the final answer by two for every $u \in U \setminus V$.
       \texttt{cd05} & 2 & 3 & 372 \\
       \texttt{cd06} & 0 & 1 & 351 \\
       \texttt{d02} & 41 & 99 & 726 \\
-      \texttt{db20} & 228 & 871 & 901 \\
+      \texttt{db21} & 228 & 871 & 901 \\
       \texttt{sbk05} & 6 & 36 & 687 \\
       \bottomrule
     \end{tabular}
@@ -706,10 +717,12 @@ this, we multiply the final answer by two for every $u \in U \setminus V$.
 \begin{figure}
   \centering
   \input{scatter.tex}%
-  \caption{ADDMC inference time using \texttt{db20} compared to \texttt{d02}
+  \caption{ADDMC inference time using \texttt{db21} compared to \texttt{d02}
     (left) and \texttt{sbk05} (right) on an instance-by-instance basis across
     all data sets.}
 \end{figure}
+
+\todo[inline]{Write an introductory paragraph.}
 
 \begin{itemize}
 \item We chose not to measure or compare encoding time because of different
@@ -770,13 +783,13 @@ which happen to be binary. We classify them into the following seven categories:
 \item Our encoding is particularly promising on instances of Grid networks.
   They are set up so that the entire Bayesian network is relevant to the
   query.
-\item However, \texttt{db20} struggles with instances from Mastermind and
+\item However, \texttt{db21} struggles with instances from Mastermind and
   Random Blocks domains (but so does \texttt{sbk05}). We conjecture that this
   is so either because the particular structure of these problems confuse the
   heuristics used by ADDMC or because these instances allow for significant
   simplifications that are exploited by $\mathtt{d02}$ but not
-  $\mathtt{db20}$.
-\item An observation from the cumulative plot: \texttt{db20} solves the same
+  $\mathtt{db21}$.
+\item An observation from the cumulative plot: \texttt{db21} solves the same
   number of instances in \SI{6.374}{\second} as \texttt{d02} does in
   \SI{1000}{\second}.
 \end{itemize}
@@ -792,21 +805,18 @@ which happen to be binary. We classify them into the following seven categories:
     \midrule
     \texttt{cd05}, \texttt{cd06}, \texttt{sbk05} & $\mathcal{O}(nv^{d+1})$ & $\mathcal{O}(nv^{d+1})$ \\
     \texttt{d02} & $\mathcal{O}(nv^{d+1})$ & $\mathcal{O}(ndv^{d+1})$ \\
-    \texttt{db20} & $\mathcal{O}(nv)$ & $\mathcal{O}(nv^2)$ \\
+    \texttt{db21} & $\mathcal{O}(nv)$ & $\mathcal{O}(nv^2)$ \\
     \bottomrule
   \end{tabular}
 \end{table}
-
-\todo[inline]{It could be confusing to use the word `variable' here. I'm using
-  it as a synonym to `logical atom'.}
 
 \paragraph{Explaining the performance benefits.} Let $n = |\mathcal{V}|$ be the
 number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
 |\mathrm{pa}(X)|$ the maximum in-degree (i.e., number of parents), and $v =
 \max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
-\Cref{tbl:asymptotes} shows how \texttt{db20} has both fewer variables and fewer
+\Cref{tbl:asymptotes} shows how \texttt{db21} has both fewer variables and fewer
 ADDs than any other encoding. However, note that these are upper bounds and most
-encodings (including \texttt{db20}) can be smaller in certain situations (e.g.,
+encodings (including \texttt{db21}) can be smaller in certain situations (e.g.,
 with binary random variables or when a CPT has repeating probabilities). We
 equate clauses and ADDs (more specifically, factors of the function $\phi$ from
 \cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
