@@ -1,13 +1,82 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage[UKenglish]{babel}
-\usepackage[UKenglish]{isodate}
-\usepackage{fullpage}
+\def\year{2020}\relax
+%File: formatting-instruction.tex
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage{aaai20}  % DO NOT CHANGE THIS
+\usepackage{times}  % DO NOT CHANGE THIS
+\usepackage{helvet} % DO NOT CHANGE THIS
+\usepackage{courier}  % DO NOT CHANGE THIS
+\usepackage[hyphens]{url}  % DO NOT CHANGE THIS
+\usepackage{graphicx} % DO NOT CHANGE THIS
+\urlstyle{rm} % DO NOT CHANGE THIS
+\def\UrlFont{\rm}  % DO NOT CHANGE THIS
+\usepackage{graphicx}  % DO NOT CHANGE THIS
+\frenchspacing  % DO NOT CHANGE THIS
+\setlength{\pdfpagewidth}{8.5in}  % DO NOT CHANGE THIS
+\setlength{\pdfpageheight}{11in}  % DO NOT CHANGE THIS
+%\nocopyright
+%PDF Info Is REQUIRED.
+% For /Author, add all authors within the parentheses, separated by commas. No accents or commands.
+% For /Title, add Title in Mixed Case. No accents or commands. Retain the parentheses.
+ \pdfinfo{
+/Title (AAAI Press Formatting Instructions for Authors Using LaTeX -- A Guide)
+/Author (AAAI Press Staff, Pater Patel Schneider, Sunil Issar, J. Scott Penberthy, George Ferguson, Hans Guesgen)
+} %Leave this	
+% /Title ()
+% Put your actual complete title (no codes, scripts, shortcuts, or LaTeX commands) within the parentheses in mixed case
+% Leave the space between \Title and the beginning parenthesis alone
+% /Author ()
+% Put your actual complete list of authors (no codes, scripts, shortcuts, or LaTeX commands) within the parentheses in mixed case. 
+% Each author should be only by a comma. If the name contains accents, remove them. If there are any LaTeX commands, 
+% remove them. 
+
+% DISALLOWED PACKAGES
+% \usepackage{authblk} -- This package is specifically forbidden
+% \usepackage{balance} -- This package is specifically forbidden
+% \usepackage{caption} -- This package is specifically forbidden
+% \usepackage{color (if used in text)
+% \usepackage{CJK} -- This package is specifically forbidden
+% \usepackage{float} -- This package is specifically forbidden
+% \usepackage{flushend} -- This package is specifically forbidden
+% \usepackage{fontenc} -- This package is specifically forbidden
+% \usepackage{fullpage} -- This package is specifically forbidden
+% \usepackage{geometry} -- This package is specifically forbidden
+% \usepackage{grffile} -- This package is specifically forbidden
+% \usepackage{hyperref} -- This package is specifically forbidden
+% \usepackage{navigator} -- This package is specifically forbidden
+% (or any other package that embeds links such as navigator or hyperref)
+% \indentfirst} -- This package is specifically forbidden
+% \layout} -- This package is specifically forbidden
+% \multicol} -- This package is specifically forbidden
+% \nameref} -- This package is specifically forbidden
+% \natbib} -- This package is specifically forbidden -- use the following workaround:
+% \usepackage{savetrees} -- This package is specifically forbidden
+% \usepackage{setspace} -- This package is specifically forbidden
+% \usepackage{stfloats} -- This package is specifically forbidden
+% \usepackage{tabu} -- This package is specifically forbidden
+% \usepackage{titlesec} -- This package is specifically forbidden
+% \usepackage{tocbibind} -- This package is specifically forbidden
+% \usepackage{ulem} -- This package is specifically forbidden
+% \usepackage{wrapfig} -- This package is specifically forbidden
+% DISALLOWED COMMANDS
+% \nocopyright -- Your paper will not be published if you use this command
+% \addtolength -- This command may not be used
+% \balance -- This command may not be used
+% \baselinestretch -- Your paper will not be published if you use this command
+% \clearpage -- No page breaks of any kind may be used for the final version of your paper
+% \columnsep -- This command may not be used
+% \newpage -- No page breaks of any kind may be used for the final version of your paper
+% \pagebreak -- No page breaks of any kind may be used for the final version of your paperr
+% \pagestyle -- This command may not be used
+% \tiny -- This is not an acceptable font size.
+% \vspace{- -- No negative value may be used in proximity of a caption, figure, table, section, subsection, subsubsection, or reference
+% \vskip{- -- No negative value may be used to alter spacing above or below a caption, figure, table, section, subsection, subsubsection, or reference
+
+\setcounter{secnumdepth}{2} %May be changed to 1 or 2 if section numbers are desired.
+
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{mathtools}
-\usepackage{hyperref}
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage[capitalise]{cleveref}
 \usepackage{bm}
@@ -20,11 +89,10 @@
 \usepackage{multirow}
 \usepackage[binary-units]{siunitx}
 \usepackage[inline]{enumitem}
-
 \usetikzlibrary{cd}
 \usetikzlibrary{bayesnet}
 \usetikzlibrary{calc}
-
+\DeclareMathOperator{\im}{im}
 \newtheorem{theorem}{Theorem}
 \newtheorem{observation}{Observation}
 \newtheorem{lemma}{Lemma}
@@ -36,16 +104,39 @@
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
-\DeclareMathOperator{\im}{im}
-
+% The file aaai20.sty is the style file for AAAI Press 
+% proceedings, working notes, and technical reports.
+%
+\setlength\titlebox{2.5in} % If your paper contains an overfull \vbox too high warning at the beginning of the document, use this
+% command to correct it. You may not alter the value below 2.5 in
 \title{Weighted Model Counting with Conditional Weights}
-\author{Paulius Dilkas}
+%Your title must be in mixed case, not sentence case. 
+% That means all verbs (including short verbs like be, is, using,and go), 
+% nouns, adverbs, adjectives should be capitalized, including both words in hyphenated terms, while
+% articles, conjunctions, and prepositions are lower case unless they
+% directly follow a colon or long dash
+\author{Written by AAAI Press Staff\textsuperscript{\rm 1}\thanks{Primarily Mike Hamilton of the Live Oak Press, LLC, with help from the AAAI Publications Committee}\\ \Large \textbf{AAAI Style Contributions by
+Pater Patel Schneider,} \\ \Large \textbf{Sunil Issar, J. Scott Penberthy, George Ferguson, Hans Guesgen}\\ % All authors must be in the same font size and format. Use \Large and \textbf to achieve this result when breaking a line
+\textsuperscript{\rm 1}Association for the Advancement of Artificial Intelligence\\ %If you have multiple authors and multiple affiliations
+% use superscripts in text and roman font to identify them. For example, Sunil Issar,\textsuperscript{\rm 2} J. Scott Penberthy\textsuperscript{\rm 3} George Ferguson,\textsuperscript{\rm 4} Hans Guesgen\textsuperscript{\rm 5}. Note that the comma should be placed BEFORE the superscript for optimum readability
+2275 East Bayshore Road, Suite 160\\
+Palo Alto, California 94303\\
+publications20@aaai.org % email address must be in roman text type, not monospace or sans serif
+}
 
 \begin{document}
 \maketitle
 
+\begin{abstract}
+AAAI creates proceedings, working notes, and technical reports directly from
+electronic source furnished by the authors. To ensure that all papers in the
+publication have a uniform appearance, authors must adhere to the following
+instructions.
+\end{abstract}
+
 \section{Introduction}
 
+\noindent Foo
 \begin{itemize}
 \item The main narrative
   \begin{enumerate}
@@ -83,14 +174,16 @@
   extracting the logical from the probabilistic. Maybe I can make a case that my
   encoding (the textual version) kind of does the same, even though the
   algorithm doesn't.
+\item Replace things like `Darwiche (Darwiche, 2005)' with `Darwiche (2005)' if
+  possible (without natbib).
 \end{itemize}
 
 \section{Related Work}
 
-\paragraph{Using WMC to perform inference on Bayesian networks.} Hitherto, four
-techniques have been proposed for encoding Bayesian networks into instances of
-WMC. We will identify them based on the initials of authors as well as
-publications years: \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}, \texttt{sbk05}
+\paragraph{WMC for Bayesian networks.} Hitherto, four techniques have been
+proposed for encoding Bayesian networks into instances of WMC. We will identify
+them based on the initials of authors as well as publications years:
+\texttt{d02} \cite{DBLP:conf/kr/Darwiche02}, \texttt{sbk05}
 \cite{DBLP:conf/aaai/SangBK05}, \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05},
 and \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06}. Below we summarise the
 observed performance differences among them. Sang et al.
@@ -137,27 +230,29 @@ CPT that is not inherited from the structure of the Bayesian network
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
 
-\begin{table}
-  \centering
-  \caption{A comparison of Boolean-algebraic (BA) and set-theoretic (ST)
-    concepts for $2^U$ for any set $U$}
-  \label{tbl:notation}
-  \begin{tabular}{lccl}
-    \toprule
-    BA name & BA symbol & ST symbol & ST name \\
-    \midrule
-    bottom & $\bot$ & $\emptyset$ & empty set \\
-    top & $\top$ & $U$ & \\
-    meet, and & $\land$ & $\cap$ & intersection \\
-    join, or & $\lor$ & $\cup$ & union \\
-    complement, not & $\neg$ & $^c$ & complement \\
-            & $\le$ & $\subseteq$ & subset relation, set inclusion \\
-    atom & & & singleton, unit set \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\todo[inline]{Describe BA-PS duality without the table.}
 
-\begin{table}
+% \begin{table}
+%   \centering
+%   \caption{A comparison of Boolean-algebraic (BA) and set-theoretic (ST)
+%     concepts for $2^U$ for any set $U$}
+%   \label{tbl:notation}
+%   \begin{tabular}{lccl}
+%     \toprule
+%     BA name & BA symbol & ST symbol & ST name \\
+%     \midrule
+%     bottom & $\bot$ & $\emptyset$ & empty set \\
+%     top & $\top$ & $U$ & \\
+%     meet, and & $\land$ & $\cap$ & intersection \\
+%     join, or & $\lor$ & $\cup$ & union \\
+%     complement, not & $\neg$ & $^c$ & complement \\
+%             & $\le$ & $\subseteq$ & subset relation, set inclusion \\
+%     atom & & & singleton, unit set \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+
+\begin{table*}
   \caption{Notation for a logic with two atoms. The elements in both columns are
     listed in the same order.}
   \label{tbl:notation_example}
@@ -177,7 +272,7 @@ CPT that is not inherited from the structure of the Bayesian network
     \multirow{-7}{*}{Formulas (elements of $2^{2^U}$)} & $\bot$ & $\emptyset$ \\
     \bottomrule
   \end{tabular}
-\end{table}
+\end{table*}
 
 Let $\mathcal{L}$ be a propositional logic with atoms $a$ and $b$, and let $U =
 \{ a, b \}$. Then $2^U$, the power set of $U$, is the set of all models of
@@ -262,20 +357,20 @@ Finally, a measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
 \mathbb{R}_{\ge 0}$ that induces $\mu$.
 
 \begin{lemma} \label{prop:measure}
-  The function $\mu_\nu$, as defined by \cref{eq:induced_measure}, is a measure.
+  The function $\mu_\nu$, (from \cref{eq:induced_measure}), is a measure.
 \end{lemma}
-\begin{proof}
-  Note that $\mu_\nu(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b
-  \in 2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
-  Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
-  $b$. Moreover, none of them can be below both $a$ and $b$ because then they
-  would have to be below $a \land b = \bot$. Thus
-  \[
-    \mu_\nu(a \lor b) = \sum_{\{u\} \le a \lor b} \nu(u) = \sum_{\{u\} \le a}
-    \nu(u) + \sum_{\{u\} \le b} \nu(u) = \mu_\nu(a) + \mu_\nu(b)
-  \]
-  as required.
-\end{proof}
+% \begin{proof}
+%   Note that $\mu_\nu(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b
+%   \in 2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
+%   Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
+%   $b$. Moreover, none of them can be below both $a$ and $b$ because then they
+%   would have to be below $a \land b = \bot$. Thus
+%   \[
+%     \mu_\nu(a \lor b) = \sum_{\{u\} \le a \lor b} \nu(u) = \sum_{\{u\} \le a}
+%     \nu(u) + \sum_{\{u\} \le b} \nu(u) = \mu_\nu(a) + \mu_\nu(b)
+%   \]
+%   as required.
+% \end{proof}
 
 In this formulation, the process of calculating the value of $\mu_\nu(x)$ for
 some $x \in 2^{2^U}$ with a given definition of $\nu$ is known as WMC.
@@ -288,17 +383,20 @@ $\mathcal{L}$ be a propositional logic with two atoms $a$ and $b$ as in
 $\mathcal{L}$ with a sole axiom $a$. Then $\Delta$ has two models: $\{ a, b \}$
 and $\{ a, \neg b \}$ and its WMC \cite{DBLP:journals/ai/ChaviraD08} is
 \begin{equation} \label{eq:wmc_example}
-  \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) = w(a)w(b) + w(a)w(\neg b) = 0.3.
+  \begin{split}
+    \mathrm{WMC}(\Delta) &= \sum_{\omega \models \Delta} \prod_{\omega \models l} w(l) \\
+    &= w(a)w(b) + w(a)w(\neg b) = 0.3.
+  \end{split}
 \end{equation}
 Alternatively, we can define $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ as
 $\nu_a(\{ a \}) = 0.3$, $\nu_a(\emptyset) = 0.7$ and $\nu_b\colon 2^{\{b\}} \to
 \mathbb{R}_{\ge 0}$ as $\nu_b(\{ b \}) = 0.2$, $\nu_b(\emptyset) = 0.8$. Let
 $\mu$ be the measure on $2^{2^U}$ induced by $\nu = \nu_a \cdot \nu_b$. Then,
 equivalently to \cref{eq:wmc_example}, we can write
-\[
-  \mu(a) = \nu(\{ a, b \}) + \nu(\{ a \}) = \nu_a(\{a\})\nu_b(\{b\}) +
-  \nu_a(\{a\})\nu_b(\emptyset) = 0.3.
-\]
+\begin{align*}
+  \mu(a) &= \nu(\{ a, b \}) + \nu(\{ a \}) \\
+         &= \nu_a(\{a\})\nu_b(\{b\}) + \nu_a(\{a\})\nu_b(\emptyset) = 0.3.
+\end{align*}
 
 \subsection{Not All Measures Are Factorable}
 
@@ -350,7 +448,7 @@ increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
 
 \section{Encoding Bayesian Networks Using Conditional Weights}
 
-\begin{figure}
+\begin{figure*}
   \centering
   \begin{subfigure}{0.2\textwidth}
     \centering
@@ -395,7 +493,7 @@ increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
   \end{subfigure}
   \caption{An example Bayesian network with its CPTs}
   \label{fig:example_bn}
-\end{figure}
+\end{figure*}
 
 In this section, we describe a way to encode Bayesian networks into WMC without
 restricting oneself to factorable measures and thus having to add extra
@@ -445,11 +543,9 @@ For the Bayesian network in \cref{fig:example_bn}, this gives us:
 \end{align*}
 
 \begin{algorithm}
-  \caption{Encoding a Bayesian network as a function $2^U \to \mathbb{R}_{\ge
-      0}$}
+  \caption{Encoding a Bayesian network}
   \label{alg:encoding}
-  \KwData{a Bayesian network with vertices $\mathcal{V}$ and probability
-    distribution $\Pr$}
+  \KwData{vertices $\mathcal{V}$, probability distribution $\Pr$}
   \KwResult{a function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$}
   $\phi \gets 1$\;
   \For{$X \in \mathcal{V}$}{
@@ -457,8 +553,8 @@ For the Bayesian network in \cref{fig:example_bn}, this gives us:
     $\mathrm{CPT}_X \gets 0$\;
     \eIf{$|\im X| = 2$}{
       \For{$(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$}{
-        $p_1 \gets \Pr(X = 1 \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
-        $p_0 \gets \Pr(X \ne 1 \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
+        $p_1 \gets \Pr(X = 1 \mid y_1, \dots, y_n)$\;
+        $p_0 \gets \Pr(X \ne 1 \mid y_1, \dots, y_n)$\;
         $\mathrm{CPT}_X \gets \mathrm{CPT}_X + p_1[\lambda_{X=1}] \cdot
         \prod_{i=1}^n [\lambda_{Y_i=y_i}] + p_0 \overline{[\lambda_{X=1}]} \cdot
         \prod_{i=1}^n [\lambda_{Y_i=y_i}]$\;
@@ -467,7 +563,7 @@ For the Bayesian network in \cref{fig:example_bn}, this gives us:
       \textit{let} $\im X = \{ x_1, \dots, x_m \}$\;
       \For{$x \in \im X$ {\rm \textbf{and}} $(y_1, \dots, y_n) \in \prod_{i =
           1}^n \im Y_i$}{
-        $p_x \gets \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$\;
+        $p_x \gets \Pr(X = x \mid y_1, \dots, y_n)$\;
         $\mathrm{CPT}_X \gets \mathrm{CPT}_X + p_x[\lambda_{X=x}] \cdot
         \prod_{i=1}^n [\lambda_{Y_i=y_i}] + \overline{[\lambda_{X=1}]} \cdot
         \prod_{i=1}^n [\lambda_{Y_i=y_i}]$\;
@@ -498,9 +594,13 @@ $\phi(T)$ to zero whenever $|\mathcal{E}(X) \cap T| \ne 1$. For the Bayesian
 network in \cref{fig:example_bn}, we get:
 \begin{align*}
   \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
-  \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
-    &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] + 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
-  \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots).
+  \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] \\
+                 &+ 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
+                 &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] \\
+                 &+ 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
+  \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \\
+                 &\cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \\
+                 &\cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots).
 \end{align*}
 
 \subsection{Proof of Correctness}
@@ -530,77 +630,83 @@ probability.
   \mathbb{R}_{\ge 0}$ is such that for any $x \in \im X$ and $(y_1, \dots, y_n)
   \in \prod_{i=1}^n \im Y_i$,
   \[
-    \mathrm{CPT}_X (\{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1,
-    \dots, n \}) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n).
+    \mathrm{CPT}_X (T) = \Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n),
   \]
+  where $T = \{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1, \dots, n
+  \}$.
 \end{lemma}
-\begin{proof}
-  Let $T = \{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1, \dots, n
-  \}$. If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im
-  Y_i|$ terms, one for each possible assignment of values to variables $X, Y_1,
-  \dots, Y_n$. Exactly one of these terms is nonzero when applied to $T$, and
-  it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
+% \begin{proof}
+% If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im
+%   Y_i|$ terms, one for each possible assignment of values to variables $X, Y_1,
+%   \dots, Y_n$. Exactly one of these terms is nonzero when applied to $T$, and
+%   it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
 
-  If $X$ is not binary, then $\left( \sum_{i=1}^m [\lambda_{X = x_i}]
-  \right)(T) = 1$, and $\left( \prod_{i=1}^m \prod_{j=i+1}^m
-    (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})
-  \right)(T) = 1$, so $\mathrm{CPT}_X(T) = \Pr(X = x \mid Y_1 = y_1,
-  \dots, Y_n = y_n)$ by a similar argument as before.
-\end{proof}
+%   If $X$ is not binary, then $\left( \sum_{i=1}^m [\lambda_{X = x_i}]
+%   \right)(T) = 1$, and $\left( \prod_{i=1}^m \prod_{j=i+1}^m
+%     (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})
+%   \right)(T) = 1$, so $\mathrm{CPT}_X(T) = \Pr(X = x \mid Y_1 = y_1,
+%   \dots, Y_n = y_n)$ by a similar argument as before.
+% \end{proof}
 
 \begin{proposition} \label{lemma:full_distribution}
   Let $\mathcal{V} = \{X_1, \dots, X_n\}$. Then
   \[
     \phi(T) =
     \begin{cases}
-      \Pr(X_1 = x_1, \dots, X_n = x_n) & \text{if } T = \{ \lambda_{X_i=x_i}
-      \mid i = 1, \dots, n \} \text{ for some } (x_1, \dots, x_n) \in
-      \prod_{i=1}^n \im X_i \\
+      \Pr(x_1, \dots, x_n) &
+      \begin{aligned}
+        &\text{if } T = \{ \lambda_{X_i=x_i} \}_{i = 1}^n \text{ for} \\
+        &\text{some } \textstyle (x_i)_{i=1}^n \in \prod_{i=1}^n \im X_i
+      \end{aligned} \\
       0 & \text{otherwise,}
     \end{cases}
   \]
   for all $T \in 2^U$.
 \end{proposition}
-\begin{proof}
-  If $T = \{ \lambda_{X=v_X} \mid X \in \mathcal{V} \}$ for some $(v_X)_{X
-    \in \mathcal{V}} \in \prod_{X \in \mathcal{V}} \im X$, then
-  \[
-    \phi(T) = \prod_{X \in \mathcal{V}} \Pr \left( X=v_X \;\middle|\;
-      \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X
-        \in \mathcal{V}} X=v_X \right)
-  \]
-  by \cref{lemma:cpt} and the definition of a Bayesian network. Otherwise there
-  must be some non-binary random variable $X \in \mathcal{V}$ such that
-  $|\mathcal{E}(X) \cap T| \ne 1$. If $\mathcal{E}(X) \cap T = \emptyset$, then
-  $\left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(T) = 0$, and so
-  $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$. If $|\mathcal{E}(X) \cap T| > 1$,
-  then we must have two different values $x_1, x_2 \in \im X$ such that
-  $\{\lambda_{X=x_1}, \lambda_{X=x_2} \} \subseteq T$ which means that
-  $(\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(T) = 0$, and
-  so, again, $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$.
-\end{proof}
+% \begin{proof}
+%   If $T = \{ \lambda_{X=v_X} \mid X \in \mathcal{V} \}$ for some $(v_X)_{X
+%     \in \mathcal{V}} \in \prod_{X \in \mathcal{V}} \im X$, then
+%   \[
+%     \phi(T) = \prod_{X \in \mathcal{V}} \Pr \left( X=v_X \;\middle|\;
+%       \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) = \Pr \left( \bigwedge_{X
+%         \in \mathcal{V}} X=v_X \right)
+%   \]
+%   by \cref{lemma:cpt} and the definition of a Bayesian network. Otherwise there
+%   must be some non-binary random variable $X \in \mathcal{V}$ such that
+%   $|\mathcal{E}(X) \cap T| \ne 1$. If $\mathcal{E}(X) \cap T = \emptyset$, then
+%   $\left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(T) = 0$, and so
+%   $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$. If $|\mathcal{E}(X) \cap T| > 1$,
+%   then we must have two different values $x_1, x_2 \in \im X$ such that
+%   $\{\lambda_{X=x_1}, \lambda_{X=x_2} \} \subseteq T$ which means that
+%   $(\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(T) = 0$, and
+%   so, again, $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$.
+% \end{proof}
+
+\todo[inline]{Try to be consistent about the usage of $\Pr$.}
 
 \begin{theorem} \label{thm:correctness}
-  For any $X \in \mathcal{V}$ and $x \in \im X$, $(\exists_U(\phi \cdot
-  [\lambda_{X=x}]))(\emptyset) = \Pr(X = x)$.
+  For any $X \in \mathcal{V}$ and $x \in \im X$,
+  \[
+    (\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset) = \Pr(X = x).
+  \]
 \end{theorem}
-\begin{proof}
-  Let $\mathcal{V} = \{ X, Y_1, \dots, Y_n \}$. Then
-  \begin{align*}
-    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{T \in 2^U} (\phi \cdot [\lambda_{X=x}])(T) = \sum_{\lambda_{X=x} \in T \in 2^U} \phi(T) = \sum_{\lambda_{X=x} \in T \in 2^U} \left( \prod_{Y \in \mathcal{V}} \mathrm{CPT}_Y \right)(T) \\
-    &= \sum_{(y_1, \dots, y_n) \in \prod_{i=1}^n \im Y_i} \Pr(X = x, Y_1 = y_1, \dots, Y_n = y_n) = \Pr(X = x)
-  \end{align*}
-  by the following arguments:
-  \begin{itemize}
-  \item the proof of Theorem~1 in the ADDMC paper \cite{DBLP:conf/aaai/DudekPV20};
-  \item if $\lambda_{X=x} \not\in T \in 2^U$, then $(\phi \cdot
-    [\lambda_{X=x}])(T) = \phi(T) \cdot [\lambda_{X=x}](T \cap \{
-    \lambda_{X=x} \}) = \phi(T) \cdot 0 = 0$;
-  \item \cref{lemma:full_distribution};
-  \item marginalisation of a probability distribution.
-  \end{itemize}
-\end{proof}
-\todo[inline]{Need to make the proof nicer.}
+% \begin{proof}
+%   Let $\mathcal{V} = \{ X, Y_1, \dots, Y_n \}$. Then
+%   \begin{align*}
+%     (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{T \in 2^U} (\phi \cdot [\lambda_{X=x}])(T) = \sum_{\lambda_{X=x} \in T \in 2^U} \phi(T) = \sum_{\lambda_{X=x} \in T \in 2^U} \left( \prod_{Y \in \mathcal{V}} \mathrm{CPT}_Y \right)(T) \\
+%     &= \sum_{(y_1, \dots, y_n) \in \prod_{i=1}^n \im Y_i} \Pr(X = x, Y_1 = y_1, \dots, Y_n = y_n) = \Pr(X = x)
+%   \end{align*}
+%   by the following arguments:
+%   \begin{itemize}
+%   \item the proof of Theorem~1 in the ADDMC paper \cite{DBLP:conf/aaai/DudekPV20};
+%   \item if $\lambda_{X=x} \not\in T \in 2^U$, then $(\phi \cdot
+%     [\lambda_{X=x}])(T) = \phi(T) \cdot [\lambda_{X=x}](T \cap \{
+%     \lambda_{X=x} \}) = \phi(T) \cdot 0 = 0$;
+%   \item \cref{lemma:full_distribution};
+%   \item marginalisation of a probability distribution.
+%   \end{itemize}
+% \end{proof}
+% TODO: need to make the proof nicer.
 
 \subsection{Textual Representation} \label{sec:textual_representation}
 
@@ -689,38 +795,35 @@ this, we multiply the final answer by two for every $u \in U \setminus V$.
 
 \begin{figure}
   \centering
-  \begin{minipage}{0.59\textwidth}
-    \centering
-    \input{cumulative.tex}%
-    \captionof{figure}{Cumulative number of instances solved by ADDMC over time
-      using each encoding}
-  \end{minipage}
-  \begin{minipage}{0.39\textwidth}
-    \centering
-    \captionof{table}{The numbers of instances solved by ADDMC with each
-      encoding (uniquely, faster than with others, and in total) under the
-      described time and memory constraints (out of 1216 instances)}%
-    \begin{tabular}{lrrr}
-      \toprule
-      Encoding & Unique & Fastest & Total \\
-      \midrule
-      \texttt{cd05} & 2 & 3 & 372 \\
-      \texttt{cd06} & 0 & 1 & 351 \\
-      \texttt{d02} & 41 & 99 & 726 \\
-      \texttt{db21} & 228 & 871 & 901 \\
-      \texttt{sbk05} & 6 & 36 & 687 \\
-      \bottomrule
-    \end{tabular}
-  \end{minipage}
+  \input{cumulative.tex}%
+  \caption{Cumulative number of instances solved by ADDMC over time using each
+    encoding}
 \end{figure}
 
-\begin{figure}
+\begin{table}
+  \centering
+  \caption{The numbers of instances solved by ADDMC with each encoding
+    (uniquely, faster than with others, and in total) under the described time
+    and memory constraints (out of 1216 instances)}%
+  \begin{tabular}{lrrr}
+    \toprule
+    Encoding & Unique & Fastest & Total \\
+    \midrule
+    \texttt{cd05} & 2 & 3 & 372 \\
+    \texttt{cd06} & 0 & 1 & 351 \\
+    \texttt{d02} & 41 & 99 & 726 \\
+    \texttt{db21} & 228 & 871 & 901 \\
+    \texttt{sbk05} & 6 & 36 & 687 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure*}
   \centering
   \input{scatter.tex}%
   \caption{ADDMC inference time using \texttt{db21} compared to \texttt{d02}
-    (left) and \texttt{sbk05} (right) on an instance-by-instance basis across
-    all data sets.}
-\end{figure}
+    (left) and \texttt{sbk05} (right) for each instance in all data sets.}
+\end{figure*}
 
 \todo[inline]{Write an introductory paragraph.}
 
@@ -861,11 +964,12 @@ table.
   \cite{DBLP:conf/uai/FierensBTGR11}.
 \end{itemize}
 
-\paragraph{Acknowledgements.} This work has made use of the resources provided
-by the Edinburgh Compute and Data Facility (ECDF)
-(\url{http://www.ecdf.ed.ac.uk/}).
+\todo[inline]{Have an appendix with proofs.}
 
-\bibliographystyle{plain}
+%\paragraph{Acknowledgements.} This work has made use of the resources provided
+%by the Edinburgh Compute and Data Facility (ECDF)
+%(\url{http://www.ecdf.ed.ac.uk/}).
+
+\bibliographystyle{aaai}
 \bibliography{paper}
-
 \end{document}

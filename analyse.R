@@ -116,12 +116,7 @@ cumulative$time <- as.numeric(cumulative$time)
 cumulative$count <- as.numeric(cumulative$count)
 cumulative <- cumulative[cumulative$time < TIMEOUT, ]
 
-max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
-interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{db21}"],
-                        y = cumulative$time[cumulative$encoding == "\\texttt{db21}"],
-                        xout = max_d02)$y
-
-tikz(file = "paper/cumulative.tex", width = 3.85, height = 2.5)
+tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
   geom_line(aes(linetype = encoding)) +
   scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
@@ -134,6 +129,11 @@ ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
   theme_light() +
   labs(color = "Encoding", linetype = "Encoding")
 dev.off()
+
+max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
+interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{db21}"],
+                        y = cumulative$time[cumulative$encoding == "\\texttt{db21}"],
+                        xout = max_d02)$y
 
 # Scatter plot for memory usage (not interesting)
 ggplot(df, aes(x = memory_db21, y = memory_cd06, col = major.dataset)) +
