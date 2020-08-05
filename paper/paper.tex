@@ -137,55 +137,67 @@
 
 \section{Introduction}
 
-% TODO
-Introduce WMC \cite{DBLP:conf/aaai/SangBK05}
+%Many WMC algorithms have been proposed
+%based primarily either on knowledge compilation
+%\cite{DBLP:conf/ecai/Darwiche04,DBLP:conf/ijcai/OztokD15,DBLP:conf/ijcai/LagniezM17}
+%or search \cite{DBLP:conf/aaai/SangBK05}.
 
-Over the last fifteen years, WMC has been extended and generalised in many ways,
-e.g., to handle continuous probability distributions
-\cite{DBLP:conf/ijcai/BellePB15}, first-order probabilistic theories
-\cite{DBLP:conf/ijcai/BroeckTMDR11,DBLP:journals/cacm/GogateD16}, and infinite
-domains \cite{DBLP:conf/aaai/Belle17}. Furthermore, WMC has been generalised
-from weights in the interval $[0, 1]$ or positive real numbers to an arbitrary
-semiring, making it applicable to domains such as parsing, dynamic programming,
-constraint programming, databases, networks, etc.
-\cite{DBLP:journals/japll/KimmigBR17}. It has been applied to Bayesian networks
+\emph{Weighted model counting} (WMC), i.e., an extension of model counting
+($\#\SAT$) that assigns a weight to every model \cite{DBLP:conf/aaai/SangBK05}
+has emerged as the unifying inference mechanism across many (probabilistic)
+domains. It has been applied to Bayesian networks
 \cite{DBLP:conf/aaai/SangBK05,DBLP:books/daglib/0024906} and probabilistic
 graphical models more generally \cite{DBLP:conf/ecsqaru/ChoiKD13}, probabilistic
 logic programming languages \cite{DBLP:journals/tplp/FierensBRSGTJR15} and
 probabilistic programs with discrete probability distributions
-\cite{DBLP:journals/corr/abs-2005-09089}. Many WMC algorithms have been proposed
-based primarily either on knowledge compilation
-\cite{DBLP:conf/ecai/Darwiche04,DBLP:conf/ijcai/OztokD15,DBLP:conf/ijcai/LagniezM17}
-or search \cite{DBLP:conf/aaai/SangBK05}.
+\cite{DBLP:journals/corr/abs-2005-09089}. Over the last fifteen years, WMC has
+been extended and generalised in many ways, e.g., to handle continuous
+probability distributions \cite{DBLP:conf/ijcai/BellePB15}, first-order
+probabilistic theories
+\cite{DBLP:conf/ijcai/BroeckTMDR11,DBLP:journals/cacm/GogateD16}, and infinite
+domains \cite{DBLP:conf/aaai/Belle17}. Furthermore, the idea of weights in WMC
+has been generalised from non-negative real numbers to an arbitrary semiring,
+making it applicable to domains such as parsing, dynamic programming, constraint
+programming, databases, and networks \cite{DBLP:journals/japll/KimmigBR17}.
 
 The most well-studied version of WMC assigns weights to models based on
 weights on literals, i.e., the weight of a model is the product of the weights
-of all literals in it. This severely restricts what probability distributions
-can be represented, and this limitation is usually overcome by increasing the
-size of the problem, i.e., adding more literals.
+of all literals in it. This simplification is motivated by the fact that the
+number of models scales exponentially with the number of atoms, so listing the
+weight of every model is intractable. However, this also severely restricts what
+probability distributions can be represented. A common way to overcome this
+limitation is by adding more literals. While we show that this is always
+possible, the rest of the paper demonstrates that it can be significantly more
+efficient to encode weights in a more flexible way instead.
 
-We show that while this workaround is always possible, it can be significantly
-more efficient to consider \emph{conditional weights} on literals. Similarly to
-conditional probabilities, conditional weights allow us to represent
-probabilities in a manner that is both efficient and interpretable. Not having
-additional variables that are only needed to manipulate the representation into
-a specific format helps with both efficiency and interpretability. Similarly to
-Bayesian networks, the size of the representation scales with independence and
-literal-weight WMC is a special case when everything is independent.
+\Cref{sec:prelims} describes three equivalent perspectives on the subject based
+on logic, set theory, and Boolean algebras. Furthermore, we describe the space
+of functions on Boolean algebras and various operations on those functions. In
+\cref{sec:wmc_as_measure}, WMC is introduced as the problem of computing the
+value of a measure on a Boolean algebra. We show that not all measures can be
+represented using literal-based WMC, but all Boolean algebras can be extended to
+make any measure representable in such a manner.
 
-We demonstrate a specific example of this by presenting a new way to
-encode Bayesian networks into instances of WMC and adapting a WMC algorithm
-ADDMC to run on the new format. ADDMC \cite{DBLP:conf/aaai/DudekPV20} is a
-recently-proposed algorithm for WMC based on manipulating functions on Boolean
-algebras using an efficient representation for such functions known as
-\emph{algebraic decision diagrams} (ADDs)
-\cite{DBLP:journals/fmsd/BaharFGHMPS97}. We show that with a few minor
-modifications the algorithm can be adapted to work on our new WMC format 
+In \cref{sec:bns}, we introduce \emph{conditional weights} on literals (in the
+spirit of conditional probabilities) that have literal-based WMC as a special
+case. As a particular example, we show how conditional weights can be used to
+encode Bayesian networks. We prove the correctness of the encoding and show
+how a state-of-the-art WMC solver ADDMC \cite{DBLP:conf/aaai/DudekPV20} can be
+adapted to the new format. ADDMC is a recently-proposed algorithm for WMC based
+on manipulating functions on Boolean algebras using an efficient representation
+for such functions known as \emph{algebraic decision diagrams} (ADDs)
+\cite{DBLP:journals/fmsd/BaharFGHMPS97}.
 
-Showing that the new encoding produces an asymptotically smaller problem (w.r.t.
-the numbers of literals and ADDs) and results in faster inferences.
+Finally, in \cref{sec:experiments}, we show how the new encoding results in
+significantly improved inference speed on most instances, often by one or two
+orders of magnitude. We explain the performance benefits by showing how the new
+encoding has asymptotically fewer variables and ADDs.
 
-% TODO: an overview of all results, with forward references
+%conditional weights allow us to represent
+%probabilities in a manner that is both efficient and interpretable. Not having
+%additional variables that are only needed to manipulate the representation into
+%a specific format helps with both efficiency and interpretability. Similarly to
+%Bayesian networks, the size of the representation scales with independence.
 
 \section{Related Work}
 
@@ -327,7 +339,7 @@ $[a](\emptyset) = 0$, $[a](\{a\}) = 1$ for any $a$. Henceforth, for any function
 $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set $T$, we will write
 $\alpha(T)$ to mean $\alpha(T \cap X)$.
 
-\section{WMC as a Measure}
+\section{WMC as a Measure} \label{sec:wmc_as_measure}
 
 Let $U$ be a set. A \emph{measure} is a function $\mu\colon 2^{2^U} \to
 \mathbb{R}_{\ge 0}$ such that $\mu(\bot) = 0$, and $\mu(a \lor b) = \mu(a) +
@@ -345,9 +357,9 @@ $\mu_\nu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if $\mu_\nu(x) = \sum_{\{u\} \le
 
 Finally, a measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
 \emph{factorable} if there exists a factored weight function $\nu\colon 2^U \to
-\mathbb{R}_{\ge 0}$ that induces $\mu$. In this formulation, the process of
-calculating the value of $\mu_\nu(x)$ for some $x \in 2^{2^U}$ with a given
-definition of $\nu$ is known as WMC.
+\mathbb{R}_{\ge 0}$ that induces $\mu$. In this formulation, WMC corresponds to
+the process of calculating the value of $\mu_\nu(x)$ for some $x \in 2^{2^U}$
+with a given definition of $\nu$.
 
 \paragraph{Relation to the classical (logic-based) view of WMC.} Let
 $\mathcal{L}$ be a propositional logic with two atoms $a$ and $b$ as in
@@ -429,7 +441,7 @@ inference task much harder.
   \land f)$ for all formulas $x \in 2^{2^U}$.
 \end{restatable}
 
-\section{Encoding Bayesian Networks Using Conditional Weights}
+\section{Encoding Bayesian Networks Using Conditional Weights} \label{sec:bns}
 
 \begin{figure*}
   \centering
@@ -978,7 +990,7 @@ table.
                                                         &= \sum_{(y_i)_{i=1}^n \in \prod_{i=1}^n \im Y_i} \Pr(x, y_1, \dots, y_n) \\
                                                         &= \Pr(X = x)
   \end{align*}
-  by the following arguments:
+  by:
   \begin{itemize}
   \item the proof of Theorem~1 by \citet{DBLP:conf/aaai/DudekPV20};
   \item if $\lambda_{X=x} \not\in T \in 2^U$, then $(\phi \cdot
@@ -988,7 +1000,6 @@ table.
   \item marginalisation of a probability distribution.
   \end{itemize}
 \end{proof}
-% TODO: need to make the proof nicer.
 
 \bibliography{paper}
 \end{document}
