@@ -107,6 +107,12 @@
 \newtheorem{example}{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
+\makeatletter
+\newcommand{\nosemic}{\renewcommand{\@endalgocfline}{\relax}}% Drop semi-colon ;
+\newcommand{\dosemic}{\renewcommand{\@endalgocfline}{\algocf@endline}}% Reinstate semi-colon ;
+\newcommand{\pushline}{\Indp}% Indent
+\newcommand{\popline}{\Indm\dosemic}% Undent
+\makeatother
 
 \title{Weighted Model Counting with Conditional Weights}
 %\author{
@@ -131,6 +137,7 @@
 
 \section{Introduction}
 
+% TODO
 Introduce WMC \cite{DBLP:conf/aaai/SangBK05}
 
 Over the last fifteen years, WMC has been extended and generalised in many ways,
@@ -182,14 +189,6 @@ the numbers of literals and ADDs) and results in faster inferences.
 
 \section{Related Work}
 
-% TODO: introduce this section and explain why there's so much about BNs
-A Bayesian network is a directed acyclic graph with random variables as vertices
-that defines a probability distribution over them. The full probability
-distribution can be expressed as the product of the conditional probability
-distributions of all random variables. For discrete Bayesian networks (and we
-only consider discrete networks in this paper), each such distribution can be
-represented by a table known as a conditional probability table (CPT).
-
 \paragraph{WMC for Bayesian networks.} Hitherto, four techniques have been
 proposed for encoding Bayesian networks into instances of WMC. We will identify
 them based on the initials of authors as well as publications years:
@@ -229,13 +228,13 @@ efficient way to manipulate functions from a Boolean algebra to any algebraic
 structure (most commonly the real numbers)
 \cite{DBLP:journals/fmsd/BaharFGHMPS97}. They have been used to represent value
 functions in Markov decision processes \cite{DBLP:conf/uai/HoeySHB99} and, for
-Bayesian network inference, to represent each CPT as an ADD
-\cite{DBLP:conf/icml/ZhaoMP15} as well as by combining ADDs and arithmetic
-circuits into a  single representation \cite{DBLP:conf/ijcai/ChaviraD07}. ADDs
-are particularly advantageous in this situation because of their ability to
-fully exploit context-specific independence, i.e., observable structure within a
-CPT that is not inherited from the structure of the Bayesian network
-\cite{DBLP:conf/uai/BoutilierFGK96}.
+Bayesian network inference, to represent each conditional probability table
+(CPT) as an ADD \cite{DBLP:conf/icml/ZhaoMP15} as well as by combining ADDs and
+arithmetic circuits into a  single representation
+\cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous in this
+situation because of their ability to fully exploit context-specific
+independence, i.e., observable structure within a CPT that is not inherited from
+the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -266,23 +265,24 @@ Let $\mathcal{L}$ be a propositional logic with atoms $a$ and $b$, and let $U =
 \{ a, b \}$. Then $2^U$, the power set of $U$, is the set of all models of
 $\mathcal{L}$, and $2^{2^U}$ is the set of all formulas. These sets can also be
 represented as Boolean algebras (e.g., $(2^{2^U}, \land, \lor, \neg, \bot,
-\top)$)---see \cref{tbl:notation_example} for examples of how various elements
-can be represented in both notations. Most importantly, note that the word
-\emph{atom} has completely different meanings in logic and in Boolean algebras.
-An atom in $\mathcal{L}$ is an atomic formula, i.e., an element of $U$, whereas
-an atom in a Boolean algebra is (in set-theoretic terms) a singleton set. For
-instance, an atom in $2^{2^U}$ corresponds to a model of $\mathcal{L}$, i.e., an
-element of $2^U$. Unless referring specifically to a logic, we will use the
-algebraic definition of an atom while referring to logical atoms as
-\emph{variables}. In the rest of the paper, for any set $U$, we will use
-set-theoretic notation for $2^U$ and Boolean-algebraic notation for $2^{2^U}$,
-except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$ for some
-model $x \in 2^U$.
+\top)$) with a partial order $\le$ that corresponds to set inclusion
+$\subseteq$---see \cref{tbl:notation_example} for examples of how various
+elements can be represented in both notations. Most importantly, note that the
+word \emph{atom} has completely different meanings in logic and in Boolean
+algebras. An atom in $\mathcal{L}$ is an atomic formula, i.e., an element of
+$U$, whereas an atom in a Boolean algebra is (in set-theoretic terms) a
+singleton set. For instance, an atom in $2^{2^U}$ corresponds to a model of
+$\mathcal{L}$, i.e., an element of $2^U$. Unless referring specifically to a
+logic, we will use the algebraic definition of an atom while referring to
+logical atoms as \emph{variables}. In the rest of the paper, for any set $U$, we
+will use set-theoretic notation for $2^U$ and Boolean-algebraic notation for
+$2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
+for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
 
-We build on the definitions of multiplication and projection in the ADDMC paper
-\cite{DBLP:conf/aaai/DudekPV20} and define more operations that can be used to
+We build on the definitions of multiplication and projection by
+\citet{DBLP:conf/aaai/DudekPV20} and define more operations that can be used to
 manipulate functions from Boolean algebras to non-negative real numbers. All of
 these operations have efficient implementations in the CUDD
 \cite{somenzi1998cudd} package for manipulating ADDs (among other things) that
@@ -424,9 +424,9 @@ inference task much harder.
 
 \begin{restatable}{theorem}{extendable}
   For any set $U$ and measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$, there
-  exists a set $V \supseteq U$ and a factorable measure $\mu'\colon 2^{2^V} \to
-  \mathbb{R}_{\ge 0}$ such that $\mu = \mu' \circ \iota$, where $\iota\colon
-  2^{2^U} \to 2^{2^V}$ is the inclusion homomorphism.
+  exists a set $V \supseteq U$, a factorable measure $\mu'\colon 2^{2^V} \to
+  \mathbb{R}_{\ge 0}$, and a formula $f \in 2^{2^V}$ such that $\mu(x) = \mu'(x
+  \land f)$ for all formulas $x \in 2^{2^U}$.
 \end{restatable}
 
 \section{Encoding Bayesian Networks Using Conditional Weights}
@@ -481,16 +481,19 @@ inference task much harder.
 In this section, we describe a way to encode Bayesian networks into WMC without
 restricting oneself to factorable measures and thus having to add extra
 variables to maintain literal independence. In line with the names of previous
-encodings, we shall call this encoding \texttt{db21}. Recall that a Bayesian
-network is a directed acyclic graph with random variables as vertices. Let
-$\mathcal{V}$ denote the set of random variables. For any random variable $X \in
-\mathcal{V}$, let $\im X$ denote its set of possible values and $\mathrm{pa}(X)$
-the set of its parents. The full probability distribution is then equal to
-$\prod_{X \in \mathcal{V}} \Pr(X \mid \mathrm{pa}(X))$. See
-\cref{fig:example_bn} for an example Bayesian network which we will refer to
-throughout this section. For this network, $\mathcal{V} = \{ W, F, T \}$,
-$\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im
-W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
+encodings, we shall call this encoding \texttt{db21}.
+
+A Bayesian network is a directed acyclic graph with random variables as vertices
+that defines a probability distribution over them. Let $\mathcal{V}$ denote this
+set of random variables. For any random variable $X \in \mathcal{V}$, let $\im
+X$ denote its set of values and $\mathrm{pa}(X)$ its set of parents. The
+full probability distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X
+\mid \mathrm{pa}(X))$. For discrete Bayesian networks (and we only consider
+discrete networks in this paper), each factor of this product can be represented
+by a CPT. See \cref{fig:example_bn} for an example Bayesian network which we
+will refer to throughout this section. For this network, $\mathcal{V} = \{ W, F,
+T \}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W
+\}$, $\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
@@ -515,44 +518,43 @@ W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
   of all indicator variables for all random variables in the Bayesian network.
 \end{definition}
 
-For the Bayesian network in \cref{fig:example_bn}, this gives us:
-\begin{align*}
-  \mathcal{E}(W) &= \{ \lambda_{W=1} \}, \\
-  \mathcal{E}(F) &= \{ \lambda_{F=1} \}, \\
-  \mathcal{E}(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h} \}, \\
-  \mathcal{E}^*(W) &= \{ \lambda_{W=1} \}, \\
-  \mathcal{E}^*(F) &= \{ \lambda_{F=1}, \lambda_{W=1} \}, \\
-  \mathcal{E}^*(T) &= \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h}, \lambda_{W=1} \}.
-\end{align*}
+For example, in the Bayesian network from \cref{fig:example_bn},
+$\mathcal{E}^*(T) = \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h},
+\lambda_{W=1} \}$.
 
 \begin{algorithm}
   \caption{Encoding a Bayesian network}
   \label{alg:encoding}
   \KwData{vertices $\mathcal{V}$, probability distribution $\Pr$}
-  \KwResult{a function $\phi\colon 2^U \to \mathbb{R}_{\ge 0}$}
+  \KwResult{$\phi\colon 2^U \to \mathbb{R}_{\ge 0}$}
   $\phi \gets 1$\;
   \For{$X \in \mathcal{V}$}{
     \textit{let} $\mathrm{pa}(X) = \{ Y_1, \dots, Y_n \}$\;
     $\mathrm{CPT}_X \gets 0$\;
     \eIf{$|\im X| = 2$}{
-      \For{$(y_1, \dots, y_n) \in \prod_{i = 1}^n \im Y_i$}{
+      \For{$(y_i)_{i=1}^n \in \prod_{i = 1}^n \im Y_i$}{
         $p_1 \gets \Pr(X = 1 \mid y_1, \dots, y_n)$\;
         $p_0 \gets \Pr(X \ne 1 \mid y_1, \dots, y_n)$\;
-        $\mathrm{CPT}_X \gets \mathrm{CPT}_X + p_1[\lambda_{X=1}] \cdot
-        \prod_{i=1}^n [\lambda_{Y_i=y_i}] + p_0 \overline{[\lambda_{X=1}]} \cdot
-        \prod_{i=1}^n [\lambda_{Y_i=y_i}]$\;
+        \nosemic $\mathrm{CPT}_X \gets \mathrm{CPT}_X$\;
+        \pushline $+ p_1[\lambda_{X=1}] \cdot \prod_{i=1}^n
+        [\lambda_{Y_i=y_i}]$\;
+        \dosemic $+ p_0 \overline{[\lambda_{X=1}]} \cdot \prod_{i=1}^n
+        [\lambda_{Y_i=y_i}]$\;
       }
     }{
       \textit{let} $\im X = \{ x_1, \dots, x_m \}$\;
-      \For{$x \in \im X$ {\rm \textbf{and}} $(y_1, \dots, y_n) \in \prod_{i =
-          1}^n \im Y_i$}{
+      \For{$x \in \im X$ {\rm \textbf{and}} $(y_i)_{i=1}^n \in \prod_{i = 1}^n
+        \im Y_i$}{
         $p_x \gets \Pr(X = x \mid y_1, \dots, y_n)$\;
-        $\mathrm{CPT}_X \gets \mathrm{CPT}_X + p_x[\lambda_{X=x}] \cdot
-        \prod_{i=1}^n [\lambda_{Y_i=y_i}] + \overline{[\lambda_{X=1}]} \cdot
-        \prod_{i=1}^n [\lambda_{Y_i=y_i}]$\;
+        \nosemic $\mathrm{CPT}_X \gets \mathrm{CPT}_X$\;
+        \pushline $+ p_x[\lambda_{X=x}] \cdot \prod_{i=1}^n
+        [\lambda_{Y_i=y_i}]$\;
+        \dosemic $+ \overline{[\lambda_{X=x}]} \cdot \prod_{i=1}^n
+        [\lambda_{Y_i=y_i}]$\;
       }
-      $\mathrm{CPT}_X \gets \mathrm{CPT}_X \cdot \left( \sum_{i=1}^m [\lambda_{X
-          = x_i}] \right) \cdot \prod_{i=1}^m \prod_{j=i+1}^m
+      \nosemic $\mathrm{CPT}_X \gets \mathrm{CPT}_X \cdot \left( \sum_{i=1}^m
+        [\lambda_{X = x_i}] \right)$\;
+      \pushline\dosemic $\cdot \prod_{i=1}^m \prod_{j=i+1}^m
       (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})$\;
     }
     $\phi \gets \phi \cdot \mathrm{CPT}_X$\;
@@ -576,14 +578,11 @@ multiply $\mathrm{CPT}_X$ by some `clause' functions that restrict the value of
 $\phi(T)$ to zero whenever $|\mathcal{E}(X) \cap T| \ne 1$. For the Bayesian
 network in \cref{fig:example_bn}, we get:
 \begin{align*}
-  \mathrm{CPT_W} &= 0.5[\lambda_{W=1}]+0.5\overline{[\lambda_{W=1}]} = 0.5 \cdot 1, \\
   \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] \\
-                 &+ 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}] \\
-                 &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4\overline{[\lambda_{F=1}]} \cdot [\lambda_{W=1}] \\
-                 &+ 0.1[\lambda_{F=1}] \cdot \overline{[\lambda_{W=1}]} + 0.9\overline{[\lambda_{F=1}]} \cdot \overline{[\lambda_{W=1}]}, \\
+                 &+ 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}], \\
   \mathrm{CPT_T} &= ([\lambda_{T=l}] + [\lambda_{T=m}] + [\lambda_{T=h}]) \\
                  &\cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=m}]}) \cdot (\overline{[\lambda_{T=l}]} + \overline{[\lambda_{T=h}]}) \\
-                 &\cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot (\dots).
+                 &\cdot (\overline{[\lambda_{T=m}]} + \overline{[\lambda_{T=h}]}) \cdot \dots.
 \end{align*}
 
 \subsection{Correctness}
@@ -787,9 +786,8 @@ which happen to be binary. We classify them into the following seven categories:
 
 % TODO: To follow formatting requirements, I will need to remove the
 % nput command. Each figure will have to be separately compiled to a PDF (maybe
-% create a Makefile for that).
-% TODO: look up how to scale figures
-% TODO: reformat all colours to CMYK from RGB (in R)
+% create a Makefile for that). Look up how to scale figures. Reformat all
+% colours to CMYK from RGB (in R).
 
 \begin{table}
   \centering
@@ -922,7 +920,19 @@ table.
 
 \extendable*
 \begin{proof}
-  TODO
+  Let $V = U \cup \{ f_m \mid m \in 2^U \}$, and $f = \bigwedge_{m \in 2^U} \{ m
+  \} \leftrightarrow f_m$. We define weight function $\nu\colon 2^V \to
+  \mathbb{R}_{\ge 0}$ as $\nu = \prod_{v \in V} \nu_v$, where $\nu_v(\{v\}) =
+  \mu(\{m\})$ if $v = f_m$ for some $m \in 2^U$ and $\nu_v(x) = 1$ for all other
+  $v \in V$ and $x \in 2^{\{v\}}$. Let $\mu'\colon 2^{2^V} \to \mathbb{R}_{\ge
+    0}$ be the measure induced by $\nu$. It is enough to show that $\mu$ and $x
+  \mapsto \mu'(x \land f)$ agree on the atoms in $2^{2^U}$. For any $\{ a \} \in
+  2^{2^U}$,
+  \begin{align*}
+    \mu'(\{ a \} \land f) &= \sum_{\{ x \} \le \{ a \} \land f} \nu(x) = \nu(a \cup \{ f_a \}) \\
+                          &= \nu_{f_a}(\{ f_a \}) = \mu(\{ a \})
+  \end{align*}
+  as required.
 \end{proof}
 
 \cptlemma*
@@ -970,7 +980,7 @@ table.
   \end{align*}
   by the following arguments:
   \begin{itemize}
-  \item the proof of Theorem~1 in the ADDMC paper \cite{DBLP:conf/aaai/DudekPV20};
+  \item the proof of Theorem~1 by \citet{DBLP:conf/aaai/DudekPV20};
   \item if $\lambda_{X=x} \not\in T \in 2^U$, then $(\phi \cdot
     [\lambda_{X=x}])(T) = \phi(T) \cdot [\lambda_{X=x}](T \cap \{
     \lambda_{X=x} \}) = \phi(T) \cdot 0 = 0$;
