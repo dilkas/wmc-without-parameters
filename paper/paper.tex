@@ -128,20 +128,22 @@
 
 \maketitle
 
-\begin{abstract} % TODO
-%1. Introduction. In one sentence, what’s the topic?
-  % WMC
-%2. State the problem you tackle.
-  % Not using additional literals
-%3. Summarize (in one sentence) why nobody else has adequately answered the research question yet.
-  % The dominant definition of WMC severely restricts what measures can be represented
-%4. Explain, in one sentence, how you tackled the research question.
-  % Defining weights akin to conditional probabilities.
-%5. In one sentence, how did you go about doing the research that follows from your big idea.
-  % ADDMC + Bayesian networks
-%6. As a single sentence, what’s the key impact of your research?
-  % Big improvements in inference speed that can be applied to other algorithms
-  % and application domains.
+\begin{abstract}
+  Weighted model counting (WMC) has emerged as the unifying inference mechanism
+  across many (probabilistic) domains. Encoding an inference problem as an
+  instance of WMC typically necessitates adding extra literals and clauses. This
+  is partly so because the predominant definition of WMC assigns weights to
+  models based on weights on literals, and this severely restricts what
+  probability distributions can be represented. We propose a way to encode
+  conditional weights on literals analogously to conditional probabilities. This
+  representation can be as succinct as standard WMC with weights on literals but
+  can also expand as needed to represent probability distributions with less
+  structure. To demonstrate the performance benefits of conditional weights over
+  the addition of extra literals, we develop a new WMC encoding for Bayesian
+  networks and adapt a state-of-the-art WMC algorithm ADDMC to the new format.
+  Our experiments show that the new encoding results in significantly faster
+  inference on most benchmark instances. Furthermore, the same idea can
+  be adapted to other WMC algorithms and other problem domains.
 \end{abstract}
 
 \section{Introduction}
@@ -184,9 +186,9 @@ format instead.
 
 \Cref{sec:prelims} describes three equivalent perspectives on the subject based
 on logic, set theory, and Boolean algebras. Furthermore, we describe the space
-of functions on Boolean algebras and various operations on those functions. In
-\cref{sec:wmc_as_measure}, WMC is introduced as the problem of computing the
-value of a measure on a Boolean algebra. We show that not all measures can be
+of functions on Boolean algebras and various operations on those functions.
+\Cref{sec:wmc_as_measure} introduces WMC as the problem of computing the value
+of a measure on a Boolean algebra. We show that not all measures can be
 represented using literal-based WMC, but all Boolean algebras can be extended to
 make any measure representable in such a manner.
 
@@ -201,9 +203,9 @@ for such functions known as \emph{algebraic decision diagrams} (ADDs)
 \cite{DBLP:journals/fmsd/BaharFGHMPS97}.
 
 Finally, in \cref{sec:experiments}, we show how the new encoding results in
-significantly improved inference speed on most instances, often by one or two
-orders of magnitude. We explain the performance benefits by showing how the new
-encoding has asymptotically fewer variables and ADDs.
+significantly improved inference speed on most benchmark instances, often by one
+or two orders of magnitude. We explain the performance benefits by showing how
+the new encoding has asymptotically fewer variables and ADDs.
 
 %conditional weights allow us to represent
 %probabilities in a manner that is both efficient and interpretable. Not having
@@ -257,8 +259,8 @@ Bayesian network inference, to represent each conditional probability table
 arithmetic circuits into a  single representation
 \cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous in this
 situation because of their ability to fully exploit context-specific
-independence, i.e., observable structure within a CPT that is not inherited from
-the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
+independence, i.e., the observable structure within a CPT that is not inherited
+from the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -306,7 +308,7 @@ $2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
 for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
-% TODO: clarify why this is needed
+% TODO: clarify why this is needed (and run a grammar check on this section)
 
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. All of
@@ -441,7 +443,7 @@ Boolean algebra. This can be demonstrated with a simple example.
   $\nu$ indeed induces $\mu$.
 \end{example}
 
-Note that in this case we chose to interpret $\nu_b$ as $\Pr(b \mid a)$
+Note that in this case, we chose to interpret $\nu_b$ as $\Pr(b \mid a)$
 while---with a different definition of $\nu_b$ that represents the joint
 probability distribution $\Pr(a, b)$---$\nu_b$ by itself could induce $\mu$. In
 general, however, factorising the full weight function into several smaller
@@ -761,8 +763,8 @@ corresponding CPT would depend on $u$, and $u$ would not be excluded), and all
 other CPTs are independent of $u$ (or they may have a trivial dependence, where
 the probability stays the same if $u$ is replaced with its complement). Thus,
 the CPT that corresponds to $u$ still multiplies the weight of every atom in the
-Boolean algebra by $0.5$, but the number of atoms being considered is halved. To
-correct for this, we multiply the final answer by two for every $u \in U
+Boolean algebra by $0.5$, but the number of atoms under consideration is halved.
+To correct for this, we multiply the final answer by two for every $u \in U
 \setminus V$.
 
 \section{Experimental Comparison} \label{sec:experiments}
@@ -855,6 +857,7 @@ which happen to be binary. We classify them into the following seven categories:
     (left) and \texttt{sbk05} (right) for each instance in all data sets.}
 \end{figure*}
 
+% TODO: write. then run through a grammar checker.
 \paragraph{Observations.}
 \begin{itemize}
 \item The order of the encodings from best to worst is exactly the opposite of
@@ -901,7 +904,7 @@ equate clauses and ADDs (more specifically, factors of the function $\phi$ from
 \cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
 encoding as a multiplicative factor of the ADD that represents the entire WMC
 instance \cite{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings, each
-weight is also a factor, but that has no effect on the asymptotic bounds in the
+weight is also a factor, but that does not affect the asymptotic bounds in the
 table.
 
 % While some ADDs may be larger as a result, experimental evidence still shows
