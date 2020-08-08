@@ -308,15 +308,15 @@ $2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
 for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
-% TODO: clarify why this is needed (and run a grammar check on this section)
 
 We also consider the space of all functions from any Boolean algebra to
-$\mathbb{R}_{\ge 0}$ together with some operations on those functions. All of
-these operations have efficient implementations in the CUDD
-\cite{somenzi1998cudd} package for manipulating ADDs (among other things) that
-is used by ADDMC \cite{DBLP:conf/aaai/DudekPV20}. The definitions of
-multiplication and projection are as defined by \citet{DBLP:conf/aaai/DudekPV20}
-while others are new.
+$\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
+be instrumental in defining WMC as a measure in \cref{sec:wmc_as_measure} and
+can be efficiently represented using ADDs. Furthermore, all of the operations
+are supported by the CUDD \cite{somenzi1998cudd} package that is used by ADDMC
+for ADD manipulation \cite{DBLP:conf/aaai/DudekPV20}. The definitions of
+multiplication and projection are as defined by
+\citet{DBLP:conf/aaai/DudekPV20}, while others are new.
 
 \begin{definition}[Operations on functions]
   Let $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and $\beta\colon 2^Y \to
@@ -414,19 +414,15 @@ Boolean algebra. This can be demonstrated with a simple example.
 
 \begin{example}
   Let $U = \{a, b\}$ be a set of atoms and $\mu\colon 2^{2^U} \to
-  \mathbb{R}_{\ge 0}$ a measure defined as:\footnote{The value of $\mu$ on any
-    other element of $2^{2^U}$ can be deduced from the definition of a measure.}
-  \begin{align*}
-    \mu(a \land b) &= 0.72, \\
-    \mu(a \land \neg b) &= 0.18, \\
-    \mu(\neg a \land b) &= 0.07, \\
-    \mu(\neg a \land \neg b) &= 0.03.
-  \end{align*}
-  If $\mu$ could be represented using literal-weight (factored) WMC, we would
-  have to find two weight functions $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge
-    0}$ and $\nu_b\colon 2^{\{b\}} \to \mathbb{R}_{\ge 0}$ such that $\nu =
-  \nu_a \cdot \nu_b$ induces $\mu$, i.e., $\nu_a$ and $\nu_b$ would have to
-  satisfy this system of equations:
+  \mathbb{R}_{\ge 0}$ a measure defined as $\mu(a \land b) = 0.72$, $\mu(a \land
+  \neg b) = 0.18$, $\mu(\neg a \land b) = 0.07$, $\mu(\neg a \land \neg b) =
+  0.03$.\footnote{The value of $\mu$ on any other element of $2^{2^U}$ can be
+    deduced from the definition of a measure.} If $\mu$ could be represented
+  using literal-weight (factored) WMC, we would have to find two weight
+  functions $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and $\nu_b\colon
+  2^{\{b\}} \to \mathbb{R}_{\ge 0}$ such that $\nu = \nu_a \cdot \nu_b$ induces
+  $\mu$, i.e., $\nu_a$ and $\nu_b$ would have to satisfy this system of
+  equations:
   \begin{align*}
     \nu_a(\{a\}) \cdot \nu_b(\{b\}) &= 0.72 \\
     \nu_a(\{a\}) \cdot \nu_b(\emptyset) &= 0.18 \\
@@ -827,10 +823,12 @@ which happen to be binary. We classify them into the following seven categories:
     encoding}
 \end{figure}
 
-% TODO: To follow formatting requirements, I will need to remove the
-% nput command. Each figure will have to be separately compiled to a PDF (maybe
-% create a Makefile for that). Look up how to scale figures. Reformat all
-% colours to CMYK from RGB (in R).
+% TODO: (needed to follow formatting requirements)
+% 1. Remove the \input command.
+% 2. R should compile the tex files to be standalone.
+% 3. Edit the tex files to replace RGB colours with CMYK.
+% 4. Compile the tex files to PDFs.
+% 5. Include the PDFs (look up how to do that in the formatting guidelines).
 
 \begin{table}
   \centering
@@ -910,7 +908,7 @@ table.
 % While some ADDs may be larger as a result, experimental evidence still shows
 % significant performance benefits.
 
-\section{Discussion and Conclusions}
+\section{Discussion and Conclusion}
 
 WMC was originally motivated by an appeal to the success of \SAT{} solvers in
 efficiently tackling an $\NP{}$-complete problem \cite{DBLP:conf/aaai/SangBK05}.
@@ -931,8 +929,6 @@ more expressive representation of weights can outperform increasing the size of
 the problem to keep the weights simple. The same idea can be adapted to
 search-based solvers such as Cachet \cite{DBLP:conf/sat/SangBBKP04} as well as
 to other inference problem domains such as probabilistic programs.
-
-% TODO: a few optimistic parting words
 
 %An additional benefit of conditional weights is that a more expressive format
 %makes it easier to invent new WMC encodings.

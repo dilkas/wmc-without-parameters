@@ -127,7 +127,7 @@ def get_format(filename):
     return 'net' if filename.endswith('.net') else 'dne'
 
 def encode(network, evidence):
-    with open(network) as f:
+    with open(network, encoding='ISO-8859-1') as f:
         text = f.read()
         clauses = encode_text(text, get_format(network))
 
@@ -159,7 +159,7 @@ def identify_goal(text, mode):
 def encode_using_ace(network, evidence_file, encoding):
     run_ace(network, evidence_file, encoding)
 
-    with open(network) as f:
+    with open(network, encoding='ISO-8859-1') as f:
         text = f.read()
     mode = get_format(network)
     goal_node, goal_value = identify_goal(text, mode)
