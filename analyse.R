@@ -20,8 +20,8 @@ df$major.dataset <- "Non-binary"
 df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
 df$major.dataset[grepl("Grid", df$instance, fixed = TRUE)] <- "Grid"
 df$major.dataset[grepl("mastermind", df$instance, fixed = TRUE)] <- "Mastermind"
-df$major.dataset[grepl("blockmap", df$instance, fixed = TRUE)] <- "Random blocks"
-df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Friends and smokers"
+df$major.dataset[grepl("blockmap", df$instance, fixed = TRUE)] <- "Random Blocks"
+df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Friends and Smokers"
 df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
@@ -92,7 +92,7 @@ ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Scatter plot: for a specific data set
-ggplot(df[df$dataset == "2004-PGM"], aes(x = time_cw, y = time_sbk05)) +
+ggplot(df[df$dataset == "2005-PGM"], aes(x = time_cw, y = time_sbk05)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0) +
   xlim(0, TIMEOUT) +
