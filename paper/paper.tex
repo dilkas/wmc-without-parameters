@@ -134,42 +134,43 @@
   instance of WMC typically necessitates adding extra literals and clauses. This
   is partly so because the predominant definition of WMC assigns weights to
   models based on weights on literals, and this severely restricts what
-  probability distributions can be represented. We propose a way to encode
-  conditional weights on literals analogously to conditional probabilities. This
-  representation can be as succinct as standard WMC with weights on literals but
-  can also expand as needed to represent probability distributions with less
-  structure. To demonstrate the performance benefits of conditional weights over
-  the addition of extra literals, we develop a new WMC encoding for Bayesian
-  networks and adapt a state-of-the-art WMC algorithm ADDMC to the new format.
-  Our experiments show that the new encoding results in significantly faster
-  inference on most benchmark instances. Furthermore, the same idea can
-  be adapted to other WMC algorithms and other problem domains.
+  probability distributions can be represented. We develop a measure-theoretic
+  perspective on WMC and propose a way to encode conditional weights on literals
+  analogously to conditional probabilities. This representation can be as
+  succinct as standard WMC with weights on literals but can also expand as
+  needed to represent probability distributions with less structure. To
+  demonstrate the performance benefits of conditional weights over the addition
+  of extra literals, we develop a new WMC encoding for Bayesian networks and
+  adapt a state-of-the-art WMC algorithm ADDMC to the new format. Our
+  experiments show that the new encoding results in significantly faster
+  inference on most benchmark instances. Furthermore, the same idea can be
+  adapted to other WMC algorithms and other problem domains.
 \end{abstract}
 
 \section{Introduction}
 
-%Many WMC algorithms have been proposed
-%based primarily either on knowledge compilation
-%\cite{DBLP:conf/ecai/Darwiche04,DBLP:conf/ijcai/OztokD15,DBLP:conf/ijcai/LagniezM17}
-%or search \cite{DBLP:conf/aaai/SangBK05}.
+% TODO: Feedback: our empirical evaluations show a x% improvement
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
-that assigns a weight to every model \cite{DBLP:conf/aaai/SangBK05} has emerged
-as the unifying inference mechanism across many (probabilistic) domains. It has
-been applied to Bayesian networks
-\cite{DBLP:conf/aaai/SangBK05,DBLP:books/daglib/0024906} and probabilistic
-graphical models more generally \cite{DBLP:conf/ecsqaru/ChoiKD13}, probabilistic
-logic programming languages \cite{DBLP:journals/tplp/FierensBRSGTJR15} and
-probabilistic programs with discrete probability distributions
-\cite{DBLP:journals/corr/abs-2005-09089}. Over the last fifteen years, WMC has
-been extended and generalised in many ways, e.g., to handle continuous
-probability distributions \cite{DBLP:conf/ijcai/BellePB15}, first-order
-probabilistic theories
+that assigns a weight to every model \cite{DBLP:conf/aaai/SangBK05}, has emerged
+as one of the most dominant and competitive approaches for handling inference
+tasks in a wide range of formalisms including Bayesian networks
+\cite{DBLP:conf/aaai/SangBK05,DBLP:books/daglib/0024906}, probabilistic
+graphical models more generally \cite{DBLP:conf/ecsqaru/ChoiKD13}, and
+probabilistic programs
+\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089}.
+Over the last fifteen years, WMC has been extended and generalised in many ways,
+e.g., to handle continuous probability distributions
+\cite{DBLP:conf/ijcai/BellePB15}, first-order probabilistic theories
 \cite{DBLP:conf/ijcai/BroeckTMDR11,DBLP:journals/cacm/GogateD16}, and infinite
-domains \cite{DBLP:conf/aaai/Belle17}. Furthermore, the idea of weights in WMC
-has been generalised from non-negative real numbers to an arbitrary semiring,
-making it applicable to domains such as parsing, dynamic programming, constraint
-programming, databases, and networks \cite{DBLP:journals/japll/KimmigBR17}.
+domains \cite{DBLP:conf/aaai/Belle17}. Furthermore, by generalising the notion
+of weights to an arbitrary semiring, a range of other problems are also captured
+\cite{DBLP:journals/japll/KimmigBR17}. Exact WMC solvers typically rely on
+either knowledge compilation
+\cite{DBLP:conf/ijcai/OztokD15,DBLP:conf/ijcai/LagniezM17} or exhaustive DPLL
+search \cite{DBLP:conf/aaai/SangBK05}, whereas approximate solvers work by
+sampling \cite{DBLP:conf/aaai/ChakrabortyFMSV14} and performing local search
+\cite{DBLP:conf/sat/WeiS05}.
 
 The most well-studied version of WMC assigns weights to models based on
 weights on literals, i.e., the weight of a model is the product of the weights
@@ -181,8 +182,6 @@ limitation is by adding more literals. While we show that this is always
 possible in \cref{sec:wmc_as_measure}, the rest of the paper demonstrates that
 it can be significantly more efficient to encode weights in a more flexible
 format instead.
-
-% TODO: highlight the main strengths
 
 \Cref{sec:prelims} describes three equivalent perspectives on the subject based
 on logic, set theory, and Boolean algebras. Furthermore, we describe the space
@@ -206,6 +205,9 @@ Finally, in \cref{sec:experiments}, we show how the new encoding results in
 significantly improved inference speed on most benchmark instances, often by one
 or two orders of magnitude. We explain the performance benefits by showing how
 the new encoding has asymptotically fewer variables and ADDs.
+
+%making it applicable to domains such as parsing, dynamic programming, constraint
+%programming, databases, and networks.
 
 %conditional weights allow us to represent
 %probabilities in a manner that is both efficient and interpretable. Not having
@@ -249,16 +251,19 @@ experiments in \cref{sec:experiments}, however, strongly disagree with this
 prediction, showing that the quality of an encoding depends strongly on the
 underlying search algorithm or compilation technique.
 
-\paragraph{ADDs and their use in probabilistic inference.} ADDs provide an
-efficient way to manipulate functions from a Boolean algebra to any algebraic
-structure (most commonly the real numbers)
-\cite{DBLP:journals/fmsd/BaharFGHMPS97}. They have been used to represent value
-functions in Markov decision processes \cite{DBLP:conf/uai/HoeySHB99} and, for
-Bayesian network inference, to represent each conditional probability table
-(CPT) as an ADD \cite{DBLP:conf/icml/ZhaoMP15} as well as by combining ADDs and
-arithmetic circuits into a  single representation
-\cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous in this
-situation because of their ability to fully exploit context-specific
+\paragraph{ADDs and their use in inference.} ADDs provide an efficient way to
+manipulate functions from a Boolean algebra to any algebraic structure (most
+commonly real numbers) \cite{DBLP:journals/fmsd/BaharFGHMPS97}. They have been
+used to represent value functions in Markov decision processes (MDPs)
+\cite{DBLP:conf/uai/HoeySHB99} and extended to handle first-order MDPs
+\cite{DBLP:journals/ai/SannerB09} and discrete and continuous state MDPs
+\cite{DBLP:conf/uai/SannerDB11}. The latter extension has also been used for
+weighted model integration---an extension of WMC that can handle continuous
+variables \cite{DBLP:conf/ijcai/KolbMSBK18}. For Bayesian networks, ADDS have
+been used to represent each conditional probability table (CPT) as an ADD
+\cite{DBLP:conf/icml/ZhaoMP15} and as a combination of ADDs and arithmetic
+circuits \cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous
+in this situation because of their ability to fully exploit context-specific
 independence, i.e., the observable structure within a CPT that is not inherited
 from the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
 
@@ -445,12 +450,20 @@ probability distribution $\Pr(a, b)$---$\nu_b$ by itself could induce $\mu$. In
 general, however, factorising the full weight function into several smaller
 functions often results in weight functions with smaller domains which leads to
 increased efficiency and decreased memory usage \cite{DBLP:conf/aaai/DudekPV20}.
+We can easily generalise this example further.
+
+\begin{theorem}
+  For any set $U$ such that $|U| \ge 2$, there exists a non-factorable measure
+  $2^{2^{U}} \to \mathbb{R}_{\ge 0}$.
+\end{theorem}
 
 Since many measures of interest may not be factorable, a well-known way to
 encode them into instances of WMC is by adding more literals
-\cite{DBLP:journals/ai/ChaviraD08}. We can indeed show that this is always
-possible, however, as ensuing sections will demonstrate, it often makes the
-inference task much harder.
+\cite{DBLP:journals/ai/ChaviraD08}. We can use the measure-theoretic perspective
+on WMC to show that this is always possible, however, as ensuing sections will
+demonstrate, it often makes the inference task much harder in
+practice.\footnote{The proofs of this and other theoretical results can be found
+in the technical appendix.}
 
 \begin{restatable}{theorem}{extendable}
   For any set $U$ and measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$, there
@@ -510,20 +523,20 @@ inference task much harder.
 
 In this section, we describe a way to encode Bayesian networks into WMC without
 restricting oneself to factorable measures and thus having to add extra
-variables. In line with the names of the previous encodings, we shall call this
-encoding \texttt{db21}.
+variables. We will refer to it as \texttt{cw}.
 
 A Bayesian network is a directed acyclic graph with random variables as vertices
 that defines a probability distribution over them. Let $\mathcal{V}$ denote this
 set of random variables. For any random variable $X \in \mathcal{V}$, let $\im
 X$ denote its set of values and $\mathrm{pa}(X)$ its set of parents. The
 full probability distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X
-\mid \mathrm{pa}(X))$. For discrete Bayesian networks (and we only consider
-discrete networks in this paper), each factor of this product can be represented
-by a CPT. See \cref{fig:example_bn} for an example Bayesian network which we
-will refer to throughout this section. For this network, $\mathcal{V} = \{ W, F,
-T \}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W
-\}$, $\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
+\mid \mathrm{pa}(X))$ \cite{DBLP:books/daglib/0023820}. For discrete Bayesian
+networks (and we only consider discrete networks in this paper), each factor of
+this product can be represented by a CPT. See \cref{fig:example_bn} for an
+example Bayesian network that we will refer to throughout this section. For
+this network, $\mathcal{V} = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$,
+$\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and
+$\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
@@ -604,7 +617,7 @@ a)$, or something else entirely.
 
 For a binary random variable $X$, $\mathrm{CPT}_X$ is simply a sum of smaller
 functions, one for each row of the CPT. If $X$ has more than two values, we also
-multiply $\mathrm{CPT}_X$ by some `clause' functions that restrict the value of
+multiply $\mathrm{CPT}_X$ by `clause' functions that restrict the value of
 $\phi(T)$ to zero whenever $|\mathcal{E}(X) \cap T| \ne 1$. For the Bayesian
 network in \cref{fig:example_bn}, we get:
 \begin{align*}
@@ -625,11 +638,11 @@ ADDs) and returning $(\exists_U\psi)(\emptyset)$
 \cite{DBLP:conf/aaai/DudekPV20}. In this section, we prove that the function
 $\phi$ produced by \cref{alg:encoding} can be used by ADDMC to correctly compute
 any marginal probability of the Bayesian network that was encoded as
-$\phi$.\footnote{It can just as well compute \emph{any} probability expressed
-  using the random variables in $\mathcal{V}$. We only focus on marginal
-  probabilities for notational simplicity.} We begin with \cref{lemma:cpt} which
-shows that any conditional weight function produces the right answer when given
-a valid encoding of variable-value assignments relevant to the CPT.
+$\phi$.\footnote{Note that it can just as well compute \emph{any} probability
+  expressed using the random variables in $\mathcal{V}$.} We begin with
+\cref{lemma:cpt} which shows that any conditional weight function produces the
+right answer when given a valid encoding of variable-value assignments relevant
+to the CPT.
 
 \begin{restatable}{lemma}{cptlemma} \label{lemma:cpt}
   Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
@@ -776,7 +789,7 @@ network. If $\mathsf{true}$ is a valid value of $X$, we compute the marginal
 probability of $X = \mathsf{true}$. Otherwise, we pick the value of $X$ which is
 listed first and calculate its marginal probability.
 
-For all encodings other than \texttt{db21}, we use their implementation in
+For all encodings other than \texttt{cw}, we use their implementation in
 Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} with
 \texttt{-encodeOnly} and \texttt{-noEclause} flags. However, Ace was not used to
 encode evidence, as preliminary experiments revealed that the evidence-encoding
@@ -793,7 +806,7 @@ additional models are supposed to be filtered out during circuit compilation
 Nonetheless, we include both encodings in the experiments.
 
 While encoding time itself was not measured because of different languages of
-implementation, it is worth noting that \texttt{db21} is linear in the total
+implementation, it is worth noting that \texttt{cw} is linear in the total
 number of CPT rows and so is unlikely to be slower than, e.g., \texttt{cd06},
 which relies on solving $\NP{}$-complete problems as part of the encoding process
 \cite{DBLP:conf/sat/ChaviraD06}.
@@ -841,8 +854,8 @@ which happen to be binary. We classify them into the following seven categories:
     \midrule
     \texttt{cd05} & 2 & 3 & 372 \\
     \texttt{cd06} & 0 & 1 & 351 \\
+    \texttt{cw} & 228 & 871 & 901 \\
     \texttt{d02} & 41 & 99 & 726 \\
-    \texttt{db21} & 228 & 871 & 901 \\
     \texttt{sbk05} & 6 & 36 & 687 \\
     \bottomrule
   \end{tabular}
@@ -851,7 +864,7 @@ which happen to be binary. We classify them into the following seven categories:
 \begin{figure*}
   \centering
   \input{scatter.tex}%
-  \caption{ADDMC inference time using \texttt{db21} compared to \texttt{d02}
+  \caption{ADDMC inference time using \texttt{cw} compared to \texttt{d02}
     (left) and \texttt{sbk05} (right) for each instance in all data sets.}
 \end{figure*}
 
@@ -863,13 +876,12 @@ which happen to be binary. We classify them into the following seven categories:
 \item Our encoding is particularly promising on instances of Grid networks.
   They are set up so that the entire Bayesian network is relevant to the
   query.
-\item However, \texttt{db21} struggles with instances from Mastermind and
+\item However, \texttt{cw} struggles with instances from Mastermind and
   Random Blocks domains (but so does \texttt{sbk05}). We conjecture that this
   is so either because the particular structure of these problems confuse the
   heuristics used by ADDMC or because these instances allow for significant
-  simplifications that are exploited by $\mathtt{d02}$ but not
-  $\mathtt{db21}$.
-\item An observation from the cumulative plot: \texttt{db21} solves the same
+  simplifications that are exploited by \texttt{d02} but not \texttt{cw}.
+\item An observation from the cumulative plot: \texttt{cw} solves the same
   number of instances in \SI{6.374}{\second} as \texttt{d02} does in
   \SI{1000}{\second}.
 \end{itemize}
@@ -884,8 +896,8 @@ which happen to be binary. We classify them into the following seven categories:
     Encoding(s) & Variables & Clauses/ADDs \\
     \midrule
     \texttt{cd05}, \texttt{cd06}, \texttt{sbk05} & $\mathcal{O}(nv^{d+1})$ & $\mathcal{O}(nv^{d+1})$ \\
+    \texttt{cw} & $\mathcal{O}(nv)$ & $\mathcal{O}(nv^2)$ \\
     \texttt{d02} & $\mathcal{O}(nv^{d+1})$ & $\mathcal{O}(ndv^{d+1})$ \\
-    \texttt{db21} & $\mathcal{O}(nv)$ & $\mathcal{O}(nv^2)$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -894,9 +906,9 @@ which happen to be binary. We classify them into the following seven categories:
 number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
 |\mathrm{pa}(X)|$ the maximum in-degree (i.e., number of parents), and $v =
 \max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
-\Cref{tbl:asymptotes} shows how \texttt{db21} has both fewer variables and fewer
+\Cref{tbl:asymptotes} shows how \texttt{cw} has both fewer variables and fewer
 ADDs than any other encoding. However, note that these are upper bounds and most
-encodings (including \texttt{db21}) can be smaller in certain situations (e.g.,
+encodings (including \texttt{cw}) can be smaller in certain situations (e.g.,
 with binary random variables or when a CPT has repeating probabilities). We
 equate clauses and ADDs (more specifically, factors of the function $\phi$ from
 \cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
