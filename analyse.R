@@ -21,7 +21,7 @@ df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
 df$major.dataset[grepl("Grid", df$instance, fixed = TRUE)] <- "Grid"
 df$major.dataset[grepl("mastermind", df$instance, fixed = TRUE)] <- "Mastermind"
 df$major.dataset[grepl("blockmap", df$instance, fixed = TRUE)] <- "Random Blocks"
-df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Friends and Smokers"
+df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
@@ -38,25 +38,25 @@ sum(is.na(df$answer_cw) & !is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cd05
 sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & !is.na(df$answer_cd06) &
       is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cd06
-sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
-      !is.na(df$answer_d02) & is.na(df$answer_sbk05)) # d02
 sum(!is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cw
+sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      !is.na(df$answer_d02) & is.na(df$answer_sbk05)) # d02
 sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       is.na(df$answer_d02) & !is.na(df$answer_sbk05)) # sbk05
 
 # Fastest
 sum(!is.na(df$answer_cd05) & abs(df$time_cd05 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_cd06) & abs(df$time_cd06 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_d02) & abs(df$time_d02 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_cw) & abs(df$time_cw - df$time_min) < 1e-5)
+sum(!is.na(df$answer_d02) & abs(df$time_d02 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_sbk05) & abs(df$time_sbk05 - df$time_min) < 1e-5)
 
 # Solved
 sum(!is.na(df$answer_cd05))
 sum(!is.na(df$answer_cd06))
-sum(!is.na(df$answer_d02))
 sum(!is.na(df$answer_cw))
+sum(!is.na(df$answer_d02))
 sum(!is.na(df$answer_sbk05))
 
 # ================ Plots ==========================

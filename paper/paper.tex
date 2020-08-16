@@ -780,7 +780,9 @@ To correct for this, we multiply the final answer by two for every $u \in U
 
 In this section, we describe an experimental study comparing the five WMC
 encodings for Bayesian networks when run with ADDMC. The experiments were run on
-Intel Xeon Gold 6138 processor with an \SI{8}{\giga\byte} memory limit.
+Intel Xeon Gold 6138 and Intel Xeon E5-2630 processors\footnote{Each instance is
+run on the same processor for all encodings.} with an \SI{8}{\gibi\byte} memory
+limit.
 
 For each Bayesian network, we need to choose a probability to compute. Whenever
 a Bayesian network comes with an evidence file, we compute the probability of
@@ -818,16 +820,16 @@ which happen to be binary. We classify them into the following seven categories:
 \begin{itemize*}
 \item DQMR and
 \item Grid networks as described by \citet{DBLP:conf/aaai/SangBK05},
-\item Friends and Smokers,
 \item Mastermind, and
 \item Random Blocks from the work of \citet{DBLP:journals/ijar/ChaviraDJ06},
 \item remaining binary Bayesian networks that include Plan Recognition
-  \cite{DBLP:conf/aaai/SangBK05}, Students and Professors
+  \cite{DBLP:conf/aaai/SangBK05}, Friends and Smokers, Students and Professors
   \cite{DBLP:journals/ijar/ChaviraDJ06}, and \texttt{tcc4f}, and
 \item non-binary classic Bayesian networks (\texttt{alarm}, \texttt{diabetes},
   \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
   \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
 \end{itemize*}
+% TODO: make sure to talk about the table (and mention that cd06 has its niche)
 
 \begin{figure}
   \centering
@@ -844,20 +846,22 @@ which happen to be binary. We classify them into the following seven categories:
 % 5. Include the PDFs (look up how to do that in the formatting guidelines).
 % 6. make sure that there are no duplicates in the bib files (look at LaTex output)
 
+% TODO: check if the total checks out
+
 \begin{table}
   \centering
-  \caption{The numbers of instances solved by ADDMC with each encoding
-    (uniquely, faster than with others, and in total) under the described time
-    and memory constraints (out of 1216 instances)}%
+  \caption{The numbers of instances (out of 1451) solved by ADDMC with each
+    encoding (uniquely, faster than with others, and in total) under the
+    described time and memory constraints}%
   \begin{tabular}{lrrr}
     \toprule
     Encoding & Unique & Fastest & Total \\
     \midrule
-    \texttt{cd05} & 2 & 3 & 372 \\
-    \texttt{cd06} & 0 & 1 & 351 \\
-    \texttt{cw} & 228 & 871 & 901 \\
-    \texttt{d02} & 41 & 99 & 726 \\
-    \texttt{sbk05} & 6 & 36 & 687 \\
+    \texttt{cd05} & 2 & 76 & 380 \\
+    \texttt{cd06} & 0 & 214 & 363 \\
+    \texttt{cw} & 234 & 633 & 965 \\
+    \texttt{d02} & 40 & 58 & 782 \\
+    \texttt{sbk05} & 12 & 16 & 750 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -883,7 +887,7 @@ which happen to be binary. We classify them into the following seven categories:
   heuristics used by ADDMC or because these instances allow for significant
   simplifications that are exploited by \texttt{d02} but not \texttt{cw}.
 \item An observation from the cumulative plot: \texttt{cw} solves the same
-  number of instances in \SI{6.374}{\second} as \texttt{d02} does in
+  number of instances in \SI{8.144}{\second} as \texttt{d02} does in
   \SI{1000}{\second}.
 \end{itemize}
 
