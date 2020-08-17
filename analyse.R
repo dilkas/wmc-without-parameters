@@ -28,6 +28,8 @@ df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
 
 # ============ Numerical investigations ================
 
+df %>% group_by(df$dataset) %>% tally()
+
 # Where answers don't match
 interesting <- df[abs(df$answer_cw - df$answer_sbk05) > 0.01,]
 
