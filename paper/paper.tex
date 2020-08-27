@@ -19,7 +19,7 @@
 % For /Author, add all authors within the parentheses, separated by commas. No accents or commands.
 % For /Title, add Title in Mixed Case. No accents or commands. Retain the parentheses.
 \pdfinfo{
-/Title (Weighted Model Counting with Conditional Weights)
+/Title (Weighted Model Counting with Conditional Weights for Bayesian Networks)
 /Author ()
 /TemplateVersion (2021.1)
 } %Leave this
@@ -114,7 +114,7 @@
 \newcommand{\popline}{\Indm\dosemic}% Undent
 \makeatother
 
-\title{Weighted Model Counting with Conditional Weights}
+\title{Weighted Model Counting with Conditional Weights for Bayesian Networks}
 %\author{
 %  Paulius Dilkas, \textsuperscript{\rm 1}
 %  Vaishak Belle \textsuperscript{\rm 1,2} \\
@@ -179,32 +179,33 @@ number of models scales exponentially with the number of atoms, so listing the
 weight of every model is intractable. However, this also severely restricts what
 probability distributions can be represented. A common way to overcome this
 limitation is by adding more literals. While we show that this is always
-possible in \cref{sec:wmc_as_measure}, the rest of the paper demonstrates that
-it can be significantly more efficient to encode weights in a more flexible
-format instead.
+possible, we also demonstrate that it can be significantly more efficient to
+encode weights in a more flexible format instead.
 
-\Cref{sec:prelims} describes three equivalent perspectives on the subject based
-on logic, set theory, and Boolean algebras. Furthermore, we describe the space
-of functions on Boolean algebras and various operations on those functions.
-\Cref{sec:wmc_as_measure} introduces WMC as the problem of computing the value
-of a measure on a Boolean algebra. We show that not all measures can be
-represented using literal-based WMC, but all Boolean algebras can be extended to
-make any measure representable in such a manner.
+After briefly reviewing the background in \cref{sec:related}, in
+\cref{sec:prelims} we  describe three equivalent perspectives on the subject
+based on logic, set theory, and Boolean algebras. Furthermore, we describe the
+space of functions on Boolean algebras and various operations on those
+functions. \Cref{sec:wmc_as_measure} introduces WMC as the problem of computing
+the value of a measure on a Boolean algebra. We show that not all measures can
+be represented using literal-based WMC, but all Boolean algebras can be extended
+to make any measure representable in such a manner.
 
-In \cref{sec:bns}, we introduce \emph{conditional weights} on literals (in the
+This new measure-theoretic perspective allows us to not only encode any
+discrete probability distribution but also improve inference speed. In
+\cref{sec:bns}, we demonstrate this by developing a new WMC encoding for
+Bayesian networks that uses \emph{conditional weights} on literals (in the
 spirit of conditional probabilities) that have literal-based WMC as a special
-case. As a particular example, we show how conditional weights can be used to
-encode Bayesian networks. We prove the correctness of the encoding and show
-how a state-of-the-art WMC solver ADDMC \cite{DBLP:conf/aaai/DudekPV20} can be
-adapted to the new format. ADDMC is a recently-proposed algorithm for WMC based
-on manipulating functions on Boolean algebras using an efficient representation
-for such functions known as \emph{algebraic decision diagrams} (ADDs)
-\cite{DBLP:journals/fmsd/BaharFGHMPS97}.
-
-Finally, in \cref{sec:experiments}, we show how the new encoding results in
-significantly improved inference speed on most benchmark instances, often by one
-or two orders of magnitude. We explain the performance benefits by showing how
-the new encoding has asymptotically fewer variables and ADDs.
+case. We prove the correctness of the encoding and show how a state-of-the-art
+WMC solver ADDMC \cite{DBLP:conf/aaai/DudekPV20} can be adapted to the new
+format. ADDMC is a recently-proposed algorithm for WMC based on manipulating
+functions on Boolean algebras using an efficient representation for such
+functions known as algebraic decision diagrams (ADDs)
+\cite{DBLP:journals/fmsd/BaharFGHMPS97}. Finally, in \cref{sec:experiments}, we
+show how the new encoding results in faster inference on the vast majority of
+benchmark instances, often by one or two orders of magnitude. We explain the
+performance benefits by showing how our encoding has asymptotically fewer
+variables and ADDs.
 
 %making it applicable to domains such as parsing, dynamic programming, constraint
 %programming, databases, and networks.
@@ -293,18 +294,18 @@ from the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
 \end{table*}
 
 In this section, we give a brief introduction to two alternative ways to think
-about logical constructs such as models and formulas. Let $\mathcal{L}$ be a
-propositional logic with atoms $a$ and $b$, and let $U = \{ a, b \}$. Then
-$2^U$, the power set of $U$, is the set of all models of $\mathcal{L}$, and
-$2^{2^U}$ is the set of all formulas. These sets can also be represented as
-Boolean algebras (e.g., using the syntax $(2^{2^U}, \land, \lor, \neg, \bot,
-\top)$) with a partial order $\le$ that corresponds to set inclusion
-$\subseteq$---see \cref{tbl:notation_example} for examples of how various
-elements can be represented in both notations. Most importantly, note that the
-word \emph{atom} has completely different meanings in logic and in Boolean
-algebras. An atom in $\mathcal{L}$ is an atomic formula, i.e., an element of
-$U$, whereas an atom in a Boolean algebra is (in set-theoretic terms) a
-singleton set. For instance, an atom in $2^{2^U}$ corresponds to a model of
+about logical constructs such as models and formulas. Let us consider a simple
+example of a propositional logic $\mathcal{L}$ with only two atoms $a$ and $b$,
+and let $U = \{ a, b \}$. Then $2^U$, the power set of $U$, is the set of all
+models of $\mathcal{L}$, and $2^{2^U}$ is the set of all formulas. These sets
+can also be represented as Boolean algebras (e.g., using the syntax $(2^{2^U},
+\land, \lor, \neg, \bot, \top)$) with a partial order $\le$ that corresponds to
+set inclusion $\subseteq$---see \cref{tbl:notation_example} for examples of how
+various elements can be represented in both notations. Most importantly, note
+that the word \emph{atom} has completely different meanings in logic and in
+Boolean algebras. An atom in $\mathcal{L}$ is an atomic formula, i.e., an
+element of $U$, whereas an atom in a Boolean algebra is (in set-theoretic terms)
+a singleton set. For instance, an atom in $2^{2^U}$ corresponds to a model of
 $\mathcal{L}$, i.e., an element of $2^U$. Unless referring specifically to a
 logic, we will use the algebraic definition of an atom and refer to logical
 atoms as \emph{variables}. In the rest of the paper, for any set $U$, we will
@@ -346,13 +347,11 @@ multiplication and projection are as defined by
   \end{description}
 \end{definition}
 
-\begin{observation}
-  Let $U$ be a set, and $\mathcal{V} = \{ \alpha\colon 2^X \to \mathbb{R}_{\ge 0}
-  \mid X \subseteq U \}$. Then $\mathcal{V}$ is a semi-vector space with three
-  additional operations: (non-scalar) multiplication, complement, and projection.
-  Specifically, note that both addition and multiplication are both associative
-  and commutative.
-\end{observation}
+Note that if $U$ is any set, then $\mathcal{V} = \{ \alpha\colon 2^X \to
+\mathbb{R}_{\ge 0} \mid X \subseteq U \}$ is a semi-vector space with three
+additional operations: (non-scalar) multiplication, complement, and projection.
+Specifically, note that both addition and multiplication are both associative
+and commutative.
 
 We end the discussion on function spaces by defining several special functions:
 unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$ defined as $1(\emptyset) = 1$,
@@ -613,7 +612,7 @@ random variable $X \in \mathcal{V}$. We call each such function a
 \emph{conditional weight function} as it represents a conditional probability
 distribution. However, the distinction is primarily a semantic one: a function
 $2^{\{a, b\}} \to \mathbb{R}_{\ge 0}$ can represent $\Pr(a \mid b)$, $\Pr(b \mid
-a)$, or something else entirely.
+a)$, or something else entirely, e.g., $\Pr(a \land b)$, $\Pr(a \lor b)$, etc.
 
 For a binary random variable $X$, $\mathrm{CPT}_X$ is simply a sum of smaller
 functions, one for each row of the CPT. If $X$ has more than two values, we also
@@ -782,8 +781,8 @@ In this section, we describe an experimental study comparing the five WMC
 encodings for Bayesian networks when run with ADDMC. The experiments were run on
 servers with Intel Xeon Gold 6138 and Intel Xeon E5-2630
 processors\footnote{Each instance is run on the same processor for all
-  encodings.} with an \SI{8}{\gibi\byte} memory limit and a \SI{1000}{\second}
-timeout.
+  encodings.} running Scientific~Linux~7 with an \SI{8}{\gibi\byte} memory limit
+and a \SI{1000}{\second} timeout.
 
 For each Bayesian network, we need to choose a probability to compute. Whenever
 a Bayesian network comes with an evidence file, we compute the probability of
@@ -829,6 +828,7 @@ which happen to be binary. We classify them into the following seven categories:
   \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
   \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
 \end{itemize*}
+We run ADDMC with each of the five encodings once on each Bayesian network.
 
 \begin{figure}
   \centering
@@ -941,9 +941,12 @@ While we chose to use ADDMC \cite{DBLP:conf/aaai/DudekPV20} as the WMC algorithm
 and Bayesian networks as a canonical example of a probabilistic inference task,
 these are only examples meant to illustrate the broader idea that choosing a
 more expressive representation of weights can outperform increasing the size of
-the problem to keep the weights simple. The same idea can be adapted to
+the problem to keep the weights simple. Indeed, in this work, we have provided a
+new theoretical perspective on the expressive power of WMC and illustrated the
+empirical benefits of that perspective. The same idea can be adapted to
 search-based solvers such as Cachet \cite{DBLP:conf/sat/SangBBKP04} as well as
-to other inference problem domains such as probabilistic programs.
+to other inference problem domains such as probabilistic programs
+\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089}.
 
 %An additional benefit of conditional weights is that a more expressive format
 %makes it easier to invent new WMC encodings.
@@ -955,6 +958,10 @@ to other inference problem domains such as probabilistic programs.
 % This work has made use of the resources provided by the Edinburgh Compute and
 % Data Facility (ECDF) (\url{http://www.ecdf.ed.ac.uk/}).
 
+\newpage
+\bibliography{paper}
+
+\newpage
 \appendix
 \section{Proofs}
 
@@ -1043,5 +1050,4 @@ to other inference problem domains such as probabilistic programs.
   \end{itemize}
 \end{proof}
 
-\bibliography{paper}
 \end{document}
