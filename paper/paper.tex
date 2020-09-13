@@ -943,10 +943,11 @@ these are only examples meant to illustrate the broader idea that choosing a
 more expressive representation of weights can outperform increasing the size of
 the problem to keep the weights simple. Indeed, in this work, we have provided a
 new theoretical perspective on the expressive power of WMC and illustrated the
-empirical benefits of that perspective. The same idea can be adapted to
-search-based solvers such as Cachet \cite{DBLP:conf/sat/SangBBKP04} as well as
-to other inference problem domains such as probabilistic programs
-\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089}.
+empirical benefits of that perspective. The same idea can be adapted to other
+inference problem domains such as probabilistic programs
+\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089} as
+well as to search-based solvers such as Cachet \cite{DBLP:conf/sat/SangBBKP04},
+although the extension may be less straightforward for other WMC techniques.
 
 %An additional benefit of conditional weights is that a more expressive format
 %makes it easier to invent new WMC encodings.
@@ -963,7 +964,9 @@ to other inference problem domains such as probabilistic programs
 
 \newpage
 \appendix
-\section{Proofs}
+\section{Technical Appendix}
+
+\subsection{Proofs}
 
 \measure*
 \begin{proof}
@@ -1049,5 +1052,32 @@ to other inference problem domains such as probabilistic programs
   \item marginalisation of a probability distribution.
   \end{itemize}
 \end{proof}
+
+\subsection{Reproducibility Checklist}
+
+Here we provide the rationale behind some of our answers to the questions in the
+reproducibility checklist.
+\begin{itemize}
+%\item The authors are not aware of any significant limitations or technical
+%  assumptions worth mentioning.
+\item The proof of Theorem~2 is not explicitly included as the idea behind the
+  proof is illustrated via an example.
+\item While we provide citations for papers that describe and/or introduce most
+  of the Bayesian networks used in our experiments, some of the classical
+  Bayesian networks used in the experiments are widely used and never cited.
+  Their origin can sometimes be traced to groups of people but not specific
+  papers.
+\item For our evaluation metrics, we count numbers of instances that were
+  solved using each encoding, numbers of instances where each encoding
+  outperformed others (including situations when multiple runs of the algorithm
+  result in exactly the same amount of time), and numbers of instances that are
+  solved by using only one encoding. As these metrics are quite elementary and
+  secondary to the cumulative and scatter plots, we do not describe the
+  motivation for using them.
+\item None of the plots or metrics in the paper have any measure of error
+  associated with them. For Figure~2 and Table~2, this is because each curve or
+  number is interpreted as a statistic of a single experiment. Figure~3, on the
+  other hand, provides a visual summary of every single experimental run.
+\end{itemize}
 
 \end{document}

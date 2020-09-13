@@ -21,8 +21,8 @@ all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_eviden
 define run_algorithms_with_evidence
 	-cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
 	-cp data/$(basename $*).$(1) data/$*.$(1)
-	python encode.py data/$*.$(1) -e data/$* db21
-	-$(RUN) --wf 4 --cf data/$*.$(1).cnf &> results/$*.db21
+	python encode.py data/$*.$(1) -e data/$* cw
+	-$(RUN) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw
 	python encode.py data/$*.$(1) -e data/$* d02
 	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.d02
 	python encode.py data/$*.$(1) -e data/$* sbk05
@@ -34,8 +34,8 @@ define run_algorithms_with_evidence
 endef
 
 data/%/WITHOUT_EVIDENCE:
-	python encode.py data/$* db21
-	-$(RUN) --wf 4 --cf data/$*.cnf &> results/$*.db21
+	python encode.py data/$* cw
+	-$(RUN) --wf 4 --cf data/$*.cnf &> results/$*.cw
 	python encode.py data/$* d02
 	-$(RUN) --cf data/$*.cnf &> results/$*.d02
 	python encode.py data/$* sbk05
@@ -64,14 +64,14 @@ clean:
 # cd05 and cd06 are supposed to produce wrong answers
 %.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
 # NET
-	python encode.py $< db21
+	python encode.py $< cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "DB21 on $@ failed" && exit 1)
 	python encode.py $< d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
 # NET with evidence
-	python encode.py $< -e $(word 3, $?) db21
+	python encode.py $< -e $(word 3, $?) cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "DB21 on $@ failed" && exit 1)
 	python encode.py $< -e $(word 3, $?) d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
@@ -80,14 +80,14 @@ clean:
 
 %.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
 # DNE
-	python encode.py $< db21
+	python encode.py $< cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "DB21 on $@ failed" && exit 1)
 	python encode.py $< d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
 # DNE with evidence
-	python encode.py $< -e $(word 3, $?) db21
+	python encode.py $< -e $(word 3, $?) cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "DB21 on $@ failed" && exit 1)
 	python encode.py $< -e $(word 3, $?) d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)

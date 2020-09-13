@@ -8,7 +8,6 @@ require(ggpubr)
 
 TIMEOUT <- 1000
 df0 <- read.csv("results.csv", header = TRUE, sep = ",")
-df0$encoding[df0$encoding == "db21"] <- "cw"
 df0$time[df0$time > TIMEOUT] <- TIMEOUT
 df0$time[is.na(df0$time)] <- TIMEOUT
 df0$memory[is.na(df0$memory)] <- max(df0$memory, na.rm = TRUE)

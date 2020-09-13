@@ -19,7 +19,7 @@ def parse_dir(directory, additional_data = {}):
         d = parse(directory + filename)
         d.update(additional_data)
         parts = filename.split('.')
-        instance = parts[0] if parts[1] in ['inst', 'cd05', 'cd06', 'sbk05', 'd02', 'db21'] else parts[0] + '.' + parts[1]
+        instance = parts[0] if parts[1] in ['inst', 'cd05', 'cd06', 'cw', 'sbk05', 'd02'] else parts[0] + '.' + parts[1]
         d['instance'] = directory + instance
         d['encoding'] = filename[filename.rindex('.')+1:]
         data.append(d)
