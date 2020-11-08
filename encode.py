@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from fractions import Fraction
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
-BN2CNF = ['./bn2cnf']
+BN2CNF = ['./bn2cnf_linux', '-e', 'DIRECT', '-implicit', '-s', 'prime']
 NODE_RE = r'\nnode (\w+)'
 PARENTS_RE = r'parents = \(([^()]*)\)'
 PROBS_RE = r'probs = ([^;]*);'
@@ -256,14 +256,39 @@ def encode_using_ace(network, evidence_file, encoding):
     with open(network + '.cnf', 'a') as f:
         f.write(evidence + '\n' + weight_encoding + '\n')
 
-def encode_using_bn2cnf(network, evidence_file):
-    # Translate the Bayesian network to the UAI format
-    uai_format = parse_network(network, True)
-    with open(network + '.uai', 'w') as f:
+def encode_using_bn2cnf(network_filename, evidence_file):
+    # Translate the Bayesian network to the UAI format and run the encoder
+    uai_format = parse_network(network_filename, True)
+    uai_filename = network_filename + '.uai'
+    cnf_filename = uai_filename + '.cnf'
+    weights_filename = uai_filename + '.weights'
+    with open(uai_filename, 'w') as f:
         f.write('\n'.join(uai_format) + '\n')
+    print(BN2CNF + ['-i', uai_filename, '-o', cnf_filename, '-w', weights_filename])
+    subprocess.run(BN2CNF + ['-i', uai_filename, '-o', cnf_filename, '-w', weights_filename])
 
-    # TODO: Run bn2cnf
-    #subprocess.run(BN2CNF + [])
+    # Move weights to the CNF file
+    positive_weights = {}
+    negative_weights = {}
+    with open(weights_filename) as f:
+        for line in f:
+            words = line.split()
+            assert(len(words) == 2)
+            literal = int(words[0])
+            if literal < 0:
+                negative_weights[-literal] = float(words[1])
+            else:
+                positive_weights[literal] = float(words[1])
+
+    lines = ['w {} {} {}'.format(literal, positive_weights[literal],
+                                 negative_weights[literal])
+             if literal in negative_weights
+             else 'w {} {}'.format(literal, positive_weights[literal])
+             for literal in positive_weights]
+    with open(cnf_filename, 'a') as f:
+        f.write('\n'.join(lines) + '\n')
+
+    # TODO: Incorporate evidence
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
