@@ -21,29 +21,33 @@ all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_eviden
 define run_algorithms_with_evidence
 	-cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
 	-cp data/$(basename $*).$(1) data/$*.$(1)
+	python encode.py data/$*.$(1) -e data/$* bklm16
+	-$(RUN) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16
+	python encode.py data/$*.$(1) -e data/$* cd05
+	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.cd05
+	python encode.py data/$*.$(1) -e data/$* cd06
+	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.cd06
 	python encode.py data/$*.$(1) -e data/$* cw
 	-$(RUN) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw
 	python encode.py data/$*.$(1) -e data/$* d02
 	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.d02
 	python encode.py data/$*.$(1) -e data/$* sbk05
 	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.sbk05
-	python encode.py data/$*.$(1) -e data/$* cd05
-	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.cd05
-	python encode.py data/$*.$(1) -e data/$* cd06
-	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.cd06
 endef
 
 data/%/WITHOUT_EVIDENCE:
+	python encode.py data/$* bklm16
+	-$(RUN) --wf 4 --cf data/$*.cnf &> results/$*.bklm16
+	python encode.py data/$* cd05
+	-$(RUN) --cf data/$*.cnf &> results/$*.cd05
+	python encode.py data/$* cd06
+	-$(RUN) --cf data/$*.cnf &> results/$*.cd06
 	python encode.py data/$* cw
 	-$(RUN) --wf 4 --cf data/$*.cnf &> results/$*.cw
 	python encode.py data/$* d02
 	-$(RUN) --cf data/$*.cnf &> results/$*.d02
 	python encode.py data/$* sbk05
 	-$(RUN) --cf data/$*.cnf &> results/$*.sbk05
-	python encode.py data/$* cd05
-	-$(RUN) --cf data/$*.cnf &> results/$*.cd05
-	python encode.py data/$* cd06
-	-$(RUN) --cf data/$*.cnf &> results/$*.cd06
 
 data/%/DNE_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,dne)
@@ -59,6 +63,7 @@ clean:
 		rm -f data/$$d/*.net.* ; \
 		rm -f data/$$d/*.inst.dne ; \
 		rm -f data/$$d/*.inst.net ; \
+		rm -f data/$$d/*.uai.* ; \
 	done
 
 # cd05 and cd06 are supposed to produce wrong answers
@@ -70,6 +75,8 @@ clean:
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< bklm16
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "BKLM16 $@ failed" && exit 1)
 # NET with evidence
 	python encode.py $< -e $(word 3, $?) cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "DB21 on $@ failed" && exit 1)
@@ -77,6 +84,8 @@ clean:
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< -e $(word 3, $?) sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) bklm16
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "BKLM16 $@ failed" && exit 1)
 
 %.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
 # DNE
@@ -86,6 +95,8 @@ clean:
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< bklm16
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "BKLM16 $@ failed" && exit 1)
 # DNE with evidence
 	python encode.py $< -e $(word 3, $?) cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "DB21 on $@ failed" && exit 1)
@@ -93,6 +104,8 @@ clean:
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 on $@ failed" && exit 1)
 	python encode.py $< -e $(word 3, $?) sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 $@ failed" && exit 1)
+	python encode.py $< -e $(word 3, $?) bklm16
+	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "BKLM16 $@ failed" && exit 1)
 
 test: $(addsuffix .test, $(basename $(wildcard test_data/*.inst)))
 	@echo "Success, all tests passed."

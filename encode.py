@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from fractions import Fraction
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
-BN2CNF = ['./bn2cnf_linux', '-e', 'DIRECT', '-implicit', '-s', 'prime']
+BN2CNF = ['./bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime'] # TODO: change it back to direct
 NODE_RE = r'\nnode (\w+)'
 PARENTS_RE = r'parents = \(([^()]*)\)'
 PROBS_RE = r'probs = ([^;]*);'
@@ -16,6 +16,7 @@ NUMBER_RE = r'\d+\.?\d*'
 PROB_SPLITTER_RE = r'[, ()\n\t]+'
 STATES_RE = {'dne': r'states = \(([^()]*)\)', 'net': r'states = \(\s*"([^()]*)"\s*\)'}
 STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
+VARIABLE_MAP_RE = r'{} = (.+)'
 
 class LiteralDict:
     _lit2var = {}
@@ -140,7 +141,7 @@ def cpt2uai(parents_dict, probabilities_dict):
               for p in sorted(parents[variable])])
         lines += [' '.join(rearranged_probabilities[frozenset(key)])
                   for key in new_keys]
-    return lines
+    return lines, variables
 
 def parse_network(filename, output_uai=False):
     'The main function responsible for parsing Bayesian networks'
@@ -182,10 +183,10 @@ def parse_network(filename, output_uai=False):
             cpt2cnf(parents_dict, probabilities_dict))
 
 def encode_inst_evidence(filename):
-    if filename is None:
-        return []
-    return [variables.get_literal_string(inst.attrib['id'], inst.attrib['value']) + ' 0'
-            for inst in ET.parse(filename).findall('inst')]
+    return [] if filename is None else [
+        variables.get_literal_string(inst.attrib['id'],
+                                     inst.attrib['value']) + ' 0'
+        for inst in ET.parse(filename).findall('inst')]
 
 def evidence_file_is_empty(evidence_file):
     return evidence_file is None or ET.parse(evidence_file).find('inst') is None
@@ -219,11 +220,11 @@ def identify_goal(text, mode):
 
 def encode_using_ace(network, evidence_file, encoding):
     subprocess.run(ACE + ['-' + encoding, network])
-
     with open(network, encoding='ISO-8859-1') as f:
         text = f.read()
     mode = get_format(network)
     goal_node, goal_value = identify_goal(text, mode)
+
     # Make a variable -> list of values map
     values = {node.group(1) : re.split(STATE_SPLITTER_RE[mode],
                                        re.search(STATES_RE[mode],
@@ -258,16 +259,17 @@ def encode_using_ace(network, evidence_file, encoding):
 
 def encode_using_bn2cnf(network_filename, evidence_file):
     # Translate the Bayesian network to the UAI format and run the encoder
-    uai_format = parse_network(network_filename, True)
+    encoded_clauses, variables = parse_network(network_filename, True)
     uai_filename = network_filename + '.uai'
-    cnf_filename = uai_filename + '.cnf'
+    cnf_filename = network_filename + '.cnf'
     weights_filename = uai_filename + '.weights'
+    variables_filename = uai_filename + '.variables'
     with open(uai_filename, 'w') as f:
-        f.write('\n'.join(uai_format) + '\n')
-    print(BN2CNF + ['-i', uai_filename, '-o', cnf_filename, '-w', weights_filename])
-    subprocess.run(BN2CNF + ['-i', uai_filename, '-o', cnf_filename, '-w', weights_filename])
+        f.write('\n'.join(encoded_clauses) + '\n')
+    subprocess.run(BN2CNF + ['-i', uai_filename, '-o', cnf_filename,
+                             '-w', weights_filename, '-v', variables_filename])
 
-    # Move weights to the CNF file
+    # Translate weights to the right format
     positive_weights = {}
     negative_weights = {}
     with open(weights_filename) as f:
@@ -276,19 +278,34 @@ def encode_using_bn2cnf(network_filename, evidence_file):
             assert(len(words) == 2)
             literal = int(words[0])
             if literal < 0:
-                negative_weights[-literal] = float(words[1])
+                negative_weights[-literal] = words[1]
             else:
-                positive_weights[literal] = float(words[1])
+                positive_weights[literal] = words[1]
 
-    lines = ['w {} {} {}'.format(literal, positive_weights[literal],
-                                 negative_weights[literal])
-             if literal in negative_weights
-             else 'w {} {}'.format(literal, positive_weights[literal])
-             for literal in positive_weights]
+    encoded_weights = ['w {} {} {}'.format(literal, positive_weights[literal],
+                                           negative_weights[literal])
+                       if literal in negative_weights
+                       else 'w {} {}'.format(literal, positive_weights[literal])
+                       for literal in positive_weights]
+
+    # Incorporate evidence (or select a goal)
+    if not evidence_file_is_empty(evidence_file):
+        encoded_evidence = encode_inst_evidence(evidence_file)
+    else:
+        # Identify the goal formula
+        with open(network_filename) as f:
+            text = f.read()
+        goal_variable_string, goal_value = identify_goal(text, get_format(network_filename))
+        goal_variable = variables.index(goal_variable_string)
+        with open(variables_filename) as f:
+            text = f.read()
+        all_values = re.search(VARIABLE_MAP_RE.format(goal_variable), text).group(1)[2:-2]
+        goal_literals = all_values.split('][')[goal_value].split(', ')
+        encoded_evidence = [l + ' 0' for l in goal_literals]
+
+    # Put everything together and write to a file
     with open(cnf_filename, 'a') as f:
-        f.write('\n'.join(lines) + '\n')
-
-    # TODO: Incorporate evidence
+        f.write('\n'.join(encoded_weights + encoded_evidence) + '\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
