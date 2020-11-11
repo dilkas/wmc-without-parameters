@@ -7,7 +7,8 @@ import xml.etree.ElementTree as ET
 from fractions import Fraction
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
-BN2CNF = ['./bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime'] # TODO: change it back to direct
+BN2CNF = ['./bn2cnf_linux', '-e', 'DIRECT'] # TODO: switch to the optimal version
+#BN2CNF = ['./bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
 NODE_RE = r'\nnode (\w+)'
 PARENTS_RE = r'parents = \(([^()]*)\)'
 PROBS_RE = r'probs = ([^;]*);'
@@ -16,7 +17,7 @@ NUMBER_RE = r'\d+\.?\d*'
 PROB_SPLITTER_RE = r'[, ()\n\t]+'
 STATES_RE = {'dne': r'states = \(([^()]*)\)', 'net': r'states = \(\s*"([^()]*)"\s*\)'}
 STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
-VARIABLE_MAP_RE = r'{} = (.+)'
+VARIABLE_MAP_RE = r'(\d+) = (.+)'
 
 class LiteralDict:
     _lit2var = {}
@@ -86,19 +87,22 @@ def cpt2cnf(parents, probabilities):
         if len(values_per_variable[variable]) == 2:
             index, literal = find_goal_value(variable)
             num_values = len(values_per_variable[variable])
-            return construct_weights(literal, num_values, parents[variable],
-                                     probabilities[variable], index,
-                                     lambda p: 1 - p)
-        values = [variables.get_literal_string(variable, v)
-                  for v in values_per_variable[variable]]
-        clauses += ['{} 0'.format(' '.join(values))] + [
-            '-{} -{} 0'.format(values[i], values[j]) for i in range(len(values))
-            for j in range(i + 1, len(values))]
-        for i, value in enumerate(values):
-            clauses += construct_weights(value,
-                                         len(values_per_variable[variable]),
-                                         parents[variable],
-                                         probabilities[variable], i, lambda p: 1)
+            clauses += construct_weights(literal, num_values, parents[variable],
+                                         probabilities[variable], index,
+                                         lambda p: 1 - p)
+        else:
+            values = [variables.get_literal_string(variable, v)
+                      for v in values_per_variable[variable]]
+            clauses += ['{} 0'.format(' '.join(values))] + [
+                '-{} -{} 0'.format(values[i], values[j])
+                for i in range(len(values))
+                for j in range(i + 1, len(values))]
+            for i, value in enumerate(values):
+                clauses += construct_weights(value,
+                                             len(values_per_variable[variable]),
+                                             parents[variable],
+                                             probabilities[variable], i,
+                                             lambda p: 1)
     return clauses
 
 def cpt2uai(parents_dict, probabilities_dict):
@@ -182,11 +186,21 @@ def parse_network(filename, output_uai=False):
     return (cpt2uai(parents_dict, probabilities_dict) if output_uai else
             cpt2cnf(parents_dict, probabilities_dict))
 
-def encode_inst_evidence(filename):
-    return [] if filename is None else [
-        variables.get_literal_string(inst.attrib['id'],
-                                     inst.attrib['value']) + ' 0'
-        for inst in ET.parse(filename).findall('inst')]
+def encode_inst_evidence(filename, indicators=None, variables_map=None):
+    if filename is None:
+        return []
+    instantiations = ET.parse(filename).findall('inst')
+    if indicators is None:
+        return [variables.get_literal_string(inst.attrib['id'],
+                                             inst.attrib['value']) + ' 0'
+                for inst in instantiations]
+    evidence = []
+    for inst in instantiations:
+        variable = variables_map.index(inst.attrib['id'])
+        values = values_per_variable[inst.attrib['id']]
+        value = values.index(inst.attrib['value'])
+        evidence += indicators[(variable, value)]
+    return evidence
 
 def evidence_file_is_empty(evidence_file):
     return evidence_file is None or ET.parse(evidence_file).find('inst') is None
@@ -288,20 +302,29 @@ def encode_using_bn2cnf(network_filename, evidence_file):
                        else 'w {} {}'.format(literal, positive_weights[literal])
                        for literal in positive_weights]
 
+    # Map (variable, value) pairs to CNF formulas
+    # (as lists of lines in DIMACS syntax)
+    indicators = {}
+    with open(variables_filename) as f:
+        text = f.read()
+    for line in re.finditer(VARIABLE_MAP_RE, text):
+        #.group(1)[2:-2]
+        variable = line.group(1)
+        values = [v.split(', ') for v in line.group(2)[2:-2].split('][')]
+        for value in range(len(values)):
+            indicators[(int(variable), value)] = [l + ' 0' for l in values[value]]
+
     # Incorporate evidence (or select a goal)
     if not evidence_file_is_empty(evidence_file):
-        encoded_evidence = encode_inst_evidence(evidence_file)
+        encoded_evidence = encode_inst_evidence(evidence_file, indicators,
+                                                variables)
     else:
         # Identify the goal formula
         with open(network_filename) as f:
             text = f.read()
         goal_variable_string, goal_value = identify_goal(text, get_format(network_filename))
         goal_variable = variables.index(goal_variable_string)
-        with open(variables_filename) as f:
-            text = f.read()
-        all_values = re.search(VARIABLE_MAP_RE.format(goal_variable), text).group(1)[2:-2]
-        goal_literals = all_values.split('][')[goal_value].split(', ')
-        encoded_evidence = [l + ' 0' for l in goal_literals]
+        encoded_evidence = indicators[(goal_variable, goal_value)]
 
     # Put everything together and write to a file
     with open(cnf_filename, 'a') as f:

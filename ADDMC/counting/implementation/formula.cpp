@@ -365,12 +365,21 @@ Formula::Formula(const std::string &filePath, WeightFormat weightFormat,
 
   varOrdering = generateVarOrdering(varOrderingHeuristic, inverse);
 
-  if (weightFormat == WeightFormat::CONDITIONAL) { /* compiles weights into ADDs */
+  /* compiles weights into ADDs */
+  if (weightFormat == WeightFormat::CONDITIONAL) {
     for (auto words : unparsedWeights) {
       int_t literal = std::stoi(words.at(1));
-      if (literal <= 0)
-        util::showError("the first literal of any weight line must be positive, but " +
-                        std::to_string(literal) + " is not");
+
+      if (literal < 0)
+        util::showError(
+          "the first literal of any weight line must be non-negative, but " +
+          std::to_string(literal) + " is not");
+      if (literal == 0) {
+        assert(words.size() == 3);
+        literalWeights[0] = std::stod(words.at(2));
+        continue;
+      }
+
       ADD cpt = constructADDFromWords(mgr, literal, words);
       auto previousEntry = weights.find(literal);
       if (previousEntry != weights.end()) {

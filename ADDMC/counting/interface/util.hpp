@@ -206,7 +206,6 @@ namespace util {
     double totalModelCount = apparentModelCount;
 
     int_t totalLiteralCount = literalWeights.size();
-    if (totalLiteralCount % 2 == 1) showError("odd total literal count");
 
     int_t totalVarCount = totalLiteralCount / 2;
     if (totalVarCount < projectedFormulaVars.size()) showError("more projected vars than total vars");
@@ -216,6 +215,9 @@ namespace util {
         totalModelCount *= literalWeights.at(formulaVar) + literalWeights.at(-formulaVar);
       }
     }
+    auto scalingFactor = literalWeights.find(0);
+    if (scalingFactor != literalWeights.end())
+      totalModelCount *= scalingFactor->second;
 
     if (totalModelCount == 0) {
       showWarning("floating-point underflow may have occured; please double-check with another tool");
