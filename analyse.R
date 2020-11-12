@@ -6,7 +6,7 @@ require(purrr)
 require(tikzDevice)
 require(ggpubr)
 
-TIMEOUT <- 1000
+TIMEOUT <- 1
 df0 <- read.csv("results.csv", header = TRUE, sep = ",")
 df0$time[df0$time > TIMEOUT] <- TIMEOUT
 df0$time[is.na(df0$time)] <- TIMEOUT

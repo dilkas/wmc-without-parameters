@@ -1,18 +1,18 @@
 TIMEOUT := 1
-MAX_MEMORY_USAGE := 7969178 # 95% of 8 GB
+MAX_MEMORY_USAGE := 1048576 # in kB
 
 EPSILON := 0.000001
 ALGORITHM := ./ADDMC/counting/addmc
-RUN := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_USAGE) && /usr/bin/time -v $(ALGORITHM)
+RUN := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_USAGE) && /usr/bin/time -v
 DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-50 DQMR/qmr-60 DQMR/qmr-70 Plan_Recognition/without_evidence Plan_Recognition/with_evidence 2004-pgm 2005-ijcai 2006-ijar ../test_data
 
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2005-ijcai/*.inst))
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2006-ijar/*.inst))
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2004-pgm/*.inst))
-all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
-all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
+#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/DQMR/qmr-100/*.dne))
-#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
+all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-60/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-70/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Grid/*/*.dne))
@@ -22,18 +22,18 @@ all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_eviden
 define run_algorithms_with_evidence
 	-cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
 	-cp data/$(basename $*).$(1) data/$*.$(1)
-	python encode.py data/$*.$(1) -e data/$* bklm16
-	-$(RUN) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16
-	python encode.py data/$*.$(1) -e data/$* cd05
-	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.cd05
-	python encode.py data/$*.$(1) -e data/$* cd06
-	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.cd06
-	python encode.py data/$*.$(1) -e data/$* cw
-	-$(RUN) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw
-	python encode.py data/$*.$(1) -e data/$* d02
-	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.d02
-	python encode.py data/$*.$(1) -e data/$* sbk05
-	-$(RUN) --cf data/$*.$(1).cnf &> results/$*.sbk05
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* cd05 &> results/$*.cd05.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd05
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* cd06 &> results/$*.cd06.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd06
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* d02 &> results/$*.d02.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.d02
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk06.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.sbk05
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* bklm16 &> results/$*.bklm16.encoding
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* cw &> results/$*.cw.encoding
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw
 endef
 
 # arguments: 1) CNF file, 2) answer file
@@ -49,18 +49,18 @@ define test_bklm
 endef
 
 data/%/WITHOUT_EVIDENCE:
-	python encode.py data/$* bklm16
-	-$(RUN) --wf 4 --cf data/$*.cnf &> results/$*.bklm16
-	python encode.py data/$* cd05
-	-$(RUN) --cf data/$*.cnf &> results/$*.cd05
-	python encode.py data/$* cd06
-	-$(RUN) --cf data/$*.cnf &> results/$*.cd06
-	python encode.py data/$* cw
-	-$(RUN) --wf 4 --cf data/$*.cnf &> results/$*.cw
-	python encode.py data/$* d02
-	-$(RUN) --cf data/$*.cnf &> results/$*.d02
-	python encode.py data/$* sbk05
-	-$(RUN) --cf data/$*.cnf &> results/$*.sbk05
+	-$(RUN) python encode.py data/$* cd05 &> results/$*.cd05.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd05
+	-$(RUN) python encode.py data/$* cd06 &> results/$*.cd06.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd06
+	-$(RUN) python encode.py data/$* d02 &> results/$*.d02.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.d02
+	-$(RUN) python encode.py data/$* sbk05 &> results/$*.sbk05.encoding
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.sbk05
+	-$(RUN) python encode.py data/$* bklm16 &> results/$*.bklm16.encoding
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.bklm16
+	-$(RUN) python encode.py data/$* cw &> results/$*.cw.encoding
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.cw
 
 data/%/DNE_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,dne)
