@@ -7,8 +7,7 @@ import xml.etree.ElementTree as ET
 from fractions import Fraction
 
 ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
-BN2CNF = ['./bn2cnf_linux', '-e', 'DIRECT'] # TODO: switch to the optimal version
-#BN2CNF = ['./bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
+BN2CNF = ['./bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
 NODE_RE = r'\nnode (\w+)'
 PARENTS_RE = r'parents = \(([^()]*)\)'
 PROBS_RE = r'probs = ([^;]*);'
