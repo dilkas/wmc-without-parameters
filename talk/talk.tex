@@ -1,0 +1,155 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage[UKenglish]{isodate}
+\usepackage{tikz-cd}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{mathtools}
+
+\beamertemplatenavigationsymbolsempty
+\usetheme{default}
+\usecolortheme{whale}
+
+\author{Paulius Dilkas}
+\title{Weighted Model Counting with Conditional Weights for Bayesian Networks}
+\date{27th November 2020}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Boolean Algebras and Propositional Logic}
+  Let \structure{$U = \{ a, b \}$}. Then \structure{$2^{2^U}$} is a Boolean
+  algebra with the following Hasse diagram (\structure{$x \le y$} if
+  \structure{$x \subseteq y$} or, equivalently, \structure{$x = x \land y$}).
+  \[
+    \begin{tikzcd}[ampersand replacement=\&, column sep=tiny]
+      \& \& \& \& \& \top \ar[dlll,dash,gray] \ar[dl,dash,gray]
+      \ar[dr,dash,gray] \ar[drrr,dash,gray] \& \& \& \\
+      \& \& a \lor b \& \& b \to a \& \& a \to b \& \& \neg a \lor \neg
+      b \\
+      a \ar[urr,dash,gray] \ar[urrrr,dash,gray] \& \& b \ar[u,dash,gray]
+      \ar[urrrr,dash,gray] \& \& a \leftrightarrow b \ar[u,dash,gray]
+      \ar[urr,dash,gray] \& \& a + b \ar[ullll,dash,gray] \ar[urr,dash,gray]
+      \& \& \neg b \ar[ullll,dash,gray] \ar[u,dash,gray] \& \& \neg a
+      \ar[ullll,dash,gray] \ar[ull,dash,gray] \\
+      \& \& \fbox{$a \land b$} \ar[ull,dash,gray] \ar[u,dash,gray]
+      \ar[urr,dash,gray] \& \& \fbox{$a \land \neg b$} \ar[ullll,dash,gray]
+      \ar[urr,dash,gray] \ar[urrrr,dash,gray] \& \& \fbox{$\neg a \land b$}
+      \ar[ullll,dash,gray] \ar[u,dash,gray] \ar[urrrr,dash,gray] \& \&
+      \fbox{$\neg a \land \neg b$} \ar[ullll,dash,gray] \ar[u,dash,gray]
+      \ar[urr,dash,gray] \\
+      \& \& \& \& \& \bot \ar[ulll,dash,gray] \ar[ul,dash,gray]
+      \ar[ur,dash,gray] \ar[urrr,dash,gray] \& \& \&
+    \end{tikzcd}
+  \]
+\end{frame}
+
+\begin{frame}{Some Definitions}
+  \begin{itemize}
+  \item A \alert{measure} is a function \structure{$\mu\colon 2^{2^U} \to
+    \mathbb{R}_{\ge 0}$} such that:
+    \begin{itemize}
+    \item \structure{$\mu(\bot) = 0$};
+    \item \structure{$\mu(x \lor y) = \mu(x) + \mu(y)$} whenever \structure{$x
+        \land y = \bot$}.
+    \end{itemize}
+    \pause
+  \item A \alert{weight function} is any function \structure{$\nu\colon 2^U \to
+      \mathbb{R}_{\ge 0}$}.
+    \pause
+    \begin{itemize}
+    \item It is \alert{factored} if
+      \[
+        \nu = \prod_{x \in U} \nu_x
+      \]
+      for some functions \structure{$\nu_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge
+          0}$}, \structure{$x \in U$}.
+    \end{itemize}
+    \pause
+  \item We say that \structure{$\nu$} \alert{induces} \structure{$\mu$} if
+    \[
+      \mu(x) = \sum_{\{u\} \le x} \nu(u)
+    \]
+    for all \structure{$x \in 2^{2^U}$}.
+    \pause
+  \item A measure \structure{$\mu$} is \alert{factorable} if there exists a
+    factored weight function \structure{$\nu$} that induces \structure{$\mu$}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{WMC as a Measure on a Boolean Algebra}
+  \begin{itemize}
+  \item \alert{Weighted model count} (WMC) of a theory \structure{$\Delta$},
+    i.e.,
+    \[
+      \mathrm{WMC}(\Delta) = \sum_{\omega \models \Delta} \prod_{\omega \models
+        l} w(l)
+    \]
+    computes \structure{$\mu(x)$} for some \structure{$x \in 2^{2^U}$}.
+    \pause
+  \item WMC with weights on literals can only compute \alert{factorable}
+    measures (c.f. independent probability distributions).
+  \item Traditional workaround: expanding the Boolean algebra.
+    \pause
+    \begin{itemize}
+    \item But we don't need to do that!
+    \item Instead, we can use \alert{conditional weight functions} in the spirit
+      of conditional probabilities.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Encoding Bayesian Networks}
+  \begin{figure}
+    \begin{subfigure}{0.2\textwidth}
+      \centering
+      \begin{tikzpicture}[edge from parent/.style={draw,-latex}]
+        \node[draw,circle] {$A$}
+        child {node[draw,circle] {$B$}};
+      \end{tikzpicture}
+    \end{subfigure}%
+    \begin{subfigure}{0.8\textwidth}
+      \centering
+      \begin{tabular}[t]{cc}
+        \toprule
+        $a$ & $\Pr(A = a)$ \\
+        \midrule
+        1 & 0.5 \\
+        0 & 0.5 \\
+        \bottomrule
+      \end{tabular}
+      \begin{tabular}[t]{ccc}
+        \toprule
+        $a$ & $b$ & $\Pr(B = b \mid A = a)$ \\
+        \midrule
+        1 & 1 & 0.6 \\
+        1 & 0 & 0.4 \\
+        0 & 1 & 0.1 \\
+        0 & 0 & 0.9 \\
+        \bottomrule
+      \end{tabular}
+    \end{subfigure}
+    \caption{A Bayesian network with its conditional probability tables}
+  \end{figure}
+  \pause
+  Let \structure{$U = \{ \lambda_{A=1}, \lambda_{B=1} \}$}. The weight function
+  \structure{$\nu\colon 2^U \to \mathbb{R}_{\ge 0}$} for this network can be
+  defined as \structure{$\nu \coloneqq \nu_A \cdot \nu_B$}, where
+  \structure{$\nu_A = 0.5$}, and
+  \begin{align*}
+    \nu_B &= 0.6[\lambda_{B=1}] \cdot [\lambda_{A=1}] + 0.4\overline{[\lambda_{B=1}]} \cdot [\lambda_{A=1}] \\
+          &+ 0.1[\lambda_{B=1}] \cdot \overline{[\lambda_{A=1}]} + 0.9\overline{[\lambda_{B=1}]} \cdot \overline{[\lambda_{A=1}]}.
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Experimental Results}
+  \centering
+  \scalebox{0.8}{\input{../paper/cumulative.tex}}
+  \vfill
+  \centering
+  \scalebox{0.6}{\input{../paper/scatter.tex}}
+\end{frame}
+
+\end{document}
