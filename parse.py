@@ -8,7 +8,10 @@ def parse(filename):
             for line in f:
                 stripped = line.lstrip()
                 if stripped.startswith('Elapsed'):
-                    d['time'] = line.split()[7]
+                    time_str = line.split()[7]
+                    colon_i = time_str.index(':')
+                    d['time'] = (60 * int(time_str[:colon_i]) +
+                                 float(time_str[colon_i+1:]))
                 if stripped.startswith('Maximum'):
                     d['memory'] = line.split()[5]
         else:
@@ -27,7 +30,9 @@ def parse_dir(directory, additional_data = {}):
         d = parse(directory + filename)
         d.update(additional_data)
         parts = filename.split('.')
-        instance = parts[0] if parts[1] in ['inst', 'cd05', 'cd06', 'cw', 'sbk05', 'd02'] else parts[0] + '.' + parts[1]
+        instance = (parts[0] if parts[1] in ['inst', 'cd05', 'cd06',
+                                             'cw', 'sbk05', 'd02']
+                    else parts[0] + '.' + parts[1])
         d['instance'] = directory + instance
         if filename.endswith('.encoding'):
             filename = filename[:-len('.encoding')]
