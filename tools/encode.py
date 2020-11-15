@@ -6,8 +6,8 @@ import subprocess
 import xml.etree.ElementTree as ET
 from fractions import Fraction
 
-ACE = ['./ace/compile', '-encodeOnly', '-noEclause']
-BN2CNF = ['./bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
+ACE = ['deps/ace/compile', '-encodeOnly', '-noEclause']
+BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
 NODE_RE = r'\nnode (\w+)'
 PARENTS_RE = r'parents = \(([^()]*)\)'
 PROBS_RE = r'probs = ([^;]*);'
@@ -325,9 +325,17 @@ def encode_using_bn2cnf(network_filename, evidence_file):
         goal_variable = variables.index(goal_variable_string)
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
+    # Update the number of clauses
+    with open(cnf_filename) as f:
+        lines = f.read().splitlines()
+    words = lines[0].split()
+    assert(len(words) == 4)
+    words[3] = str(int(words[3]) + len(encoded_evidence))
+    lines[0] = ' '.join(words)
+
     # Put everything together and write to a file
-    with open(cnf_filename, 'a') as f:
-        f.write('\n'.join(encoded_weights + encoded_evidence) + '\n')
+    with open(cnf_filename, 'w') as f:
+        f.write('\n'.join(lines + encoded_weights + encoded_evidence) + '\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

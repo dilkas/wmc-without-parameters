@@ -28,7 +28,7 @@ define run_algorithms_with_evidence
 	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd06
 	-$(RUN) python encode.py data/$*.$(1) -e data/$* d02 &> results/$*.d02.encoding
 	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.d02
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk06.encoding
+	-$(RUN) python encode.py data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk05.encoding
 	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.sbk05
 	-$(RUN) python encode.py data/$*.$(1) -e data/$* bklm16 &> results/$*.bklm16.encoding
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16

@@ -7,13 +7,23 @@ require(tikzDevice)
 require(ggpubr)
 
 TIMEOUT <- 1
-df0 <- read.csv("results.csv", header = TRUE, sep = ",")
-df0$time[df0$time > TIMEOUT] <- TIMEOUT
-df0$time[is.na(df0$time)] <- TIMEOUT
-df0$memory[is.na(df0$memory)] <- max(df0$memory, na.rm = TRUE)
-df <- dcast(data = df0, formula = instance + dataset ~ encoding, fun.aggregate = sum, value.var = c("answer", "time", "memory"))
-df$time_min <- as.numeric(apply(df, 1, function (row) min(row["time_cd05"], row["time_cd06"],
-                                                          row["time_d02"], row["time_cw"], row["time_sbk05"])))
+data <- read.csv("results.csv", header = TRUE, sep = ",")
+data$time[data$time > TIMEOUT] <- TIMEOUT
+data$time[is.na(data$time)] <- TIMEOUT
+data$memory[is.na(data$memory)] <- max(data$memory, na.rm = TRUE)
+
+# Choose one: encoding or inference
+df0 <- data[data$stage == "encoding", !colnames(data) %in% c("stage")]
+df0 <- data[data$stage == "inference", !colnames(data) %in% c("stage")]
+
+df <- dcast(data = df0, formula = instance + dataset ~ encoding,
+            fun.aggregate = sum,
+            value.var = c("answer", "time", "memory"))
+df$time_min <- as.numeric(apply(df, 1, function (row) min(row["time_cd05"],
+                                                          row["time_cd06"],
+                                                          row["time_d02"],
+                                                          row["time_cw"],
+                                                          row["time_sbk05"])))
 
 df$major.dataset <- "Non-binary"
 df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
