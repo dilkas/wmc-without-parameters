@@ -8,6 +8,11 @@ from fractions import Fraction
 
 # Software dependencies
 ACE = ['deps/ace/compile', '-encodeOnly', '-noEclause']
+ACE_LEGACY_BASIC = ['deps/ace/compile', '-forceC2d']
+ACE_LEGACY = {'d02': ACE_LEGACY_BASIC + ['-d02', '-dtHypergraph', '3'],
+              'cd05': ACE_LEGACY_BASIC + ['-cd05', '-dtBnOrder'],
+              'cd06': ACE_LEGACY_BASIC + ['-cd06', '-dtBnOrder'],
+              'sbk05': ACE + ['-sbk05']}
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
 
@@ -235,8 +240,13 @@ def identify_goal(text, mode):
     goal_value = values.index('true') if 'true' in values else 0
     return goal_node, goal_value
 
-def encode_using_ace(network, evidence_file, encoding):
-    subprocess.run(ACE + ['-' + encoding, network])
+def encode_using_ace(network, evidence_file, encoding, legacy_mode):
+    if not legacy_mode:
+        subprocess.run(ACE + ['-' + encoding, network])
+    else:
+        print(ACE_LEGACY[encoding] + [network])
+        subprocess.run(ACE_LEGACY[encoding] + [network])
+
     with open(network, encoding='ISO-8859-1') as f:
         text = f.read()
     mode = get_format(network)
@@ -362,4 +372,4 @@ if __name__ == '__main__':
     elif args.encoding == 'bklm16':
         encode_using_bn2cnf(args.network, args.evidence, args.l)
     else:
-        encode_using_ace(args.network, args.evidence, args.encoding)
+        encode_using_ace(args.network, args.evidence, args.encoding, args.l)
