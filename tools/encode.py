@@ -6,8 +6,12 @@ import subprocess
 import xml.etree.ElementTree as ET
 from fractions import Fraction
 
+# Software dependencies
 ACE = ['deps/ace/compile', '-encodeOnly', '-noEclause']
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
+C2D = ['deps/ace/c2d_linux']
+
+# Regular expressions
 NODE_RE = r'\nnode (\w+)'
 PARENTS_RE = r'parents = \(([^()]*)\)'
 PROBS_RE = r'probs = ([^;]*);'
@@ -270,7 +274,7 @@ def encode_using_ace(network, evidence_file, encoding):
     with open(network + '.cnf', 'a') as f:
         f.write(evidence + '\n' + weight_encoding + '\n')
 
-def encode_using_bn2cnf(network_filename, evidence_file):
+def encode_using_bn2cnf(network_filename, evidence_file, legacy_mode):
     # Translate the Bayesian network to the UAI format and run the encoder
     encoded_clauses, variables = parse_network(network_filename, True)
     uai_filename = network_filename + '.uai'
@@ -283,23 +287,28 @@ def encode_using_bn2cnf(network_filename, evidence_file):
                              '-w', weights_filename, '-v', variables_filename])
 
     # Translate weights to the right format
-    positive_weights = {}
-    negative_weights = {}
-    with open(weights_filename) as f:
-        for line in f:
-            words = line.split()
-            assert(len(words) == 2)
-            literal = int(words[0])
-            if literal < 0:
-                negative_weights[-literal] = words[1]
-            else:
-                positive_weights[literal] = words[1]
+    if legacy_mode:
+        encoded_weights = []
+    else:
+        positive_weights = {}
+        negative_weights = {}
+        with open(weights_filename) as f:
+            for line in f:
+                words = line.split()
+                assert(len(words) == 2)
+                literal = int(words[0])
+                if literal < 0:
+                    negative_weights[-literal] = words[1]
+                else:
+                    positive_weights[literal] = words[1]
 
-    encoded_weights = ['w {} {} {}'.format(literal, positive_weights[literal],
-                                           negative_weights[literal])
-                       if literal in negative_weights
-                       else 'w {} {}'.format(literal, positive_weights[literal])
-                       for literal in positive_weights]
+        encoded_weights = ['w {} {} {}'.format(literal,
+                                               positive_weights[literal],
+                                               negative_weights[literal])
+                           if literal in negative_weights
+                           else 'w {} {}'.format(literal,
+                                                 positive_weights[literal])
+                           for literal in positive_weights]
 
     # Map (variable, value) pairs to CNF formulas
     # (as lists of lines in DIMACS syntax)
@@ -337,16 +346,20 @@ def encode_using_bn2cnf(network_filename, evidence_file):
     with open(cnf_filename, 'w') as f:
         f.write('\n'.join(lines + encoded_weights + encoded_evidence) + '\n')
 
+    if legacy_mode:
+        subprocess.run(C2D + ['-in', cnf_filename])
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of weighted model counting (WMC)')
     parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
-    parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'd02', 'sbk05'], help='a WMC encoding')
-    parser.add_argument('-e', dest='evidence', help="evidence file (in the INST format)")
+    parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'd02', 'sbk05'], help='choose a WMC encoding')
+    parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')
+    parser.add_argument('-l', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
     args = parser.parse_args()
     if args.encoding == 'cw':
         encode(args.network, args.evidence)
     elif args.encoding == 'bklm16':
-        encode_using_bn2cnf(args.network, args.evidence)
+        encode_using_bn2cnf(args.network, args.evidence, args.l)
     else:
         encode_using_ace(args.network, args.evidence, args.encoding)
