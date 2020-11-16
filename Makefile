@@ -2,7 +2,8 @@ TIMEOUT := 1
 MAX_MEMORY_USAGE := 1048576 # in kB
 
 EPSILON := 0.000001
-ALGORITHM := ./ADDMC/counting/addmc
+ALGORITHM := deps/ADDMC/counting/addmc
+EVALUATE := deps/ace/evaluate
 RUN := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_USAGE) && /usr/bin/time -v
 DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-50 DQMR/qmr-60 DQMR/qmr-70 Plan_Recognition/without_evidence Plan_Recognition/with_evidence 2004-pgm 2005-ijcai 2006-ijar ../test_data
 
@@ -19,21 +20,32 @@ all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
 
 #===============================================================================
 
+# The argument is the file format (dne or net)
 define run_algorithms_with_evidence
 	-cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
 	-cp data/$(basename $*).$(1) data/$*.$(1)
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* cd05 &> results/$*.cd05.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd05
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* cd06 &> results/$*.cd06.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd06
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* d02 &> results/$*.d02.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.d02
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk05.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.sbk05
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* bklm16 &> results/$*.bklm16.encoding
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16
-	-$(RUN) python encode.py data/$*.$(1) -e data/$* cw &> results/$*.cw.encoding
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw
+	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* cd05 &> results/$*.cd05.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd05.new_inf
+	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* cd06 &> results/$*.cd06.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd06.new_inf
+	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* d02 &> results/$*.d02.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.d02.new_inf
+	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk05.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.sbk05.new_inf
+	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* bklm16 &> results/$*.bklm16.new_enc
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16.new_inf
+	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* cw &> results/$*.cw.new_enc
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw.new_inf
+
+# TODO: finish this (and everything below)
+	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* cd05 &> results/$*.cd05.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd05.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* cd06 &> results/$*.cd06.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd06.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* d02 &> results/$*.d02.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.d02.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk05.old_enc
+	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* bklm16 &> results/$*.bklm16.old_enc
 endef
 
 # arguments: 1) CNF file, 2) answer file
@@ -49,17 +61,17 @@ define test_bklm
 endef
 
 data/%/WITHOUT_EVIDENCE:
-	-$(RUN) python encode.py data/$* cd05 &> results/$*.cd05.encoding
+	-$(RUN) python tools/encode.py data/$* cd05 &> results/$*.cd05.encoding
 	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd05
-	-$(RUN) python encode.py data/$* cd06 &> results/$*.cd06.encoding
+	-$(RUN) python tools/encode.py data/$* cd06 &> results/$*.cd06.encoding
 	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd06
-	-$(RUN) python encode.py data/$* d02 &> results/$*.d02.encoding
+	-$(RUN) python tools/encode.py data/$* d02 &> results/$*.d02.encoding
 	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.d02
-	-$(RUN) python encode.py data/$* sbk05 &> results/$*.sbk05.encoding
+	-$(RUN) python tools/encode.py data/$* sbk05 &> results/$*.sbk05.encoding
 	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.sbk05
-	-$(RUN) python encode.py data/$* bklm16 &> results/$*.bklm16.encoding
+	-$(RUN) python tools/encode.py data/$* bklm16 &> results/$*.bklm16.encoding
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.bklm16
-	-$(RUN) python encode.py data/$* cw &> results/$*.cw.encoding
+	-$(RUN) python tools/encode.py data/$* cw &> results/$*.cw.encoding
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.cw
 
 data/%/DNE_WITH_EVIDENCE:
@@ -80,44 +92,44 @@ clean:
 	done
 
 # cd05 and cd06 are supposed to produce wrong answers
-%.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
+%.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
 # NET
-	python encode.py $< cw
+	python tools/encode.py $< cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python encode.py $< d02
+	python tools/encode.py $< d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python encode.py $< sbk05
+	python tools/encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python encode.py $< bklm16
+	python tools/encode.py $< bklm16
 	$(call test_bklm,$<.cnf,$(word 2, $?))
 # NET with evidence
-	python encode.py $< -e $(word 3, $?) cw
+	python tools/encode.py $< -e $(word 3, $?) cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python encode.py $< -e $(word 3, $?) d02
+	python tools/encode.py $< -e $(word 3, $?) d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python encode.py $< -e $(word 3, $?) sbk05
+	python tools/encode.py $< -e $(word 3, $?) sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python encode.py $< -e $(word 3, $?) bklm16
+	python tools/encode.py $< -e $(word 3, $?) bklm16
 	$(call test_bklm,$<.cnf,$(word 4, $?))
 
-%.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) encode.py
+%.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
 # DNE
-	python encode.py $< cw
+	python tools/encode.py $< cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python encode.py $< d02
+	python tools/encode.py $< d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python encode.py $< sbk05
+	python tools/encode.py $< sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python encode.py $< bklm16
+	python tools/encode.py $< bklm16
 	$(call test_bklm,$<.cnf,$(word 2, $?))
 # DNE with evidence
-	python encode.py $< -e $(word 3, $?) cw
+	python tools/encode.py $< -e $(word 3, $?) cw
 	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python encode.py $< -e $(word 3, $?) d02
+	python tools/encode.py $< -e $(word 3, $?) d02
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python encode.py $< -e $(word 3, $?) sbk05
+	python tools/encode.py $< -e $(word 3, $?) sbk05
 	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python encode.py $< -e $(word 3, $?) bklm16
+	python tools/encode.py $< -e $(word 3, $?) bklm16
 	$(call test_bklm,$<.cnf,$(word 4, $?))
 
 test: $(addsuffix .test, $(basename $(wildcard test_data/*.inst)))

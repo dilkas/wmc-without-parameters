@@ -6,13 +6,13 @@ import subprocess
 import xml.etree.ElementTree as ET
 from fractions import Fraction
 
+EPSILON = 0.000001
 # Software dependencies
 ACE = ['deps/ace/compile', '-encodeOnly', '-noEclause']
 ACE_LEGACY_BASIC = ['deps/ace/compile', '-forceC2d']
 ACE_LEGACY = {'d02': ACE_LEGACY_BASIC + ['-d02', '-dtHypergraph', '3'],
               'cd05': ACE_LEGACY_BASIC + ['-cd05', '-dtBnOrder'],
-              'cd06': ACE_LEGACY_BASIC + ['-cd06', '-dtBnOrder'],
-              'sbk05': ACE + ['-sbk05']}
+              'cd06': ACE_LEGACY_BASIC + ['-cd06', '-dtBnOrder']}
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
 
@@ -237,20 +237,33 @@ def identify_goal(text, mode):
     'Which marginal probability should we compute?'
     goal_node, goal_node_end = [(i.group(1), i.end()) for i in re.finditer(NODE_RE, text)][-1]
     values = re.split(STATE_SPLITTER_RE[mode], re.search(STATES_RE[mode], text[goal_node_end:]).group(1))
-    goal_value = values.index('true') if 'true' in values else 0
-    return goal_node, goal_value
+    goal_value = 'true' if 'true' in values else values[0]
+    goal_value_index = values.index(goal_value)
+    return goal_node, goal_value_index, goal_value
+
+def new_evidence_file(network_filename, variable, value):
+    'Create a new evidence file for a goal variable and value'
+    new_filename = network_filename + '.inst'
+    with open(new_filename, 'w') as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n<instantiation><inst id="{}" value="{}"/></instantiation>'.format(variable, value))
+    return new_filename
 
 def encode_using_ace(network, evidence_file, encoding, legacy_mode):
-    if not legacy_mode:
-        subprocess.run(ACE + ['-' + encoding, network])
-    else:
-        print(ACE_LEGACY[encoding] + [network])
-        subprocess.run(ACE_LEGACY[encoding] + [network])
-
+    # Identify the goal
     with open(network, encoding='ISO-8859-1') as f:
         text = f.read()
     mode = get_format(network)
-    goal_node, goal_value = identify_goal(text, mode)
+    goal_node, goal_value_index, goal_value = identify_goal(text, mode)
+
+    if legacy_mode and encoding != 'sbk05':
+        subprocess.run(ACE_LEGACY[encoding] +
+                       [network, '-e',
+                        new_evidence_file(network, goal_node, goal_value)
+                        if evidence_file_is_empty(evidence_file)
+                        else evidence_file])
+        return
+
+    subprocess.run(ACE + ['-' + encoding, network])
 
     # Make a variable -> list of values map
     values = {node.group(1) : re.split(STATE_SPLITTER_RE[mode],
@@ -259,6 +272,7 @@ def encode_using_ace(network, evidence_file, encoding, legacy_mode):
               for node in re.finditer(NODE_RE, text)}
 
     # Move weights from the LMAP file to the CNF file
+    # (and convert the goal to a literal)
     weights = {}
     max_literal = 0
     for line in open(network + '.lmap'):
@@ -273,14 +287,22 @@ def encode_using_ace(network, evidence_file, encoding, legacy_mode):
                 value = int(components[6].rstrip())
                 if literal > 0:
                     variables.add_literal(variable, values[variable][value], literal)
-                if variable == goal_node and value == goal_value:
+                if variable == goal_node and value == goal_value_index:
                     goal_literal = literal
 
     evidence = ('{} 0\n'.format(goal_literal)
                 if evidence_file_is_empty(evidence_file)
                 else '\n'.join(encode_inst_evidence(evidence_file)))
-    weight_encoding = 'c weights ' + ' '.join(l for literal in range(1, max_literal + 1)
-                                              for l in [weights[literal], weights[-literal]])
+
+    if legacy_mode:
+        weight_encoding = '\n'.join('w {} {}'.format(
+            literal, -1 if abs(float(weights[literal]) - 1) < EPSILON
+            else weights[literal]) for literal in range(1, max_literal + 1))
+    else:
+        weight_encoding = 'c weights ' + ' '.join(
+            l for literal in range(1, max_literal + 1)
+            for l in [weights[literal], weights[-literal]])
+
     with open(network + '.cnf', 'a') as f:
         f.write(evidence + '\n' + weight_encoding + '\n')
 
@@ -340,7 +362,7 @@ def encode_using_bn2cnf(network_filename, evidence_file, legacy_mode):
         # Identify the goal formula
         with open(network_filename) as f:
             text = f.read()
-        goal_variable_string, goal_value = identify_goal(text, get_format(network_filename))
+        goal_variable_string, goal_value, _ = identify_goal(text, get_format(network_filename))
         goal_variable = variables.index(goal_variable_string)
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
