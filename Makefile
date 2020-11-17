@@ -4,6 +4,7 @@ MAX_MEMORY_USAGE := 1048576 # in kB
 EPSILON := 0.000001
 ALGORITHM := deps/ADDMC/counting/addmc
 EVALUATE := deps/ace/evaluate
+CACHET := deps/cachet/cachet
 RUN := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_USAGE) && /usr/bin/time -v
 DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-50 DQMR/qmr-60 DQMR/qmr-70 Plan_Recognition/without_evidence Plan_Recognition/with_evidence 2004-pgm 2005-ijcai 2006-ijar ../test_data
 
@@ -36,8 +37,6 @@ define run_algorithms_with_evidence
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16.new_inf
 	-$(RUN) python tools/encode.py data/$*.$(1) -e data/$* cw &> results/$*.cw.new_enc
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw.new_inf
-
-# TODO: finish this (and everything below)
 	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* cd05 &> results/$*.cd05.old_enc
 	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd05.old_inf
 	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* cd06 &> results/$*.cd06.old_enc
@@ -45,7 +44,9 @@ define run_algorithms_with_evidence
 	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* d02 &> results/$*.d02.old_enc
 	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.d02.old_inf
 	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* sbk05 &> results/$*.sbk05.old_enc
+	-$(RUN) $(CACHET) data/$*.$(1).cnf &> results/$*.sbk05.old_inf
 	-$(RUN) python tools/encode.py -l data/$*.$(1) -e data/$* bklm16 &> results/$*.bklm16.old_enc
+	-$(RUN) python tools/bklm16_wrapper.py data/$*.$(1) &> results/$*.bklm16.old_inf
 endef
 
 # arguments: 1) CNF file, 2) answer file
@@ -61,18 +62,28 @@ define test_bklm
 endef
 
 data/%/WITHOUT_EVIDENCE:
-	-$(RUN) python tools/encode.py data/$* cd05 &> results/$*.cd05.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd05
-	-$(RUN) python tools/encode.py data/$* cd06 &> results/$*.cd06.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd06
-	-$(RUN) python tools/encode.py data/$* d02 &> results/$*.d02.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.d02
-	-$(RUN) python tools/encode.py data/$* sbk05 &> results/$*.sbk05.encoding
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.sbk05
-	-$(RUN) python tools/encode.py data/$* bklm16 &> results/$*.bklm16.encoding
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.bklm16
-	-$(RUN) python tools/encode.py data/$* cw &> results/$*.cw.encoding
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.cw
+	-$(RUN) python tools/encode.py data/$* cd05 &> results/$*.cd05.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd05.new_inf
+	-$(RUN) python tools/encode.py data/$* cd06 &> results/$*.cd06.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd06.new_inf
+	-$(RUN) python tools/encode.py data/$* d02 &> results/$*.d02.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.d02.new_inf
+	-$(RUN) python tools/encode.py data/$* sbk05 &> results/$*.sbk05.new_enc
+	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.sbk05.new_inf
+	-$(RUN) python tools/encode.py data/$* bklm16 &> results/$*.bklm16.new_enc
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.bklm16.new_inf
+	-$(RUN) python tools/encode.py data/$* cw &> results/$*.cw.new_enc
+	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.cw.new_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) cd05 &> results/$*.cd05.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd05.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) cd06 &> results/$*.cd06.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd06.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) d02 &> results/$*.d02.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.d02.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) sbk05 &> results/$*.sbk05.old_enc
+	-$(RUN) $(CACHET) data/$*.$(1).cnf &> results/$*.sbk05.old_inf
+	-$(RUN) python tools/encode.py -l data/$*.$(1) bklm16 &> results/$*.bklm16.old_enc
+	-$(RUN) python tools/bklm16_wrapper.py data/$*.$(1) &> results/$*.bklm16.old_inf
 
 data/%/DNE_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,dne)
