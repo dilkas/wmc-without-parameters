@@ -4,25 +4,28 @@ import os
 def parse(filename):
     d = {}
     with open(filename) as f:
-        if filename.endswith('.encoding'):
-            for line in f:
-                stripped = line.lstrip()
-                if stripped.startswith('Elapsed'):
-                    time_str = line.split()[7]
-                    colon_i = time_str.index(':')
-                    d['time'] = (60 * int(time_str[:colon_i]) +
-                                 float(time_str[colon_i+1:]))
-                if stripped.startswith('Maximum'):
-                    d['memory'] = line.split()[5]
-        else:
-            for line in f:
-                if line.startswith('* modelCount'):
-                    d['answer'] = line.split()[2]
-                if line.startswith('* seconds'):
-                    d['time'] = line.split()[2]
-                if line.lstrip().startswith('Maximum'):
-                    d['memory'] = line.split()[5]
-        return d
+        lines = f.read().splitlines()
+
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith('Elapsed'):
+            # Time
+            time_str = line.split()[7]
+            colon_i = time_str.index(':')
+            d['time'] = (60 * int(time_str[:colon_i]) +
+                         float(time_str[colon_i+1:]))
+        elif stripped.startswith('Maximum'):
+            d['memory'] = line.split()[5] # Memory
+        elif filename.endswith('.new_inf') and line.startswith('* modelCount'):
+            d['answer'] = line.split()[2] # ADDMC answer
+        elif filename.endswith('.bklm16.old_inf') and line[0].isdigit():
+            d['answer'] = line # Query-DNNF answer
+        elif (filename.endswith('.sbk05.old_inf') and
+              line.startswith('Satisfying')):
+            d['answer'] = line.split()[2] # Cachet answer
+        elif filename.endswith('.old_inf') and line.startswith('Pr(e) ='):
+            d['answer'] = line.split()[2] # Ace evaluation answer
+    return d
 
 def parse_dir(directory, additional_data = {}):
     data = []
@@ -34,12 +37,8 @@ def parse_dir(directory, additional_data = {}):
                                              'cw', 'sbk05', 'd02']
                     else parts[0] + '.' + parts[1])
         d['instance'] = directory + instance
-        if filename.endswith('.encoding'):
-            filename = filename[:-len('.encoding')]
-            d['stage'] = 'encoding'
-        else:
-            d['stage'] = 'inference'
-        d['encoding'] = filename[filename.rindex('.')+1:]
+        d['stage'] = parts[-1]
+        d['encoding'] = parts[-2]
         data.append(d)
     return data
 
@@ -61,6 +60,7 @@ fieldnames = set()
 for d in data:
     fieldnames.update(d.keys())
 
+# TODO: can I remove the listing of fieldnames below and use the variable instead?
 with open('results.csv', 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=['dataset', 'stage', 'encoding',
                                                  'time', 'answer', 'instance',

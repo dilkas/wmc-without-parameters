@@ -7,14 +7,16 @@ require(tikzDevice)
 require(ggpubr)
 
 TIMEOUT <- 1
-data <- read.csv("results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results.csv", header = TRUE, sep = ",")
 data$time[data$time > TIMEOUT] <- TIMEOUT
 data$time[is.na(data$time)] <- TIMEOUT
 data$memory[is.na(data$memory)] <- max(data$memory, na.rm = TRUE)
 
-# Choose one: encoding or inference
-df0 <- data[data$stage == "encoding", !colnames(data) %in% c("stage")]
-df0 <- data[data$stage == "inference", !colnames(data) %in% c("stage")]
+# Choose one: (encoding or inference) and (old or new)
+df0 <- data[data$stage == "old_enc", !colnames(data) %in% c("stage")]
+df0 <- data[data$stage == "new_enc", !colnames(data) %in% c("stage")]
+df0 <- data[data$stage == "old_inf", !colnames(data) %in% c("stage")]
+df0 <- data[data$stage == "new_inf", !colnames(data) %in% c("stage")]
 
 df <- dcast(data = df0, formula = instance + dataset ~ encoding,
             fun.aggregate = sum,
