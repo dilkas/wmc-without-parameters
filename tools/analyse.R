@@ -5,6 +5,7 @@ require(maditr)
 require(purrr)
 require(tikzDevice)
 require(ggpubr)
+require(tidyr)
 
 TIMEOUT <- 1
 data <- read.csv("../results.csv", header = TRUE, sep = ",")
@@ -42,23 +43,33 @@ df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
 df %>% group_by(df$dataset) %>% tally()
 
 # Where answers don't match
-interesting <- df[abs(df$answer_cw - df$answer_sbk05) > 0.01,]
+interesting <- df[abs(df$answer_d02 - df$answer_bklm16) > 0.01,]
 
+# Number of instances
 nrow(df)
 
 # Unique
-sum(is.na(df$answer_cw) & !is.na(df$answer_cd05) & is.na(df$answer_cd06) &
-      is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cd05
-sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & !is.na(df$answer_cd06) &
-      is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cd06
-sum(!is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
-      is.na(df$answer_d02) & is.na(df$answer_sbk05)) # cw
-sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
-      !is.na(df$answer_d02) & is.na(df$answer_sbk05)) # d02
-sum(is.na(df$answer_cw) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
-      is.na(df$answer_d02) & !is.na(df$answer_sbk05)) # sbk05
+# bklm16
+sum(!is.na(df$answer_bklm16) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      is.na(df$answer_cw) & is.na(df$answer_d02) & is.na(df$answer_sbk05))
+# cd05
+sum(is.na(df$answer_bklm16) & !is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      is.na(df$answer_cw) & is.na(df$answer_d02) & is.na(df$answer_sbk05))
+# cd06
+sum(is.na(df$answer_bklm16) & is.na(df$answer_cd05) & !is.na(df$answer_cd06) &
+      is.na(df$answer_cw) & is.na(df$answer_d02) & is.na(df$answer_sbk05))
+# cw
+sum(is.na(df$answer_bklm16) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      !is.na(df$answer_cw) & is.na(df$answer_d02) & is.na(df$answer_sbk05))
+# d02
+sum(is.na(df$answer_bklm16) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      is.na(df$answer_cw) & !is.na(df$answer_d02) & is.na(df$answer_sbk05))
+# sbk05
+sum(is.na(df$answer_bklm16) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
+      is.na(df$answer_cw) & is.na(df$answer_d02) & !is.na(df$answer_sbk05))
 
 # Fastest
+sum(!is.na(df$answer_bklm16) & abs(df$time_bklm16 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_cd05) & abs(df$time_cd05 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_cd06) & abs(df$time_cd06 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_cw) & abs(df$time_cw - df$time_min) < 1e-5)
@@ -66,6 +77,7 @@ sum(!is.na(df$answer_d02) & abs(df$time_d02 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_sbk05) & abs(df$time_sbk05 - df$time_min) < 1e-5)
 
 # Solved
+sum(!is.na(df$answer_bklm16))
 sum(!is.na(df$answer_cd05))
 sum(!is.na(df$answer_cd06))
 sum(!is.na(df$answer_cw))
@@ -104,20 +116,16 @@ tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
-# Scatter plot: for a specific data set
-ggplot(df[df$dataset == "2005-PGM"], aes(x = time_cw, y = time_sbk05)) +
-  geom_point() +
-  geom_abline(slope = 1, intercept = 0) +
-  xlim(0, TIMEOUT) +
-  ylim(0, TIMEOUT)
-
 # Cumulative plot
+# TODO: parameters: 'encoding', names of encodings, df0
+bklm16.times <- unique(df0$time[df0$encoding == "bklm16"])
 cd05.times <- unique(df0$time[df0$encoding == "cd05"])
 cd06.times <- unique(df0$time[df0$encoding == "cd06"])
 d02.times <- unique(df0$time[df0$encoding == "d02"])
 cw.times <- unique(df0$time[df0$encoding == "cw"])
 sbk05.times <- unique(df0$time[df0$encoding == "sbk05"])
 cumulative <- rbind(
+  cbind(bklm16.times, "bklm16", unlist(bklm16.times %>% map(function(x) sum(df0$time[df0$encoding == "bklm16"] <= x)))),
   cbind(cd05.times, "cd05", unlist(cd05.times %>% map(function(x) sum(df0$time[df0$encoding == "cd05"] <= x)))),
   cbind(cd06.times, "cd06", unlist(cd06.times %>% map(function(x) sum(df0$time[df0$encoding == "cd06"] <= x)))),
   cbind(d02.times, "d02", unlist(d02.times %>% map(function(x) sum(df0$time[df0$encoding == "d02"] <= x)))),
@@ -137,13 +145,14 @@ ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
   xlab("Time (s)") +
   ylab("Instances solved") +
   scale_colour_brewer(palette = "Dark2") +
-  scale_linetype_manual(breaks = c("\\texttt{cd05}", "\\texttt{cd06}", "\\texttt{cw}", "\\texttt{d02}",
-                                   "\\texttt{sbk05}"), values = c(4, 3, 1, 5, 2)) +
+  scale_linetype_manual(breaks = c("\\texttt{bklm16}", "\\texttt{cd05}", "\\texttt{cd06}", "\\texttt{cw}", "\\texttt{d02}",
+                                   "\\texttt{sbk05}"), values = c(6, 4, 3, 1, 5, 2)) +
   annotation_logticks(sides = "b", colour = "#989898") +
   theme_light() +
   labs(color = "Encoding", linetype = "Encoding")
 dev.off()
 
+# Numerical
 max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
 interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{cw}"],
                         y = cumulative$time[cumulative$encoding == "\\texttt{cw}"],

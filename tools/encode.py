@@ -13,7 +13,7 @@ ACE_LEGACY_BASIC = ['deps/ace/compile', '-forceC2d']
 ACE_LEGACY = {'d02': ACE_LEGACY_BASIC + ['-d02', '-dtHypergraph', '3'],
               'cd05': ACE_LEGACY_BASIC + ['-cd05', '-dtBnOrder'],
               'cd06': ACE_LEGACY_BASIC + ['-cd06', '-dtBnOrder']}
-BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-implicit', '-s', 'prime']
+BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
 
 # Regular expressions

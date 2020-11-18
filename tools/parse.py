@@ -1,5 +1,6 @@
 import csv
 import os
+import re
 
 def parse(filename):
     d = {}
@@ -24,7 +25,8 @@ def parse(filename):
               line.startswith('Satisfying')):
             d['answer'] = line.split()[2] # Cachet answer
         elif filename.endswith('.old_inf') and line.startswith('Pr(e) ='):
-            d['answer'] = line.split()[2] # Ace evaluation answer
+            # Ace evaluation answer
+            d['answer'] = re.match(r'[\d\.]+', line.split()[2]).group(0)
     return d
 
 def parse_dir(directory, additional_data = {}):
