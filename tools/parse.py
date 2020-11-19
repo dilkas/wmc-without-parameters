@@ -39,7 +39,9 @@ def parse_dir(directory, additional_data = {}):
                                              'cw', 'sbk05', 'd02']
                     else parts[0] + '.' + parts[1])
         d['instance'] = directory + instance
-        d['stage'] = parts[-1]
+        novelty, stage = parts[-1].split('_')
+        d['novelty'] = novelty
+        d['stage'] = 'encoding' if stage == 'enc' else 'inference'
         d['encoding'] = parts[-2]
         data.append(d)
     return data
@@ -62,11 +64,8 @@ fieldnames = set()
 for d in data:
     fieldnames.update(d.keys())
 
-# TODO: can I remove the listing of fieldnames below and use the variable instead?
 with open('results.csv', 'w', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=['dataset', 'stage', 'encoding',
-                                                 'time', 'answer', 'instance',
-                                                 'memory'])
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
     for d in data:
         writer.writerow(d)
