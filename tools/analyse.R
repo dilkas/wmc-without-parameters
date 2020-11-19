@@ -117,39 +117,46 @@ ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Cumulative plot
-# TODO: parameters: 'encoding', names of encodings, df0
-bklm16.times <- unique(df0$time[df0$encoding == "bklm16"])
-cd05.times <- unique(df0$time[df0$encoding == "cd05"])
-cd06.times <- unique(df0$time[df0$encoding == "cd06"])
-d02.times <- unique(df0$time[df0$encoding == "d02"])
-cw.times <- unique(df0$time[df0$encoding == "cw"])
-sbk05.times <- unique(df0$time[df0$encoding == "sbk05"])
-cumulative <- rbind(
-  cbind(bklm16.times, "bklm16", unlist(bklm16.times %>% map(function(x) sum(df0$time[df0$encoding == "bklm16"] <= x)))),
-  cbind(cd05.times, "cd05", unlist(cd05.times %>% map(function(x) sum(df0$time[df0$encoding == "cd05"] <= x)))),
-  cbind(cd06.times, "cd06", unlist(cd06.times %>% map(function(x) sum(df0$time[df0$encoding == "cd06"] <= x)))),
-  cbind(d02.times, "d02", unlist(d02.times %>% map(function(x) sum(df0$time[df0$encoding == "d02"] <= x)))),
-  cbind(cw.times, "cw", unlist(cw.times %>% map(function(x) sum(df0$time[df0$encoding == "cw"] <= x)))),
-  cbind(sbk05.times, "sbk05", unlist(sbk05.times %>% map(function(x) sum(df0$time[df0$encoding == "sbk05"] <= x)))))
-cumulative <- as.data.frame(cumulative)
-names(cumulative) <- c("time", "encoding", "count")
-cumulative$encoding <- as.factor(paste("\\texttt{", cumulative$encoding, "}", sep = ""))
-cumulative$time <- as.numeric(cumulative$time)
-cumulative$count <- as.numeric(cumulative$count)
-cumulative <- cumulative[cumulative$time < TIMEOUT, ]
+cumulative_plot <- function(column_name, pretty_column_name, column_values,
+                            linetypes) {
+  times <- vector(mode = "list", length = length(column_values))
+  names(times) <- column_values
+  for (value in column_values) {
+    times[[value]] <- unique(df0$time[df0[column_name] == value])
+  }
+  chunks <- vector(mode = "list", length = length(column_values))
+  names(chunks) <- column_values
+  for (value in column_values) {
+    chunks[[value]] <- cbind(times[[value]], value,
+                             unlist(times[[value]] %>%
+                                      map(function(x)
+                                        sum(df0$time[df0[column_name] == value]
+                                            <= x))))
+  }
+  cumulative <- as.data.frame(do.call(rbind, as.list(chunks)))
+  names(cumulative) <- c("time", column_name, "count")
+  cumulative[[column_name]] <- as.factor(paste("\\texttt{",
+                                               cumulative[[column_name]], "}",
+                                               sep = ""))
+  cumulative$time <- as.numeric(cumulative$time)
+  cumulative$count <- as.numeric(cumulative$count)
+  cumulative <- cumulative[cumulative$time < TIMEOUT, ]
+  ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
+    geom_line(aes(linetype = .data[[column_name]])) +
+    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
+    xlab("Time (s)") +
+    ylab("Instances solved") +
+    scale_colour_brewer(palette = "Dark2") +
+    scale_linetype_manual(breaks = map(column_values, function(x) paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
+    annotation_logticks(sides = "b", colour = "#989898") +
+    theme_light() +
+    labs(color = pretty_column_name, linetype = pretty_column_name)
+}
 
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
-ggplot(cumulative, aes(x = time, y = count, color = encoding)) +
-  geom_line(aes(linetype = encoding)) +
-  scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
-  xlab("Time (s)") +
-  ylab("Instances solved") +
-  scale_colour_brewer(palette = "Dark2") +
-  scale_linetype_manual(breaks = c("\\texttt{bklm16}", "\\texttt{cd05}", "\\texttt{cd06}", "\\texttt{cw}", "\\texttt{d02}",
-                                   "\\texttt{sbk05}"), values = c(6, 4, 3, 1, 5, 2)) +
-  annotation_logticks(sides = "b", colour = "#989898") +
-  theme_light() +
-  labs(color = "Encoding", linetype = "Encoding")
+cumulative <- cumulative_plot("encoding", "Encoding",
+                c("bklm16", "cd05", "cd06", "d02", "cw", "sbk05"),
+                c(6, 4, 3, 1, 5, 2))
 dev.off()
 
 # Numerical
