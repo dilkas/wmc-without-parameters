@@ -9,13 +9,18 @@ require(tidyr)
 
 TIMEOUT <- 4
 data <- read.csv("../results.csv", header = TRUE, sep = ",")
-data$time[data$time > TIMEOUT] <- TIMEOUT
-data$time[is.na(data$time)] <- TIMEOUT
-data$encoding <- paste(data$novelty, data$encoding, sep = "_")
-data <- subset(data, select = -c(novelty))
+min.time <- min(data$time[data$time > 0])
+data$time[data$time == 0] <- min.time
+
+data2 <- data
+data2$encoding <- paste(data2$novelty, data2$encoding, sep = "_")
+data2 <- subset(data2, select = -c(novelty))
+
+data$stage[data$stage == "encoding"] <- "time_encoding"
+data$stage[data$stage == "inference"] <- "time_inference"
 
 # Add encoding and inference times
-df0 <- dcast(data = data, formula = instance + dataset + encoding ~ .,
+df0 <- dcast(data = data2, formula = instance + dataset + encoding ~ .,
              fun = list(function (x) ifelse(is.na(x[1]), x[2], x[1]), sum),
              value.var = list("answer", "time"))
 setnames(df0, old = c("answer_function", "time_sum"), new = c("answer", "time"))
@@ -25,7 +30,6 @@ df <- dcast(data = df0, formula = instance + dataset ~ encoding,
             value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
-
 df$major.dataset <- "Non-binary"
 df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
 df$major.dataset[grepl("Grid", df$instance, fixed = TRUE)] <- "Grid"
@@ -35,6 +39,18 @@ df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
+
+df_old <- dcast(data = data[data$novelty == "old",], formula = instance + dataset + encoding ~ stage,
+            fun.aggregate = sum,
+            value.var = "time")
+time_columns <- Filter(function(x) startsWith(x, "time_"), names(df_old))
+df_old$time_min <- as.numeric(apply(df_old, 1, function (row) min(row[time_columns])))
+
+df_new <- dcast(data = data[data$novelty == "new",], formula = instance + dataset + encoding ~ stage,
+            fun.aggregate = sum,
+            value.var = "time")
+time_columns <- Filter(function(x) startsWith(x, "time_"), names(df_new))
+df_new$time_min <- as.numeric(apply(df_new, 1, function (row) min(row[time_columns])))
 
 # ============ Numerical investigations ================
 
@@ -85,34 +101,44 @@ sum(!is.na(df$answer_sbk05))
 # ================ Plots ==========================
 
 # Scatter plot
-min.time <- min(df0$time)
-scatter_plot <- function(x_column, y_column, x_name, y_name) {
+scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby, groupby_name) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
-                                      col = major.dataset,
-                                      shape = major.dataset)) +
+                                      col = .data[[groupby]],
+                                      shape = .data[[groupby]])) +
     geom_point(alpha = 0.5, size = 1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
-    scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT),
-                       breaks = c(0.1, 10, 1000),
-                       labels = c("0.1", "10", "1000")) +
-    scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT),
-                       breaks = c(0.1, 10, 1000),
-                       labels = c("0.1", "10", "1000")) +
-    ylab(paste0("\\texttt{", y_name, "} time (s)")) +
-    xlab(paste0("\\texttt{", x_name, "} time (s)")) +
-    scale_color_brewer(palette = "Dark2", name = "Data set") +
+    scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
+#                       breaks = c(0.1, 10, 1000),
+#                       labels = c("0.1", "10", "1000")) +
+    scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
+#                       breaks = c(0.1, 10, 1000),
+#                       labels = c("0.1", "10", "1000")) +
+    ylab(y_name) +
+    xlab(x_name) +
+    scale_color_brewer(palette = "Dark2", name = groupby_name) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
-    labs(color = "Data set", shape = "Data set")
+    labs(color = groupby_name, shape = groupby_name)
 }
 
-p1 <- scatter_plot("time_new_d02", "time_new_cw", "d02", "cw")
-p2 <- scatter_plot("time_new_bklm16", "time_new_cw", "bklm16", "cw")
+# Compare CW with a couple other encodings
+p1 <- scatter_plot(df, "time_new_d02", "time_new_cw", "\\texttt{d02} time (s)",
+                   "\\texttt{cw} time (s)", "major.dataset", "Data set")
+p2 <- scatter_plot(df, "time_new_bklm16", "time_new_cw",
+                   "\\texttt{bklm16} time (s)", "\\texttt{cw} time (s)",
+                   "major.dataset", "Data set")
+
+# Compare encoding and inference time for old and new setups
+# TODO: export these plots separately (to add subcaptions)
+p1 <- scatter_plot(df_old, "time_encoding", "time_inference",
+                   "Encoding time (s)", "Inference (s)", "encoding", "Encoding")
+p2 <- scatter_plot(df_new, "time_encoding", "time_inference",
+                   "Encoding time (s)", "Inference (s)", "encoding", "Encoding")
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
-ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "right")
+ggarrange(p2, p1, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Cumulative plot
