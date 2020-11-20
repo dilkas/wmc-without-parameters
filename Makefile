@@ -13,8 +13,8 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2004-pgm/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
-#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/DQMR/qmr-100/*.dne))
-all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
+all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/DQMR/qmr-100/*.dne))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-60/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-70/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Grid/*/*.dne))
@@ -74,16 +74,16 @@ data/%/WITHOUT_EVIDENCE:
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.bklm16.new_inf
 	-$(RUN) python tools/encode.py data/$* cw &> results/$*.cw.new_enc
 	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.cw.new_inf
-	-$(RUN) python tools/encode.py -l data/$*.$(1) cd05 &> results/$*.cd05.old_enc
-	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd05.old_inf
-	-$(RUN) python tools/encode.py -l data/$*.$(1) cd06 &> results/$*.cd06.old_enc
-	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd06.old_inf
-	-$(RUN) python tools/encode.py -l data/$*.$(1) d02 &> results/$*.d02.old_enc
-	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.d02.old_inf
-	-$(RUN) python tools/encode.py -l data/$*.$(1) sbk05 &> results/$*.sbk05.old_enc
-	-$(RUN) $(CACHET) data/$*.$(1).cnf &> results/$*.sbk05.old_inf
-	-$(RUN) python tools/encode.py -l data/$*.$(1) bklm16 &> results/$*.bklm16.old_enc
-	-$(RUN) python tools/bklm16_wrapper.py data/$*.$(1) &> results/$*.bklm16.old_inf
+	-$(RUN) python tools/encode.py -l data/$* cd05 &> results/$*.cd05.old_enc
+	-$(RUN) $(EVALUATE) data/$* &> results/$*.cd05.old_inf
+	-$(RUN) python tools/encode.py -l data/$* cd06 &> results/$*.cd06.old_enc
+	-$(RUN) $(EVALUATE) data/$* &> results/$*.cd06.old_inf
+	-$(RUN) python tools/encode.py -l data/$* d02 &> results/$*.d02.old_enc
+	-$(RUN) $(EVALUATE) data/$* &> results/$*.d02.old_inf
+	-$(RUN) python tools/encode.py -l data/$* sbk05 &> results/$*.sbk05.old_enc
+	-$(RUN) $(CACHET) data/$*.cnf &> results/$*.sbk05.old_inf
+	-$(RUN) python tools/encode.py -l data/$* bklm16 &> results/$*.bklm16.old_enc
+	-$(RUN) python tools/bklm16_wrapper.py data/$* &> results/$*.bklm16.old_inf
 
 data/%/DNE_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,dne)
