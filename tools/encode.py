@@ -2,6 +2,7 @@ import argparse
 import itertools
 import os
 import re
+import resource
 import subprocess
 import xml.etree.ElementTree as ET
 from fractions import Fraction
@@ -248,22 +249,31 @@ def new_evidence_file(network_filename, variable, value):
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n<instantiation><inst id="{}" value="{}"/></instantiation>'.format(variable, value))
     return new_filename
 
-def encode_using_ace(network, evidence_file, encoding, legacy_mode):
+def run(args, command):
+    if args.memory:
+        subprocess.run(command, preexec_fn=lambda:
+                       resource.setrlimit(resource.RLIMIT_AS,
+                                          (int(args.memory) * 1024,
+                                           resource.RLIM_INFINITY)))
+    else:
+        subprocess.run(command)
+
+def encode_using_ace(args):
     # Identify the goal
-    with open(network, encoding='ISO-8859-1') as f:
+    with open(args.network, encoding='ISO-8859-1') as f:
         text = f.read()
-    mode = get_format(network)
+    mode = get_format(args.network)
     goal_node, goal_value_index, goal_value = identify_goal(text, mode)
 
-    if legacy_mode and encoding != 'sbk05':
-        subprocess.run(ACE_LEGACY[encoding] +
-                       [network, '-e',
-                        new_evidence_file(network, goal_node, goal_value)
-                        if evidence_file_is_empty(evidence_file)
-                        else evidence_file])
+    if args.legacy and args.encoding != 'sbk05':
+        run(args, ACE_LEGACY[args.encoding] +
+            [args.network, '-e',
+             new_evidence_file(args.network, goal_node, goal_value)
+             if evidence_file_is_empty(args.evidence)
+             else args.evidence])
         return
 
-    subprocess.run(ACE + ['-' + encoding, network])
+    run(args, ACE + ['-' + args.encoding, args.network])
 
     # Make a variable -> list of values map
     values = {node.group(1) : re.split(STATE_SPLITTER_RE[mode],
@@ -275,7 +285,7 @@ def encode_using_ace(network, evidence_file, encoding, legacy_mode):
     # (and convert the goal to a literal)
     weights = {}
     max_literal = 0
-    for line in open(network + '.lmap'):
+    for line in open(args.network + '.lmap'):
         if line.startswith('cc$I') or line.startswith('cc$C') or line.startswith('cc$P'):
             components = line.split('$')
             literal = int(components[2])
@@ -291,10 +301,10 @@ def encode_using_ace(network, evidence_file, encoding, legacy_mode):
                     goal_literal = literal
 
     evidence = ('{} 0\n'.format(goal_literal)
-                if evidence_file_is_empty(evidence_file)
-                else '\n'.join(encode_inst_evidence(evidence_file)))
+                if evidence_file_is_empty(args.evidence)
+                else '\n'.join(encode_inst_evidence(args.evidence)))
 
-    if legacy_mode:
+    if args.legacy:
         weight_encoding = '\n'.join('w {} {}'.format(
             literal, -1 if abs(float(weights[literal]) - 1) < EPSILON
             else weights[literal]) for literal in range(1, max_literal + 1))
@@ -303,23 +313,23 @@ def encode_using_ace(network, evidence_file, encoding, legacy_mode):
             l for literal in range(1, max_literal + 1)
             for l in [weights[literal], weights[-literal]])
 
-    with open(network + '.cnf', 'a') as f:
+    with open(args.network + '.cnf', 'a') as f:
         f.write(evidence + '\n' + weight_encoding + '\n')
 
-def encode_using_bn2cnf(network_filename, evidence_file, legacy_mode):
+def encode_using_bn2cnf(args):
     # Translate the Bayesian network to the UAI format and run the encoder
-    encoded_clauses, variables = parse_network(network_filename, True)
-    uai_filename = network_filename + '.uai'
-    cnf_filename = network_filename + '.cnf'
+    encoded_clauses, variables = parse_network(args.network, True)
+    uai_filename = args.network + '.uai'
+    cnf_filename = args.network + '.cnf'
     weights_filename = uai_filename + '.weights'
     variables_filename = uai_filename + '.variables'
     with open(uai_filename, 'w') as f:
         f.write('\n'.join(encoded_clauses) + '\n')
-    subprocess.run(BN2CNF + ['-i', uai_filename, '-o', cnf_filename,
-                             '-w', weights_filename, '-v', variables_filename])
+    run(args, BN2CNF + ['-i', uai_filename, '-o', cnf_filename,
+                        '-w', weights_filename, '-v', variables_filename])
 
     # Translate weights to the right format
-    if legacy_mode:
+    if args.legacy:
         encoded_weights = []
     else:
         positive_weights = {}
@@ -355,14 +365,14 @@ def encode_using_bn2cnf(network_filename, evidence_file, legacy_mode):
             indicators[(int(variable), value)] = [l + ' 0' for l in values[value]]
 
     # Incorporate evidence (or select a goal)
-    if not evidence_file_is_empty(evidence_file):
-        encoded_evidence = encode_inst_evidence(evidence_file, indicators,
+    if not evidence_file_is_empty(args.evidence):
+        encoded_evidence = encode_inst_evidence(args.evidence, indicators,
                                                 variables)
     else:
         # Identify the goal formula
-        with open(network_filename) as f:
+        with open(args.network) as f:
             text = f.read()
-        goal_variable_string, goal_value, _ = identify_goal(text, get_format(network_filename))
+        goal_variable_string, goal_value, _ = identify_goal(text, get_format(args.network))
         goal_variable = variables.index(goal_variable_string)
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
@@ -378,8 +388,8 @@ def encode_using_bn2cnf(network_filename, evidence_file, legacy_mode):
     with open(cnf_filename, 'w') as f:
         f.write('\n'.join(lines + encoded_weights + encoded_evidence) + '\n')
 
-    if legacy_mode:
-        subprocess.run(C2D + ['-in', cnf_filename])
+    if args.legacy:
+        run(args, C2D + ['-in', cnf_filename])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -387,11 +397,12 @@ if __name__ == '__main__':
     parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
     parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'd02', 'sbk05'], help='choose a WMC encoding')
     parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')
-    parser.add_argument('-l', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
+    parser.add_argument('-l', dest='legacy', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
+    parser.add_argument('-m', dest='memory', help="the maximum amount of virtual memory available to underlying encoders (in kiB)")
     args = parser.parse_args()
     if args.encoding == 'cw':
         encode(args.network, args.evidence)
     elif args.encoding == 'bklm16':
-        encode_using_bn2cnf(args.network, args.evidence, args.l)
+        encode_using_bn2cnf(args)
     else:
-        encode_using_ace(args.network, args.evidence, args.encoding, args.l)
+        encode_using_ace(args)
