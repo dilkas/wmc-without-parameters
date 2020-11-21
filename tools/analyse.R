@@ -7,25 +7,28 @@ require(tikzDevice)
 require(ggpubr)
 require(tidyr)
 
-TIMEOUT <- 4
+TIMEOUT <- 5
 data <- read.csv("../results.csv", header = TRUE, sep = ",")
-min.time <- min(data$time[data$time > 0])
-data$time[data$time == 0] <- min.time
+min.time <- min(min(data$encoding_time[data$encoding_time > 0]),
+                min(data$inference_time[data$inference_time > 0]))
+data$encoding_time[data$encoding_time == 0] <- min.time
+data$inference_time[data$inference_time == 0] <- min.time
+data$answer[data$encoding_time >= TIMEOUT] <- NA
+data$answer[data$inference_time >= TIMEOUT] <- NA
+data$encoding_time[is.na(data$answer)] <- TIMEOUT
+data$inference_time[is.na(data$answer)] <- TIMEOUT
 
-data2 <- data
-data2$encoding <- paste(data2$novelty, data2$encoding, sep = "_")
-data2 <- subset(data2, select = -c(novelty))
-
-data$stage[data$stage == "encoding"] <- "time_encoding"
-data$stage[data$stage == "inference"] <- "time_inference"
+# Merge 'novelty' and 'encoding' columns
+data_merged <- data
+data_merged$encoding <- paste(data_merged$novelty, data_merged$encoding, sep = "_")
+data_merged <- subset(data_merged, select = -c(novelty))
 
 # Add encoding and inference times
-df0 <- dcast(data = data2, formula = instance + dataset + encoding ~ .,
-             fun = list(function (x) ifelse(is.na(x[1]), x[2], x[1]), sum),
-             value.var = list("answer", "time"))
-setnames(df0, old = c("answer_function", "time_sum"), new = c("answer", "time"))
+data_sum <- data_merged
+data_sum$time <- data_sum$encoding_time + data_sum$inference_time
+data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
-df <- dcast(data = df0, formula = instance + dataset ~ encoding,
+df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = sum,
             value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
@@ -39,18 +42,6 @@ df$major.dataset[grepl("fs-", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
-
-df_old <- dcast(data = data[data$novelty == "old",], formula = instance + dataset + encoding ~ stage,
-            fun.aggregate = sum,
-            value.var = "time")
-time_columns <- Filter(function(x) startsWith(x, "time_"), names(df_old))
-df_old$time_min <- as.numeric(apply(df_old, 1, function (row) min(row[time_columns])))
-
-df_new <- dcast(data = data[data$novelty == "new",], formula = instance + dataset + encoding ~ stage,
-            fun.aggregate = sum,
-            value.var = "time")
-time_columns <- Filter(function(x) startsWith(x, "time_"), names(df_new))
-df_new$time_min <- as.numeric(apply(df_new, 1, function (row) min(row[time_columns])))
 
 # ============ Numerical investigations ================
 
@@ -101,7 +92,8 @@ sum(!is.na(df$answer_sbk05))
 # ================ Plots ==========================
 
 # Scatter plot
-scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby, groupby_name) {
+scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
+                         groupby_name) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
                                       col = .data[[groupby]],
@@ -123,7 +115,8 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby, groupb
     labs(color = groupby_name, shape = groupby_name)
 }
 
-# Compare CW with a couple other encodings
+# Compare CW with other encodings
+# TODO: Need to adjust limits (perhaps to the max of total time)
 p1 <- scatter_plot(df, "time_new_d02", "time_new_cw", "\\texttt{d02} time (s)",
                    "\\texttt{cw} time (s)", "major.dataset", "Data set")
 p2 <- scatter_plot(df, "time_new_bklm16", "time_new_cw",
@@ -132,10 +125,10 @@ p2 <- scatter_plot(df, "time_new_bklm16", "time_new_cw",
 
 # Compare encoding and inference time for old and new setups
 # TODO: export these plots separately (to add subcaptions)
-p1 <- scatter_plot(df_old, "time_encoding", "time_inference",
-                   "Encoding time (s)", "Inference (s)", "encoding", "Encoding")
-p2 <- scatter_plot(df_new, "time_encoding", "time_inference",
-                   "Encoding time (s)", "Inference (s)", "encoding", "Encoding")
+p1 <- scatter_plot(data[data$novelty == "old",], "encoding_time", "inference_time",
+                   "Encoding time (s)", "Inference time (s)", "encoding", "Encoding")
+p2 <- scatter_plot(data[data$novelty == "new",], "encoding_time", "inference_time",
+                   "Encoding time (s)", "Inference time (s)", "encoding", "Encoding")
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 ggarrange(p2, p1, ncol = 2, common.legend = TRUE, legend = "right")
@@ -147,7 +140,7 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
   times <- vector(mode = "list", length = length(column_values))
   names(times) <- column_values
   for (value in column_values) {
-    times[[value]] <- unique(df0$time[df0[[column_name]] == value])
+    times[[value]] <- unique(data_sum$time[data_sum[[column_name]] == value])
   }
   chunks <- vector(mode = "list", length = length(column_values))
   names(chunks) <- column_values
@@ -155,7 +148,7 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
     chunks[[value]] <- cbind(times[[value]], value,
                              unlist(times[[value]] %>%
                                       map(function(x)
-                                        sum(df0$time[df0[[column_name]] == value]
+                                        sum(data_sum$time[data_sum[[column_name]] == value]
                                             <= x))))
   }
   cumulative <- as.data.frame(do.call(rbind, as.list(chunks)))
@@ -178,9 +171,10 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
     labs(color = pretty_column_name, linetype = pretty_column_name)
 }
 
+# TODO: 11 lines in one plot is too much
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot("encoding", "Encoding",
-                unique(df0$encoding),
+                unique(data_sum$encoding),
                 c(6, 4, 3, 1, 5, 2, 7, 8, 9, 10, 11))
 dev.off()
 
