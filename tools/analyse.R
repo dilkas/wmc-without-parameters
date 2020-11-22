@@ -93,17 +93,17 @@ sum(!is.na(df$answer_sbk05))
 
 # Scatter plot
 scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
-                         groupby_name) {
+                         groupby_name, max.time) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
                                       col = .data[[groupby]],
                                       shape = .data[[groupby]])) +
     geom_point(alpha = 0.5, size = 1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
-    scale_x_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
+    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time)) +
 #                       breaks = c(0.1, 10, 1000),
 #                       labels = c("0.1", "10", "1000")) +
-    scale_y_continuous(trans = log10_trans(), limits = c(min.time, TIMEOUT)) +
+    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time)) +
 #                       breaks = c(0.1, 10, 1000),
 #                       labels = c("0.1", "10", "1000")) +
     ylab(y_name) +
@@ -116,19 +116,21 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
 }
 
 # Compare CW with other encodings
-# TODO: Need to adjust limits (perhaps to the max of total time)
 p1 <- scatter_plot(df, "time_new_d02", "time_new_cw", "\\texttt{d02} time (s)",
-                   "\\texttt{cw} time (s)", "major.dataset", "Data set")
+                   "\\texttt{cw} time (s)", "major.dataset", "Data set",
+                   2 * TIMEOUT)
 p2 <- scatter_plot(df, "time_new_bklm16", "time_new_cw",
                    "\\texttt{bklm16} time (s)", "\\texttt{cw} time (s)",
-                   "major.dataset", "Data set")
+                   "major.dataset", "Data set", 2 * TIMEOUT)
 
 # Compare encoding and inference time for old and new setups
 # TODO: export these plots separately (to add subcaptions)
 p1 <- scatter_plot(data[data$novelty == "old",], "encoding_time", "inference_time",
-                   "Encoding time (s)", "Inference time (s)", "encoding", "Encoding")
+                   "Encoding time (s)", "Inference time (s)", "encoding",
+                   "Encoding", TIMEOUT)
 p2 <- scatter_plot(data[data$novelty == "new",], "encoding_time", "inference_time",
-                   "Encoding time (s)", "Inference time (s)", "encoding", "Encoding")
+                   "Encoding time (s)", "Inference time (s)", "encoding",
+                   "Encoding", TIMEOUT)
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 ggarrange(p2, p1, ncol = 2, common.legend = TRUE, legend = "right")
@@ -165,18 +167,41 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
     xlab("Time (s)") +
     ylab("Instances solved") +
 #    scale_colour_brewer(palette = "Dark2") +
-    scale_linetype_manual(breaks = map(column_values, function(x) paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
+    scale_linetype_manual(breaks = map(column_values, function(x)
+      paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
     theme_light() +
     labs(color = pretty_column_name, linetype = pretty_column_name)
 }
 
-# TODO: 11 lines in one plot is too much
+# TODO: 11 lines in one plot is too much. Should I split it into two?
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot("encoding", "Encoding",
                 unique(data_sum$encoding),
                 c(6, 4, 3, 1, 5, 2, 7, 8, 9, 10, 11))
 dev.off()
+
+# Stacked bar plots comparing encoding and inference time
+data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
+                    measure = c("encoding_time", "inference_time")) %>%
+  group_by(encoding, novelty, variable) %>%
+  summarize(time = mean(value), lower = mean(value) - 0.1 * sd(value),
+            upper = mean(value) + 0.1 * sd(value))
+data_melted$lower[data_melted$variable =="inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
+data_melted$upper[data_melted$variable =="inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
+data_melted$novelty <- factor(data_melted$novelty, levels = c("old", "new"))
+novelties <- c("Originally", "With ADDMC")
+names(novelties) <- c("old", "new")
+
+ggplot(data_melted, aes(encoding, time, fill = variable)) +
+  geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
+  facet_grid(cols = vars(novelty), labeller = labeller(novelty = novelties)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.3, position = "identity") +
+  theme_light() +
+  scale_fill_brewer(palette = "Dark2", labels = c("Encoding", "Inference")) +
+  xlab("") +
+  ylab("Time (s)") +
+  labs(fill = "")
 
 # Numerical stuff
 max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
