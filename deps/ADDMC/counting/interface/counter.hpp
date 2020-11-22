@@ -47,6 +47,7 @@ protected:
 
 public:
   double count(Formula &formula);
+  void printInfo(Formula &formula);
   MonolithicCounter(Cudd *mgr);
 };
 

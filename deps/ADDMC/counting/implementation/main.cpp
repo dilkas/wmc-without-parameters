@@ -18,6 +18,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
     (CLUSTERING_HEURISTIC_OPTION, "Clustering heuristic", cxxopts::value<std::string>()->default_value(std::to_string(DEFAULT_CLUSTERING_HEURISTIC_OPTION)))
     (CLUSTER_VAR_ORDER_OPTION, "Cluster variable order heuristic", cxxopts::value<std::string>()->default_value(std::to_string(DEFAULT_FORMULA_VAR_ORDERING_HEURISTIC_OPTION)))
     (DIAGRAM_VAR_ORDER_OPTION, "Diagram variable order heuristic", cxxopts::value<std::string>()->default_value(std::to_string(DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION)))
+    (STATS_OPTION, "Output statistics about the full ADD (instead of performing WMC)", cxxopts::value<bool>()->default_value("false"))
   ;
 
   cxxopts::ParseResult result = options.parse(argc, argv);
@@ -37,6 +38,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
       clusteringHeuristicOption = std::stoi(result[CLUSTERING_HEURISTIC_OPTION].as<std::string>());
       formulaVarOrderingHeuristicOption = std::stoi(result[CLUSTER_VAR_ORDER_OPTION].as<std::string>());
       addVarOrderingHeuristicOption = std::stoi(result[DIAGRAM_VAR_ORDER_OPTION].as<std::string>());
+      statsOption = result[STATS_OPTION].as<bool>();
       break;
     }
     default: {
@@ -100,7 +102,12 @@ void testing::test() {
 
 /* namespace solving **********************************************************/
 
-void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, ClusteringHeuristic clusteringHeuristic, VarOrderingHeuristic formulaVarOrderingHeuristic, bool inverseFormulaVarOrdering, VarOrderingHeuristic addVarOrderingHeuristic, bool inverseAddVarOrdering) {
+void solving::solveFile(const std::string &filePath, WeightFormat weightFormat,
+                        ClusteringHeuristic clusteringHeuristic,
+                        VarOrderingHeuristic formulaVarOrderingHeuristic,
+                        bool inverseFormulaVarOrdering,
+                        VarOrderingHeuristic addVarOrderingHeuristic,
+                        bool inverseAddVarOrdering, bool statsOption) {
   std::cout << "\nReading DIMACS CNF file:\n";
   util::printRow("cnfFilePath", filePath);
   Cudd mgr;
@@ -117,6 +124,12 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   util::printRow("inverseClusterVarOrder", inverseFormulaVarOrdering);
   util::printRow("diagramVarOrder", util::getVarOrderingHeuristicName(addVarOrderingHeuristic));
   util::printRow("inverseDiagramVarOrder", inverseAddVarOrdering);
+
+  if (statsOption) {
+    MonolithicCounter monolithicCounter(&mgr);
+    monolithicCounter.printInfo(formula);
+    return;
+  }
 
   std::cout << "\nCounting models...\n";
   double modelCount;
@@ -156,7 +169,12 @@ void solving::solveFile(const std::string &filePath, WeightFormat weightFormat, 
   util::printRow("modelCount", modelCount);
 }
 
-void solving::solveOptions(const std::string &filePath, int_t weightFormatOption, int_t clusteringHeuristicOption, int_t formulaVarOrderingHeuristicOption, int_t addVarOrderingHeuristicOption) {
+void solving::solveOptions(const std::string &filePath,
+                           int_t weightFormatOption,
+                           int_t clusteringHeuristicOption,
+                           int_t formulaVarOrderingHeuristicOption,
+                           int_t addVarOrderingHeuristicOption,
+                           bool statsOption) {
   WeightFormat weightFormat = WEIGHT_FORMAT_OPTIONS.at(weightFormatOption);
 
   ClusteringHeuristic clusteringHeuristic = CLUSTERING_HEURISTIC_OPTIONS.at(clusteringHeuristicOption);
@@ -167,7 +185,9 @@ void solving::solveOptions(const std::string &filePath, int_t weightFormatOption
   VarOrderingHeuristic addVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_OPTIONS.at(std::abs(addVarOrderingHeuristicOption));
   bool inverseAddVarOrdering = addVarOrderingHeuristicOption < 0;
 
-  solveFile(filePath, weightFormat, clusteringHeuristic, formulaVarOrderingHeuristic, inverseFormulaVarOrdering, addVarOrderingHeuristic, inverseAddVarOrdering);
+  solveFile(filePath, weightFormat, clusteringHeuristic,
+            formulaVarOrderingHeuristic, inverseFormulaVarOrdering,
+            addVarOrderingHeuristic, inverseAddVarOrdering, statsOption);
 }
 
 void solving::solveCommand(int argc, char *argv[]) {
@@ -179,7 +199,8 @@ void solving::solveCommand(int argc, char *argv[]) {
       optionDict.weightFormatOption,
       optionDict.clusteringHeuristicOption,
       optionDict.formulaVarOrderingHeuristicOption,
-      optionDict.addVarOrderingHeuristicOption
+      optionDict.addVarOrderingHeuristicOption,
+      optionDict.statsOption
     );
     util::printDuration(startTime);
   }

@@ -38,6 +38,7 @@ const std::string WEIGHT_FORMAT_OPTION = "wf";
 const std::string CLUSTERING_HEURISTIC_OPTION = "ch";
 const std::string CLUSTER_VAR_ORDER_OPTION = "cv";
 const std::string DIAGRAM_VAR_ORDER_OPTION = "dv";
+const std::string STATS_OPTION = "s";
 
 enum class WeightFormat { UNWEIGHTED, MINIC2D, CACHET, CONDITIONAL };
 const std::map<int_t, WeightFormat> WEIGHT_FORMAT_OPTIONS = {

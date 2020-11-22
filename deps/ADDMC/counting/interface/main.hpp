@@ -13,6 +13,7 @@ public:
   int_t clusteringHeuristicOption;
   int_t formulaVarOrderingHeuristicOption;
   int_t addVarOrderingHeuristicOption;
+  bool statsOption;
 
   OptionDict(int argc, char *argv[]);
   bool hasValidFilePath();
@@ -32,13 +33,15 @@ namespace solving {
     VarOrderingHeuristic formulaVarOrderingHeuristic,
     bool inverseFormulaVarOrdering,
     VarOrderingHeuristic addVarOrderingHeuristic,
-    bool inverseAddVarOrdering);
+    bool inverseAddVarOrdering,
+    bool statsOption);
   void solveOptions(
     const std::string &filePath,
     int_t weightFormatOption = DEFAULT_WEIGHT_FORMAT_OPTION,
     int_t clusteringHeuristicOption = DEFAULT_CLUSTERING_HEURISTIC_OPTION,
     int_t formulaVarOrderingHeuristicOption = DEFAULT_FORMULA_VAR_ORDERING_HEURISTIC_OPTION,
-    int_t addVarOrderingHeuristicOption = DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION);
+    int_t addVarOrderingHeuristicOption = DEFAULT_ADD_VAR_ORDERING_HEURISTIC_OPTION,
+    bool statsOption = false);
   void solveCommand(int argc, char *argv[]);
 }
 

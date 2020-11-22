@@ -117,12 +117,13 @@ double MonolithicCounter::count(Formula &formula) {
   ADD cnfAdd;
   setCnfAdd(cnfAdd, formula);
   writeDotFile(cnfAdd);
-  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL)
+  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL) {
     for (auto pair : formula.getWeights()) {
       writeDotFile(pair.second);
       cnfAdd *= pair.second;
       writeDotFile(cnfAdd);
     }
+  }
 
   SetT<int_t> support = util::getSupport(cnfAdd);
   for (int_t addVar : support) {
@@ -137,6 +138,18 @@ double MonolithicCounter::count(Formula &formula) {
   modelCount = util::adjustModelCount(modelCount, getFormulaVars(support), formula.getLiteralWeights(),
                                       formula.getWeightFormat());
   return modelCount;
+}
+
+void MonolithicCounter::printInfo(Formula &formula) {
+  orderAddVars(formula);
+  ADD cnfAdd;
+  setCnfAdd(cnfAdd, formula);
+  if (formula.getWeightFormat() == WeightFormat::CONDITIONAL)
+    for (auto pair : formula.getWeights())
+      cnfAdd *= pair.second;
+  std::cout << std::endl;
+  mgr->info();
+  std::cout << std::endl;
 }
 
 MonolithicCounter::MonolithicCounter(Cudd *mgr) {

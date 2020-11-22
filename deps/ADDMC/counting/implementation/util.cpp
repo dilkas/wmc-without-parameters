@@ -115,6 +115,8 @@ void util::printOptions() {
   printClusteringHeuristicOptions();
   printFormulaVarOrderingHeuristicOptions();
   printAddVarOrderingHeuristicOptions();
+  std::cout << "      -" << STATS_OPTION << "      ";
+  std::cout << "Output statistics about the full ADD (instead of performing WMC)" << "\n";
 }
 
 /* functions: CNF ***********************************************************/
