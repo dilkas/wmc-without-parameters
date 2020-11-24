@@ -7,7 +7,9 @@ import subprocess
 import xml.etree.ElementTree as ET
 from fractions import Fraction
 
-EPSILON = 0.000001
+EPSILON = 0.000001 # For comparing floating-point numbers
+SOFT_MEMORY_LIMIT = 0.95 # As a proportion of the hard limit
+
 # Software dependencies
 ACE = ['deps/ace/compile', '-encodeOnly', '-noEclause']
 ACE_LEGACY_BASIC = ['deps/ace/compile', '-forceC2d']
@@ -251,10 +253,10 @@ def new_evidence_file(network_filename, variable, value):
 
 def run(args, command):
     if args.memory:
+        mem = int(args.memory) * 1024**3
         subprocess.run(command, preexec_fn=lambda:
                        resource.setrlimit(resource.RLIMIT_AS,
-                                          (int(args.memory) * 1024,
-                                           resource.RLIM_INFINITY)))
+                                          (int(SOFT_MEMORY_LIMIT * mem), mem)))
     else:
         subprocess.run(command)
 
@@ -398,7 +400,7 @@ if __name__ == '__main__':
     parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'd02', 'sbk05'], help='choose a WMC encoding')
     parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')
     parser.add_argument('-l', dest='legacy', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
-    parser.add_argument('-m', dest='memory', help="the maximum amount of virtual memory available to underlying encoders (in kiB)")
+    parser.add_argument('-m', dest='memory', help="the maximum amount of virtual memory available to underlying encoders (in GiB)")
     args = parser.parse_args()
     if args.encoding == 'cw':
         encode(args.network, args.evidence)

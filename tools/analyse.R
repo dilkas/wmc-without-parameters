@@ -7,7 +7,7 @@ require(tikzDevice)
 require(ggpubr)
 require(tidyr)
 
-TIMEOUT <- 5
+TIMEOUT <- 1000
 data <- read.csv("../results.csv", header = TRUE, sep = ",")
 min.time <- min(min(data$encoding_time[data$encoding_time > 0]),
                 min(data$inference_time[data$inference_time > 0]))
