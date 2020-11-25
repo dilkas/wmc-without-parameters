@@ -162,8 +162,10 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < TIMEOUT, ]
   ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
-    geom_line(aes(linetype = .data[[column_name]])) +
+#    geom_line(aes(linetype = .data[[column_name]])) +
+    geom_line() +
 #    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
+    scale_x_continuous(trans = log10_trans()) +
     xlab("Time (s)") +
     ylab("Instances solved") +
 #    scale_colour_brewer(palette = "Dark2") +
