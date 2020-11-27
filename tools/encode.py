@@ -360,7 +360,6 @@ def encode_using_bn2cnf(args):
     with open(variables_filename) as f:
         text = f.read()
     for line in re.finditer(VARIABLE_MAP_RE, text):
-        #.group(1)[2:-2]
         variable = line.group(1)
         values = [v.split(', ') for v in line.group(2)[2:-2].split('][')]
         for value in range(len(values)):

@@ -132,6 +132,7 @@
 \end{abstract}
 
 \section{Introduction}
+% TODO: mention more recent papers in the introduction
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \cite{DBLP:conf/aaai/SangBK05}, has emerged
@@ -344,6 +345,8 @@ $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set $T$, we will write
 $\alpha(T)$ to mean $\alpha(T \cap X)$.
 
 \section{WMC as a Measure on a Boolean Algebra} \label{sec:wmc_as_measure}
+% TODO beginning of section 4: a weight function is *any* function; end the
+% paragraph with 'for all x \in U'.
 
 In this section, we introduce an alternative definition of WMC and demonstrate
 how it relates to the standard one. Let $U$ be a set. A \emph{measure} is a
@@ -415,7 +418,7 @@ Boolean algebra. This can be demonstrated with a simple example.
     \nu_a(\emptyset) \cdot \nu_b(\{b\}) &= 0.07 \\
     \nu_a(\emptyset) \cdot \nu_b(\emptyset) &= 0.03,
   \end{align*}
-  which has no solutions.
+  which has no solution.
 
   Alternatively, we can let $b$ depend on $a$ and consider weight functions
   $\nu_a\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ and $\nu_b\colon 2^{\{a, b\}}
@@ -814,7 +817,7 @@ which happen to be binary. We classify them into the following seven categories:
 \end{itemize*}
 We run ADDMC with each of the five encodings once on each Bayesian network.
 
-\begin{figure} % TODO: update
+\begin{figure}
   \centering
   \input{../paper1/cumulative.tex}%
   \caption{Cumulative number of instances solved by ADDMC over time using each
@@ -841,7 +844,7 @@ We run ADDMC with each of the five encodings once on each Bayesian network.
   \label{tbl:tallies}
 \end{table}
 
-\begin{figure*} % TODO: update
+\begin{figure*}
   \centering
   \input{../paper1/scatter.tex}%
   \caption{ADDMC inference time using \texttt{cw} compared to \texttt{d02}
@@ -849,6 +852,8 @@ We run ADDMC with each of the five encodings once on each Bayesian network.
   \label{fig:scatter}
 \end{figure*}
 
+% TODO: Either remove the 'conjecture' (preferable), or explain why those
+% instances perform worse
 According to the cumulative plot in \cref{fig:cumulative}, \texttt{cw} is
 consistently able to solve more instances with any given time limit than any
 other encoding, while the order of the remaining encodings from best to worst is
@@ -913,6 +918,7 @@ still encoded as clauses. As has been noted previously
 or one can be represented as clauses as well. Therefore, our work can be seen as
 proposing a middle ground between $\#\SAT{}$ and probabilistic inference.
 
+% TODO: clarify what 'more expressive' means
 While we chose to use ADDMC \cite{DBLP:conf/aaai/DudekPV20} as the WMC algorithm
 and Bayesian networks as a canonical example of a probabilistic inference task,
 these are only examples meant to illustrate the broader idea that choosing a
