@@ -34,7 +34,7 @@ mpq_class OrNode::modelCount(const WeightVector& weights, map<shared_ptr<Node>, 
 			mpq_class factor = 1_mpq;
 			const auto& seenChild = branch.child->seenVars();
 			for (int var: _seenVars) {
-				if (seenChild.count(var) == 0) {
+				if (seenChild.count(var) == 0 && !(weights.weightFor(var) == 1 and weights.weightFor(-var) == 1)) {
 					factor = factor * weights.weightFor(var) + factor * weights.weightFor(-var);
 				}
 				if (factor == 0_mpq) {

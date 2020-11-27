@@ -22,10 +22,8 @@ else:
     process = subprocess.Popen('./deps/query-dnnf/query-dnnf',
                                stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
-# Apparently, query-dnnf only computes the right WMC if you ask it to print the
-# d-DNNF first
 output, _ = process.communicate(
-    'load {}.cnf.nnf\np\nw {}.uai.weights\nmc'.format(args.network,
+    'load {}.cnf.nnf\nw {}.uai.weights\nmc'.format(args.network,
                                                    args.network).encode())
 output_probability = float(output.decode('utf-8').split()[-1])
 
