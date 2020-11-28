@@ -132,7 +132,14 @@
 \end{abstract}
 
 \section{Introduction}
-% TODO: mention more recent papers in the introduction
+% TODO: mention more recent papers
+% TODO: emphasise the contributions (even more)
+% TODO: write ADDMC, Ace, query-dnnf, Cachet, bn2cnf, c2d in a tt font
+% TODO: double-check the capitalisation of, e.g., c2d
+% TODO: relate non-factorable measures to VCSPs, provenance/probabilistic
+% databases
+% TODO: simplify the introductory explanations (take inspiration from the
+% comments of reviewer #5) (this is more about the next two sections)
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \cite{DBLP:conf/aaai/SangBK05}, has emerged
@@ -457,6 +464,11 @@ in the technical appendix.}
 \end{restatable}
 
 \section{Encoding Bayesian Networks Using Conditional Weights} \label{sec:bns}
+% TODO: make it clear which parts of the encoding are not new
+% TODO: rewrite the encoding without using an algorithm (look into the feedback
+% of reviewer #5 and someone before him)
+% TODO: explain/prove why it's impossible for the all-zero encoding to represent
+% the last value (a.k.a. the -implicit flag)
 
 \begin{figure*}
   \centering
@@ -723,6 +735,7 @@ with the additional clauses that restrict what combinations of indicator
 variables can co-occur.
 
 \subsection{Changes to ADDMC}
+% TODO: clarify that both variable orders are handled by the ADDMC heuristics
 
 Here we describe two changes to
 ADDMC\footnote{\url{https://github.com/vardigroup/ADDMC}}
@@ -761,6 +774,43 @@ To correct for this, we multiply the final answer by two for every $u \in U
 \setminus V$.
 
 \section{Experimental Comparison} \label{sec:experiments}
+% TODO: stacked bar charts: 1) mention that the error bars denote 0.1 * standard
+% deviation
+% 2) and that only successfully run instances are included
+% 3) and that the top error bar relates only to inference (and not the sum of
+% the two)
+% TODO: note: I'm unable to replicate the experiments from bklm. This could be
+% due to two reasons:
+% 1) I'm measuring running time rather than compiled structure size <- more
+% likely
+% 2) I'm not using the -implicit flag.
+% TODO: We use Ace to compile the BN together with its evidence (as opposed to
+% compiling just the BN and using evidence during inference) as this more
+% closely resembles the behaviour of ADDMC
+% TODO: we run cd05 only with dtBnMinfill, as that's the more commonly used
+% setting (although another one was used as well)
+% TODO: The -implicit flag of bklm16 cannot be used because even a small
+% Bayesian network with seven independent binary variables with 0.1/0.9
+% probabilities is already big enough to drive the scaling factor down to zero.
+% The last step of this encoding is a multiplication of a huge number (on the
+% order of 10^30 for some of the smaller DQMR instances) by a number
+% equivalently close to zero (so that their product lands in the interval [0,
+% 1]). Thus, we disable this flag (thus making the algorithm slower but
+% correct).
+% TODO: the legacy mode encoding of bklm16 also runs c2d (as packaged with Ace)
+% TODO: query-dnnf: http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html
+% TODO: bn2cnf http://www.cril.univ-artois.fr/KC/bn2cnf.html
+% TODO: Note that our encoder was implemented in Python with no concern for
+% efficiency, so encoding could easily be improved by one or two orders of
+% magnitude.
+% TODO: Python, Java, gcc versions (maybe also all the software that I'm using
+% (e.g., bn2cnf, Cachet))
+% TODO: 85% is as recommended in the README of Ace (might have to go lower than that)
+% TODO: for each encoding, mention:
+% 1) software
+% 2) encoding options
+% 3) additional data processing
+% 4) inference options
 
 In this section, we describe an experimental study comparing the five WMC
 encodings for Bayesian networks when run with ADDMC. The experiments were run on
@@ -931,9 +981,11 @@ inference problem domains such as probabilistic programs
 well as to search-based solvers such as Cachet \cite{DBLP:conf/sat/SangBBKP04},
 although the extension may be less straightforward for other WMC techniques.
 
-%An additional benefit of conditional weights is that a more expressive format
-%makes it easier to invent new WMC encodings.
-%Filtering out ADDs that have nothing to do with the answer helps
+% TODO: emphasise that the simplicity of the BN encoding implies the strength of
+% the general principle.
+% An additional benefit of conditional weights is that a more expressive format
+% makes it easier to invent new WMC encodings.
+% Filtering out ADDs that have nothing to do with the answer helps
 %  tremendously, but I'm purposefully not doing that.
 
 % \section*{Acknowledgements}
