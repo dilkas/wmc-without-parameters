@@ -141,26 +141,27 @@
 % TODO: simplify the introductory explanations (take inspiration from the
 % comments of reviewer #5) (this is more about the next two sections)
 
+% Over the last fifteen years, WMC has been extended and generalised in many
+% ways, e.g., to handle continuous probability distributions
+% \cite{DBLP:conf/ijcai/BellePB15}, first-order probabilistic theories
+% \cite{DBLP:conf/ijcai/BroeckTMDR11,DBLP:journals/cacm/GogateD16}, and infinite
+% domains \cite{DBLP:conf/aaai/Belle17}.
+
+% , whereas approximate solvers work by sampling
+% \cite{DBLP:conf/aaai/ChakrabortyFMSV14} and performing local search
+% \cite{DBLP:conf/sat/WeiS05}.
+
+% TODO: rephrase
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \cite{DBLP:conf/aaai/SangBK05}, has emerged
 as one of the most dominant and competitive approaches for handling inference
 tasks in a wide range of formalisms including Bayesian networks
-\cite{DBLP:conf/aaai/SangBK05,DBLP:books/daglib/0024906}, probabilistic
-graphical models more generally \cite{DBLP:conf/ecsqaru/ChoiKD13}, and
-probabilistic programs
-\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089}.
-Over the last fifteen years, WMC has been extended and generalised in many ways,
-e.g., to handle continuous probability distributions
-\cite{DBLP:conf/ijcai/BellePB15}, first-order probabilistic theories
-\cite{DBLP:conf/ijcai/BroeckTMDR11,DBLP:journals/cacm/GogateD16}, and infinite
-domains \cite{DBLP:conf/aaai/Belle17}. Furthermore, by generalising the notion
-of weights to an arbitrary semiring, a range of other problems are also captured
-\cite{DBLP:journals/japll/KimmigBR17}. Exact WMC solvers typically rely on
-either knowledge compilation
-\cite{DBLP:conf/ijcai/OztokD15,DBLP:conf/ijcai/LagniezM17} or exhaustive DPLL
-search \cite{DBLP:conf/aaai/SangBK05}, whereas approximate solvers work by
-sampling \cite{DBLP:conf/aaai/ChakrabortyFMSV14} and performing local search
-\cite{DBLP:conf/sat/WeiS05}.
+\cite{DBLP:conf/aaai/SangBK05} and probabilistic programs
+\cite{DBLP:journals/tplp/FierensBRSGTJR15}. Furthermore, by generalising the
+notion of weights to an arbitrary semiring, a range of other problems are also
+captured \cite{DBLP:journals/japll/KimmigBR17}. Exact WMC solvers typically rely
+on either knowledge compilation \cite{DBLP:conf/ijcai/LagniezM17} or exhaustive
+DPLL search \cite{DBLP:conf/aaai/SangBK05}.
 
 The most well-studied version of WMC assigns weights to models based on
 weights on literals, i.e., the weight of a model is the product of the weights
@@ -242,21 +243,22 @@ faster than \texttt{d02}. The experiments in \cref{sec:experiments}, however,
 strongly disagree with this prediction, showing that the quality of an encoding
 depends strongly on the underlying search algorithm or compilation technique.
 
-\paragraph{ADDs and their use in inference.} ADDs provide an efficient way to
-manipulate functions from a Boolean algebra to any algebraic structure (most
-commonly real numbers) \cite{DBLP:journals/fmsd/BaharFGHMPS97}. They have been
-used to represent value functions in Markov decision processes (MDPs)
-\cite{DBLP:conf/uai/HoeySHB99} and extended to handle first-order MDPs
-\cite{DBLP:journals/ai/SannerB09} and discrete and continuous state MDPs
-\cite{DBLP:conf/uai/SannerDB11}. The latter extension has also been used for
-weighted model integration---an extension of WMC that can handle continuous
-variables \cite{DBLP:conf/ijcai/KolbMSBK18}. For Bayesian networks, ADDS have
-been used to represent each conditional probability table (CPT) as an ADD
-\cite{DBLP:conf/icml/ZhaoMP15} and as a combination of ADDs and arithmetic
-circuits \cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous
-in this situation because of their ability to fully exploit context-specific
-independence, i.e., the observable structure within a CPT that is not inherited
-from the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
+% TODO: maybe summarise this in one sentence
+% \paragraph{ADDs and their use in inference.} ADDs provide an efficient way to
+% manipulate functions from a Boolean algebra to any algebraic structure (most
+% commonly real numbers) \cite{DBLP:journals/fmsd/BaharFGHMPS97}. They have been
+% used to represent value functions in Markov decision processes (MDPs)
+% \cite{DBLP:conf/uai/HoeySHB99} and extended to handle first-order MDPs
+% \cite{DBLP:journals/ai/SannerB09} and discrete and continuous state MDPs
+% \cite{DBLP:conf/uai/SannerDB11}. The latter extension has also been used for
+% weighted model integration---an extension of WMC that can handle continuous
+% variables \cite{DBLP:conf/ijcai/KolbMSBK18}. For Bayesian networks, ADDS have
+% been used to represent each conditional probability table (CPT) as an ADD
+% \cite{DBLP:conf/icml/ZhaoMP15} and as a combination of ADDs and arithmetic
+% circuits \cite{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous
+% in this situation because of their ability to fully exploit context-specific
+% independence, i.e., the observable structure within a CPT that is not inherited
+% from the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -305,14 +307,15 @@ for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
 
+% TODO: add a link to CUDD
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
 be instrumental in defining WMC as a measure in \cref{sec:wmc_as_measure} and
 can be efficiently represented using ADDs. Furthermore, all of the operations
-are supported by the CUDD \cite{somenzi1998cudd} package that is used by ADDMC
-for ADD manipulation \cite{DBLP:conf/aaai/DudekPV20}. The definitions of
-multiplication and projection are as defined by
-Dudek \etal{}~\shortcite{DBLP:conf/aaai/DudekPV20}, while others are new.
+are supported by CUDD package that is used by ADDMC for ADD manipulation
+\cite{DBLP:conf/aaai/DudekPV20}. The definitions of multiplication and
+projection are as defined by Dudek \etal{}~\shortcite{DBLP:conf/aaai/DudekPV20},
+while others are new.
 
 \begin{definition}[Operations on functions]
   Let $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and $\beta\colon 2^Y \to
@@ -355,17 +358,17 @@ $\alpha(T)$ to mean $\alpha(T \cap X)$.
 % TODO beginning of section 4: a weight function is *any* function; end the
 % paragraph with 'for all x \in U'.
 
+% TODO: mention that putting a measure on a BA is a well-known idea
 In this section, we introduce an alternative definition of WMC and demonstrate
 how it relates to the standard one. Let $U$ be a set. A \emph{measure} is a
 function $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ such that $\mu(\bot) = 0$,
 and $\mu(a \lor b) = \mu(a) + \mu(b)$ for all $a, b \in 2^{2^U}$ whenever $a
-\land b = \bot$ \cite{gaifman1964concerning,DBLP:books/daglib/0090259}. A
-\emph{weight function} is a function $\nu\colon 2^U \to \mathbb{R}_{\ge 0}$. A
-weight function is \emph{factored} if $\nu = \prod_{x \in U} \nu_x$ for some
-functions $\nu_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$, $x \in U$. We say that
-a weight function $\nu\colon 2^U \to \mathbb{R}_{\ge 0}$ \emph{induces} a
-measure $\mu_\nu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if $\mu_\nu(x) =
-\sum_{\{u\} \le x} \nu(u)$.
+\land b = \bot$. A \emph{weight function} is a function $\nu\colon 2^U \to
+\mathbb{R}_{\ge 0}$. A weight function is \emph{factored} if $\nu = \prod_{x \in
+  U} \nu_x$ for some functions $\nu_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge 0}$,
+$x \in U$. We say that a weight function $\nu\colon 2^U \to \mathbb{R}_{\ge 0}$
+\emph{induces} a measure $\mu_\nu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if
+$\mu_\nu(x) = \sum_{\{u\} \le x} \nu(u)$.
 
 \begin{restatable}{theorem}{measure} \label{prop:measure}
   The function $\mu_\nu$ is a measure.
@@ -526,13 +529,12 @@ that defines a probability distribution over them. Let $\mathcal{V}$ denote this
 set of random variables. For any random variable $X \in \mathcal{V}$, let $\im
 X$ denote its set of values and $\mathrm{pa}(X)$ its set of parents. The
 full probability distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X
-\mid \mathrm{pa}(X))$ \cite{DBLP:books/daglib/0023820}. For discrete Bayesian
-networks (and we only consider discrete networks in this paper), each factor of
-this product can be represented by a CPT. See \cref{fig:example_bn} for an
-example Bayesian network that we will refer to throughout this section. For
-this network, $\mathcal{V} = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$,
-$\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and
-$\im T = \{ l, m, h \}$.
+\mid \mathrm{pa}(X))$. For discrete Bayesian networks (and we only consider
+discrete networks in this paper), each factor of this product can be represented
+by a CPT. See \cref{fig:example_bn} for an example Bayesian network that we will
+refer to throughout this section. For this network, $\mathcal{V} = \{ W, F, T
+\}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$,
+$\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
@@ -741,16 +743,17 @@ Here we describe two changes to
 ADDMC\footnote{\url{https://github.com/vardigroup/ADDMC}}
 \cite{DBLP:conf/aaai/DudekPV20} needed to adapt it to the new format.
 
-First, ADDMC constructs the \emph{Gaifman graph} \cite{gaifman1982local} of the
-input CNF formula as an aid for the algorithm's heuristics. This graph has as
-vertices the variables of the formula, and there is an edge between two
-variables $u$ and $v$ if there is a clause in the formula that contains both $u$
-and $v$. We extend this definition to functions on Boolean algebras, i.e., the
-factors of $\phi$. For any pair of distinct variables $u, v \in U$, we draw an
-edge between them in the Gaifman graph if there is a function $\alpha\colon 2^X
-\to \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v
-\in X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges
-between all distinct pairs of variables in $\mathcal{E}^*(X)$.
+% TODO: Gaifman graph is also known as the primal graph
+First, ADDMC constructs the \emph{Gaifman graph} of the input CNF formula as an
+aid for the algorithm's heuristics. This graph has as vertices the variables of
+the formula, and there is an edge between two variables $u$ and $v$ if there is
+a clause in the formula that contains both $u$ and $v$. We extend this
+definition to functions on Boolean algebras, i.e., the factors of $\phi$. For
+any pair of distinct variables $u, v \in U$, we draw an edge between them in the
+Gaifman graph if there is a function $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$
+that is a factor of $\phi$ such that $u \in X$ and $v \in X$. For instance, a
+factor such as $\mathrm{CPT}_X$ will enable edges between all distinct pairs of
+variables in $\mathcal{E}^*(X)$.
 
 Second, even though the function $\phi$ produced by \cref{alg:encoding} is
 constructed to have $2^U$ as its domain, sometimes the domain is effectively
@@ -977,7 +980,7 @@ the problem to keep the weights simple. Indeed, in this work, we have provided a
 new theoretical perspective on the expressive power of WMC and illustrated the
 empirical benefits of that perspective. The same idea can be adapted to other
 inference problem domains such as probabilistic programs
-\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089} as
+\cite{DBLP:journals/tplp/FierensBRSGTJR15} as
 well as to search-based solvers such as Cachet \cite{DBLP:conf/sat/SangBBKP04},
 although the extension may be less straightforward for other WMC techniques.
 
