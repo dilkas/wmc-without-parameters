@@ -260,8 +260,7 @@ depends strongly on the underlying search algorithm or compilation technique.
 % independence, i.e., the observable structure within a CPT that is not inherited
 % from the structure of the Bayesian network \cite{DBLP:conf/uai/BoutilierFGK96}.
 
-\section{Boolean Algebras, Power Sets, and Propositional
-  Logic} \label{sec:prelims}
+\section{Boolean Algebras and Propositional Logic} \label{sec:prelims}
 
 \begin{table*}
   \centering
@@ -307,7 +306,7 @@ for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
 
-% TODO: add a link to CUDD
+% TODO: explain what CUDD is
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
 be instrumental in defining WMC as a measure in \cref{sec:wmc_as_measure} and
@@ -466,7 +465,7 @@ in the technical appendix.}
   \land f)$ for all formulas $x \in 2^{2^U}$.
 \end{restatable}
 
-\section{Encoding Bayesian Networks Using Conditional Weights} \label{sec:bns}
+\section{Example: Bayesian Networks} \label{sec:bns}
 % TODO: make it clear which parts of the encoding are not new
 % TODO: rewrite the encoding without using an algorithm (look into the feedback
 % of reviewer #5 and someone before him)
@@ -801,8 +800,6 @@ To correct for this, we multiply the final answer by two for every $u \in U
 % 1]). Thus, we disable this flag (thus making the algorithm slower but
 % correct).
 % TODO: the legacy mode encoding of bklm16 also runs c2d (as packaged with Ace)
-% TODO: query-dnnf: http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html
-% TODO: bn2cnf http://www.cril.univ-artois.fr/KC/bn2cnf.html
 % TODO: Note that our encoder was implemented in Python with no concern for
 % efficiency, so encoding could easily be improved by one or two orders of
 % magnitude.
@@ -814,6 +811,15 @@ To correct for this, we multiply the final answer by two for every $u \in U
 % 2) encoding options
 % 3) additional data processing
 % 4) inference options
+
+TODO: Things I will need to mention:
+\begin{itemize}
+\item
+  \texttt{query-dnnf}\footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}}
+\item
+  \texttt{bn2cnf}\footnote{\url{http://www.cril.univ-artois.fr/KC/bn2cnf.html}}
+  and \texttt{bklm16} \cite{DBLP:conf/ecai/BartKLM16}
+\end{itemize}
 
 In this section, we describe an experimental study comparing the five WMC
 encodings for Bayesian networks when run with ADDMC. The experiments were run on

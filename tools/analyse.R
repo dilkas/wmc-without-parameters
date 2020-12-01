@@ -9,6 +9,7 @@ require(tidyr)
 
 TIMEOUT <- 1000
 data <- read.csv("../results.csv", header = TRUE, sep = ",")
+data$inference_time[is.na(data$inference_time)] <- TIMEOUT
 min.time <- min(min(data$encoding_time[data$encoding_time > 0]),
                 min(data$inference_time[data$inference_time > 0]))
 data$encoding_time[data$encoding_time == 0] <- min.time
@@ -32,7 +33,9 @@ df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = sum,
             value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
+time_columns0 <- time_columns[time_columns != "time_new_cw"]
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
+df$time_min0 <- as.numeric(apply(df, 1, function (row) min(row[time_columns0])))
 df$major.dataset <- "Non-binary"
 df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
 df$major.dataset[grepl("Grid", df$instance, fixed = TRUE)] <- "Grid"
@@ -43,12 +46,27 @@ df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
 
+# instance_to_min_time <- df$time_min
+# names(instance_to_min_time) <- df$instance
+# instance_to_min_time0 <- df$time_min0
+# names(instance_to_min_time0) <- df$instance
+# df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1", answer = NA, time = instance_to_min_time[df$instance])
+# df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0", answer = NA, time = instance_to_min_time0[df$instance])
+# data_sum <- rbind(data_sum, df.temp, df.temp2)
+
 # ============ Numerical investigations ================
 
 df %>% group_by(df$dataset) %>% tally()
 
 # Where answers don't match
-interesting <- df[abs(df$answer_d02 - df$answer_bklm16) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_new_bklm16) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_new_d02) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_new_sbk05) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_old_bklm16) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_old_cd05) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_old_cd06) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_old_d02) > 0.01,]
+interesting <- df[abs(df$answer_new_cw - df$answer_old_sbk05) > 0.01,]
 
 # Number of instances
 nrow(df)
@@ -116,11 +134,11 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
 }
 
 # Compare CW with other encodings
-p1 <- scatter_plot(df, "time_new_d02", "time_new_cw", "\\texttt{d02} time (s)",
+p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
                    "\\texttt{cw} time (s)", "major.dataset", "Data set",
                    2 * TIMEOUT)
-p2 <- scatter_plot(df, "time_new_bklm16", "time_new_cw",
-                   "\\texttt{bklm16} time (s)", "\\texttt{cw} time (s)",
+p2 <- scatter_plot(df, "time_old_d02", "time_new_d02",
+                   "\\texttt{old_d02} time (s)", "\\texttt{new_d02} time (s)",
                    "major.dataset", "Data set", 2 * TIMEOUT)
 
 # Compare encoding and inference time for old and new setups
@@ -137,12 +155,12 @@ ggarrange(p2, p1, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Cumulative plot
-cumulative_plot <- function(column_name, pretty_column_name, column_values,
+cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
                             linetypes) {
   times <- vector(mode = "list", length = length(column_values))
   names(times) <- column_values
   for (value in column_values) {
-    times[[value]] <- unique(data_sum$time[data_sum[[column_name]] == value])
+    times[[value]] <- unique(df$time[df[[column_name]] == value])
   }
   chunks <- vector(mode = "list", length = length(column_values))
   names(chunks) <- column_values
@@ -150,7 +168,7 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
     chunks[[value]] <- cbind(times[[value]], value,
                              unlist(times[[value]] %>%
                                       map(function(x)
-                                        sum(data_sum$time[data_sum[[column_name]] == value]
+                                        sum(df$time[df[[column_name]] == value]
                                             <= x))))
   }
   cumulative <- as.data.frame(do.call(rbind, as.list(chunks)))
@@ -162,13 +180,14 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < TIMEOUT, ]
   ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
-#    geom_line(aes(linetype = .data[[column_name]])) +
-    geom_line() +
+    geom_line(aes(linetype = .data[[column_name]])) +
+#    geom_line() +
 #    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
     scale_x_continuous(trans = log10_trans()) +
     xlab("Time (s)") +
     ylab("Instances solved") +
 #    scale_colour_brewer(palette = "Dark2") +
+    scale_colour_manual(values = c(2, 3, 4, 1, 5, 6, 2, 3, 4, 5, 6)) +
     scale_linetype_manual(breaks = map(column_values, function(x)
       paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
@@ -177,10 +196,12 @@ cumulative_plot <- function(column_name, pretty_column_name, column_values,
 }
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
+df2 <- data_sum[data_sum$dataset == "Grid-50" & !is.na(data_sum$dataset),]
+df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
-cumulative_plot("encoding", "Encoding",
-                unique(data_sum$encoding),
-                c(6, 4, 3, 1, 5, 2, 7, 8, 9, 10, 11))
+cumulative_plot(df2, "encoding", "Encoding",
+                sort(unique(df2$encoding)),
+                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3))
 dev.off()
 
 # Stacked bar plots comparing encoding and inference time
