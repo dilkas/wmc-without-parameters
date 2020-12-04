@@ -46,13 +46,13 @@ df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
 
-# instance_to_min_time <- df$time_min
-# names(instance_to_min_time) <- df$instance
-# instance_to_min_time0 <- df$time_min0
-# names(instance_to_min_time0) <- df$instance
-# df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1", answer = NA, time = instance_to_min_time[df$instance])
-# df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0", answer = NA, time = instance_to_min_time0[df$instance])
-# data_sum <- rbind(data_sum, df.temp, df.temp2)
+instance_to_min_time <- df$time_min
+names(instance_to_min_time) <- df$instance
+instance_to_min_time0 <- df$time_min0
+names(instance_to_min_time0) <- df$instance
+df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1", answer = NA, time = instance_to_min_time[df$instance])
+df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0", answer = NA, time = instance_to_min_time0[df$instance])
+data_sum <- rbind(data_sum, df.temp, df.temp2)
 
 # ============ Numerical investigations ================
 
@@ -187,7 +187,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
     xlab("Time (s)") +
     ylab("Instances solved") +
 #    scale_colour_brewer(palette = "Dark2") +
-    scale_colour_manual(values = c(2, 3, 4, 1, 5, 6, 2, 3, 4, 5, 6)) +
+    scale_colour_manual(values = c(2, 3, 4, 1, 5, 6, 2, 3, 4, 5, 6, 7, 7)) +
     scale_linetype_manual(breaks = map(column_values, function(x)
       paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
