@@ -18,6 +18,7 @@ ACE_LEGACY = {'d02': ACE_LEGACY_BASIC + ['-d02', '-dtHypergraph', '3'],
               'cd06': ACE_LEGACY_BASIC + ['-cd06', '-dtBnOrder']}
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
+PMC = ['deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied', '-iterate=10']
 
 # Regular expressions
 NODE_RE = r'\nnode (\w+)'
@@ -94,13 +95,15 @@ def find_goal_value(variable):
 def cpt2cnf(parents, probabilities):
     'Transform a Bayesian network represented as two dictionaries to a list of clauses'
     clauses = []
+    weight_clauses = []
     for variable in parents:
         if len(values_per_variable[variable]) == 2:
             index, literal = find_goal_value(variable)
             num_values = len(values_per_variable[variable])
-            clauses += construct_weights(literal, num_values, parents[variable],
-                                         probabilities[variable], index,
-                                         lambda p: 1 - p)
+            weight_clauses += construct_weights(literal, num_values,
+                                                parents[variable],
+                                                probabilities[variable], index,
+                                                lambda p: 1 - p)
         else:
             values = [variables.get_literal_string(variable, v)
                       for v in values_per_variable[variable]]
@@ -109,12 +112,10 @@ def cpt2cnf(parents, probabilities):
                 for i in range(len(values))
                 for j in range(i + 1, len(values))]
             for i, value in enumerate(values):
-                clauses += construct_weights(value,
-                                             len(values_per_variable[variable]),
-                                             parents[variable],
-                                             probabilities[variable], i,
-                                             lambda p: 1)
-    return clauses
+                weight_clauses += construct_weights(
+                    value, len(values_per_variable[variable]),
+                    parents[variable], probabilities[variable], i, lambda p: 1)
+    return clauses, weight_clauses
 
 def cpt2uai(parents_dict, probabilities_dict):
     variables = list(parents_dict.keys()) # Fix an order on variables
@@ -221,20 +222,16 @@ def get_format(filename):
     assert filename.endswith('.dne') or filename.endswith('.net') or filename.endswith('.hugin')
     return 'net' if filename.endswith('.net') else 'dne'
 
-def encode(network, evidence):
-    clauses = parse_network(network)
+def encode(args):
+    clauses, weight_clauses = parse_network(args.network)
 
-    evidence_clauses = encode_inst_evidence(evidence)
+    evidence_clauses = encode_inst_evidence(args.evidence)
     if evidence_clauses:
         clauses += evidence_clauses
     else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
         literal = variables.get_true_or_min_literal(variables.get_last_variable())
         clauses.append('{} 0'.format(literal))
-
-    num_clauses = sum([not c.startswith('w') for c in clauses])
-    encoding = 'p cnf {} {}\n'.format(len(variables), num_clauses) + '\n'.join(clauses) + '\n'
-    with open(network + '.cnf', 'w') as f:
-        f.write(encoding)
+    output_cnf(args, len(variables), clauses, weight_clauses)
 
 def identify_goal(text, mode):
     'Which marginal probability should we compute?'
@@ -251,16 +248,21 @@ def new_evidence_file(network_filename, variable, value):
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n<instantiation><inst id="{}" value="{}"/></instantiation>'.format(variable, value))
     return new_filename
 
-def run(args, command):
-    if args.memory:
-        mem = int(args.memory) * 1024**3
-        subprocess.run(command, preexec_fn=lambda:
-                       resource.setrlimit(resource.RLIMIT_AS,
-                                          (int(SOFT_MEMORY_LIMIT * mem), mem)))
+def run(command, memory_limit = None):
+    print('...Running {}...'.format(' '.join(command)), end='')
+    if memory_limit:
+        mem = int(memory_limit) * 1024**3
+        process = subprocess.run(
+            command, stdout=subprocess.PIPE, preexec_fn=lambda:
+            resource.setrlimit(resource.rlimit_as,
+                               (int(soft_memory_limit * mem), mem)))
     else:
-        subprocess.run(command)
+        process = subprocess.run(command, stdout=subprocess.PIPE)
+    print('... OK')
+    return process.stdout.decode('utf-8')
 
 def encode_using_ace(args):
+    'The main function behind encoding using ace'
     # Identify the goal
     with open(args.network, encoding='ISO-8859-1') as f:
         text = f.read()
@@ -268,14 +270,14 @@ def encode_using_ace(args):
     goal_node, goal_value_index, goal_value = identify_goal(text, mode)
 
     if args.legacy and args.encoding != 'sbk05':
-        run(args, ACE_LEGACY[args.encoding] +
+        run(ACE_LEGACY[args.encoding] +
             [args.network, '-e',
              new_evidence_file(args.network, goal_node, goal_value)
              if evidence_file_is_empty(args.evidence)
-             else args.evidence])
+             else args.evidence], args.memory)
         return
 
-    run(args, ACE + ['-' + args.encoding, args.network])
+    run(ACE + ['-' + args.encoding, args.network], args.memory)
 
     # Make a variable -> list of values map
     values = {node.group(1) : re.split(STATE_SPLITTER_RE[mode],
@@ -302,21 +304,23 @@ def encode_using_ace(args):
                 if variable == goal_node and value == goal_value_index:
                     goal_literal = literal
 
-    evidence = ('{} 0\n'.format(goal_literal)
+    evidence = (['{} 0'.format(goal_literal)]
                 if evidence_file_is_empty(args.evidence)
-                else '\n'.join(encode_inst_evidence(args.evidence)))
+                else encode_inst_evidence(args.evidence))
 
     if args.legacy:
-        weight_encoding = '\n'.join('w {} {}'.format(
+        weight_encoding = ['w {} {}'.format(
             literal, -1 if abs(float(weights[literal]) - 1) < EPSILON
-            else weights[literal]) for literal in range(1, max_literal + 1))
+            else weights[literal]) for literal in range(1, max_literal + 1)]
     else:
-        weight_encoding = 'c weights ' + ' '.join(
+        weight_encoding = ['c weights ' + ' '.join(
             l for literal in range(1, max_literal + 1)
-            for l in [weights[literal], weights[-literal]])
+            for l in [weights[literal], weights[-literal]])]
 
-    with open(args.network + '.cnf', 'a') as f:
-        f.write(evidence + '\n' + weight_encoding + '\n')
+    with open(args.network + '.cnf') as f:
+        lines = f.readlines()
+        clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-']
+    output_cnf(args, max_literal, clauses + evidence, weight_encoding)
 
 def encode_using_bn2cnf(args):
     # Translate the Bayesian network to the UAI format and run the encoder
@@ -327,8 +331,8 @@ def encode_using_bn2cnf(args):
     variables_filename = uai_filename + '.variables'
     with open(uai_filename, 'w') as f:
         f.write('\n'.join(encoded_clauses) + '\n')
-    run(args, BN2CNF + ['-i', uai_filename, '-o', cnf_filename,
-                        '-w', weights_filename, '-v', variables_filename])
+    run(BN2CNF + ['-i', uai_filename, '-o', cnf_filename, '-w',
+                  weights_filename, '-v', variables_filename], args.memory)
 
     # Translate weights to the right format
     if args.legacy:
@@ -380,17 +384,27 @@ def encode_using_bn2cnf(args):
     # Update the number of clauses
     with open(cnf_filename) as f:
         lines = f.read().splitlines()
-    words = lines[0].split()
-    assert(len(words) == 4)
-    words[3] = str(int(words[3]) + len(encoded_evidence))
-    lines[0] = ' '.join(words)
 
     # Put everything together and write to a file
-    with open(cnf_filename, 'w') as f:
-        f.write('\n'.join(lines + encoded_weights + encoded_evidence) + '\n')
+    clauses = [l.rstrip() for l in lines
+               if l[0].isdigit() or l[0] == '-'] + encoded_evidence
+    output_cnf(args, max(positive_weights), clauses, encoded_weights)
 
     if args.legacy:
-        run(args, C2D + ['-in', cnf_filename])
+        run(C2D + ['-in', cnf_filename], args.memory)
+
+def output_cnf(args, num_variables, clauses, weights):
+    header = 'p cnf {} {}'.format(num_variables, len(clauses))
+    filename = args.network + '.cnf'
+    if args.preprocess:
+        with open(filename, 'w') as f:
+            f.write('\n'.join([header] + clauses) + '\n')
+        output = run(PMC + [filename], args.memory)
+        with open(filename, 'w') as f:
+            f.write(output + '\n'.join(weights) + '\n')
+    else:
+        with open(filename, 'w') as f:
+            f.write('\n'.join([header] + clauses + weights) + '\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -400,9 +414,11 @@ if __name__ == '__main__':
     parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')
     parser.add_argument('-l', dest='legacy', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
     parser.add_argument('-m', dest='memory', help="the maximum amount of virtual memory available to underlying encoders (in GiB)")
+    parser.add_argument('-p', dest='preprocess', action='store_true', help='run a preprocessor (PMC) on the CNF file')
     args = parser.parse_args()
+
     if args.encoding == 'cw':
-        encode(args.network, args.evidence)
+        encode(args)
     elif args.encoding == 'bklm16':
         encode_using_bn2cnf(args)
     else:
