@@ -72,8 +72,7 @@ void solving::solveOptions(
   Int weightFormatOption,
   Float jtWaitSeconds,
   Float performanceFactor,
-  Int ddVarOrderingHeuristicOption
-) {
+  Int ddVarOrderingHeuristicOption) {
   WeightFormat weightFormat;
   try {
     weightFormat = WEIGHT_FORMAT_CHOICES.at(weightFormatOption);
@@ -107,14 +106,17 @@ void solving::solveOptions(
     util::printRow("inverseDiagramVarOrder", inverseDdVarOrdering);
   }
 
-  const Cnf cnf(cnfFilePath, weightFormat);
+  Cudd mgr;
+  Cnf cnf(cnfFilePath, weightFormat, &mgr, ddVarOrderingHeuristic,
+          inverseDdVarOrdering);
 
-  const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds, performanceFactor, cnf.getClauses());
+  const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds,
+                                      performanceFactor, cnf.getClauses(),
+                                      cnf.getDependencies());
   JoinTreeCounter joinTreeCounter(
     joinTreeReader.getJoinTreeRoot(),
     ddVarOrderingHeuristic,
-    inverseDdVarOrdering
-  );
+    inverseDdVarOrdering);
 
   joinTreeCounter.output(cnf, OutputFormat::MODEL_COUNT);
 }
@@ -134,8 +136,7 @@ void solving::solveCommand(int argc, char *argv[]) {
       optionDict.weightFormatOption,
       optionDict.jtWaitSeconds,
       optionDict.performanceFactor,
-      optionDict.ddVarOrderingHeuristicOption
-    );
+      optionDict.ddVarOrderingHeuristicOption);
     cout << "\n";
     util::printDuration(startTime);
   }

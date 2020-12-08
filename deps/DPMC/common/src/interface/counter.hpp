@@ -20,9 +20,7 @@ namespace diagram {
 class Counter { // abstract
 protected:
   Int dotFileIndex = 1;
-  Cudd mgr;
-  VarOrderingHeuristic ddVarOrderingHeuristic;
-  bool inverseDdVarOrdering;
+  Cudd *mgr;
   Map<Int, Int> cnfVarToDdVarMap; // e.g. {42: 0, 13: 1}
   vector<Int> ddVarToCnfVarMap; // e.g. [42, 13], i.e. ddVarOrdering
 
@@ -37,10 +35,13 @@ protected:
     return cnfVars;
   }
   const vector<Int> &getDdVarOrdering() const; // ddVarToCnfVarMap
-  void orderDdVars(const Cnf &cnf); // writes: cnfVarToDdVarMap, ddVarToCnfVarMap
+  void orderDdVars(Cnf &cnf); // writes: cnfVarToDdVarMap, ddVarToCnfVarMap
   ADD getClauseDd(const vector<Int> &clause) const;
-  void abstract(ADD &dd, Int ddVar, const Map<Int, Float> &literalWeights);
-  void abstractCube(ADD &dd, const Set<Int> &ddVars, const Map<Int, Float> &literalWeights);
+  void abstract(ADD &dd, Int ddVar, const Map<Int, Float> &literalWeights,
+                WeightFormat weightFormat);
+  void abstractCube(ADD &dd, const Set<Int> &ddVars,
+                    const Map<Int, Float> &literalWeights,
+                    const WeightFormat weightFormat);
 
   void printJoinTree(const Cnf &cnf) const;
 
@@ -49,18 +50,21 @@ public:
   void setJoinTree(const Cnf &cnf); // handles cnf with/without empty clause
 
   ADD countSubtree(JoinNode *joinNode, const Cnf &cnf, Set<Int> &projectedCnfVars); // handles cnf without empty clause
-  Float countJoinTree(const Cnf &cnf); // handles cnf with/without empty clause
+  Float countJoinTree(Cnf &cnf); // handles cnf with/without empty clause
 
-  virtual Float computeModelCount(const Cnf &cnf) = 0; // handles cnf without empty clause
-  Float getModelCount(const Cnf &cnf); // handles cnf with/without empty clause
+  virtual Float computeModelCount(Cnf &cnf) = 0; // handles cnf without empty clause
+  Float getModelCount(Cnf &cnf); // handles cnf with/without empty clause
 
-  void output(const Cnf &cnf, OutputFormat outputFormat);
+  void output(Cnf &cnf, OutputFormat outputFormat);
 };
 
 class JoinTreeCounter : public Counter {
+protected:
+  VarOrderingHeuristic cnfVarOrderingHeuristic;
+  bool inverseCnfVarOrdering;
 public:
   void constructJoinTree(const Cnf &cnf) override;
-  Float computeModelCount(const Cnf &cnf) override;
+  Float computeModelCount(Cnf &cnf) override;
   JoinTreeCounter(
     JoinNonterminal *joinRoot,
     VarOrderingHeuristic ddVarOrderingHeuristic,
@@ -70,16 +74,13 @@ public:
 
 class MonolithicCounter : public Counter { // builds an ADD for the entire CNF
 protected:
-  void setMonolithicClauseDds(vector<ADD> &clauseDds, const Cnf &cnf);
-  void setCnfDd(ADD &cnfDd, const Cnf &cnf);
+  void setMonolithicClauseDds(vector<ADD> &clauseDds, Cnf &cnf);
+  void setCnfDd(ADD &cnfDd, Cnf &cnf);
 
 public:
   void constructJoinTree(const Cnf &cnf) override;
-  Float computeModelCount(const Cnf &cnf) override;
-  MonolithicCounter(
-    VarOrderingHeuristic ddVarOrderingHeuristic,
-    bool inverseDdVarOrdering
-  );
+  Float computeModelCount(Cnf &cnf) override;
+  MonolithicCounter(Cudd *mgr);
 };
 
 class FactoredCounter : public Counter {}; // abstract; builds an ADD for each clause
@@ -88,16 +89,14 @@ class LinearCounter : public FactoredCounter { // combines adjacent clauses
 protected:
   vector<Set<Int>> projectableCnfVarSets; // clauseIndex |-> cnfVars
 
-  void fillProjectableCnfVarSets(const vector<vector<Int>> &clauses);
-  void setLinearClauseDds(vector<ADD> &clauseDds, const Cnf &cnf);
+  void fillProjectableCnfVarSets(const vector<vector<Int>> &clauses,
+                                 const Map<Int, vector<Int>> &dependencies);
+  void setLinearClauseDds(vector<ADD> &clauseDds, Cnf &cnf);
 
 public:
   void constructJoinTree(const Cnf &cnf) override;
-  Float computeModelCount(const Cnf &cnf) override;
-  LinearCounter(
-    VarOrderingHeuristic ddVarOrderingHeuristic,
-    bool inverseDdVarOrdering
-  );
+  Float computeModelCount(Cnf &cnf) override;
+  LinearCounter(Cudd *mgr);
 };
 
 class NonlinearCounter : public FactoredCounter { // abstract; puts clauses in clusters
@@ -114,16 +113,33 @@ protected:
   vector<vector<ADD>> ddClusters; // clusterIndex |-> ADDs (if usingTreeClustering)
   vector<Set<Int>> projectingDdVarSets; // clusterIndex |-> ddVars (if usingTreeClustering)
 
-  void printClusters(const vector<vector<Int>> &clauses) const;
-  void fillClusters(const vector<vector<Int>> &clauses, const vector<Int> &cnfVarOrdering, bool usingMinVar);
+  void printClusters(const vector<vector<Int>> &clauses,
+                     const Map<Int, vector<Int>> &dependencies) const;
+  void fillClusters(const vector<vector<Int>> &clauses,
+                    const Map<Int, vector<Int>> &dependencies,
+                    const vector<Int> &cnfVarOrdering, bool usingMinVar);
 
   void printOccurrentCnfVarSets() const;
   void printProjectableCnfVarSets() const;
-  void fillCnfVarSets(const vector<vector<Int>> &clauses, bool usingMinVar); // writes: occurrentCnfVarSets, projectableCnfVarSets
+  // writes: occurrentCnfVarSets, projectableCnfVarSets
+  void fillCnfVarSets(const vector<vector<Int>> &clauses,
+                      const Map<Int, vector<Int>> &dependencies,
+                      bool usingMinVar);
 
-  Set<Int> getProjectingDdVars(Int clusterIndex, bool usingMinVar, const vector<Int> &cnfVarOrdering, const vector<vector<Int>> &clauses);
-  void fillDdClusters(const vector<vector<Int>> &clauses, const vector<Int> &cnfVarOrdering, bool usingMinVar); // (if usingTreeClustering)
-  void fillProjectingDdVarSets(const vector<vector<Int>> &clauses, const vector<Int> &cnfVarOrdering, bool usingMinVar); // (if usingTreeClustering)
+  Set<Int> getProjectingDdVars(Int clusterIndex, bool usingMinVar,
+                               const vector<Int> &cnfVarOrdering,
+                               const vector<vector<Int>> &clauses,
+                               const Map<Int, vector<Int>> &dependencies);
+  // (if usingTreeClustering)
+  void fillDdClusters(const vector<vector<Int>> &clauses,
+                      const Map<Int, vector<Int>> &dependencies,
+                      const Map<Int, ADD> &weights,
+                      const vector<Int> &cnfVarOrdering, bool usingMinVar);
+  void fillProjectingDdVarSets(const vector<vector<Int>> &clauses,
+                               const Map<Int, vector<Int>> &dependencies,
+                               const Map<Int, ADD> &weights,
+                               const vector<Int> &cnfVarOrdering,
+                               bool usingMinVar); // (if usingTreeClustering)
 
   Int getTargetClusterIndex(Int clusterIndex) const; // returns DUMMY_MAX_INT if no var remains
   Int getNewClusterIndex(const ADD &abstractedClusterDd, const vector<Int> &cnfVarOrdering, bool usingMinVar) const; // returns DUMMY_MAX_INT if no var remains (if usingTreeClustering)
@@ -132,33 +148,29 @@ protected:
   void constructJoinTreeUsingListClustering(const Cnf &cnf, bool usingMinVar);
   void constructJoinTreeUsingTreeClustering(const Cnf &cnf, bool usingMinVar);
 
-  Float countUsingListClustering(const Cnf &cnf, bool usingMinVar);
-  Float countUsingTreeClustering(const Cnf &cnf, bool usingMinVar);
-  Float countUsingTreeClustering(const Cnf &cnf); // #MAVC
+  Float countUsingListClustering(Cnf &cnf, bool usingMinVar);
+  Float countUsingTreeClustering(Cnf &cnf, bool usingMinVar);
+  Float countUsingTreeClustering(Cnf &cnf); // #MAVC
 };
 
 class BucketCounter : public NonlinearCounter { // bucket elimination
 public:
   void constructJoinTree(const Cnf &cnf) override;
-  Float computeModelCount(const Cnf &cnf) override;
+  Float computeModelCount(Cnf &cnf) override;
   BucketCounter(
+    Cudd *mgr,
     bool usingTreeClustering,
     VarOrderingHeuristic cnfVarOrderingHeuristic,
-    bool inverseCnfVarOrdering,
-    VarOrderingHeuristic ddVarOrderingHeuristic,
-    bool inverseDdVarOrdering
-  );
+    bool inverseCnfVarOrdering);
 };
 
 class BouquetCounter : public NonlinearCounter { // Bouquet's Method
 public:
   void constructJoinTree(const Cnf &cnf) override;
-  Float computeModelCount(const Cnf &cnf) override;
+  Float computeModelCount(Cnf &cnf) override;
   BouquetCounter(
+    Cudd *mgr,
     bool usingTreeClustering,
     VarOrderingHeuristic cnfVarOrderingHeuristic,
-    bool inverseCnfVarOrdering,
-    VarOrderingHeuristic ddVarOrderingHeuristic,
-    bool inverseDdVarOrdering
-  );
+    bool inverseCnfVarOrdering);
 };

@@ -40,8 +40,7 @@ namespace solving {
     Int weightFormatOption,
     Float jtWaitSeconds,
     Float performanceFactor,
-    Int ddVarOrderingHeuristicOption
-  );
+    Int ddVarOrderingHeuristicOption);
   void solveCommand(int argc, char *argv[]);
 }
 

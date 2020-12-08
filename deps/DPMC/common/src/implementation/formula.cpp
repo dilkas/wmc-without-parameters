@@ -49,6 +49,17 @@ Graph Cnf::getGaifmanGraph() const {
     }
   }
 
+  // include variables from weight ADDs in the graph
+  for (auto words : unparsedWeights) {
+    for (Int i = 1; i < words.size(); i++) {
+      Int var1 = std::abs(std::stoi(words.at(i)));
+      for (Int j = i + 1; j < words.size() - 2; j++) {
+        Int var2 = std::abs(std::stoi(words.at(j)));
+        graph.addEdge(var1, var2);
+      }
+    }
+  }
+
   return graph;
 }
 
@@ -179,7 +190,7 @@ vector<Int> Cnf::getMinFillVarOrdering() const {
   return varOrdering;
 }
 
-vector<Int> Cnf::getVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool inverse) const {
+vector<Int> Cnf::generateVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool inverse) const {
   vector<Int> varOrdering;
   switch (varOrderingHeuristic) {
     case VarOrderingHeuristic::APPEARANCE: {
@@ -218,6 +229,22 @@ vector<Int> Cnf::getVarOrdering(VarOrderingHeuristic varOrderingHeuristic, bool 
     util::invert(varOrdering);
   }
   return varOrdering;
+}
+
+vector<Int> Cnf::getVarOrdering() const {
+  return varOrdering;
+}
+
+const Map<Int, ADD> &Cnf::getWeights() const {
+  return weights;
+}
+
+const Map<Int, vector<Int>> &Cnf::getDependencies() const {
+  return dependencies;
+}
+
+WeightFormat Cnf::getWeightFormat() const {
+  return weightFormat;
 }
 
 Int Cnf::getDeclaredVarCount() const { return declaredVarCount; }
@@ -307,6 +334,30 @@ void Cnf::printWeightedFormula(const WeightFormat &outputWeightFormat) const {
   printThinLine();
 }
 
+ADD Cnf::literalToDd(Int literal, Cudd *mgr) {
+  auto it = std::find(varOrdering.begin(), varOrdering.end(),
+                      std::abs(literal));
+  Int index = std::distance(varOrdering.begin(), it);
+  return mgr->addVar(index);
+}
+
+ADD Cnf::constructDdFromWords(Cudd *mgr, Int var,
+                              const vector<std::string> &words) {
+  ADD positive = literalToDd(var, mgr);
+  ADD negative = ~positive;
+  for (Int i = 2; i < words.size() - 2; i++) {
+    Int var = std::stoi(words.at(i));
+    ADD varADD = literalToDd(var, mgr);
+    ADD newVariable = (var > 0) ? varADD : ~varADD;
+    positive &= newVariable;
+    negative &= newVariable;
+  }
+  double_t positiveWeight = std::stod(words.at(words.size() - 2));
+  double_t negativeWeight = std::stod(words.at(words.size() - 1));
+  return (mgr->constant(positiveWeight) * positive) +
+         (mgr->constant(negativeWeight) * negative);
+}
+
 Cnf::Cnf(const vector<vector<Int>> &clauses) {
   this->clauses = clauses;
 
@@ -317,7 +368,8 @@ Cnf::Cnf(const vector<vector<Int>> &clauses) {
   }
 }
 
-Cnf::Cnf(const string &filePath, WeightFormat weightFormat) {
+Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
+         VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
   printComment("Reading CNF formula...", 1);
 
   std::ifstream inputFileStream(filePath); // variable will be destroyed if it goes out of scope
@@ -410,6 +462,10 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat) {
         }
         Float weight = std::stold(words.at(2));
         literalWeights[var] = weight;
+      } else if (weightFormat == WeightFormat::CONDITIONAL) {
+        unparsedWeights.push_back(words);
+        for (Int i = 1; i < words.size(); i++)
+          updateApparentVars(std::stoi(words.at(i)));
       }
       else if (weightFormat == WeightFormat::MCC && (wordCount == 3 || wordCount == 4 && words.at(3) == LINE_END_WORD)) {
         Int literal = std::stoll(words.at(1));
@@ -470,7 +526,9 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat) {
     showError("MINIC2D weight line not found");
   }
 
-  if (weightFormat == WeightFormat::UNWEIGHTED) { // populates literalWeights with 1s
+  // populates literalWeights with 1s
+  if (weightFormat == WeightFormat::UNWEIGHTED ||
+      weightFormat == WeightFormat::CONDITIONAL) {
     for (Int var = 1; var <= declaredVarCount; var++) {
       literalWeights[var] = 1;
       literalWeights[-var] = 1;
@@ -500,6 +558,38 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat) {
       if (literalWeights.find(-var) == literalWeights.end()) {
         literalWeights[-var] = MCC_DEFAULT_LITERAL_WEIGHT;
       }
+    }
+  }
+
+  varOrdering = generateVarOrdering(varOrderingHeuristic, inverse);
+
+  // compiles weights into DDs
+  if (weightFormat == WeightFormat::CONDITIONAL) {
+    for (auto words : unparsedWeights) {
+      Int literal = std::stoi(words.at(1));
+
+      if (literal < 0) {
+        util::showError(
+          "the first literal of any weight line must be non-negative, but " +
+          std::to_string(literal) + " is not");
+      } else if (literal == 0) {
+        assert(words.size() == 3);
+        literalWeights[0] = std::stod(words.at(2));
+        continue;
+      }
+
+      ADD cpt = constructDdFromWords(mgr, literal, words);
+      auto previousEntry = weights.find(literal);
+      if (previousEntry != weights.end()) {
+        previousEntry->second += cpt;
+      } else {
+        weights[literal] = cpt;
+      }
+    }
+    for (auto weight : weights) {
+      dependencies[weight.first] = {};
+      for (Int index : util::getSupport(weight.second))
+        dependencies[weight.first].push_back(varOrdering[index]);
     }
   }
 

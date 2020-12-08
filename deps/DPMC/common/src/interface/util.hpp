@@ -79,7 +79,7 @@ extern const string &DIAGRAM_VAR_ORDER_OPTION;
 extern const string &RANDOM_SEED_OPTION;
 extern const string &VERBOSITY_LEVEL_OPTION;
 
-enum class WeightFormat { UNWEIGHTED, MINIC2D, CACHET, MCC };
+enum class WeightFormat { UNWEIGHTED, MINIC2D, CACHET, MCC, CONDITIONAL };
 extern const std::map<Int, WeightFormat> WEIGHT_FORMAT_CHOICES;
 extern const Int DEFAULT_WEIGHT_FORMAT_CHOICE;
 
@@ -157,8 +157,12 @@ namespace util {
   /* functions: CNF ***********************************************************/
 
   Int getCnfVar(Int literal);
-  Set<Int> getClauseCnfVars(const vector<Int> &clause);
-  Set<Int> getClusterCnfVars(const vector<Int> &cluster, const vector<vector<Int>> &clauses);
+  Set<Int> getClauseCnfVars(const vector<vector<Int>> &clause,
+                            const Map<Int, vector<Int>> &dependencies,
+                            Int clause_index);
+  Set<Int> getClusterCnfVars(const vector<Int> &cluster,
+                             const vector<vector<Int>> &clauses,
+                             const Map<Int, vector<Int>> &dependencies);
 
   bool appearsIn(Int cnfVar, const vector<Int> &clause);
   bool isPositiveLiteral(Int literal);
@@ -253,7 +257,11 @@ namespace util {
     return true;
   }
 
-  template<typename T> Float adjustModelCount(Float apparentModelCount, const T &projectedCnfVars, const Map<Int, Float> &literalWeights) {
+  template <typename T>
+  Float adjustModelCount(Float apparentModelCount,
+                         const T &projectedCnfVars,
+                         const Map<Int, Float> &literalWeights,
+                         WeightFormat weightFormat) {
     Float totalModelCount = apparentModelCount;
 
     Int totalLiteralCount = literalWeights.size();
@@ -267,6 +275,10 @@ namespace util {
         totalModelCount *= literalWeights.at(cnfVar) + literalWeights.at(-cnfVar);
       }
     }
+
+    auto scalingFactor = literalWeights.find(0);
+    if (scalingFactor != literalWeights.end())
+      totalModelCount *= scalingFactor->second;
 
     if (totalModelCount == 0) {
       showWarning("floating-point underflow may have occured");

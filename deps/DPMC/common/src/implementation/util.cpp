@@ -259,6 +259,9 @@ string util::getWeightFormatName(WeightFormat weightFormat) {
     case WeightFormat::MCC: {
       return "MCC";
     }
+    case WeightFormat::CONDITIONAL: {
+      return "CONDITIONAL";
+    }
     default: {
       showError("illegal weightFormat");
       return DUMMY_STR;
@@ -371,15 +374,26 @@ Int util::getCnfVar(Int literal) {
   return abs(literal);
 }
 
-Set<Int> util::getClauseCnfVars(const vector<Int> &clause) {
+Set<Int> util::getClauseCnfVars(const vector<vector<Int>> &clause,
+                                const Map<Int, vector<Int>> &dependencies,
+                                Int clauseIndex) {
   Set<Int> cnfVars;
-  for (Int literal : clause) cnfVars.insert(getCnfVar(literal));
+  if (clauseIndex < clause.size()) {
+    for (Int literal : clause.at(clauseIndex))
+      cnfVars.insert(getCnfVar(literal));
+  } else {
+    for (Int dependency : dependencies.at(clauseIndex - clause.size()))
+      cnfVars.insert(dependency);
+  }
   return cnfVars;
 }
 
-Set<Int> util::getClusterCnfVars(const vector<Int> &cluster, const vector<vector<Int>> &clauses) {
+Set<Int> util::getClusterCnfVars(const vector<Int> &cluster,
+                                 const vector<vector<Int>> &clauses,
+                                 const Map<Int, vector<Int>> &dependencies) {
   Set<Int> cnfVars;
-  for (Int clauseIndex : cluster) unionize(cnfVars, getClauseCnfVars(clauses.at(clauseIndex)));
+  for (Int clauseIndex : cluster)
+    unionize(cnfVars, getClauseCnfVars(clauses, dependencies, clauseIndex));
   return cnfVars;
 }
 

@@ -51,7 +51,7 @@ void Counter::handleSignals(int signal) {
 }
 
 void Counter::writeDotFile(ADD &dd, const string &dotFileDir) {
-  writeDd(mgr, dd, dotFileDir + "dd" + to_string(dotFileIndex) + ".dot");
+  writeDd(*mgr, dd, dotFileDir + "dd" + to_string(dotFileIndex) + ".dot");
   dotFileIndex++;
 }
 
@@ -59,37 +59,46 @@ const vector<Int> &Counter::getDdVarOrdering() const {
   return ddVarToCnfVarMap;
 }
 
-void Counter::orderDdVars(const Cnf &cnf) {
-  ddVarToCnfVarMap = cnf.getVarOrdering(ddVarOrderingHeuristic, inverseDdVarOrdering);
+void Counter::orderDdVars(Cnf &cnf) {
+  ddVarToCnfVarMap = cnf.getVarOrdering();
   for (Int ddVar = 0; ddVar < ddVarToCnfVarMap.size(); ddVar++) {
     Int cnfVar = ddVarToCnfVarMap.at(ddVar);
     cnfVarToDdVarMap[cnfVar] = ddVar;
-    mgr.addVar(ddVar); // creates ddVar-th ADD var
+    mgr->addVar(ddVar); // creates ddVar-th ADD var
   }
 }
 
 ADD Counter::getClauseDd(const vector<Int> &clause) const {
-  ADD clauseDd = mgr.addZero();
+  ADD clauseDd = mgr->addZero();
   for (Int literal : clause) {
     Int ddVar = cnfVarToDdVarMap.at(util::getCnfVar(literal));
-    ADD literalDd = mgr.addVar(ddVar);
+    ADD literalDd = mgr->addVar(ddVar);
     if (!util::isPositiveLiteral(literal)) literalDd = ~literalDd;
     clauseDd |= literalDd;
   }
   return clauseDd;
 }
 
-void Counter::abstract(ADD &dd, Int ddVar, const Map<Int, Float> &literalWeights) {
-  Int cnfVar = ddVarToCnfVarMap.at(ddVar);
-  ADD positiveWeight = mgr.constant(literalWeights.at(cnfVar));
-  ADD negativeWeight = mgr.constant(literalWeights.at(-cnfVar));
+void Counter::abstract(ADD &dd, Int ddVar,
+                       const Map<Int, Float> &literalWeights,
+                       WeightFormat weightFormat) {
+  if (weightFormat != WeightFormat::CONDITIONAL) {
+    Int cnfVar = ddVarToCnfVarMap.at(ddVar);
+    ADD positiveWeight = mgr->constant(literalWeights.at(cnfVar));
+    ADD negativeWeight = mgr->constant(literalWeights.at(-cnfVar));
 
-  dd = positiveWeight * dd.Compose(mgr.addOne(), ddVar) + negativeWeight * dd.Compose(mgr.addZero(), ddVar);
+    dd = positiveWeight * dd.Compose(mgr->addOne(), ddVar) +
+         negativeWeight * dd.Compose(mgr->addZero(), ddVar);
+  } else {
+    dd = dd.Compose(mgr->addOne(), ddVar) + dd.Compose(mgr->addZero(), ddVar);
+  }
 }
 
-void Counter::abstractCube(ADD &dd, const Set<Int> &ddVars, const Map<Int, Float> &literalWeights) {
+void Counter::abstractCube(ADD &dd, const Set<Int> &ddVars,
+                           const Map<Int, Float> &literalWeights,
+                           WeightFormat weightFormat) {
   for (Int ddVar :ddVars) {
-    abstract(dd, ddVar, literalWeights);
+    abstract(dd, ddVar, literalWeights, weightFormat);
   }
 }
 
@@ -120,7 +129,7 @@ ADD Counter::countSubtree(JoinNode *joinNode, const Cnf &cnf, Set<Int> &projecte
     return getClauseDd(cnf.getClauses().at(joinNode->getNodeIndex()));
   }
   else {
-    ADD dd = mgr.addOne();
+    ADD dd = mgr->addOne();
     bool greedy = true;
     greedy = false; // non-greedy in CP-2020 experiments
     if (greedy) { // iteratively multiplies 2 smallest child ADDs
@@ -156,13 +165,13 @@ ADD Counter::countSubtree(JoinNode *joinNode, const Cnf &cnf, Set<Int> &projecte
       projectedCnfVars.insert(cnfVar);
 
       Int ddVar = cnfVarToDdVarMap.at(cnfVar);
-      abstract(dd, ddVar, cnf.getLiteralWeights());
+      abstract(dd, ddVar, cnf.getLiteralWeights(), cnf.getWeightFormat());
     }
     return dd;
   }
 }
 
-Float Counter::countJoinTree(const Cnf &cnf) {
+Float Counter::countJoinTree(Cnf &cnf) {
   Int i = cnf.getEmptyClauseIndex();
   if (i != DUMMY_MIN_INT) { // empty clause found
     showWarning("clause " + to_string(i + 1) + " of cnf is empty (1-indexing)");
@@ -175,12 +184,14 @@ Float Counter::countJoinTree(const Cnf &cnf) {
     ADD dd = countSubtree(static_cast<JoinNode *>(joinRoot), cnf, projectedCnfVars);
 
     Float modelCount = diagram::countConstDdFloat(dd);
-    modelCount = util::adjustModelCount(modelCount, projectedCnfVars, cnf.getLiteralWeights());
+    modelCount = util::adjustModelCount(modelCount, projectedCnfVars,
+                                        cnf.getLiteralWeights(),
+                                        cnf.getWeightFormat());
     return modelCount;
   }
 }
 
-Float Counter::getModelCount(const Cnf &cnf) {
+Float Counter::getModelCount(Cnf &cnf) {
   Int i = cnf.getEmptyClauseIndex();
   if (i != DUMMY_MIN_INT) { // empty clause found
     showWarning("clause " + to_string(i + 1) + " of cnf is empty (1-indexing)");
@@ -191,7 +202,7 @@ Float Counter::getModelCount(const Cnf &cnf) {
   }
 }
 
-void Counter::output(const Cnf &cnf, OutputFormat outputFormat) {
+void Counter::output(Cnf &cnf, OutputFormat outputFormat) {
   printComment("Computing output...", 1);
 
   signal(SIGINT, handleSignals); // Ctrl c
@@ -219,7 +230,7 @@ void Counter::output(const Cnf &cnf, OutputFormat outputFormat) {
 
 void JoinTreeCounter::constructJoinTree(const Cnf &cnf) {}
 
-Float JoinTreeCounter::computeModelCount(const Cnf &cnf) {
+Float JoinTreeCounter::computeModelCount(Cnf &cnf) {
   bool testing = false;
   // testing = true;
   if (testing) {
@@ -235,13 +246,13 @@ JoinTreeCounter::JoinTreeCounter(
   bool inverseDdVarOrdering
 ) {
   this->joinRoot = joinRoot;
-  this->ddVarOrderingHeuristic = ddVarOrderingHeuristic;
-  this->inverseDdVarOrdering = inverseDdVarOrdering;
+  this->cnfVarOrderingHeuristic = ddVarOrderingHeuristic;
+  this->inverseCnfVarOrdering = inverseDdVarOrdering;
 }
 
 /* class MonolithicCounter ****************************************************/
 
-void MonolithicCounter::setMonolithicClauseDds(vector<ADD> &clauseDds, const Cnf &cnf) {
+void MonolithicCounter::setMonolithicClauseDds(vector<ADD> &clauseDds, Cnf &cnf) {
   clauseDds.clear();
   for (const vector<Int> &clause : cnf.getClauses()) {
     ADD clauseDd = getClauseDd(clause);
@@ -249,10 +260,10 @@ void MonolithicCounter::setMonolithicClauseDds(vector<ADD> &clauseDds, const Cnf
   }
 }
 
-void MonolithicCounter::setCnfDd(ADD &cnfDd, const Cnf &cnf) {
+void MonolithicCounter::setCnfDd(ADD &cnfDd, Cnf &cnf) {
   vector<ADD> clauseDds;
   setMonolithicClauseDds(clauseDds, cnf);
-  cnfDd = mgr.addOne();
+  cnfDd = mgr->addOne();
   for (const ADD &clauseDd : clauseDds) {
     cnfDd &= clauseDd; // operator& is operator* in class ADD
   }
@@ -269,37 +280,45 @@ void MonolithicCounter::constructJoinTree(const Cnf &cnf) {
   joinRoot = new JoinNonterminal(terminals, Set<Int>(projectableCnfVars.begin(), projectableCnfVars.end()));
 }
 
-Float MonolithicCounter::computeModelCount(const Cnf &cnf) {
+Float MonolithicCounter::computeModelCount(Cnf &cnf) {
   orderDdVars(cnf);
 
   ADD cnfDd;
   setCnfDd(cnfDd, cnf);
 
+  if (cnf.getWeightFormat() == WeightFormat::CONDITIONAL)
+    for (auto pair : cnf.getWeights())
+      cnfDd *= pair.second;
+
   Set<Int> support = util::getSupport(cnfDd);
   for (Int ddVar : support) {
-    abstract(cnfDd, ddVar, cnf.getLiteralWeights());
+    abstract(cnfDd, ddVar, cnf.getLiteralWeights(), cnf.getWeightFormat());
   }
 
   Float modelCount = diagram::countConstDdFloat(cnfDd);
-  modelCount = util::adjustModelCount(modelCount, getCnfVars(support), cnf.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, getCnfVars(support),
+                                      cnf.getLiteralWeights(),
+                                      cnf.getWeightFormat());
   return modelCount;
 }
 
-MonolithicCounter::MonolithicCounter(VarOrderingHeuristic ddVarOrderingHeuristic, bool inverseDdVarOrdering) {
-  this->ddVarOrderingHeuristic = ddVarOrderingHeuristic;
-  this->inverseDdVarOrdering = inverseDdVarOrdering;
+MonolithicCounter::MonolithicCounter(Cudd *mgr) {
+  this->mgr = mgr;
 }
 
 /* class FactoredCounter ******************************************************/
 
 /* class LinearCounter ******************************************************/
 
-void LinearCounter::fillProjectableCnfVarSets(const vector<vector<Int>> &clauses) {
+void LinearCounter::fillProjectableCnfVarSets(
+    const vector<vector<Int>> &clauses,
+    const Map<Int, vector<Int>> &dependencies) {
   projectableCnfVarSets = vector<Set<Int>>(clauses.size(), Set<Int>());
 
   Set<Int> placedCnfVars; // cumulates vars placed in projectableCnfVarSets so far
   for (Int clauseIndex = clauses.size() - 1; clauseIndex >= 0; clauseIndex--) {
-    Set<Int> clauseCnfVars = util::getClauseCnfVars(clauses.at(clauseIndex));
+    Set<Int> clauseCnfVars = util::getClauseCnfVars(clauses, dependencies,
+                                                    clauseIndex);
 
     Set<Int> placingCnfVars;
     util::differ(placingCnfVars, clauseCnfVars, placedCnfVars);
@@ -308,18 +327,21 @@ void LinearCounter::fillProjectableCnfVarSets(const vector<vector<Int>> &clauses
   }
 }
 
-void LinearCounter::setLinearClauseDds(vector<ADD> &clauseDds, const Cnf &cnf) {
+void LinearCounter::setLinearClauseDds(vector<ADD> &clauseDds, Cnf &cnf) {
   clauseDds.clear();
-  clauseDds.push_back(mgr.addOne());
+  clauseDds.push_back(mgr->addOne());
   for (const vector<Int> &clause : cnf.getClauses()) {
     ADD clauseDd = getClauseDd(clause);
     clauseDds.push_back(clauseDd);
   }
+  if (cnf.getWeightFormat() == WeightFormat::CONDITIONAL)
+    for (auto pair : cnf.getWeights())
+      clauseDds.push_back(pair.second);
 }
 
 void LinearCounter::constructJoinTree(const Cnf &cnf) {
   const vector<vector<Int>> &clauses = cnf.getClauses();
-  fillProjectableCnfVarSets(clauses);
+  fillProjectableCnfVarSets(clauses, cnf.getDependencies());
 
   vector<JoinNode *> clauseNodes;
   for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
@@ -333,7 +355,7 @@ void LinearCounter::constructJoinTree(const Cnf &cnf) {
   }
 }
 
-Float LinearCounter::computeModelCount(const Cnf &cnf) {
+Float LinearCounter::computeModelCount(Cnf &cnf) {
   orderDdVars(cnf);
 
   vector<ADD> factorDds;
@@ -351,25 +373,29 @@ Float LinearCounter::computeModelCount(const Cnf &cnf) {
 
     Set<Int> projectingDdVars;
     util::differ(projectingDdVars, productDdVars, otherDdVars);
-    abstractCube(product, projectingDdVars, cnf.getLiteralWeights());
+    abstractCube(product, projectingDdVars, cnf.getLiteralWeights(),
+                 cnf.getWeightFormat());
     util::unionize(projectedCnfVars, getCnfVars(projectingDdVars));
 
     factorDds.push_back(product);
   }
 
   Float modelCount = diagram::countConstDdFloat(util::getSoleMember(factorDds));
-  modelCount = util::adjustModelCount(modelCount, projectedCnfVars, cnf.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, projectedCnfVars,
+                                      cnf.getLiteralWeights(),
+                                      cnf.getWeightFormat());
   return modelCount;
 }
 
-LinearCounter::LinearCounter(VarOrderingHeuristic ddVarOrderingHeuristic, bool inverseDdVarOrdering) {
-  this->ddVarOrderingHeuristic = ddVarOrderingHeuristic;
-  this->inverseDdVarOrdering = inverseDdVarOrdering;
+LinearCounter::LinearCounter(Cudd *mgr) {
+  this->mgr = mgr;
 }
 
 /* class NonlinearCounter ********************************************************/
 
-void NonlinearCounter::printClusters(const vector<vector<Int>> &clauses) const {
+void NonlinearCounter::printClusters(
+    const vector<vector<Int>> &clauses,
+    const Map<Int, vector<Int>> &dependencies) const {
   printThinLine();
   printComment("clusters {");
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
@@ -383,7 +409,10 @@ void NonlinearCounter::printClusters(const vector<vector<Int>> &clauses) const {
   printThinLine();
 }
 
-void NonlinearCounter::fillClusters(const vector<vector<Int>> &clauses, const vector<Int> &cnfVarOrdering, bool usingMinVar) {
+void NonlinearCounter::fillClusters(const vector<vector<Int>> &clauses,
+                                    const Map<Int, vector<Int>> &dependencies,
+                                    const vector<Int> &cnfVarOrdering,
+                                    bool usingMinVar) {
   clusters = vector<vector<Int>>(cnfVarOrdering.size(), vector<Int>());
   for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     Int clusterIndex = usingMinVar ? util::getMinClauseRank(clauses.at(clauseIndex), cnfVarOrdering) : util::getMaxClauseRank(clauses.at(clauseIndex), cnfVarOrdering);
@@ -418,13 +447,16 @@ void NonlinearCounter::printProjectableCnfVarSets() const {
   printComment("}");
 }
 
-void NonlinearCounter::fillCnfVarSets(const vector<vector<Int>> &clauses, bool usingMinVar) {
+void NonlinearCounter::fillCnfVarSets(
+    const vector<vector<Int>> &clauses,
+    const Map<Int, vector<Int>> &dependencies,
+    bool usingMinVar) {
   occurrentCnfVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
   projectableCnfVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
 
   Set<Int> placedCnfVars; // cumulates vars placed in projectableCnfVarSets so far
   for (Int clusterIndex = clusters.size() - 1; clusterIndex >= 0; clusterIndex--) {
-    Set<Int> clusterCnfVars = util::getClusterCnfVars(clusters.at(clusterIndex), clauses);
+    Set<Int> clusterCnfVars = util::getClusterCnfVars(clusters.at(clusterIndex), clauses, dependencies);
 
     occurrentCnfVarSets[clusterIndex] = clusterCnfVars;
 
@@ -435,18 +467,24 @@ void NonlinearCounter::fillCnfVarSets(const vector<vector<Int>> &clauses, bool u
   }
 }
 
-Set<Int> NonlinearCounter::getProjectingDdVars(Int clusterIndex, bool usingMinVar, const vector<Int> &cnfVarOrdering, const vector<vector<Int>> &clauses) {
+Set<Int> NonlinearCounter::getProjectingDdVars(
+    Int clusterIndex, bool usingMinVar, const vector<Int> &cnfVarOrdering,
+    const vector<vector<Int>> &clauses,
+    const Map<Int, vector<Int>> &dependencies) {
   Set<Int> projectableCnfVars;
 
   if (usingMinVar) { // bucket elimination
     projectableCnfVars.insert(cnfVarOrdering.at(clusterIndex));
   }
   else { // Bouquet's Method
-    Set<Int> activeCnfVars = util::getClusterCnfVars(clusters.at(clusterIndex), clauses);
+    Set<Int> activeCnfVars = util::getClusterCnfVars(clusters.at(clusterIndex),
+                                                     clauses, dependencies);
 
     Set<Int> otherCnfVars;
     for (Int i = clusterIndex + 1; i < clusters.size(); i++) {
-      util::unionize(otherCnfVars, util::getClusterCnfVars(clusters.at(i), clauses));
+      util::unionize(otherCnfVars, util::getClusterCnfVars(clusters.at(i),
+                                                           clauses,
+                                                           dependencies));
     }
 
     util::differ(projectableCnfVars, activeCnfVars, otherCnfVars);
@@ -459,25 +497,36 @@ Set<Int> NonlinearCounter::getProjectingDdVars(Int clusterIndex, bool usingMinVa
   return projectingDdVars;
 }
 
-void NonlinearCounter::fillDdClusters(const vector<vector<Int>> &clauses, const vector<Int> &cnfVarOrdering, bool usingMinVar) {
-  fillClusters(clauses, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses);
+void NonlinearCounter::fillDdClusters(
+    const vector<vector<Int>> &clauses,
+    const Map<Int, vector<Int>> &dependencies,
+    const Map<Int, ADD> &weights,
+    const vector<Int> &cnfVarOrdering, bool usingMinVar) {
+  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
 
   ddClusters = vector<vector<ADD>>(clusters.size(), vector<ADD>());
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
     for (Int clauseIndex : clusters.at(clusterIndex)) {
-      ADD clauseDd = getClauseDd(clauses.at(clauseIndex));
+      ADD clauseDd = (clauseIndex < clauses.size()) ? getClauseDd(clauses.at(clauseIndex)) : weights.at(clauseIndex - clauses.size());
       ddClusters.at(clusterIndex).push_back(clauseDd);
     }
   }
 }
 
-void NonlinearCounter::fillProjectingDdVarSets(const vector<vector<Int>> &clauses, const vector<Int> &cnfVarOrdering, bool usingMinVar) {
-  fillDdClusters(clauses, cnfVarOrdering, usingMinVar);
+void NonlinearCounter::fillProjectingDdVarSets(
+  const vector<vector<Int>> &clauses,
+  const Map<Int, vector<Int>> &dependencies, const Map<Int, ADD> &weights,
+  const vector<Int> &cnfVarOrdering, bool usingMinVar) {
+  fillDdClusters(clauses, dependencies, weights, cnfVarOrdering, usingMinVar);
 
   projectingDdVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
   for (Int clusterIndex = 0; clusterIndex < ddClusters.size(); clusterIndex++) {
-    projectingDdVarSets[clusterIndex] = getProjectingDdVars(clusterIndex, usingMinVar, cnfVarOrdering, clauses);
+    projectingDdVarSets[clusterIndex] = getProjectingDdVars(clusterIndex,
+                                                            usingMinVar,
+                                                            cnfVarOrdering,
+                                                            clauses,
+                                                            dependencies);
   }
 }
 
@@ -515,13 +564,14 @@ Int NonlinearCounter::getNewClusterIndex(const Set<Int> &remainingDdVars) const 
 }
 
 void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool usingMinVar) {
-  vector<Int> cnfVarOrdering = cnf.getVarOrdering(cnfVarOrderingHeuristic, inverseCnfVarOrdering);
+  vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
+  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
 
-  fillClusters(clauses, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses);
+  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
 
-  fillCnfVarSets(clauses, usingMinVar);
+  fillCnfVarSets(clauses, dependencies, usingMinVar);
   if (verbosityLevel >= 2) {
     printOccurrentCnfVarSets();
     printProjectableCnfVarSets();
@@ -562,13 +612,14 @@ void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool
 }
 
 void NonlinearCounter::constructJoinTreeUsingTreeClustering(const Cnf &cnf, bool usingMinVar) {
-  vector<Int> cnfVarOrdering = cnf.getVarOrdering(cnfVarOrderingHeuristic, inverseCnfVarOrdering);
+  vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
+  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
 
-  fillClusters(clauses, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses);
+  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
 
-  fillCnfVarSets(clauses, usingMinVar);
+  fillCnfVarSets(clauses, dependencies, usingMinVar);
   if (verbosityLevel >= 2) {
     printOccurrentCnfVarSets();
     printProjectableCnfVarSets();
@@ -625,62 +676,72 @@ void NonlinearCounter::constructJoinTreeUsingTreeClustering(const Cnf &cnf, bool
   joinRoot = new JoinNonterminal(rootChildren);
 }
 
-Float NonlinearCounter::countUsingListClustering(const Cnf &cnf, bool usingMinVar) {
+Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
   orderDdVars(cnf);
 
-  vector<Int> cnfVarOrdering = cnf.getVarOrdering(cnfVarOrderingHeuristic, inverseCnfVarOrdering);
+  vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
+  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
+  const Map<Int, ADD> &weights = cnf.getWeights();
 
-  fillClusters(clauses, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses);
+  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
 
   /* builds ADD for CNF: */
-  ADD cnfDd = mgr.addOne();
+  ADD cnfDd = mgr->addOne();
   Set<Int> projectedCnfVars;
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
     /* builds ADD for cluster: */
-    ADD clusterDd = mgr.addOne();
+    ADD clusterDd = mgr->addOne();
     const vector<Int> &clauseIndices = clusters.at(clusterIndex);
     for (Int clauseIndex : clauseIndices) {
-      ADD clauseDd = getClauseDd(clauses.at(clauseIndex));
+      ADD clauseDd = (clauseIndex < clauses.size()) ? getClauseDd(clauses.at(clauseIndex)) : weights.at(clauseIndex - clauses.size());
       clusterDd *= clauseDd;
     }
 
     cnfDd *= clusterDd;
 
-    Set<Int> projectingDdVars = getProjectingDdVars(clusterIndex, usingMinVar, cnfVarOrdering, clauses);
-    abstractCube(cnfDd, projectingDdVars, cnf.getLiteralWeights());
+    Set<Int> projectingDdVars = getProjectingDdVars(clusterIndex, usingMinVar,
+                                                    cnfVarOrdering, clauses, dependencies);
+    abstractCube(cnfDd, projectingDdVars, cnf.getLiteralWeights(),
+                 cnf.getWeightFormat());
     util::unionize(projectedCnfVars, getCnfVars(projectingDdVars));
   }
 
   Float modelCount = diagram::countConstDdFloat(cnfDd);
-  modelCount = util::adjustModelCount(modelCount, cnfVarOrdering, cnf.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, cnfVarOrdering,
+                                      cnf.getLiteralWeights(),
+                                      cnf.getWeightFormat());
   return modelCount;
 }
 
-Float NonlinearCounter::countUsingTreeClustering(const Cnf &cnf, bool usingMinVar) {
+Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf, bool usingMinVar) {
   orderDdVars(cnf);
 
-  vector<Int> cnfVarOrdering = cnf.getVarOrdering(cnfVarOrderingHeuristic, inverseCnfVarOrdering);
+  vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
+  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
+  const Map<Int, ADD> &weights = cnf.getWeights();
 
-  fillProjectingDdVarSets(clauses, cnfVarOrdering, usingMinVar);
+  fillProjectingDdVarSets(clauses, dependencies, weights, cnfVarOrdering,
+                          usingMinVar);
 
   /* builds ADD for CNF: */
-  ADD cnfDd = mgr.addOne();
+  ADD cnfDd = mgr->addOne();
   Set<Int> projectedCnfVars;
   Int clusterCount = clusters.size();
   for (Int clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++) {
     const vector<ADD> &ddCluster = ddClusters.at(clusterIndex);
     if (!ddCluster.empty()) {
       /* builds ADD for cluster: */
-      ADD clusterDd = mgr.addOne();
+      ADD clusterDd = mgr->addOne();
       for (const ADD &dd : ddCluster) clusterDd *= dd;
 
       Set<Int> projectingDdVars = projectingDdVarSets.at(clusterIndex);
       if (usingMinVar && projectingDdVars.size() != 1) showError("wrong number of projecting vars (bucket elimination)");
 
-      abstractCube(clusterDd, projectingDdVars, cnf.getLiteralWeights());
+      abstractCube(clusterDd, projectingDdVars, cnf.getLiteralWeights(),
+                   cnf.getWeightFormat());
       util::unionize(projectedCnfVars, getCnfVars(projectingDdVars));
 
       Int newClusterIndex = getNewClusterIndex(clusterDd, cnfVarOrdering, usingMinVar);
@@ -701,18 +762,22 @@ Float NonlinearCounter::countUsingTreeClustering(const Cnf &cnf, bool usingMinVa
   }
 
   Float modelCount = diagram::countConstDdFloat(cnfDd);
-  modelCount = util::adjustModelCount(modelCount, projectedCnfVars, cnf.getLiteralWeights());
+  modelCount = util::adjustModelCount(modelCount, projectedCnfVars,
+                                      cnf.getLiteralWeights(),
+                                      cnf.getWeightFormat());
   return modelCount;
 }
-Float NonlinearCounter::countUsingTreeClustering(const Cnf &cnf) { // #MAVC
+Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf) { // #MAVC
   orderDdVars(cnf);
 
-  vector<Int> cnfVarOrdering = cnf.getVarOrdering(cnfVarOrderingHeuristic, inverseCnfVarOrdering);
+  vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
+  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
 
   bool usingMinVar = false;
 
-  fillProjectingDdVarSets(clauses, cnfVarOrdering, usingMinVar);
+  fillProjectingDdVarSets(clauses, dependencies, cnf.getWeights(),
+                          cnfVarOrdering, usingMinVar);
 
   vector<Set<Int>> clustersDdVars; // clusterIndex |-> ddVars
   for (const auto &ddCluster : ddClusters) {
@@ -764,17 +829,18 @@ void BucketCounter::constructJoinTree(const Cnf &cnf) {
   return usingTreeClustering ? NonlinearCounter::constructJoinTreeUsingTreeClustering(cnf, usingMinVar) : NonlinearCounter::constructJoinTreeUsingListClustering(cnf, usingMinVar);
 }
 
-Float BucketCounter::computeModelCount(const Cnf &cnf) {
+Float BucketCounter::computeModelCount(Cnf &cnf) {
   bool usingMinVar = true;
   return usingTreeClustering ? NonlinearCounter::countUsingTreeClustering(cnf, usingMinVar) : NonlinearCounter::countUsingListClustering(cnf, usingMinVar);
 }
 
-BucketCounter::BucketCounter(bool usingTreeClustering, VarOrderingHeuristic cnfVarOrderingHeuristic, bool inverseCnfVarOrdering, VarOrderingHeuristic ddVarOrderingHeuristic, bool inverseDdVarOrdering) {
+BucketCounter::BucketCounter(Cudd *mgr, bool usingTreeClustering,
+                             VarOrderingHeuristic cnfVarOrderingHeuristic,
+                             bool inverseCnfVarOrdering) {
+  this->mgr = mgr;
   this->usingTreeClustering = usingTreeClustering;
   this->cnfVarOrderingHeuristic = cnfVarOrderingHeuristic;
   this->inverseCnfVarOrdering = inverseCnfVarOrdering;
-  this->ddVarOrderingHeuristic = ddVarOrderingHeuristic;
-  this->inverseDdVarOrdering = inverseDdVarOrdering;
 }
 
 /* class BouquetCounter *******************************************************/
@@ -784,16 +850,17 @@ void BouquetCounter::constructJoinTree(const Cnf &cnf) {
   return usingTreeClustering ? NonlinearCounter::constructJoinTreeUsingTreeClustering(cnf, usingMinVar) : NonlinearCounter::constructJoinTreeUsingListClustering(cnf, usingMinVar);
 }
 
-Float BouquetCounter::computeModelCount(const Cnf &cnf) {
+Float BouquetCounter::computeModelCount(Cnf &cnf) {
   bool usingMinVar = false;
   // return NonlinearCounter::countUsingTreeClustering(cnf); // #MAVC
   return usingTreeClustering ? NonlinearCounter::countUsingTreeClustering(cnf, usingMinVar) : NonlinearCounter::countUsingListClustering(cnf, usingMinVar);
 }
 
-BouquetCounter::BouquetCounter(bool usingTreeClustering, VarOrderingHeuristic cnfVarOrderingHeuristic, bool inverseCnfVarOrdering, VarOrderingHeuristic ddVarOrderingHeuristic, bool inverseDdVarOrdering) {
+BouquetCounter::BouquetCounter(Cudd *mgr, bool usingTreeClustering,
+                               VarOrderingHeuristic cnfVarOrderingHeuristic,
+                               bool inverseCnfVarOrdering) {
+  this->mgr = mgr;
   this->usingTreeClustering = usingTreeClustering;
   this->cnfVarOrderingHeuristic = cnfVarOrderingHeuristic;
   this->inverseCnfVarOrdering = inverseCnfVarOrdering;
-  this->ddVarOrderingHeuristic = ddVarOrderingHeuristic;
-  this->inverseDdVarOrdering = inverseDdVarOrdering;
 }

@@ -105,38 +105,44 @@ void solving::solveOptions(
     util::printRow("inverseClusterVarOrder", inverseCnfVarOrdering);
   }
 
-  const Cnf cnf(cnfFilePath, weightFormat);
+  Cudd mgr;
+  Cnf cnf(cnfFilePath, weightFormat, &mgr, cnfVarOrderingHeuristic,
+                inverseCnfVarOrdering);
 
   VarOrderingHeuristic ddVarOrderingHeuristic = VarOrderingHeuristic::DUMMY_VAR_ORDERING_HEURISTIC;
   bool inverseDdVarOrdering = false; // dummy
   switch (clusteringHeuristic) {
     case ClusteringHeuristic::MONOLITHIC: {
-      MonolithicCounter monolithicCounter(ddVarOrderingHeuristic, inverseDdVarOrdering);
+      MonolithicCounter monolithicCounter(&mgr);
       monolithicCounter.output(cnf, OutputFormat::JOIN_TREE);
       break;
     }
     case ClusteringHeuristic::LINEAR: {
-      LinearCounter linearCounter(ddVarOrderingHeuristic, inverseDdVarOrdering);
+      LinearCounter linearCounter(&mgr);
         linearCounter.output(cnf, OutputFormat::JOIN_TREE);
       break;
     }
     case ClusteringHeuristic::BUCKET_LIST: {
-      BucketCounter bucketCounter(false, cnfVarOrderingHeuristic, inverseCnfVarOrdering, ddVarOrderingHeuristic, inverseDdVarOrdering);
+      BucketCounter bucketCounter(&mgr, false, cnfVarOrderingHeuristic,
+                                  inverseCnfVarOrdering);
       bucketCounter.output(cnf, OutputFormat::JOIN_TREE);
       break;
     }
     case ClusteringHeuristic::BUCKET_TREE: {
-      BucketCounter bucketCounter(true, cnfVarOrderingHeuristic, inverseCnfVarOrdering, ddVarOrderingHeuristic, inverseDdVarOrdering);
+      BucketCounter bucketCounter(&mgr, true, cnfVarOrderingHeuristic,
+                                  inverseCnfVarOrdering);
       bucketCounter.output(cnf, OutputFormat::JOIN_TREE);
       break;
     }
     case ClusteringHeuristic::BOUQUET_LIST: {
-      BouquetCounter bouquetCounter(false, cnfVarOrderingHeuristic, inverseCnfVarOrdering, ddVarOrderingHeuristic, inverseDdVarOrdering);
+      BouquetCounter bouquetCounter(&mgr, false, cnfVarOrderingHeuristic,
+                                    inverseCnfVarOrdering);
       bouquetCounter.output(cnf, OutputFormat::JOIN_TREE);
       break;
     }
     case ClusteringHeuristic::BOUQUET_TREE: {
-      BouquetCounter bouquetCounter(true, cnfVarOrderingHeuristic, inverseCnfVarOrdering, ddVarOrderingHeuristic, inverseDdVarOrdering);
+      BouquetCounter bouquetCounter(&mgr, true, cnfVarOrderingHeuristic,
+                                    inverseCnfVarOrdering);
       bouquetCounter.output(cnf, OutputFormat::JOIN_TREE);
       break;
     }
