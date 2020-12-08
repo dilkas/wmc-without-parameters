@@ -28,8 +28,8 @@ protected:
   WeightFormat weightFormat;
   Int declaredVarCount = DUMMY_MIN_INT; // in cnf file
   Map<Int, Float> literalWeights;
-  Map<Int, ADD> weights; /* conditional probability tables encoded as ADDs */
-  Map<Int, vector<Int>> dependencies; /* how variables depend on other variables */
+  vector<ADD> weights; /* conditional probability tables encoded as ADDs */
+  vector<vector<Int>> dependencies; /* how variables depend on other variables */
   vector<vector<Int>> clauses;
   vector<Int> apparentVars; // vars appearing in clauses, ordered by 1st appearance
   vector<vector<std::string>> unparsedWeights; /* needed to compute variable ordering heuristics */
@@ -54,9 +54,9 @@ public:
   vector<Int> getVarOrdering() const;
   Int getDeclaredVarCount() const;
   Map<Int, Float> getLiteralWeights() const;
-  const Map<Int, ADD> &getWeights() const;
+  const vector<ADD> &getWeights() const;
   WeightFormat getWeightFormat() const;
-  const Map<Int, vector<Int>> &getDependencies() const;
+  const vector<vector<Int>> &getDependencies() const;
   Int getEmptyClauseIndex() const; // first (nonnegative) index if found else DUMMY_MIN_INT
   const vector<vector<Int>> &getClauses() const;
   const vector<Int> &getApparentVars() const;

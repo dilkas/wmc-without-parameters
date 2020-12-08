@@ -158,11 +158,11 @@ namespace util {
 
   Int getCnfVar(Int literal);
   Set<Int> getClauseCnfVars(const vector<vector<Int>> &clause,
-                            const Map<Int, vector<Int>> &dependencies,
+                            const vector<vector<Int>> &dependencies,
                             Int clause_index);
   Set<Int> getClusterCnfVars(const vector<Int> &cluster,
                              const vector<vector<Int>> &clauses,
-                             const Map<Int, vector<Int>> &dependencies);
+                             const vector<vector<Int>> &dependencies);
 
   bool appearsIn(Int cnfVar, const vector<Int> &clause);
   bool isPositiveLiteral(Int literal);

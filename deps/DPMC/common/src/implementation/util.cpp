@@ -39,7 +39,8 @@ const std::map<Int, WeightFormat> WEIGHT_FORMAT_CHOICES = {
   {1, WeightFormat::UNWEIGHTED},
   {2, WeightFormat::MINIC2D},
   {3, WeightFormat::CACHET}, // buggy '-1' weight
-  {4, WeightFormat::MCC} // weight line's trailing '0' is optional
+  {4, WeightFormat::MCC}, // weight line's trailing '0' is optional
+  {5, WeightFormat::CONDITIONAL}
 };
 const Int DEFAULT_WEIGHT_FORMAT_CHOICE = 3;
 
@@ -375,14 +376,14 @@ Int util::getCnfVar(Int literal) {
 }
 
 Set<Int> util::getClauseCnfVars(const vector<vector<Int>> &clause,
-                                const Map<Int, vector<Int>> &dependencies,
+                                const vector<vector<Int>> &dependencies,
                                 Int clauseIndex) {
   Set<Int> cnfVars;
   if (clauseIndex < clause.size()) {
     for (Int literal : clause.at(clauseIndex))
       cnfVars.insert(getCnfVar(literal));
   } else {
-    for (Int dependency : dependencies.at(clauseIndex - clause.size()))
+    for (Int dependency : dependencies[clauseIndex - clause.size()])
       cnfVars.insert(dependency);
   }
   return cnfVars;
@@ -390,7 +391,7 @@ Set<Int> util::getClauseCnfVars(const vector<vector<Int>> &clause,
 
 Set<Int> util::getClusterCnfVars(const vector<Int> &cluster,
                                  const vector<vector<Int>> &clauses,
-                                 const Map<Int, vector<Int>> &dependencies) {
+                                 const vector<vector<Int>> &dependencies) {
   Set<Int> cnfVars;
   for (Int clauseIndex : cluster)
     unionize(cnfVars, getClauseCnfVars(clauses, dependencies, clauseIndex));

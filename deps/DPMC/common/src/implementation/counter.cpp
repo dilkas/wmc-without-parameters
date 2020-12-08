@@ -126,7 +126,9 @@ void Counter::setJoinTree(const Cnf &cnf) {
 
 ADD Counter::countSubtree(JoinNode *joinNode, const Cnf &cnf, Set<Int> &projectedCnfVars) {
   if (joinNode->isTerminal()) {
-    return getClauseDd(cnf.getClauses().at(joinNode->getNodeIndex()));
+    auto i = joinNode->getNodeIndex();
+    auto clauses = cnf.getClauses();
+    return (i < clauses.size()) ? getClauseDd(clauses.at(i)) : cnf.getWeights().at(i - clauses.size());
   }
   else {
     ADD dd = mgr->addOne();
@@ -241,10 +243,12 @@ Float JoinTreeCounter::computeModelCount(Cnf &cnf) {
 }
 
 JoinTreeCounter::JoinTreeCounter(
+  Cudd *mgr,
   JoinNonterminal *joinRoot,
   VarOrderingHeuristic ddVarOrderingHeuristic,
   bool inverseDdVarOrdering
 ) {
+  this->mgr = mgr;
   this->joinRoot = joinRoot;
   this->cnfVarOrderingHeuristic = ddVarOrderingHeuristic;
   this->inverseCnfVarOrdering = inverseDdVarOrdering;
@@ -287,8 +291,8 @@ Float MonolithicCounter::computeModelCount(Cnf &cnf) {
   setCnfDd(cnfDd, cnf);
 
   if (cnf.getWeightFormat() == WeightFormat::CONDITIONAL)
-    for (auto pair : cnf.getWeights())
-      cnfDd *= pair.second;
+    for (auto w : cnf.getWeights())
+      cnfDd *= w;
 
   Set<Int> support = util::getSupport(cnfDd);
   for (Int ddVar : support) {
@@ -312,7 +316,7 @@ MonolithicCounter::MonolithicCounter(Cudd *mgr) {
 
 void LinearCounter::fillProjectableCnfVarSets(
     const vector<vector<Int>> &clauses,
-    const Map<Int, vector<Int>> &dependencies) {
+    const vector<vector<Int>> &dependencies) {
   projectableCnfVarSets = vector<Set<Int>>(clauses.size(), Set<Int>());
 
   Set<Int> placedCnfVars; // cumulates vars placed in projectableCnfVarSets so far
@@ -335,8 +339,8 @@ void LinearCounter::setLinearClauseDds(vector<ADD> &clauseDds, Cnf &cnf) {
     clauseDds.push_back(clauseDd);
   }
   if (cnf.getWeightFormat() == WeightFormat::CONDITIONAL)
-    for (auto pair : cnf.getWeights())
-      clauseDds.push_back(pair.second);
+    for (auto w : cnf.getWeights())
+      clauseDds.push_back(w);
 }
 
 void LinearCounter::constructJoinTree(const Cnf &cnf) {
@@ -395,7 +399,7 @@ LinearCounter::LinearCounter(Cudd *mgr) {
 
 void NonlinearCounter::printClusters(
     const vector<vector<Int>> &clauses,
-    const Map<Int, vector<Int>> &dependencies) const {
+    const vector<vector<Int>> &dependencies) const {
   printThinLine();
   printComment("clusters {");
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
@@ -410,7 +414,7 @@ void NonlinearCounter::printClusters(
 }
 
 void NonlinearCounter::fillClusters(const vector<vector<Int>> &clauses,
-                                    const Map<Int, vector<Int>> &dependencies,
+                                    const vector<vector<Int>> &dependencies,
                                     const vector<Int> &cnfVarOrdering,
                                     bool usingMinVar) {
   clusters = vector<vector<Int>>(cnfVarOrdering.size(), vector<Int>());
@@ -449,7 +453,7 @@ void NonlinearCounter::printProjectableCnfVarSets() const {
 
 void NonlinearCounter::fillCnfVarSets(
     const vector<vector<Int>> &clauses,
-    const Map<Int, vector<Int>> &dependencies,
+    const vector<vector<Int>> &dependencies,
     bool usingMinVar) {
   occurrentCnfVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
   projectableCnfVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
@@ -470,7 +474,7 @@ void NonlinearCounter::fillCnfVarSets(
 Set<Int> NonlinearCounter::getProjectingDdVars(
     Int clusterIndex, bool usingMinVar, const vector<Int> &cnfVarOrdering,
     const vector<vector<Int>> &clauses,
-    const Map<Int, vector<Int>> &dependencies) {
+    const vector<vector<Int>> &dependencies) {
   Set<Int> projectableCnfVars;
 
   if (usingMinVar) { // bucket elimination
@@ -499,8 +503,8 @@ Set<Int> NonlinearCounter::getProjectingDdVars(
 
 void NonlinearCounter::fillDdClusters(
     const vector<vector<Int>> &clauses,
-    const Map<Int, vector<Int>> &dependencies,
-    const Map<Int, ADD> &weights,
+    const vector<vector<Int>> &dependencies,
+    const vector<ADD> &weights,
     const vector<Int> &cnfVarOrdering, bool usingMinVar) {
   fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
   if (verbosityLevel >= 2) printClusters(clauses, dependencies);
@@ -516,7 +520,7 @@ void NonlinearCounter::fillDdClusters(
 
 void NonlinearCounter::fillProjectingDdVarSets(
   const vector<vector<Int>> &clauses,
-  const Map<Int, vector<Int>> &dependencies, const Map<Int, ADD> &weights,
+  const vector<vector<Int>> &dependencies, const vector<ADD> &weights,
   const vector<Int> &cnfVarOrdering, bool usingMinVar) {
   fillDdClusters(clauses, dependencies, weights, cnfVarOrdering, usingMinVar);
 
@@ -566,7 +570,7 @@ Int NonlinearCounter::getNewClusterIndex(const Set<Int> &remainingDdVars) const 
 void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool usingMinVar) {
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
-  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
+  const vector<vector<Int>> &dependencies = cnf.getDependencies();
 
   fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
   if (verbosityLevel >= 2) printClusters(clauses, dependencies);
@@ -614,7 +618,7 @@ void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool
 void NonlinearCounter::constructJoinTreeUsingTreeClustering(const Cnf &cnf, bool usingMinVar) {
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
-  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
+  const vector<vector<Int>> &dependencies = cnf.getDependencies();
 
   fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
   if (verbosityLevel >= 2) printClusters(clauses, dependencies);
@@ -681,8 +685,8 @@ Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
-  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
-  const Map<Int, ADD> &weights = cnf.getWeights();
+  const vector<vector<Int>> &dependencies = cnf.getDependencies();
+  const vector<ADD> &weights = cnf.getWeights();
 
   fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
   if (verbosityLevel >= 2) printClusters(clauses, dependencies);
@@ -720,8 +724,8 @@ Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf, bool usingMinVar) {
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
-  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
-  const Map<Int, ADD> &weights = cnf.getWeights();
+  const vector<vector<Int>> &dependencies = cnf.getDependencies();
+  const vector<ADD> &weights = cnf.getWeights();
 
   fillProjectingDdVarSets(clauses, dependencies, weights, cnfVarOrdering,
                           usingMinVar);
@@ -772,7 +776,7 @@ Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf) { // #MAVC
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<vector<Int>> &clauses = cnf.getClauses();
-  const Map<Int, vector<Int>> &dependencies = cnf.getDependencies();
+  const vector<vector<Int>> &dependencies = cnf.getDependencies();
 
   bool usingMinVar = false;
 

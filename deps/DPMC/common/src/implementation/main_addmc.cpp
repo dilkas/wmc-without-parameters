@@ -232,6 +232,7 @@ void solving::solveOptions(
                                         performanceFactor, cnf.getClauses(),
                                         cnf.getDependencies());
     JoinTreeCounter joinTreeCounter(
+      &mgr,
       joinTreeReader.getJoinTreeRoot(),
       ddVarOrderingHeuristic,
       inverseDdVarOrdering

@@ -1,7 +1,7 @@
 appname := lg
 
 CXX := g++
-CXXFLAGS := -std=c++17 -O3 -DNDEBUG -I ./src -pedantic
+CXXFLAGS := -g -std=c++17 -O3 -DNDEBUG -I ./src -pedantic
 LDLIBS := -lboost_system -pthread
 
 srcfiles := $(shell find . -name "*.cc" -not -path "./solvers/*")

@@ -66,6 +66,7 @@ public:
   void constructJoinTree(const Cnf &cnf) override;
   Float computeModelCount(Cnf &cnf) override;
   JoinTreeCounter(
+    Cudd *mgr,
     JoinNonterminal *joinRoot,
     VarOrderingHeuristic ddVarOrderingHeuristic,
     bool inverseDdVarOrdering
@@ -90,7 +91,7 @@ protected:
   vector<Set<Int>> projectableCnfVarSets; // clauseIndex |-> cnfVars
 
   void fillProjectableCnfVarSets(const vector<vector<Int>> &clauses,
-                                 const Map<Int, vector<Int>> &dependencies);
+                                 const vector<vector<Int>> &dependencies);
   void setLinearClauseDds(vector<ADD> &clauseDds, Cnf &cnf);
 
 public:
@@ -114,30 +115,30 @@ protected:
   vector<Set<Int>> projectingDdVarSets; // clusterIndex |-> ddVars (if usingTreeClustering)
 
   void printClusters(const vector<vector<Int>> &clauses,
-                     const Map<Int, vector<Int>> &dependencies) const;
+                     const vector<vector<Int>> &dependencies) const;
   void fillClusters(const vector<vector<Int>> &clauses,
-                    const Map<Int, vector<Int>> &dependencies,
+                    const vector<vector<Int>> &dependencies,
                     const vector<Int> &cnfVarOrdering, bool usingMinVar);
 
   void printOccurrentCnfVarSets() const;
   void printProjectableCnfVarSets() const;
   // writes: occurrentCnfVarSets, projectableCnfVarSets
   void fillCnfVarSets(const vector<vector<Int>> &clauses,
-                      const Map<Int, vector<Int>> &dependencies,
+                      const vector<vector<Int>> &dependencies,
                       bool usingMinVar);
 
   Set<Int> getProjectingDdVars(Int clusterIndex, bool usingMinVar,
                                const vector<Int> &cnfVarOrdering,
                                const vector<vector<Int>> &clauses,
-                               const Map<Int, vector<Int>> &dependencies);
+                               const vector<vector<Int>> &dependencies);
   // (if usingTreeClustering)
   void fillDdClusters(const vector<vector<Int>> &clauses,
-                      const Map<Int, vector<Int>> &dependencies,
-                      const Map<Int, ADD> &weights,
+                      const vector<vector<Int>> &dependencies,
+                      const vector<ADD> &weights,
                       const vector<Int> &cnfVarOrdering, bool usingMinVar);
   void fillProjectingDdVarSets(const vector<vector<Int>> &clauses,
-                               const Map<Int, vector<Int>> &dependencies,
-                               const Map<Int, ADD> &weights,
+                               const vector<vector<Int>> &dependencies,
+                               const vector<ADD> &weights,
                                const vector<Int> &cnfVarOrdering,
                                bool usingMinVar); // (if usingTreeClustering)
 

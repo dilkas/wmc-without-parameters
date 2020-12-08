@@ -53,9 +53,9 @@ public:
      this->projectableCnfVars */
   virtual const Set<Int> &getApparentCnfVars(
       const vector<vector<Int>> &clauses,
-      const Map<Int, vector<Int>> &dependencies) = 0;
+      const vector<vector<Int>> &dependencies) = 0;
   virtual Int getMaxVarCount(const vector<vector<Int>> &clauses,
-                             const Map<Int, vector<Int>> &dependencies) = 0;
+                             const vector<vector<Int>> &dependencies) = 0;
   virtual void printSubtree(const string &prefix = "") const = 0;
 };
 
@@ -63,9 +63,9 @@ class JoinTerminal : public JoinNode {
 public:
   const Set<Int> &getApparentCnfVars(
       const vector<vector<Int>> &clauses,
-      const Map<Int, vector<Int>> &dependencies) override;
+      const vector<vector<Int>> &dependencies) override;
   virtual Int getMaxVarCount(const vector<vector<Int>> &clauses,
-                             const Map<Int, vector<Int>> &dependencies);
+                             const vector<vector<Int>> &dependencies);
   void printSubtree(const string &prefix = "") const override;
   JoinTerminal();
 };
@@ -75,9 +75,9 @@ public:
   void printNode(const string &prefix) const;
   const Set<Int> &getApparentCnfVars(
       const vector<vector<Int>> &clauses,
-      const Map<Int, vector<Int>> &dependencies) override;
+      const vector<vector<Int>> &dependencies) override;
   virtual Int getMaxVarCount(const vector<vector<Int>> &clauses,
-                             const Map<Int, vector<Int>> &dependencies);
+                             const vector<vector<Int>> &dependencies);
   void printSubtree(const string &prefix = "") const override; // post-order
   void addProjectableCnfVars(const Set<Int> &cnfVars);
   JoinNonterminal(
@@ -124,7 +124,7 @@ protected:
   Int problemLineIndex = DUMMY_MIN_INT;
   Int joinTreeEndLineIndex = DUMMY_MIN_INT;
   vector<vector<Int>> clauses;
-  Map<Int, vector<Int>> dependencies;
+  vector<vector<Int>> dependencies;
 
   /* timer: */
   static void killPlanner(); // SIGKILL
@@ -146,6 +146,6 @@ public:
     Float jtWaitSeconds,
     Float performanceFactor,
     const vector<vector<Int>> &clauses,
-    const Map<Int, vector<Int>> &dependencies
+    const vector<vector<Int>> &dependencies
   );
 };

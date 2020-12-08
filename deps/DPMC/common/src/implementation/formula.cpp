@@ -235,11 +235,11 @@ vector<Int> Cnf::getVarOrdering() const {
   return varOrdering;
 }
 
-const Map<Int, ADD> &Cnf::getWeights() const {
+const vector<ADD> &Cnf::getWeights() const {
   return weights;
 }
 
-const Map<Int, vector<Int>> &Cnf::getDependencies() const {
+const vector<vector<Int>> &Cnf::getDependencies() const {
   return dependencies;
 }
 
@@ -464,7 +464,7 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
         literalWeights[var] = weight;
       } else if (weightFormat == WeightFormat::CONDITIONAL) {
         unparsedWeights.push_back(words);
-        for (Int i = 1; i < words.size(); i++)
+        for (Int i = 1; i < words.size() - 2; i++)
           updateApparentVars(std::stoi(words.at(i)));
       }
       else if (weightFormat == WeightFormat::MCC && (wordCount == 3 || wordCount == 4 && words.at(3) == LINE_END_WORD)) {
@@ -565,6 +565,9 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
 
   // compiles weights into DDs
   if (weightFormat == WeightFormat::CONDITIONAL) {
+    for (size_t i = 0; i < declaredVarCount; i++)
+      weights.push_back(mgr->addZero());
+
     for (auto words : unparsedWeights) {
       Int literal = std::stoi(words.at(1));
 
@@ -578,18 +581,13 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
         continue;
       }
 
-      ADD cpt = constructDdFromWords(mgr, literal, words);
-      auto previousEntry = weights.find(literal);
-      if (previousEntry != weights.end()) {
-        previousEntry->second += cpt;
-      } else {
-        weights[literal] = cpt;
-      }
+      weights[literal - 1] += constructDdFromWords(mgr, literal, words);
     }
-    for (auto weight : weights) {
-      dependencies[weight.first] = {};
-      for (Int index : util::getSupport(weight.second))
-        dependencies[weight.first].push_back(varOrdering[index]);
+    for (size_t i = 0; i < declaredVarCount; i++) {
+      vector<Int> v;
+      for (Int index : util::getSupport(weights[i]))
+        v.push_back(varOrdering[index]);
+      dependencies.push_back(v);
     }
   }
 
