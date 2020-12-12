@@ -133,7 +133,7 @@ ADD Counter::countSubtree(JoinNode *joinNode, const Cnf &cnf, Set<Int> &projecte
   else {
     ADD dd = mgr->addOne();
     bool greedy = true;
-    greedy = false; // non-greedy in CP-2020 experiments
+    //greedy = false; // non-greedy in CP-2020 experiments
     if (greedy) { // iteratively multiplies 2 smallest child ADDs
       auto comparer = [](ADD left, ADD right) {
         return left.nodeCount() > right.nodeCount();

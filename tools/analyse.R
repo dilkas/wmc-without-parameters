@@ -196,7 +196,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 }
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
-df2 <- data_sum[data_sum$dataset == "2005-IJCAI" & !is.na(data_sum$dataset),]
+df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
 df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
