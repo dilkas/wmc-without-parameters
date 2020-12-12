@@ -36,12 +36,10 @@ using namespace std;
 #ifdef useGMP
 #include <gmpxx.h>
 
-typedef 
-  mpz_class IntegerType;
+typedef mpz_class IntegerType;
 #else
 #warning this IntegerType may not be suitable for some input file. Consider using GMP
-typedef
-  long IntegerType;
+typedef long IntegerType;
 #endif
 
 /**
@@ -81,7 +79,6 @@ public:
     cout << endl;
   }
 
-
   /**
    * callback called when we read a term of the objective function
    *
@@ -103,16 +100,16 @@ public:
   void objectiveProduct(IntegerType coeff, vector<int> list)
   {
     cout << "[" << showpos << coeff << noshowpos << " ";
-    for(int i=0;i<list.size();++i)
+    for (int i = 0; i < list.size(); ++i)
     {
-      if (list[i]<0)
-	cout << "~x" << -list[i] << ' ';
+      if (list[i] < 0)
+        cout << "~x" << -list[i] << ' ';
       else
-	cout << "x" << list[i] << ' ';
+        cout << "x" << list[i] << ' ';
     }
     cout << "] ";
   }
-  
+
   /**
    * callback called before we read a constraint
    */
@@ -120,7 +117,7 @@ public:
   {
     cout << "constraint: ";
   }
-  
+
   /**
    * callback called after we've read a constraint
    */
@@ -150,12 +147,12 @@ public:
   void constraintProduct(IntegerType coeff, vector<int> list)
   {
     cout << "[" << showpos << coeff << noshowpos << " ";
-    for(int i=0;i<list.size();++i)
+    for (int i = 0; i < list.size(); ++i)
     {
-      if (list[i]<0)
-	cout << "~x" << -list[i] << ' ';
+      if (list[i] < 0)
+        cout << "~x" << -list[i] << ' ';
       else
-	cout << "x" << list[i] << ' ';
+        cout << "x" << list[i] << ' ';
     }
     cout << "] ";
   }
@@ -189,19 +186,19 @@ public:
   {
     IntegerType r;
 
-    // product => newSymbol (this is a clause) 
+    // product => newSymbol (this is a clause)
     // not x0 or not x1 or ... or not xn or newSymbol
-    r=1;
+    r = 1;
     beginConstraint();
-    constraintTerm(1,newSymbol);
-    for(int i=0;i<product.size();++i)
-      if (product[i]>0)
+    constraintTerm(1, newSymbol);
+    for (int i = 0; i < product.size(); ++i)
+      if (product[i] > 0)
       {
-	constraintTerm(-1,product[i]);
-	r-=1;
+        constraintTerm(-1, product[i]);
+        r -= 1;
       }
       else
-	constraintTerm(1,-product[i]);
+        constraintTerm(1, -product[i]);
     constraintRelOp(">=");
     constraintRightTerm(r);
     endConstraint();
@@ -209,17 +206,17 @@ public:
 #ifdef ONLYCLAUSES
     // newSymbol => product translated as
     // not newSymbol of xi (for all i)
-    for(int i=0;i<product.size();++i)
+    for (int i = 0; i < product.size(); ++i)
     {
-      r=0;
+      r = 0;
       beginConstraint();
-      constraintTerm(-1,newSymbol);
-      if (product[i]>0)
-	constraintTerm(1,product[i]);
+      constraintTerm(-1, newSymbol);
+      if (product[i] > 0)
+        constraintTerm(1, product[i]);
       else
       {
-	constraintTerm(-1,-product[i]);
-	r-=1;
+        constraintTerm(-1, -product[i]);
+        r -= 1;
       }
       constraintRelOp(">=");
       constraintRightTerm(r);
@@ -228,23 +225,22 @@ public:
 #else
     // newSymbol => product translated as
     // x0+x1+x3...+xn-n*newSymbol>=0
-    r=0;
+    r = 0;
     beginConstraint();
-    constraintTerm(-(int)product.size(),newSymbol);
-    for(int i=0;i<product.size();++i)
-      if (product[i]>0)
-	constraintTerm(1,product[i]);
+    constraintTerm(-(int)product.size(), newSymbol);
+    for (int i = 0; i < product.size(); ++i)
+      if (product[i] > 0)
+        constraintTerm(1, product[i]);
       else
       {
-	constraintTerm(-1,-product[i]);
-	r-=1;
+        constraintTerm(-1, -product[i]);
+        r -= 1;
       }
     constraintRelOp(">=");
     constraintRightTerm(r);
     endConstraint();
 #endif
   }
-
 };
 
 /**
@@ -258,16 +254,16 @@ private:
   // we represent each node of a n-ary tree by a vector<ProductNode>
   struct ProductNode
   {
-    int lit; // ID of the literal
-    int productId; // identifier associated to the product of the
-		   // literals found from the root up to this node
+    int lit;                   // ID of the literal
+    int productId;             // identifier associated to the product of the
+                               // literals found from the root up to this node
     vector<ProductNode> *next; // list of next literals in a product
 
     ProductNode(int l)
     {
-      lit=l;
-      productId=0;
-      next=NULL;
+      lit = l;
+      productId = 0;
+      next = NULL;
     }
 
     // if we define a destructor to free <next>, we'll have to define
@@ -275,7 +271,7 @@ private:
   };
 
   vector<ProductNode> root; // root of the n-ary tree
-  int nextSymbol; // next available variable
+  int nextSymbol;           // next available variable
 
   /**
    * define an order on ProductNode based on the literal (used to
@@ -284,9 +280,9 @@ private:
   class ProductNodeLessLit
   {
   public:
-    bool operator () (const ProductNode &a, const ProductNode &b)
+    bool operator()(const ProductNode &a, const ProductNode &b)
     {
-      return a.lit<b.lit;
+      return a.lit < b.lit;
     }
   };
 
@@ -296,7 +292,7 @@ public:
    */
   void setFirstExtraSymbol(int id)
   {
-    nextSymbol=id;
+    nextSymbol = id;
   }
 
   /**
@@ -305,30 +301,30 @@ public:
    */
   int getProductVariable(vector<int> &list)
   {
-    vector<ProductNode> *p=&root;
+    vector<ProductNode> *p = &root;
     typename vector<ProductNode>::iterator pos;
 
     // list must be sorted
-    sort(list.begin(),list.end());
+    sort(list.begin(), list.end());
 
     // is this a known product ?
-    for(int i=0;i<list.size();++i)
+    for (int i = 0; i < list.size(); ++i)
     {
-      assert(p!=NULL);
+      assert(p != NULL);
 
       // look for list[i] in *p
-      pos=lower_bound(p->begin(),p->end(),list[i],ProductNodeLessLit());
-      if (pos==p->end() || (*pos).lit!=list[i])
-	pos=p->insert(pos,ProductNode(list[i])); // insert at the right place
-      
-      if (i!=list.size()-1 && (*pos).next==NULL)
-	(*pos).next=new vector<ProductNode>;
+      pos = lower_bound(p->begin(), p->end(), list[i], ProductNodeLessLit());
+      if (pos == p->end() || (*pos).lit != list[i])
+        pos = p->insert(pos, ProductNode(list[i])); // insert at the right place
 
-      p=(*pos).next;
+      if (i != list.size() - 1 && (*pos).next == NULL)
+        (*pos).next = new vector<ProductNode>;
+
+      p = (*pos).next;
     }
 
-    if ((*pos).productId==0)
-      (*pos).productId=nextSymbol++;
+    if ((*pos).productId == 0)
+      (*pos).productId = nextSymbol++;
 
     return (*pos).productId;
   }
@@ -341,9 +337,8 @@ public:
   {
     vector<int> list;
 
-    defineProductVariableRec(cb,root,list);
+    defineProductVariableRec(cb, root, list);
   }
-
 
   /**
    * free all allocated product data
@@ -359,22 +354,21 @@ private:
    * add the constraints which define all product terms
    *
    */
-  void defineProductVariableRec(Callback &cb, 
-				vector<ProductNode> &nodes, vector<int> &list)
+  void defineProductVariableRec(Callback &cb,
+                                vector<ProductNode> &nodes, vector<int> &list)
   {
-    for(int i=0;i<nodes.size();++i)
+    for (int i = 0; i < nodes.size(); ++i)
     {
       list.push_back(nodes[i].lit);
       if (nodes[i].productId)
-	cb.linearizeProduct(nodes[i].productId,list);
+        cb.linearizeProduct(nodes[i].productId, list);
 
       if (nodes[i].next)
-	defineProductVariableRec(cb,*nodes[i].next,list);
+        defineProductVariableRec(cb, *nodes[i].next, list);
 
       list.pop_back();
     }
   }
-
 
   /**
    * free all allocated product data
@@ -382,18 +376,17 @@ private:
    */
   void freeProductVariableRec(vector<ProductNode> &nodes)
   {
-    for(int i=0;i<nodes.size();++i)
+    for (int i = 0; i < nodes.size(); ++i)
     {
       if (nodes[i].next)
       {
-	freeProductVariableRec(*nodes[i].next);
-	delete nodes[i].next;
+        freeProductVariableRec(*nodes[i].next);
+        delete nodes[i].next;
       }
     }
 
     nodes.clear();
   }
-
 };
 
 template <typename Callback>
@@ -403,10 +396,10 @@ public:
   Callback cb;
 
 private:
-  ifstream in; // the stream we're reading from
-  int nbVars,nbConstr; // MetaData: #Variables and #Constraints in file.
+  ifstream in;          // the stream we're reading from
+  int nbVars, nbConstr; // MetaData: #Variables and #Constraints in file.
 
-  int nbProduct,sizeProduct; // MetaData for non linear format
+  int nbProduct, sizeProduct; // MetaData for non linear format
   ProductStore<Callback> store;
   bool autoLinearize; // should the parser linearize constraints ?
 
@@ -441,7 +434,8 @@ private:
   {
     char c;
 
-    while(isspace(c=get()));
+    while (isspace(c = get()))
+      ;
 
     putback(c);
   }
@@ -454,52 +448,55 @@ private:
   bool readIdentifier(vector<int> &list)
   {
     char c;
-    bool negated=false;
+    bool negated = false;
 
     skipSpaces();
 
     // first char (must be 'x')
-    c=get();
+    c = get();
     if (eof())
       return false;
 
-    if (c=='~')
+    if (c == '~')
     {
-      negated=true;
-      c=get();
+      negated = true;
+      c = get();
     }
 
-    if (c!='x') {
+    if (c != 'x')
+    {
       putback(c);
       return false;
     }
 
-    int varID=0;
-    
+    int varID = 0;
+
     // next chars (must be digits)
-    while(true) {
-      c=get();
+    while (true)
+    {
+      c = get();
       if (eof())
-	break;
-      
+        break;
+
       if (isdigit(c))
-	varID=varID*10+c-'0';
-      else {
-	putback(c);
-	break;
+        varID = varID * 10 + c - '0';
+      else
+      {
+        putback(c);
+        break;
       }
     }
-    
+
     //Small check on the coefficient ID to make sure everything is ok
     if (varID > nbVars)
       throw runtime_error("variable identifier larger than "
-			  "#variables in metadata.");
+                          "#variables in metadata.");
 
     if (negated)
-      varID=-varID;
+      varID = -varID;
 
     list.push_back(varID);
-    
+
     return true;
   }
 
@@ -514,19 +511,19 @@ private:
 
     skipSpaces();
 
-    c=get();
+    c = get();
     if (eof())
       return false;
 
-    if (c=='=')
+    if (c == '=')
     {
-      s="=";
+      s = "=";
       return true;
     }
 
-    if (c=='>' && get()=='=')
+    if (c == '>' && get() == '=')
     {
-      s=">=";
+      s = ">=";
       return true;
     }
 
@@ -545,60 +542,59 @@ private:
     string s;
 
     // get the number of variables and constraints
-    c=get();
-    if (c!='*')
+    c = get();
+    if (c != '*')
       throw runtime_error("First line of input file should be a comment");
 
     in >> s;
-    if (eof() || s!="#variable=")
+    if (eof() || s != "#variable=")
       throw runtime_error("First line should contain #variable= as first keyword");
 
     in >> nbVars;
-    store.setFirstExtraSymbol(nbVars+1);
+    store.setFirstExtraSymbol(nbVars + 1);
 
     in >> s;
-    if (eof() || s!="#constraint=")
+    if (eof() || s != "#constraint=")
       throw runtime_error("First line should contain #constraint= as second keyword");
 
     in >> nbConstr;
 
     skipSpaces();
 
-    c=get();
+    c = get();
     putback(c);
 
-    if (c=='#')
+    if (c == '#')
     {
       // assume non linear format
       in >> s;
-      if (eof() || s!="#product=")
-	throw runtime_error("First line should contain #product= as third keyword");
+      if (eof() || s != "#product=")
+        throw runtime_error("First line should contain #product= as third keyword");
 
       in >> nbProduct;
-      
+
       in >> s;
-      if (eof() || s!="sizeproduct=")
-	throw runtime_error("First line should contain sizeproduct= as fourth keyword");
+      if (eof() || s != "sizeproduct=")
+        throw runtime_error("First line should contain sizeproduct= as fourth keyword");
 
       in >> sizeProduct;
     }
 
     // skip the rest of the line
-    getline(in,s);
+    getline(in, s);
 
     // callback to transmit the data
     if (nbProduct && autoLinearize)
     {
 #ifdef ONLYCLAUSES
-      cb.metaData(nbVars+nbProduct,nbConstr+nbProduct+sizeProduct);
+      cb.metaData(nbVars + nbProduct, nbConstr + nbProduct + sizeProduct);
 #else
-      cb.metaData(nbVars+nbProduct,nbConstr+2*nbProduct);
+      cb.metaData(nbVars + nbProduct, nbConstr + 2 * nbProduct);
 #endif
     }
     else
-      cb.metaData(nbVars,nbConstr);
+      cb.metaData(nbVars, nbConstr);
   }
-
 
   /**
    * skip the comments at the beginning of the file
@@ -610,14 +606,13 @@ private:
 
     // skip further comments
 
-    while(!eof() && (c=get())=='*')
+    while (!eof() && (c = get()) == '*')
     {
-      getline(in,s);
+      getline(in, s);
     }
 
     putback(c);
   }
-
 
   /**
    * read a term into coeff and list
@@ -631,12 +626,13 @@ private:
     list.clear();
 
     in >> coeff;
-    
-    skipSpaces();
-    
-    while(readIdentifier(list));
 
-    if (list.size()==0)
+    skipSpaces();
+
+    while (readIdentifier(list))
+      ;
+
+    if (list.size() == 0)
       throw runtime_error("identifier expected");
   }
 
@@ -656,35 +652,34 @@ private:
     // read objective line (if any)
 
     skipSpaces();
-    c=get();
-    if (c!='m')
+    c = get();
+    if (c != 'm')
     {
       // no objective line
       putback(c);
       return;
     }
 
-    if (get()=='i' && get()=='n' && get()==':')
+    if (get() == 'i' && get() == 'n' && get() == ':')
     {
       cb.beginObjective(); // callback
 
-      while(!eof())
+      while (!eof())
       {
-	readTerm(coeff,list);
-	if (list.size()==1 && list[0]>0)
-	  cb.objectiveTerm(coeff,list[0]);
-	else
-	  handleProduct(true,coeff,list);
+        readTerm(coeff, list);
+        if (list.size() == 1 && list[0] > 0)
+          cb.objectiveTerm(coeff, list[0]);
+        else
+          handleProduct(true, coeff, list);
 
-	skipSpaces();
-	c=get();
-	if (c==';')
-	  break; // end of objective
-	else
-	  if (c=='-' || c=='+' || isdigit(c))
-	    putback(c);
-	  else
-	    throw runtime_error("unexpected character in objective function");
+        skipSpaces();
+        c = get();
+        if (c == ';')
+          break; // end of objective
+        else if (c == '-' || c == '+' || isdigit(c))
+          putback(c);
+        else
+          throw runtime_error("unexpected character in objective function");
       }
 
       cb.endObjective();
@@ -708,45 +703,44 @@ private:
 
     cb.beginConstraint();
 
-    while(!eof())
+    while (!eof())
     {
-      readTerm(coeff,list);
-      if (list.size()==1 && list[0]>0)
-	cb.constraintTerm(coeff,list[0]);
+      readTerm(coeff, list);
+      if (list.size() == 1 && list[0] > 0)
+        cb.constraintTerm(coeff, list[0]);
       else
-	handleProduct(false,coeff,list);
+        handleProduct(false, coeff, list);
 
       skipSpaces();
-      c=get();
-      if (c=='>' || c=='=')
+      c = get();
+      if (c == '>' || c == '=')
       {
-	// relational operator found
-	putback(c);
-	break;
+        // relational operator found
+        putback(c);
+        break;
       }
+      else if (c == '-' || c == '+' || isdigit(c))
+        putback(c);
       else
-	if (c=='-' || c=='+' || isdigit(c))
-	  putback(c);
-	else
-	  throw runtime_error("unexpected character in constraint");
+        throw runtime_error("unexpected character in constraint");
     }
 
     if (eof())
       throw runtime_error("unexpected EOF before end of constraint");
-      
+
     if (readRelOp(s))
       cb.constraintRelOp(s);
     else
       throw runtime_error("unexpected relational operator in constraint");
-    
+
     in >> coeff;
     cb.constraintRightTerm(coeff);
-    
+
     skipSpaces();
-    c=get();
-    if (eof() || c!=';')
+    c = get();
+    if (eof() || c != ';')
       throw runtime_error("semicolon expected at end of constraint");
-    
+
     cb.endConstraint();
   }
 
@@ -759,19 +753,19 @@ private:
     if (autoLinearize)
     {
       // get symbol corresponding to this product
-      int var=store.getProductVariable(list);
+      int var = store.getProductVariable(list);
 
       if (inObjective)
-	cb.objectiveTerm(coeff,var);
+        cb.objectiveTerm(coeff, var);
       else
-	cb.constraintTerm(coeff,var);
+        cb.constraintTerm(coeff, var);
     }
     else
     {
       if (inObjective)
-	cb.objectiveProduct(coeff, list);
+        cb.objectiveProduct(coeff, list);
       else
-	cb.constraintProduct(coeff, list);
+        cb.constraintProduct(coeff, list);
     }
   }
 
@@ -781,17 +775,17 @@ public:
    */
   SimpleParser(char *filename)
   {
-    in.open(filename,ios_base::in);
+    in.open(filename, ios_base::in);
 
     if (!in.good())
       throw runtime_error("error opening input file");
 
-    autoLinearize=false;
+    autoLinearize = false;
 
-    nbVars=0;
-    nbConstr=0;
-    nbProduct=0;
-    sizeProduct=0;
+    nbVars = 0;
+    nbConstr = 0;
+    nbProduct = 0;
+    sizeProduct = 0;
   }
 
   ~SimpleParser()
@@ -803,9 +797,9 @@ public:
    * ask the parser to linearize the constraints using a simple
    * default method
    */
-  void setAutoLinearize(bool lin=true)
+  void setAutoLinearize(bool lin = true)
   {
-    autoLinearize=lin;
+    autoLinearize = lin;
   }
 
   /**
@@ -824,26 +818,27 @@ public:
 
     // read constraints
     int nbConstraintsRead = 0;
-    while(!eof()) {
+    while (!eof())
+    {
       skipSpaces();
       if (eof())
-	break;
+        break;
 
-      putback(c=get());
-      if(c=='*')
-	skipComments();
-      
+      putback(c = get());
+      if (c == '*')
+        skipComments();
+
       if (eof())
-	break;
+        break;
 
       readConstraint();
       nbConstraintsRead++;
     }
-    
+
     //Small check on the number of constraints
     if (nbConstraintsRead != nbConstr)
       throw runtime_error("number of constraints read is different from metadata.");
-    
+
     if (autoLinearize)
     {
       store.defineProductVariable(cb);
@@ -851,12 +846,11 @@ public:
   }
 }; // class SimpleParser
 
-
 int main(int argc, char *argv[])
 {
   try
   {
-    if (argc!=2)
+    if (argc != 2)
       cout << "usage: SimpleParser <filename>" << endl;
     else
     {
@@ -866,7 +860,7 @@ int main(int argc, char *argv[])
       parser.parse();
     }
   }
-  catch(exception &e)
+  catch (exception &e)
   {
     cout.flush();
     cerr << "ERROR: " << e.what() << endl;
