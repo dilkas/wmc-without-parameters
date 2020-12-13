@@ -19,7 +19,7 @@ CUDD_LINK = -lcudd
 
 O_DIR = obj
 
-_OBJ = util.o graph.o formula.o join.o visual.o counter.o
+_OBJ = util.o graph.o formula.o join.o visual.o counter.o constraint.o SimpleParser.o
 _OBJ_HTB = $(_OBJ) main_htb.o
 _OBJ_DMC = $(_OBJ) main_dmc.o
 _OBJ_ADDMC = $(_OBJ) main_addmc.o
