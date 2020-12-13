@@ -368,8 +368,8 @@ Cnf::Cnf(const vector<Constraint*> &clauses) {
       updateApparentVars(variable);
 }
 
-Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
-         VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
+Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
+         Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse) {
   printComment("Reading CNF formula...", 1);
 
   std::ifstream inputFileStream(filePath); // variable will be destroyed if it goes out of scope
@@ -395,6 +395,7 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
   Int lineIndex = 0;
   Int problemLineIndex = DUMMY_MIN_INT;
   Int minic2dWeightLineIndex = DUMMY_MIN_INT;
+  std::stringstream pbInput;
 
   string line;
   while (std::getline(*inputStream, line)) {
@@ -432,7 +433,7 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
     }
     else if (startWord == "c") { // comment
       if (weightFormat == WeightFormat::MINIC2D && wordCount > 1 && words.at(1) == WEIGHTS_WORD) { // MINIC2D weight line
-        if (problemLineIndex == DUMMY_MIN_INT) {
+        if (format == Format::CNF && problemLineIndex == DUMMY_MIN_INT) {
           showError("no problem line before MINIC2D weight line " + to_string(lineIndex));
         }
         if (minic2dWeightLineIndex != DUMMY_MIN_INT) {
@@ -451,7 +452,7 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
       }
     }
     else if (startWord == WEIGHT_WORD) {
-      if (problemLineIndex == DUMMY_MIN_INT) {
+      if (format == Format::CNF && problemLineIndex == DUMMY_MIN_INT) {
         showError("no problem line before weight line " + to_string(lineIndex));
       }
 
@@ -483,13 +484,19 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
       }
     }
     else { // clause line
-      if (problemLineIndex == DUMMY_MIN_INT) {
-        showError("no problem line before clause line " + to_string(lineIndex));
+      if (format == Format::CNF) {
+        if (problemLineIndex == DUMMY_MIN_INT) {
+          showError("no problem line before clause line " +
+                    to_string(lineIndex));
+        }
+        ClauseConstraint *constraint = new ClauseConstraint(words,
+                                                            declaredVarCount,
+                                                            lineIndex);
+        addClause(constraint);
+        processedClauseCount++;
+      } else {
+        pbInput << line << endl;
       }
-      ClauseConstraint *clause = new ClauseConstraint(words, declaredVarCount,
-                                                      lineIndex);
-      addClause(clause);
-      processedClauseCount++;
     }
   }
 
@@ -498,8 +505,19 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
     printThickLine();
   }
 
-  if (problemLineIndex == DUMMY_MIN_INT) {
+  if (format == Format::CNF && problemLineIndex == DUMMY_MIN_INT) {
     showError("no problem line before cnf file ends on line " + to_string(lineIndex));
+  }
+
+  if (format == Format::PB) {
+    SimpleParser<DPMCCallback> parser(&pbInput);
+    parser.setAutoLinearize(true);
+    parser.parse();
+    declaredVarCount = parser.cb.declaredVarCount;
+    declaredClauseCount = parser.cb.declaredConstraintCount;
+    processedClauseCount = parser.cb.constraints.size();
+    for (auto constraint : parser.cb.constraints)
+      addClause(constraint);
   }
 
   if (weightFormat == WeightFormat::MINIC2D && minic2dWeightLineIndex == DUMMY_MIN_INT) {

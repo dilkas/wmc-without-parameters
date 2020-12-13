@@ -1,12 +1,13 @@
-* #variable= 5 #constraint= 4
-*
-* comments
-*
-* 
-min: 1 x2 -1 x3 ;
-1 x1 +4 x2 -2 x5 >=2;
--1 x1 +4 x2 -2 x5 >= 3;
-* a big number
-12345678901234567890 x4 +4 x3 >= 10;
-2 x2 +3 x4 +2 x1 +3 x5 = 5 ;
-* the end
+* #variable= 4 #constraint= 2
+* We're calculating the probability of Tired=low in the paper by Sang et al.
+* Note that this is not the most straightforward encoding because it's meant to
+* demonstrate the syntax and the capabilities of the format.
+w 1 0.5 0.5
+w 2 1 0.2 1
+w 2 -1 0.6 1
+w 3 1 0.4 1
+w 3 -1 0.3 1
+w 4 1 0.4 1
+w 4 -1 0.1 1
+1 x2 +1 x3 +1 x4 = 1;
+2 x2 >= 1;

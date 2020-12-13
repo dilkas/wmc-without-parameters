@@ -144,6 +144,9 @@ public:
 class DPMCCallback : public DefaultCallback
 {
 public:
+  vector<PBConstraint*> constraints;
+  Int declaredVarCount;
+  Int declaredConstraintCount;
   void metaData(int nbvar, int nbconstr);
   void beginObjective();
   void endObjective();
@@ -157,8 +160,7 @@ public:
   void constraintRightTerm(IntegerType val);
 
 private:
-  PBConstraint currentConstraint;
-  vector<PBConstraint> constraints;
+  PBConstraint *currentConstraint;
 };
 
 /**
@@ -314,7 +316,7 @@ public:
   Callback cb;
 
 private:
-  ifstream in;          // the stream we're reading from
+  stringstream *in;          // the stream we're reading from
   int nbVars, nbConstr; // MetaData: #Variables and #Constraints in file.
 
   int nbProduct, sizeProduct; // MetaData for non linear format
@@ -326,7 +328,7 @@ private:
    */
   char get()
   {
-      return in.get();
+      return in->get();
   }
 
   /**
@@ -334,7 +336,7 @@ private:
    */
   void putback(char c)
   {
-      in.putback(c);
+      in->putback(c);
   }
 
   /**
@@ -342,7 +344,7 @@ private:
    */
   bool eof()
   {
-      return !in.good();
+      return !in->good();
   }
 
   /**
@@ -464,18 +466,18 @@ private:
       if (c != '*')
           throw runtime_error("First line of input file should be a comment");
 
-      in >> s;
+      (*in) >> s;
       if (eof() || s != "#variable=")
           throw runtime_error("First line should contain #variable= as first keyword");
 
-      in >> nbVars;
+      (*in) >> nbVars;
       store.setFirstExtraSymbol(nbVars + 1);
 
-      in >> s;
+      (*in) >> s;
       if (eof() || s != "#constraint=")
           throw runtime_error("First line should contain #constraint= as second keyword");
 
-      in >> nbConstr;
+      (*in) >> nbConstr;
 
       skipSpaces();
 
@@ -485,21 +487,21 @@ private:
       if (c == '#')
       {
           // assume non linear format
-          in >> s;
+          (*in) >> s;
           if (eof() || s != "#product=")
               throw runtime_error("First line should contain #product= as third keyword");
 
-          in >> nbProduct;
+          (*in) >> nbProduct;
 
-          in >> s;
+          (*in) >> s;
           if (eof() || s != "sizeproduct=")
               throw runtime_error("First line should contain sizeproduct= as fourth keyword");
 
-          in >> sizeProduct;
+          (*in) >> sizeProduct;
       }
 
       // skip the rest of the line
-      getline(in, s);
+      getline(*in, s);
 
       // callback to transmit the data
       if (nbProduct && autoLinearize)
@@ -526,7 +528,7 @@ private:
 
       while (!eof() && (c = get()) == '*')
       {
-          getline(in, s);
+          getline(*in, s);
       }
 
       putback(c);
@@ -543,7 +545,7 @@ private:
 
       list.clear();
 
-      in >> coeff;
+      (*in) >> coeff;
 
       skipSpaces();
 
@@ -651,7 +653,7 @@ private:
       else
           throw runtime_error("unexpected relational operator in constraint");
 
-      in >> coeff;
+      (*in) >> coeff;
       cb.constraintRightTerm(coeff);
 
       skipSpaces();
@@ -691,11 +693,11 @@ public:
   /**
    * constructor which only opens the file
    */
-  SimpleParser(char *filename)
+  SimpleParser(stringstream *in)
   {
-      in.open(filename, ios_base::in);
+      this->in = in;
 
-      if (!in.good())
+      if (!in->good())
           throw runtime_error("error opening input file");
 
       autoLinearize = false;
@@ -763,5 +765,3 @@ public:
       }
   }
 }; // class SimpleParser
-
-// int main(int argc, char *argv[]);

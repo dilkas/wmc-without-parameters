@@ -99,7 +99,7 @@ void testing::test() {
   Cudd mgr;
   VarOrderingHeuristic ddVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_CHOICES.at(DEFAULT_DD_VAR_ORDERING_HEURISTIC_CHOICE);
   VarOrderingHeuristic cnfVarOrderingHeuristic = VAR_ORDERING_HEURISTIC_CHOICES.at(DEFAULT_CNF_VAR_ORDERING_HEURISTIC_CHOICE);
-  Cnf cnf("../examples/F-CACHET.cnf", WeightFormat::CACHET, &mgr,
+  Cnf cnf("../examples/F-CACHET.cnf", Format::CNF, WeightFormat::CACHET, &mgr,
           ddVarOrderingHeuristic, false);
 
   MonolithicCounter monolithicCounter(&mgr);
@@ -232,7 +232,7 @@ void solving::solveOptions(
   }
 
   Cudd mgr;
-  Cnf cnf(cnfFilePath, weightFormat, &mgr, ddVarOrderingHeuristic,
+  Cnf cnf(cnfFilePath, format, weightFormat, &mgr, ddVarOrderingHeuristic,
           inverseDdVarOrdering);
 
   if (outputFormat == OutputFormat::WEIGHTED_FORMULA) {

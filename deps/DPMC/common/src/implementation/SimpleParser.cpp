@@ -132,7 +132,10 @@ void DefaultCallback::linearizeProduct(int newSymbol, vector<int> product)
 #endif
 }
 
-void DPMCCallback::metaData(int nbvar, int nbconstr) {}
+void DPMCCallback::metaData(int nbvar, int nbconstr) {
+  declaredVarCount = nbvar;
+  declaredConstraintCount = nbconstr;
+}
 
 void DPMCCallback::beginObjective()
 {
@@ -156,7 +159,7 @@ void DPMCCallback::objectiveProduct(IntegerType coeff, vector<int> list)
 
 void DPMCCallback::beginConstraint()
 {
-  currentConstraint = PBConstraint();
+  currentConstraint = new PBConstraint();
 }
 
 void DPMCCallback::endConstraint()
@@ -166,7 +169,7 @@ void DPMCCallback::endConstraint()
 
 void DPMCCallback::constraintTerm(IntegerType coeff, int idVar)
 {
-  currentConstraint.addTerm(coeff, idVar);
+  currentConstraint->addTerm(coeff, idVar);
 }
 
 void DPMCCallback::constraintProduct(IntegerType coeff, vector<int> list)
@@ -176,33 +179,10 @@ void DPMCCallback::constraintProduct(IntegerType coeff, vector<int> list)
 
 void DPMCCallback::constraintRelOp(string relop)
 {
-  currentConstraint.setEquality(relop == "=");
+  currentConstraint->setEquality(relop == "=");
 }
 
 void DPMCCallback::constraintRightTerm(IntegerType val)
 {
-  currentConstraint.setDegree(val);
+  currentConstraint->setDegree(val);
 }
-
-// int main(int argc, char *argv[])
-// {
-//   try
-//   {
-//     if (argc != 2)
-//       cout << "usage: SimpleParser <filename>" << endl;
-//     else
-//     {
-//       SimpleParser<DefaultCallback> parser(argv[1]);
-
-//       parser.setAutoLinearize(true);
-//       parser.parse();
-//     }
-//   }
-//   catch (exception &e)
-//   {
-//     cout.flush();
-//     cerr << "ERROR: " << e.what() << endl;
-//   }
-
-//   return 0;
-// }

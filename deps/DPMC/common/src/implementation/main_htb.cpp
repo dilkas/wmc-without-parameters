@@ -106,7 +106,7 @@ void solving::solveOptions(
   }
 
   Cudd mgr;
-  Cnf cnf(cnfFilePath, weightFormat, &mgr, cnfVarOrderingHeuristic,
+  Cnf cnf(cnfFilePath, Format::CNF, weightFormat, &mgr, cnfVarOrderingHeuristic,
                 inverseCnfVarOrdering);
 
   VarOrderingHeuristic ddVarOrderingHeuristic = VarOrderingHeuristic::DUMMY_VAR_ORDERING_HEURISTIC;

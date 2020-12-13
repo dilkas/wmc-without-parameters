@@ -120,7 +120,7 @@ void solving::solveOptions(
   }
 
   Cudd mgr;
-  Cnf cnf(cnfFilePath, weightFormat, &mgr, ddVarOrderingHeuristic,
+  Cnf cnf(cnfFilePath, format, weightFormat, &mgr, ddVarOrderingHeuristic,
           inverseDdVarOrdering);
 
   const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds,

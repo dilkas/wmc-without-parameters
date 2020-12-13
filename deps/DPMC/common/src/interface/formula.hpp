@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "constraint.hpp"
 #include "graph.hpp"
+#include "SimpleParser.hpp"
 
 /* constants ******************************************************************/
 
@@ -65,6 +66,6 @@ public:
   void printClauses() const;
   void printWeightedFormula(const WeightFormat &outputWeightFormat) const;
   Cnf(const vector<Constraint*> &clauses);
-  Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
-      VarOrderingHeuristic varOrderingHeuristic, bool inverse);
+  Cnf(const string &filePath, Format format, WeightFormat weightFormat,
+      Cudd *mgr, VarOrderingHeuristic varOrderingHeuristic, bool inverse);
 };
