@@ -375,79 +375,15 @@ Int util::getCnfVar(Int literal) {
   return abs(literal);
 }
 
-Set<Int> util::getClauseCnfVars(const vector<vector<Int>> &clause,
-                                const vector<vector<Int>> &dependencies,
-                                Int clauseIndex) {
-  Set<Int> cnfVars;
-  if (clauseIndex < clause.size()) {
-    for (Int literal : clause.at(clauseIndex))
-      cnfVars.insert(getCnfVar(literal));
-  } else {
-    for (Int dependency : dependencies[clauseIndex - clause.size()])
-      cnfVars.insert(dependency);
-  }
-  return cnfVars;
-}
-
-Set<Int> util::getClusterCnfVars(const vector<Int> &cluster,
-                                 const vector<vector<Int>> &clauses,
-                                 const vector<vector<Int>> &dependencies) {
-  Set<Int> cnfVars;
-  for (Int clauseIndex : cluster)
-    unionize(cnfVars, getClauseCnfVars(clauses, dependencies, clauseIndex));
-  return cnfVars;
-}
-
-bool util::appearsIn(Int cnfVar, const vector<Int> &clause) {
-  for (Int literal : clause) if (getCnfVar(literal) == cnfVar) return true;
-  return false;
-}
-
 bool util::isPositiveLiteral(Int literal) {
   if (literal == 0) showError("literal is 0");
   return literal > 0;
 }
 
-Int util::getLiteralRank(Int literal, const vector<Int> &cnfVarOrdering) {
-  Int cnfVar = getCnfVar(literal);
-  auto it = std::find(cnfVarOrdering.begin(), cnfVarOrdering.end(), cnfVar);
+Int util::getVariableRank(Int variable, const vector<Int> &cnfVarOrdering) {
+  auto it = std::find(cnfVarOrdering.begin(), cnfVarOrdering.end(), variable);
   if (it == cnfVarOrdering.end()) showError("cnfVar not found in cnfVarOrdering");
   return it - cnfVarOrdering.begin();
-}
-
-Int util::getMinClauseRank(const vector<Int> &clause, const vector<Int> &cnfVarOrdering) {
-  Int minRank = DUMMY_MAX_INT;
-  for (Int literal : clause) {
-    Int rank = getLiteralRank(literal, cnfVarOrdering);
-    if (rank < minRank) minRank = rank;
-  }
-  return minRank;
-}
-
-Int util::getMaxClauseRank(const vector<Int> &clause, const vector<Int> &cnfVarOrdering) {
-  Int maxRank = DUMMY_MIN_INT;
-  for (Int literal : clause) {
-    Int rank = getLiteralRank(literal, cnfVarOrdering);
-    if (rank > maxRank) maxRank = rank;
-  }
-  return maxRank;
-}
-
-void util::printClause(const vector<Int> &clause) {
-  for (Int literal : clause) {
-    cout << std::right << std::setw(5) << literal << " ";
-  }
-  cout << "\n";
-}
-
-void util::printCnf(const vector<vector<Int>> &clauses) {
-  printComment("cnf {");
-  for (Int i = 0; i < clauses.size(); i++) {
-    cout << "c\t" "clause ";
-    cout << std::right << std::setw(5) << i + 1 << " : ";
-    printClause(clauses.at(i));
-  }
-  printComment("}");
 }
 
 void util::printLiteralWeights(const Map<Int, Float> &literalWeights) {

@@ -63,16 +63,16 @@ const Set<Int> &JoinNode::getProjectableCnfVars() const {
 /* class JoinTerminal *****************************************************/
 
 const Set<Int> &JoinTerminal::getApparentCnfVars(
-    const vector<vector<Int>> &clauses,
+    const vector<Constraint*> &clauses,
     const vector<vector<Int>> &dependencies) {
   if (!evaluatedApparentCnfVars) {
     evaluatedApparentCnfVars = true;
-    apparentCnfVars = util::getClauseCnfVars(clauses, dependencies, nodeIndex);
+    apparentCnfVars = getClauseCnfVars(clauses, dependencies, nodeIndex);
   }
   return apparentCnfVars;
 }
 
-Int JoinTerminal::getMaxVarCount(const vector<vector<Int>> &clauses,
+Int JoinTerminal::getMaxVarCount(const vector<Constraint*> &clauses,
                                  const vector<vector<Int>> &dependencies) {
   return getApparentCnfVars(clauses, dependencies).size();
 }
@@ -103,7 +103,7 @@ void JoinNonterminal::printNode(const string &prefix = "") const {
 }
 
 const Set<Int> &JoinNonterminal::getApparentCnfVars(
-    const vector<vector<Int>> &clauses,
+    const vector<Constraint*> &clauses,
     const vector<vector<Int>> &dependencies) {
   if (!evaluatedApparentCnfVars) {
     evaluatedApparentCnfVars = true;
@@ -118,7 +118,7 @@ const Set<Int> &JoinNonterminal::getApparentCnfVars(
   return apparentCnfVars;
 }
 
-Int JoinNonterminal::getMaxVarCount(const vector<vector<Int>> &clauses,
+Int JoinNonterminal::getMaxVarCount(const vector<Constraint*> &clauses,
                                     const vector<vector<Int>> &dependencies) {
   Int maxVarCount = getApparentCnfVars(clauses, dependencies).size();
   for (JoinNode *child : children) {
@@ -454,7 +454,7 @@ JoinTreeReader::JoinTreeReader(
   const string &filePath,
   Float jtWaitSeconds,
   Float performanceFactor,
-  const vector<vector<Int>> &clauses,
+  const vector<Constraint*> &clauses,
   const vector<vector<Int>> &dependencies
 ) {
   this->jtWaitSeconds = jtWaitSeconds;

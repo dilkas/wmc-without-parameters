@@ -3,6 +3,7 @@
 /* inclusions *****************************************************************/
 
 #include <assert.h>
+#include "constraint.hpp"
 #include "graph.hpp"
 
 /* constants ******************************************************************/
@@ -30,7 +31,7 @@ protected:
   Map<Int, Float> literalWeights;
   vector<ADD> weights; /* conditional probability tables encoded as ADDs */
   vector<vector<Int>> dependencies; /* how variables depend on other variables */
-  vector<vector<Int>> clauses;
+  vector<Constraint*> clauses;
   vector<Int> apparentVars; // vars appearing in clauses, ordered by 1st appearance
   vector<vector<std::string>> unparsedWeights; /* needed to compute variable ordering heuristics */
   vector<Int> varOrdering;
@@ -38,7 +39,7 @@ protected:
   ADD literalToDd(Int literal, Cudd *mgr);
   ADD constructDdFromWords(Cudd *mgr, Int var, const vector<std::string> &words);
   void updateApparentVars(Int literal); // adds var to apparentVars
-  void addClause(const vector<Int> &clause); // writes: clauses, apparentVars
+  void addClause(Constraint *clause); // writes: clauses, apparentVars
   Graph getGaifmanGraph() const;
   vector<Int> generateVarOrdering(VarOrderingHeuristic varOrderingHeuristic,
                                   bool inverse) const;
@@ -58,12 +59,12 @@ public:
   WeightFormat getWeightFormat() const;
   const vector<vector<Int>> &getDependencies() const;
   Int getEmptyClauseIndex() const; // first (nonnegative) index if found else DUMMY_MIN_INT
-  const vector<vector<Int>> &getClauses() const;
+  const vector<Constraint*> &getClauses() const;
   const vector<Int> &getApparentVars() const;
   void printLiteralWeights() const;
   void printClauses() const;
   void printWeightedFormula(const WeightFormat &outputWeightFormat) const;
-  Cnf(const vector<vector<Int>> &clauses);
+  Cnf(const vector<Constraint*> &clauses);
   Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
       VarOrderingHeuristic varOrderingHeuristic, bool inverse);
 };

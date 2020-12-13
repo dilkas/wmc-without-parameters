@@ -157,22 +157,11 @@ namespace util {
   /* functions: CNF ***********************************************************/
 
   Int getCnfVar(Int literal);
-  Set<Int> getClauseCnfVars(const vector<vector<Int>> &clause,
-                            const vector<vector<Int>> &dependencies,
-                            Int clause_index);
-  Set<Int> getClusterCnfVars(const vector<Int> &cluster,
-                             const vector<vector<Int>> &clauses,
-                             const vector<vector<Int>> &dependencies);
 
-  bool appearsIn(Int cnfVar, const vector<Int> &clause);
   bool isPositiveLiteral(Int literal);
 
-  Int getLiteralRank(Int literal, const vector<Int> &cnfVarOrdering);
-  Int getMinClauseRank(const vector<Int> &clause, const vector<Int> &cnfVarOrdering);
-  Int getMaxClauseRank(const vector<Int> &clause, const vector<Int> &cnfVarOrdering);
+  Int getVariableRank(Int variable, const vector<Int> &cnfVarOrdering);
 
-  void printClause(const vector<Int> &clause);
-  void printCnf(const vector<vector<Int>> &clauses);
   void printLiteralWeights(const Map<Int, Float> &literalWeights);
 
   /* functions: timing ********************************************************/
@@ -308,7 +297,7 @@ namespace util {
     Int minRank = DUMMY_MAX_INT;
     for (Int ddVar : getSupport(dd)) {
       Int cnfVar = ddVarToCnfVarMap.at(ddVar);
-      Int rank = getLiteralRank(cnfVar, cnfVarOrdering);
+      Int rank = getVariableRank(cnfVar, cnfVarOrdering);
       if (rank < minRank) minRank = rank;
     }
     return minRank;
@@ -318,7 +307,7 @@ namespace util {
     Int maxRank = DUMMY_MIN_INT;
     for (Int ddVar : getSupport(dd)) {
       Int cnfVar = ddVarToCnfVarMap.at(ddVar);
-      Int rank = getLiteralRank(cnfVar, cnfVarOrdering);
+      Int rank = getVariableRank(cnfVar, cnfVarOrdering);
       if (rank > maxRank) maxRank = rank;
     }
     return maxRank;

@@ -29,9 +29,10 @@ void Cnf::updateApparentVars(Int literal) {
   if (!util::isFound(var, apparentVars)) apparentVars.push_back(var);
 }
 
-void Cnf::addClause(const vector<Int> &clause) {
+void Cnf::addClause(Constraint *clause) {
   clauses.push_back(clause);
-  for (Int literal : clause) updateApparentVars(literal);
+  for (Int variable : clause->getVariables())
+    updateApparentVars(variable);
 }
 
 Graph Cnf::getGaifmanGraph() const {
@@ -39,12 +40,11 @@ Graph Cnf::getGaifmanGraph() const {
   for (Int var : apparentVars) vars.insert(var);
   Graph graph(vars);
 
-  for (const vector<Int> &clause : clauses) {
-    for (auto literal1 = clause.begin(); literal1 != clause.end(); literal1++) {
-      for (auto literal2 = std::next(literal1); literal2 != clause.end(); literal2++) {
-        Int var1 = util::getCnfVar(*literal1);
-        Int var2 = util::getCnfVar(*literal2);
-        graph.addEdge(var1, var2);
+  for (Constraint *clause : clauses) {
+    auto variables = clause->getVariables();
+    for (auto var1 = variables.begin(); var1 != variables.end(); var1++) {
+      for (auto var2 = std::next(var1); var2 != variables.end(); var2++) {
+        graph.addEdge(*var1, *var2);
       }
     }
   }
@@ -253,14 +253,14 @@ Map<Int, Float> Cnf::getLiteralWeights() const { return literalWeights; }
 
 Int Cnf::getEmptyClauseIndex() const {
   for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
-    if (clauses.at(clauseIndex).empty()) {
+    if (clauses.at(clauseIndex)->empty()) {
       return clauseIndex;
     }
   }
   return DUMMY_MIN_INT;
 }
 
-const vector<vector<Int>> &Cnf::getClauses() const { return clauses; }
+const vector<Constraint*> &Cnf::getClauses() const { return clauses; }
 
 const vector<Int> &Cnf::getApparentVars() const { return apparentVars; }
 
@@ -269,7 +269,13 @@ void Cnf::printLiteralWeights() const {
 }
 
 void Cnf::printClauses() const {
-  util::printCnf(clauses);
+  printComment("cnf {");
+  for (Int i = 0; i < clauses.size(); i++) {
+    cout << "c\t" "clause ";
+    cout << std::right << std::setw(5) << i + 1 << " : ";
+    clauses.at(i)->print();
+  }
+  printComment("}");
 }
 
 void Cnf::printWeightedFormula(const WeightFormat &outputWeightFormat) const {
@@ -324,12 +330,8 @@ void Cnf::printWeightedFormula(const WeightFormat &outputWeightFormat) const {
     }
   }
 
-  for (const vector<Int> &clause : clauses) {
-    for (Int literal : clause) {
-      cout << literal << " ";
-    }
-    cout << LINE_END_WORD << "\n";
-  }
+  for (Constraint *clause : clauses)
+    clause->print();
 
   printThinLine();
 }
@@ -358,14 +360,12 @@ ADD Cnf::constructDdFromWords(Cudd *mgr, Int var,
          (mgr->constant(negativeWeight) * negative);
 }
 
-Cnf::Cnf(const vector<vector<Int>> &clauses) {
+Cnf::Cnf(const vector<Constraint*> &clauses) {
   this->clauses = clauses;
 
-  for (const vector<Int> &clause : clauses) {
-    for (Int literal : clause) {
-      updateApparentVars(literal);
-    }
-  }
+  for (Constraint *clause : clauses)
+    for (Int variable : clause->getVariables())
+      updateApparentVars(variable);
 }
 
 Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
@@ -486,30 +486,10 @@ Cnf::Cnf(const string &filePath, WeightFormat weightFormat, Cudd *mgr,
       if (problemLineIndex == DUMMY_MIN_INT) {
         showError("no problem line before clause line " + to_string(lineIndex));
       }
-
-      vector<Int> clause;
-      for (Int i = 0; i < wordCount; i++) {
-        Int num = std::stoll(words.at(i));
-
-        if (num > declaredVarCount || num < -declaredVarCount) {
-          showError("literal '" + to_string(num) + "' is inconsistent with declared var count '" + to_string(declaredVarCount) + "' -- line " + to_string(lineIndex));
-        }
-
-        if (num == 0) {
-          if (i != wordCount - 1) {
-            showError("clause terminated prematurely by '0' -- line " + to_string(lineIndex));
-          }
-
-          addClause(clause);
-          processedClauseCount++;
-        }
-        else { // literal
-          if (i == wordCount - 1) {
-            showError("missing end-of-clause indicator '" + to_string(0) + "' -- line " + to_string(lineIndex));
-          }
-          clause.push_back(num);
-        }
-      }
+      ClauseConstraint *clause = new ClauseConstraint(words, declaredVarCount,
+                                                      lineIndex);
+      addClause(clause);
+      processedClauseCount++;
     }
   }
 
