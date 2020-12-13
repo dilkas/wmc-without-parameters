@@ -23,6 +23,7 @@ const string &OPTIONAL_OPTION_GROUP = "Optional";
 
 const string &HELP_OPTION = "h, hi";
 const string &CNF_FILE_OPTION = "cf";
+const string &FORMAT_OPTION = "fo";
 const string &WEIGHT_FORMAT_OPTION = "wf";
 const string &OUTPUT_WEIGHT_FORMAT_OPTION = "ow";
 const string &JT_FILE_OPTION = "jf";
@@ -34,6 +35,12 @@ const string &CLUSTER_VAR_ORDER_OPTION = "cv";
 const string &DIAGRAM_VAR_ORDER_OPTION = "dv";
 const string &RANDOM_SEED_OPTION = "rs";
 const string &VERBOSITY_LEVEL_OPTION = "vl";
+
+const std::map<Int, Format> FORMAT_CHOICES = {
+  {1, Format::CNF},
+  {2, Format::PB}
+};
+const Int DEFAULT_FORMAT_CHOICE = 1;
 
 const std::map<Int, WeightFormat> WEIGHT_FORMAT_CHOICES = {
   {1, WeightFormat::UNWEIGHTED},
@@ -133,6 +140,19 @@ void util::printHelpOption() {
 void util::printCnfFileOption() {
   cout << "      --" << CNF_FILE_OPTION << std::left << std::setw(56) << "=arg  cnf file path (to use stdin, type: --" + CNF_FILE_OPTION + "=-)";
   cout << "Default arg: -\n";
+}
+
+void util::printFormatOption() {
+  cout << "      --" << FORMAT_OPTION << "=arg  ";
+  cout << "the format of the input file:\n";
+  for (const auto &kv : FORMAT_CHOICES) {
+    int num = kv.first;
+    cout << "           " << num << "    " << std::left << std::setw(50)
+         << getFormatName(kv.second);
+    if (num == DEFAULT_FORMAT_CHOICE)
+      cout << "Default arg: " << DEFAULT_FORMAT_CHOICE;
+    cout << "\n";
+  }
 }
 
 void util::printWeightFormatOption() {
@@ -244,6 +264,21 @@ vector<string> util::getArgV(int argc, char *argv[]) {
   vector<string> argV;
   for (Int i = 0; i < argc; i++) argV.push_back(string(argv[i]));
   return argV;
+}
+
+string util::getFormatName(Format format) {
+  switch (format) {
+    case Format::CNF: {
+      return "CNF";
+    }
+    case Format::PB: {
+      return "PB";
+    }
+    default: {
+      showError("illegal format");
+      return DUMMY_STR;
+    }
+  }
 }
 
 string util::getWeightFormatName(WeightFormat weightFormat) {

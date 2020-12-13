@@ -40,7 +40,7 @@ protected:
                 WeightFormat weightFormat);
   void abstractCube(ADD &dd, const Set<Int> &ddVars,
                     const Map<Int, Float> &literalWeights,
-                    const WeightFormat weightFormat);
+                    WeightFormat weightFormat);
 
   void printJoinTree(const Cnf &cnf) const;
 

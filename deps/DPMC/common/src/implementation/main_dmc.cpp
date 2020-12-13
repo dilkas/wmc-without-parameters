@@ -8,6 +8,7 @@
 
 void OptionDict::printOptionalOptions() const {
   cout << " Optional options:\n";
+  util::printFormatOption();
   util::printWeightFormatOption();
   util::printJtWaitOption();
   util::printPerformanceFactorOption();
@@ -34,6 +35,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
 
   options->add_options(OPTIONAL_OPTION_GROUP)
     (VERBOSITY_LEVEL_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_VERBOSITY_LEVEL_CHOICE))->implicit_value(to_string(DEFAULT_VERBOSITY_LEVEL_CHOICE + 1)))
+    (FORMAT_OPTION, "the format of the input file", cxxopts::value<string>()->default_value(to_string(DEFAULT_FORMAT_CHOICE)))
     (WEIGHT_FORMAT_OPTION, "weight format", cxxopts::value<string>()->default_value(to_string(DEFAULT_WEIGHT_FORMAT_CHOICE)))
     (JT_WAIT_DURAION_OPTION, "jt wait duration in seconds", cxxopts::value<Float>()->default_value(to_string(DEFAULT_JT_WAIT_SECONDS)))
     (PERFORMANCE_FACTOR_OPTION, "performance factor", cxxopts::value<Float>()->default_value(to_string(DEFAULT_PERFORMANCE_FACTOR)))
@@ -51,6 +53,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
   if (hasEnoughArgs) {
     cnfFilePath = result[CNF_FILE_OPTION].as<string>();
     jtFilePath = result[JT_FILE_OPTION].as<string>();
+    formatOption = std::stoll(result[FORMAT_OPTION].as<string>());
     weightFormatOption = std::stoll(result[WEIGHT_FORMAT_OPTION].as<string>());
     jtWaitSeconds = (result[JT_WAIT_DURAION_OPTION].as<Float>());
     performanceFactor = result[PERFORMANCE_FACTOR_OPTION].as<Float>();
@@ -69,10 +72,19 @@ OptionDict::OptionDict(int argc, char *argv[]) {
 void solving::solveOptions(
   const string &cnfFilePath,
   const string &jtFilePath,
+  Int formatOption,
   Int weightFormatOption,
   Float jtWaitSeconds,
   Float performanceFactor,
   Int ddVarOrderingHeuristicOption) {
+  Format format;
+  try {
+    format = FORMAT_CHOICES.at(formatOption);
+  }
+  catch (const std::out_of_range &) {
+    showError("illegal formatOption: " + to_string(formatOption));
+  }
+
   WeightFormat weightFormat;
   try {
     weightFormat = WEIGHT_FORMAT_CHOICES.at(weightFormatOption);
@@ -99,6 +111,7 @@ void solving::solveOptions(
     util::printRow("jtFilePath", jtFilePath);
 
     /* optional: */
+    util::printRow("format", util::getFormatName(format));
     util::printRow("weightFormat", util::getWeightFormatName(weightFormat));
     util::printRow("jtWaitSeconds", jtWaitSeconds);
     util::printRow("performanceFactor", performanceFactor);
@@ -134,6 +147,7 @@ void solving::solveCommand(int argc, char *argv[]) {
     solveOptions(
       optionDict.cnfFilePath,
       optionDict.jtFilePath,
+      optionDict.formatOption,
       optionDict.weightFormatOption,
       optionDict.jtWaitSeconds,
       optionDict.performanceFactor,

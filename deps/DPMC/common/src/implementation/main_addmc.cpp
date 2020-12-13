@@ -10,6 +10,7 @@ void OptionDict::printOptionalOptions() const {
   cout << " Optional options:\n";
   util::printHelpOption();
   util::printCnfFileOption();
+  util::printFormatOption();
   util::printWeightFormatOption();
   util::printOutputWeightFormatOption();
   util::printJtFileOption();
@@ -52,6 +53,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
     (HELP_OPTION, "help")
     (VERBOSITY_LEVEL_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_VERBOSITY_LEVEL_CHOICE))->implicit_value(to_string(DEFAULT_VERBOSITY_LEVEL_CHOICE + 1)))
     (CNF_FILE_OPTION, "", cxxopts::value<string>()->default_value(STDIN_CONVENTION))
+    (FORMAT_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_FORMAT_CHOICE)))
     (WEIGHT_FORMAT_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_WEIGHT_FORMAT_CHOICE)))
     (OUTPUT_WEIGHT_FORMAT_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_WEIGHT_FORMAT_CHOICE)))
     (JT_FILE_OPTION, "", cxxopts::value<string>()->default_value(DUMMY_STR))
@@ -77,6 +79,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
     showError("options --" + CNF_FILE_OPTION + " and --" + JT_FILE_OPTION + " must have distinct args", !helpFlag);
   }
 
+  formatOption = std::stoll(result[FORMAT_OPTION].as<string>());
   weightFormatOption = std::stoll(result[WEIGHT_FORMAT_OPTION].as<string>());
   outputWeightFormatOption = std::stoll(result[OUTPUT_WEIGHT_FORMAT_OPTION].as<string>());
   jtWaitSeconds = std::stold(result[JT_WAIT_DURAION_OPTION].as<string>());
@@ -135,6 +138,7 @@ void testing::test() {
 
 void solving::solveOptions(
   const string &cnfFilePath,
+  Int formatOption,
   Int weightFormatOption,
   Int outputWeightFormatOption,
   const string &jtFilePath,
@@ -145,6 +149,14 @@ void solving::solveOptions(
   Int cnfVarOrderingHeuristicOption,
   Int ddVarOrderingHeuristicOption
 ) {
+  Format format;
+  try {
+    format = FORMAT_CHOICES.at(formatOption);
+  }
+  catch (const std::out_of_range &) {
+    showError("illegal formatOption: " + to_string(formatOption));
+  }
+
   WeightFormat weightFormat;
   try {
     weightFormat = WEIGHT_FORMAT_CHOICES.at(weightFormatOption);
@@ -204,6 +216,7 @@ void solving::solveOptions(
     util::printRow("cnfFilePath", cnfFilePath);
 
     /* optional: */
+    util::printRow("format", util::getFormatName(format));
     util::printRow("weightFormat", util::getWeightFormatName(weightFormat));
     util::printRow("outputWeightFormat", util::getWeightFormatName(outputWeightFormat));
     util::printRow("jtFilePath", jtFilePath);
@@ -298,6 +311,7 @@ void solving::solveCommand(int argc, char *argv[]) {
 
     solveOptions(
       optionDict.cnfFilePath,
+      optionDict.formatOption,
       optionDict.weightFormatOption,
       optionDict.outputWeightFormatOption,
       optionDict.jtFilePath,

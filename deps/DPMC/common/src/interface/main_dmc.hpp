@@ -15,6 +15,7 @@ public:
   string jtFilePath;
 
   /* optional: */
+  Int formatOption;
   Int weightFormatOption;
   Float jtWaitSeconds;
   Float performanceFactor;
@@ -37,6 +38,7 @@ namespace solving {
   void solveOptions(
     const string &cnfFilePath,
     const string &jtFilePath,
+    Int formatOption,
     Int weightFormatOption,
     Float jtWaitSeconds,
     Float performanceFactor,

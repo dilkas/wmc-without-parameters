@@ -67,6 +67,7 @@ extern const string &OPTIONAL_OPTION_GROUP;
 
 extern const string &HELP_OPTION;
 extern const string &CNF_FILE_OPTION;
+extern const string &FORMAT_OPTION;
 extern const string &WEIGHT_FORMAT_OPTION;
 extern const string &OUTPUT_WEIGHT_FORMAT_OPTION;
 extern const string &JT_FILE_OPTION;
@@ -78,6 +79,10 @@ extern const string &CLUSTER_VAR_ORDER_OPTION;
 extern const string &DIAGRAM_VAR_ORDER_OPTION;
 extern const string &RANDOM_SEED_OPTION;
 extern const string &VERBOSITY_LEVEL_OPTION;
+
+enum class Format { CNF, PB };
+extern const std::map<Int, Format> FORMAT_CHOICES;
+extern const Int DEFAULT_FORMAT_CHOICE;
 
 enum class WeightFormat { UNWEIGHTED, MINIC2D, CACHET, MCC, CONDITIONAL };
 extern const std::map<Int, WeightFormat> WEIGHT_FORMAT_CHOICES;
@@ -132,6 +137,7 @@ namespace util {
 
   void printHelpOption();
   void printCnfFileOption();
+  void printFormatOption();
   void printWeightFormatOption();
   void printOutputWeightFormatOption();
   void printJtFileOption();
@@ -148,6 +154,7 @@ namespace util {
 
   vector<string> getArgV(int argc, char *argv[]);
 
+  string getFormatName(Format format);
   string getWeightFormatName(WeightFormat weightFormat);
   string getOutputFormatName(OutputFormat outputFormat);
   string getClusteringHeuristicName(ClusteringHeuristic clusteringHeuristic);

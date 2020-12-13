@@ -16,7 +16,7 @@ Int Constraint::getMinRank(const vector<Int> &cnfVarOrdering) const {
     return minRank;
 }
 Int Constraint::getMaxRank(const vector<Int> &cnfVarOrdering) const {
-    Int maxRank = DUMMY_MAX_INT;
+    Int maxRank = DUMMY_MIN_INT;
     for (Int variable : getVariables()) {
         Int rank = util::getVariableRank(variable, cnfVarOrdering);
         if (rank > maxRank)

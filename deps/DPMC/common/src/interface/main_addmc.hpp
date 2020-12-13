@@ -11,6 +11,7 @@ public:
   /* optional: */
   bool helpFlag;
   string cnfFilePath;
+  Int formatOption;
   Int weightFormatOption;
   Int outputWeightFormatOption;
   string jtFilePath;
@@ -40,6 +41,7 @@ namespace testing {
 namespace solving {
   void solveOptions(
     const string &cnfFilePath,
+    Int formatOption,
     Int weightFormatOption,
     Int outputWeightFormatOption,
     const string &jtFilePath,
