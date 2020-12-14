@@ -4,7 +4,7 @@
 
 class Constraint {
 public:
-    virtual ADD getDD(Cudd *mgr, Map<Int, Int> cnfVarToDdVarMap) const = 0;
+    virtual ADD getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const = 0;
     virtual vector<Int> getVariables() const = 0;
     bool appearsIn(Int variable) const;
     Int getMinRank(const vector<Int> &cnfVarOrdering) const;
@@ -18,11 +18,13 @@ private:
     vector<Int> literals;
 
 public:
-    ADD getDD(Cudd *mgr, Map<Int, Int> cnfVarToDdVarMap) const override;
+    ADD getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const override;
     vector<Int> getVariables() const override;
     void print() const override;
     bool empty() const override;
-    ClauseConstraint(vector<string> words, Int declaredVarCount, Int lineIndex);
+    ClauseConstraint(const vector<string> &words, Int declaredVarCount,
+                     Int lineIndex);
+    ClauseConstraint(const vector<Int> &literals);
 };
 
 class PBConstraint : public Constraint {
@@ -31,16 +33,21 @@ private:
     Int degree; // the constant on the right-hand-side
     vector<Int> coefficients;
     vector<Int> variables;
+    ADD constructEqualityDD(size_t firstIndex, int degree, Cudd *mgr,
+                            Map<Int, Int> &cnfVarToDdVarMap) const;
+    ADD constructInequalityDD(size_t firstIndex, int degree, Cudd *mgr,
+                              Map<Int, Int> &cnfVarToDdVarMap) const;
 
 public:
     void addTerm(int coefficient, int variable);
     void setEquality(bool equality);
     void setDegree(int degree);
-    ADD getDD(Cudd *mgr, Map<Int, Int> cnfVarToDdVarMap) const override;
+    ADD getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const override;
     vector<Int> getVariables() const override;
     void print() const override;
     bool empty() const override;
     PBConstraint();
+    PBConstraint(const vector<Int> &variables);
 };
 
 Set<Int> getClauseCnfVars(const vector<Constraint*> &clause,

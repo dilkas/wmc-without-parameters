@@ -25,7 +25,7 @@ Int Constraint::getMaxRank(const vector<Int> &cnfVarOrdering) const {
     return maxRank;
 }
 
-ADD ClauseConstraint::getDD(Cudd *mgr, Map<Int, Int> cnfVarToDdVarMap) const {
+ADD ClauseConstraint::getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const {
   ADD clauseDd = mgr->addZero();
   for (Int literal : literals) {
     Int ddVar = cnfVarToDdVarMap.at(util::getCnfVar(literal));
@@ -54,7 +54,7 @@ bool ClauseConstraint::empty() const {
     return literals.empty();
 }
 
-ClauseConstraint::ClauseConstraint(vector<string> words,
+ClauseConstraint::ClauseConstraint(const vector<string> &words,
                                    Int declaredVarCount, Int lineIndex) {
     Int wordCount = words.size();
     for (Int i = 0; i < wordCount; i++) {
@@ -82,6 +82,10 @@ ClauseConstraint::ClauseConstraint(vector<string> words,
     }
 }
 
+ClauseConstraint::ClauseConstraint(const vector<Int> &literals) {
+    this->literals = literals;
+}
+
 void PBConstraint::addTerm(int coefficient, int variable) {
     coefficients.push_back(coefficient);
     variables.push_back(variable);
@@ -95,9 +99,31 @@ void PBConstraint::setDegree(int degree) {
     this->degree = degree;
 }
 
-ADD PBConstraint::getDD(Cudd *mgr, Map<Int, Int> cnfVarToDdVarMap) const {
-    // TODO: implement
+ADD PBConstraint::getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap)
+    const {
+    return (equality) ? constructEqualityDD(0, degree, mgr, cnfVarToDdVarMap) : constructInequalityDD(0, degree, mgr, cnfVarToDdVarMap);
+}
+
+ADD PBConstraint::constructEqualityDD(
+    size_t firstIndex, int degree, Cudd *mgr,
+    Map<Int, Int> &cnfVarToDdVarMap) const {
+    if (firstIndex >= coefficients.size())
+        return (degree == 0) ? mgr->addOne() : mgr->addZero();
+    ADD x1 = mgr->addVar(cnfVarToDdVarMap[variables[firstIndex]]);
+    return (x1 & constructEqualityDD(firstIndex + 1,
+                                     degree - coefficients[firstIndex], mgr,
+                                     cnfVarToDdVarMap)) |
+           (~x1 & constructEqualityDD(firstIndex + 1, degree, mgr,
+                                      cnfVarToDdVarMap));
+}
+
+ADD PBConstraint::constructInequalityDD(
+    size_t firstIndex, int degree, Cudd *mgr,
+    Map<Int, Int> &cnfVarToDdVarMap) const {
     return mgr->addZero();
+    // TODO: implement
+    // TODO: implement the 'early stop' conditions
+    // TODO: optimize the computation of sums
 }
 
 vector<Int> PBConstraint::getVariables() const {
@@ -117,6 +143,10 @@ bool PBConstraint::empty() const {
 }
 
 PBConstraint::PBConstraint() {}
+
+PBConstraint::PBConstraint(const vector<Int> &variables) {
+    this->variables = variables;
+}
 
 Set<Int> getClauseCnfVars(const vector<Constraint *> &clause,
                           const vector<vector<Int>> &dependencies,
