@@ -8,7 +8,7 @@ require(ggpubr)
 require(tidyr)
 
 TIMEOUT <- 1000
-data <- read.csv("../results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
 min.time <- min(min(data$encoding_time[data$encoding_time > 0]),
                 min(data$inference_time[data$inference_time > 0]))

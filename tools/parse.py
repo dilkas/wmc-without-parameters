@@ -65,7 +65,7 @@ fieldnames = set()
 for d in data:
     fieldnames.update(d.keys())
 
-with open('results.csv', 'w', newline='') as csvfile:
+with open('results/results.csv', 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
     for d in data:
