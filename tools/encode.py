@@ -92,8 +92,20 @@ def find_goal_value(variable):
                 variables.get_literal(variable, 'true'))
     return 0, variables.get_min_literal(variable)
 
-def cpt2cnf(parents, probabilities):
-    'Transform a Bayesian network represented as two dictionaries to a list of clauses'
+def generate_clauses(values, mode):
+    if mode == 'cnf':
+        return ['{} 0'.format(' '.join(values))] + [
+            '-{} -{} 0'.format(values[i], values[j])
+            for i in range(len(values))
+            for j in range(i + 1, len(values))]
+    elif mode == 'pb':
+        return [' '.join('+1 x{}'.format(value) for value in values) + ' = 1;']
+    else:
+        raise ValueError()
+
+def cpt2cnf(parents, probabilities, mode):
+    '''Transform a Bayesian network represented as two dictionaries to a list
+    of constraints/clauses. mode is either cnf or pb.'''
     clauses = []
     weight_clauses = []
     for variable in parents:
@@ -107,10 +119,7 @@ def cpt2cnf(parents, probabilities):
         else:
             values = [variables.get_literal_string(variable, v)
                       for v in values_per_variable[variable]]
-            clauses += ['{} 0'.format(' '.join(values))] + [
-                '-{} -{} 0'.format(values[i], values[j])
-                for i in range(len(values))
-                for j in range(i + 1, len(values))]
+            clauses += generate_clauses(values, mode)
             for i, value in enumerate(values):
                 weight_clauses += construct_weights(
                     value, len(values_per_variable[variable]),
@@ -159,8 +168,9 @@ def cpt2uai(parents_dict, probabilities_dict):
                   for key in new_keys]
     return lines, variables
 
-def parse_network(filename, output_uai=False):
-    'The main function responsible for parsing Bayesian networks'
+def parse_network(filename, output_mode):
+    '''The main function responsible for parsing Bayesian networks. output_mode
+    is one of: cnf, uai, pb.'''
     mode = get_format(filename)
     assert mode == 'dne' or mode == 'net'
 
@@ -195,16 +205,22 @@ def parse_network(filename, output_uai=False):
             probabilities = re.findall(NUMBER_RE, potential.group(2))
             parents_dict[header[0]] = header[1:]
             probabilities_dict[header[0]] = probabilities
-    return (cpt2uai(parents_dict, probabilities_dict) if output_uai else
-            cpt2cnf(parents_dict, probabilities_dict))
 
-def encode_inst_evidence(filename, indicators=None, variables_map=None):
+    if output_mode == 'uai':
+        return cpt2uai(parents_dict, probabilities_dict)
+    elif output_mode == 'cnf' or output_mode == 'pb':
+        return cpt2cnf(parents_dict, probabilities_dict, output_mode)
+    else:
+        raise ValueError()
+
+def encode_inst_evidence(filename, encoding, indicators=None, variables_map=None):
     if filename is None:
         return []
     instantiations = ET.parse(filename).findall('inst')
     if indicators is None:
-        return [variables.get_literal_string(inst.attrib['id'],
-                                             inst.attrib['value']) + ' 0'
+        return [format_goal(variables.get_literal_string(inst.attrib['id'],
+                                                         inst.attrib['value']),
+                            encoding)
                 for inst in instantiations]
     evidence = []
     for inst in instantiations:
@@ -222,16 +238,26 @@ def get_format(filename):
     assert filename.endswith('.dne') or filename.endswith('.net') or filename.endswith('.hugin')
     return 'net' if filename.endswith('.net') else 'dne'
 
-def encode(args):
-    clauses, weight_clauses = parse_network(args.network)
+def format_goal(literal, encoding):
+    if encoding == 'cw_pb':
+        return '1 x{} = 0;'.format(literal[1:]) if literal.startswith('-') else '1 x{} = 1;'.format(literal)
+    return '{} 0'.format(literal)
 
-    evidence_clauses = encode_inst_evidence(args.evidence)
+def encode_cnf(args):
+    clauses, weight_clauses = parse_network(args.network, args.encoding[3:])
+    evidence_clauses = encode_inst_evidence(args.evidence, args.encoding)
     if evidence_clauses:
         clauses += evidence_clauses
     else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
         literal = variables.get_true_or_min_literal(variables.get_last_variable())
-        clauses.append('{} 0'.format(literal))
-    output_cnf(args, len(variables), clauses, weight_clauses)
+        clauses.append(format_goal(literal, args.encoding))
+
+    if args.encoding.endswith('cnf'):
+        output_cnf(args, len(variables), clauses, weight_clauses)
+    elif args.encoding.endswith('pb'):
+        output_pb(args, len(variables), clauses, weight_clauses)
+    else:
+        raise ValueError()
 
 def identify_goal(text, mode):
     'Which marginal probability should we compute?'
@@ -306,7 +332,7 @@ def encode_using_ace(args):
 
     evidence = (['{} 0'.format(goal_literal)]
                 if evidence_file_is_empty(args.evidence)
-                else encode_inst_evidence(args.evidence))
+                else encode_inst_evidence(args.evidence, args.encoding))
 
     if args.legacy:
         weight_encoding = ['w {} {}'.format(
@@ -324,7 +350,7 @@ def encode_using_ace(args):
 
 def encode_using_bn2cnf(args):
     # Translate the Bayesian network to the UAI format and run the encoder
-    encoded_clauses, variables = parse_network(args.network, True)
+    encoded_clauses, variables = parse_network(args.network, 'uai')
     uai_filename = args.network + '.uai'
     cnf_filename = args.network + '.cnf'
     weights_filename = uai_filename + '.weights'
@@ -371,8 +397,8 @@ def encode_using_bn2cnf(args):
 
     # Incorporate evidence (or select a goal)
     if not evidence_file_is_empty(args.evidence):
-        encoded_evidence = encode_inst_evidence(args.evidence, indicators,
-                                                variables)
+        encoded_evidence = encode_inst_evidence(args.evidence, args.encoding,
+                                                indicators, variables)
     else:
         # Identify the goal formula
         with open(args.network) as f:
@@ -406,19 +432,26 @@ def output_cnf(args, num_variables, clauses, weights):
         with open(filename, 'w') as f:
             f.write('\n'.join([header] + clauses + weights) + '\n')
 
+def output_pb(args, num_variables, constraints, weights):
+    header = '* #variable= {} #constraint= {}\n*'.format(num_variables,
+                                                         len(constraints))
+    filename = args.network + '.pb'
+    with open(filename, 'w') as f:
+        f.write('\n'.join([header] + constraints + weights) + '\n')
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of weighted model counting (WMC)')
     parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
-    parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'd02', 'sbk05'], help='choose a WMC encoding')
+    parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw_cnf', 'cw_pb', 'd02', 'sbk05'], help='choose a WMC encoding')
     parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')
     parser.add_argument('-l', dest='legacy', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
     parser.add_argument('-m', dest='memory', help="the maximum amount of virtual memory available to underlying encoders (in GiB)")
     parser.add_argument('-p', dest='preprocess', action='store_true', help='run a preprocessor (PMC) on the CNF file')
     args = parser.parse_args()
 
-    if args.encoding == 'cw':
-        encode(args)
+    if args.encoding.startswith('cw'):
+        encode_cnf(args)
     elif args.encoding == 'bklm16':
         encode_using_bn2cnf(args)
     else:
