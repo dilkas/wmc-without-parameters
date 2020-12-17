@@ -1,6 +1,7 @@
 # A collection of functions and classes used in multiple Python scripts
 
 import re
+import xml.etree.ElementTree as ET
 
 NODE_RE = r'\nnode (\w+)'
 STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
@@ -63,3 +64,12 @@ def get_file_format(filename):
     assert (filename.endswith('.dne') or filename.endswith('.net')
             or filename.endswith('.hugin'))
     return 'net' if filename.endswith('.net') else 'dne'
+
+
+def parse_evidence(filename):
+    for inst in ET.parse(filename).findall('inst'):
+        yield (inst.attrib['id'], inst.attrib['value'])
+
+
+def empty_evidence(filename):
+    return filename is None or ET.parse(filename).find('inst') is None

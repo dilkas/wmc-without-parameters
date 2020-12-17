@@ -3,7 +3,6 @@ import itertools
 import re
 import resource
 import subprocess
-import xml.etree.ElementTree as ET
 from fractions import Fraction
 
 import common
@@ -172,25 +171,16 @@ def encode_inst_evidence(values,
                          variables_map=None):
     if filename is None:
         return []
-    instantiations = ET.parse(filename).findall('inst')
     if indicators is None:
         return [
-            format_goal(
-                literal_dict.get_literal(inst.attrib['id'],
-                                         inst.attrib['value']), encoding)
-            for inst in instantiations
+            format_goal(literal_dict.get_literal(variable, value), encoding)
+            for variable, value in common.parse_evidence(filename)
         ]
     evidence = []
-    for inst in instantiations:
-        variable = variables_map.index(inst.attrib['id'])
-        value = values[inst.attrib['id']].index(inst.attrib['value'])
-        evidence += indicators[(variable, value)]
+    for variable, value in common.parse_evidence(filename):
+        evidence += indicators[(variables_map.index(variable),
+                                values[variable].index(value))]
     return evidence
-
-
-def evidence_file_is_empty(evidence_file):
-    return evidence_file is None or ET.parse(evidence_file).find(
-        'inst') is None
 
 
 def format_goal(literal, encoding):
@@ -270,7 +260,7 @@ def encode_using_ace(args):
             ACE_LEGACY[args.encoding] + [
                 args.network, '-e',
                 new_evidence_file(args.network, goal_node, goal_value)
-                if evidence_file_is_empty(args.evidence) else args.evidence
+                if common.empty_evidence(args.evidence) else args.evidence
             ], args.memory)
         return
 
@@ -306,9 +296,9 @@ def encode_using_ace(args):
                 if variable == goal_node and value == goal_value_index:
                     goal_literal = literal
 
-    evidence = (['{} 0'.format(goal_literal)] if evidence_file_is_empty(
-        args.evidence) else encode_inst_evidence(values, literal_dict,
-                                                 args.evidence, args.encoding))
+    evidence = (['{} 0'.format(goal_literal)] if
+                common.empty_evidence(args.evidence) else encode_inst_evidence(
+                    values, literal_dict, args.evidence, args.encoding))
 
     if args.legacy:
         weight_encoding = [
@@ -384,7 +374,7 @@ def encode_using_bn2cnf(args):
                         value)] = [l + ' 0' for l in values[value]]
 
     # Incorporate evidence (or select a goal)
-    if not evidence_file_is_empty(args.evidence):
+    if not common.empty_evidence(args.evidence):
         encoded_evidence = encode_inst_evidence(bn.values, literal_dict,
                                                 args.evidence, args.encoding,
                                                 indicators, literal_dict)
@@ -459,7 +449,7 @@ if __name__ == '__main__':
         '-m',
         dest='memory',
         help=
-        "the maximum amount of virtual memory available to underlying encoders (in GiB)"
+        'the maximum amount of virtual memory available to underlying encoders (in GiB)'
     )
     parser.add_argument('-p',
                         dest='preprocess',
