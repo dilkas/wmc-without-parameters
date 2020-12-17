@@ -65,17 +65,26 @@ class LiteralDict:
     def __len__(self):
         return self._next_lit - 1
 
-variables = LiteralDict()
+    def __init__(self, bn=None):
+        if bn is None:
+            return
+        for variable in bn.values:
+            if len(bn.values[variable]) == 2:
+                self.add(variable, 'true' if 'true' in bn.values[variable]
+                              else bn.values[variable][0])
+            else:
+                for value in bn.values[variable]:
+                    self.add(variable, value)
 
-# TODO: consider moving some of these bn functions to the class
 # TODO: standardise how cnf vs pb 'mode' is handled
+
 # TODO: num_values could be removed
-def construct_weights(bn, variable, literal, num_values,
+def construct_weights(bn, literal_dict, variable, literal, num_values,
                       probability_index, negate_probability):
     rows_of_cpt = itertools.product(*[bn.values[p] for p in bn.parents[variable]])
     clauses = []
     for row_index, row in enumerate(rows_of_cpt):
-        conditions = [variables.get_literal_string(parent, parent_value)
+        conditions = [literal_dict.get_literal_string(parent, parent_value)
                       for parent, parent_value in zip(bn.parents[variable], row)]
         p = Fraction(bn.probabilities[variable][probability_index]).limit_denominator()
         clauses.append('w {} {} {}'.format(' '.join([literal] + conditions),
@@ -83,11 +92,11 @@ def construct_weights(bn, variable, literal, num_values,
         probability_index += num_values
     return clauses
 
-def find_goal_value(bn, variable):
+def find_goal_value(bn, literal_dict, variable):
     if 'true' in bn.values[variable]:
         return (bn.values[variable].index('true'),
-                variables.get_literal(variable, 'true'))
-    return 0, variables.get_min_literal(variable)
+                literal_dict.get_literal(variable, 'true'))
+    return 0, literal_dict.get_min_literal(variable)
 
 def generate_clauses(values, pb_mode=False):
     if pb_mode:
@@ -98,26 +107,26 @@ def generate_clauses(values, pb_mode=False):
             for i in range(len(values))
             for j in range(i + 1, len(values))]
 
-def cpt2cnf(bn, mode):
+def cpt2cnf(bn, literal_dict, mode):
     '''Transform a Bayesian network to a list of constraints/clauses. mode is
     either cnf or pb.'''
     clauses = []
     weight_clauses = []
     for variable in bn.parents:
         if len(bn.values[variable]) == 2:
-            index, literal = find_goal_value(bn, variable)
+            index, literal = find_goal_value(bn, literal_dict, variable)
             num_values = len(bn.values[variable])
-            weight_clauses += construct_weights(bn, variable, literal,
-                                                num_values, index,
+            weight_clauses += construct_weights(bn, literal_dict, variable,
+                                                literal, num_values, index,
                                                 lambda p: 1 - p)
         else:
-            values = [variables.get_literal_string(variable, v)
+            values = [literal_dict.get_literal_string(variable, v)
                       for v in bn.values[variable]]
             clauses += generate_clauses(values, mode == 'pb')
             for i, value in enumerate(values):
                 weight_clauses += construct_weights(
-                    bn, variable, value, len(bn.values[variable]),
-                    i, lambda p: 1)
+                    bn, literal_dict, variable, value,
+                    len(bn.values[variable]), i, lambda p: 1)
     return clauses, weight_clauses
 
 def cpt2uai(bn):
@@ -162,22 +171,13 @@ def cpt2uai(bn):
                   for key in new_keys]
     return lines, variables
 
-def initialise_variables(bn):
-    for variable in bn.values:
-        if len(bn.values[variable]) == 2:
-            variables.add(variable, 'true' if 'true' in bn.values[variable]
-                          else bn.values[variable][0])
-        else:
-            for value in bn.values[variable]:
-                variables.add(variable, value)
-
-def encode_inst_evidence(values, filename, encoding, indicators=None,
-                         variables_map=None):
+def encode_inst_evidence(values, literal_dict, filename, encoding,
+                         indicators=None, variables_map=None):
     if filename is None:
         return []
     instantiations = ET.parse(filename).findall('inst')
     if indicators is None:
-        return [format_goal(variables.get_literal_string(inst.attrib['id'],
+        return [format_goal(literal_dict.get_literal_string(inst.attrib['id'],
                                                          inst.attrib['value']),
                             encoding)
                 for inst in instantiations]
@@ -198,20 +198,20 @@ def format_goal(literal, encoding):
 
 def encode_cnf(args):
     bn = common.BayesianNetwork(args.network)
-    initialise_variables(bn)
-    clauses, weight_clauses = cpt2cnf(bn, 'pb' if args.encoding.endswith('pb') else 'cnf')
+    literal_dict = LiteralDict(bn)
+    clauses, weight_clauses = cpt2cnf(bn, literal_dict, 'pb' if args.encoding.endswith('pb') else 'cnf')
 
-    evidence_clauses = encode_inst_evidence(bn.values, args.evidence, args.encoding)
+    evidence_clauses = encode_inst_evidence(bn.values, literal_dict, args.evidence, args.encoding)
     if evidence_clauses:
         clauses += evidence_clauses
     else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
-        literal = variables.get_true_or_min_literal(variables.get_last_variable())
+        literal = literal_dict.get_true_or_min_literal(literal_dict.get_last_variable())
         clauses.append(format_goal(literal, args.encoding))
 
     if args.encoding.endswith('pb'):
-        output_pb(args, len(variables), clauses, weight_clauses)
+        output_pb(args, len(literal_dict), clauses, weight_clauses)
     else:
-        output_cnf(args, len(variables), clauses, weight_clauses)
+        output_cnf(args, len(literal_dict), clauses, weight_clauses)
 
 def identify_goal(text, mode):
     'Which marginal probability should we compute?'
@@ -272,6 +272,7 @@ def encode_using_ace(args):
     # (and convert the goal to a literal)
     weights = {}
     max_literal = 0
+    literal_dict = LiteralDict()
     for line in open(args.network + '.lmap'):
         if line.startswith('cc$I') or line.startswith('cc$C') or line.startswith('cc$P'):
             components = line.split('$')
@@ -283,13 +284,13 @@ def encode_using_ace(args):
                 variable = components[5]
                 value = int(components[6].rstrip())
                 if literal > 0:
-                    variables.add_literal(variable, values[variable][value], literal)
+                    literal_dict.add_literal(variable, values[variable][value], literal)
                 if variable == goal_node and value == goal_value_index:
                     goal_literal = literal
 
     evidence = (['{} 0'.format(goal_literal)]
                 if evidence_file_is_empty(args.evidence)
-                else encode_inst_evidence(values, args.evidence, args.encoding))
+                else encode_inst_evidence(values, literal_dict, args.evidence, args.encoding))
 
     if args.legacy:
         weight_encoding = ['w {} {}'.format(
@@ -308,8 +309,8 @@ def encode_using_ace(args):
 def encode_using_bn2cnf(args):
     'Translate the Bayesian network to the UAI format and run the encoder'
     bn = common.BayesianNetwork(args.network)
-    initialise_variables(bn)
-    encoded_clauses, variables = cpt2uai(bn)
+    literal_dict = LiteralDict(bn)
+    encoded_clauses, literal_dict = cpt2uai(bn)
 
     uai_filename = args.network + '.uai'
     cnf_filename = args.network + '.cnf'
@@ -357,15 +358,15 @@ def encode_using_bn2cnf(args):
 
     # Incorporate evidence (or select a goal)
     if not evidence_file_is_empty(args.evidence):
-        encoded_evidence = encode_inst_evidence(bn.values, args.evidence,
-                                                args.encoding, indicators,
-                                                variables)
+        encoded_evidence = encode_inst_evidence(bn.values, literal_dict,
+                                                args.evidence, args.encoding,
+                                                indicators, literal_dict)
     else:
         # Identify the goal formula
         with open(args.network) as f:
             text = f.read()
         goal_variable_string, goal_value, _ = identify_goal(text, common.get_file_format(args.network))
-        goal_variable = variables.index(goal_variable_string)
+        goal_variable = literal_dict.index(goal_variable_string)
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
     # Update the number of clauses
