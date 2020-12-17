@@ -67,8 +67,8 @@ class LiteralDict:
 
 variables = LiteralDict()
 
-# TODO: standardise how cnf vs pb 'mode' is handled
 # TODO: consider moving some of these bn functions to the class
+# TODO: standardise how cnf vs pb 'mode' is handled
 # TODO: num_values could be removed
 def construct_weights(bn, variable, literal, num_values,
                       probability_index, negate_probability):
@@ -162,9 +162,7 @@ def cpt2uai(bn):
                   for key in new_keys]
     return lines, variables
 
-# TODO: rename/refactor this into something that makes more sense
-def parse_network(filename, output_mode):
-    bn = common.BayesianNetwork(filename)
+def initialise_variables(bn):
     for variable in bn.values:
         if len(bn.values[variable]) == 2:
             variables.add(variable, 'true' if 'true' in bn.values[variable]
@@ -172,13 +170,6 @@ def parse_network(filename, output_mode):
         else:
             for value in bn.values[variable]:
                 variables.add(variable, value)
-
-    if output_mode == 'uai':
-        return bn, cpt2uai(bn)
-    elif output_mode == 'cnf' or output_mode == 'pb':
-        return bn, cpt2cnf(bn, output_mode)
-    else:
-        raise ValueError()
 
 def encode_inst_evidence(values, filename, encoding, indicators=None,
                          variables_map=None):
@@ -206,7 +197,10 @@ def format_goal(literal, encoding):
     return '{} 0'.format(literal)
 
 def encode_cnf(args):
-    bn, (clauses, weight_clauses) = parse_network(args.network, 'pb' if args.encoding.endswith('pb') else 'cnf')
+    bn = common.BayesianNetwork(args.network)
+    initialise_variables(bn)
+    clauses, weight_clauses = cpt2cnf(bn, 'pb' if args.encoding.endswith('pb') else 'cnf')
+
     evidence_clauses = encode_inst_evidence(bn.values, args.evidence, args.encoding)
     if evidence_clauses:
         clauses += evidence_clauses
@@ -247,7 +241,7 @@ def run(command, memory_limit = None):
                                (int(soft_memory_limit * mem), mem)))
     else:
         process = subprocess.run(command, stdout=subprocess.PIPE)
-    print('... OK')
+    print('...OK')
     return process.stdout.decode('utf-8')
 
 def encode_using_ace(args):
@@ -312,8 +306,11 @@ def encode_using_ace(args):
     output_cnf(args, max_literal, clauses + evidence, weight_encoding)
 
 def encode_using_bn2cnf(args):
-    # Translate the Bayesian network to the UAI format and run the encoder
-    bn, (encoded_clauses, variables) = parse_network(args.network, 'uai')
+    'Translate the Bayesian network to the UAI format and run the encoder'
+    bn = common.BayesianNetwork(args.network)
+    initialise_variables(bn)
+    encoded_clauses, variables = cpt2uai(bn)
+
     uai_filename = args.network + '.uai'
     cnf_filename = args.network + '.cnf'
     weights_filename = uai_filename + '.weights'
