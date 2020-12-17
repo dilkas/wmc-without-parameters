@@ -7,6 +7,8 @@ import subprocess
 import xml.etree.ElementTree as ET
 from fractions import Fraction
 
+import common
+
 EPSILON = 0.000001 # For comparing floating-point numbers
 SOFT_MEMORY_LIMIT = 0.95 # As a proportion of the hard limit
 
@@ -21,14 +23,7 @@ C2D = ['deps/ace/c2d_linux']
 PMC = ['deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied', '-iterate=10']
 
 # Regular expressions
-NODE_RE = r'\nnode (\w+)'
-PARENTS_RE = r'parents = \(([^()]*)\)'
-PROBS_RE = r'probs = ([^;]*);'
 POTENTIAL_RE = r'\npotential([^{]*){([^}]*)}'
-NUMBER_RE = r'\d+\.?\d*'
-PROB_SPLITTER_RE = r'[, ()\n\t]+'
-STATES_RE = {'dne': r'states = \(([^()]*)\)', 'net': r'states = \(\s*"([^()]*)"\s*\)'}
-STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
 VARIABLE_MAP_RE = r'(\d+) = (.+)'
 
 class LiteralDict:
@@ -71,72 +66,71 @@ class LiteralDict:
         return self._next_lit - 1
 
 variables = LiteralDict()
-values_per_variable = {}
 
-def construct_weights(literal, num_values, parents, probabilities,
+# TODO: standardise how cnf vs pb 'mode' is handled
+# TODO: consider moving some of these bn functions to the class
+# TODO: num_values could be removed
+def construct_weights(bn, variable, literal, num_values,
                       probability_index, negate_probability):
-    rows_of_cpt = itertools.product(*[values_per_variable[p] for p in parents])
+    rows_of_cpt = itertools.product(*[bn.values[p] for p in bn.parents[variable]])
     clauses = []
     for row_index, row in enumerate(rows_of_cpt):
         conditions = [variables.get_literal_string(parent, parent_value)
-                      for parent, parent_value in zip(parents, row)]
-        p = Fraction(probabilities[probability_index]).limit_denominator()
+                      for parent, parent_value in zip(bn.parents[variable], row)]
+        p = Fraction(bn.probabilities[variable][probability_index]).limit_denominator()
         clauses.append('w {} {} {}'.format(' '.join([literal] + conditions),
                                            float(p), float(negate_probability(p))))
         probability_index += num_values
     return clauses
 
-def find_goal_value(variable):
-    if 'true' in values_per_variable[variable]:
-        return (values_per_variable[variable].index('true'),
+def find_goal_value(bn, variable):
+    if 'true' in bn.values[variable]:
+        return (bn.values[variable].index('true'),
                 variables.get_literal(variable, 'true'))
     return 0, variables.get_min_literal(variable)
 
-def generate_clauses(values, mode):
-    if mode == 'cnf':
+def generate_clauses(values, pb_mode=False):
+    if pb_mode:
+        return [' '.join('+1 x{}'.format(value) for value in values) + ' = 1;']
+    else:
         return ['{} 0'.format(' '.join(values))] + [
             '-{} -{} 0'.format(values[i], values[j])
             for i in range(len(values))
             for j in range(i + 1, len(values))]
-    elif mode == 'pb':
-        return [' '.join('+1 x{}'.format(value) for value in values) + ' = 1;']
-    else:
-        raise ValueError()
 
-def cpt2cnf(parents, probabilities, mode):
-    '''Transform a Bayesian network represented as two dictionaries to a list
-    of constraints/clauses. mode is either cnf or pb.'''
+def cpt2cnf(bn, mode):
+    '''Transform a Bayesian network to a list of constraints/clauses. mode is
+    either cnf or pb.'''
     clauses = []
     weight_clauses = []
-    for variable in parents:
-        if len(values_per_variable[variable]) == 2:
-            index, literal = find_goal_value(variable)
-            num_values = len(values_per_variable[variable])
-            weight_clauses += construct_weights(literal, num_values,
-                                                parents[variable],
-                                                probabilities[variable], index,
+    for variable in bn.parents:
+        if len(bn.values[variable]) == 2:
+            index, literal = find_goal_value(bn, variable)
+            num_values = len(bn.values[variable])
+            weight_clauses += construct_weights(bn, variable, literal,
+                                                num_values, index,
                                                 lambda p: 1 - p)
         else:
             values = [variables.get_literal_string(variable, v)
-                      for v in values_per_variable[variable]]
-            clauses += generate_clauses(values, mode)
+                      for v in bn.values[variable]]
+            clauses += generate_clauses(values, mode == 'pb')
             for i, value in enumerate(values):
                 weight_clauses += construct_weights(
-                    value, len(values_per_variable[variable]),
-                    parents[variable], probabilities[variable], i, lambda p: 1)
+                    bn, variable, value, len(bn.values[variable]),
+                    i, lambda p: 1)
     return clauses, weight_clauses
 
-def cpt2uai(parents_dict, probabilities_dict):
-    variables = list(parents_dict.keys()) # Fix an order on variables
+def cpt2uai(bn):
+    variables = list(bn.parents.keys()) # Fix an order on variables
     parents = [[variables.index(v)
-                for v in parents_dict[variables[variable]]]
+                for v in bn.parents[variables[variable]]]
                for variable in range(len(variables))]
-    probabilities = [probabilities_dict[variables[v]]
+    probabilities = [bn.probabilities[variables[v]]
                      for v in range(len(variables))]
 
     # The first four lines
     lines = ['BAYES', str(len(variables)),
-             ' '.join(str(len(values_per_variable[variables[v]]))
+             ' '.join(str(len(bn.values[variables[v]]))
                       for v in range(len(variables))),
              str(len(variables))]
 
@@ -152,68 +146,42 @@ def cpt2uai(parents_dict, probabilities_dict):
         # Assign each row of probabilities to a set of (parent_var, parent_val)
         # pairs, then retrieve them in a different order
         keys = itertools.product(
-            *[[(p, v) for v in values_per_variable[variables[p]]]
+            *[[(p, v) for v in bn.values[variables[p]]]
               for p in parents[variable]])
         rearranged_probabilities = {}
-        num_values = len(values_per_variable[variables[variable]])
+        num_values = len(bn.values[variables[variable]])
         for i, key in enumerate(keys):
             first_index = i * num_values
             last_index = (i + 1) * num_values
             rearranged_probabilities[frozenset(key)] = probabilities[variable][
                 first_index:last_index]
         new_keys = itertools.product(
-            *[[(p, v) for v in values_per_variable[variables[p]]]
+            *[[(p, v) for v in bn.values[variables[p]]]
               for p in sorted(parents[variable])])
         lines += [' '.join(rearranged_probabilities[frozenset(key)])
                   for key in new_keys]
     return lines, variables
 
+# TODO: rename/refactor this into something that makes more sense
 def parse_network(filename, output_mode):
-    '''The main function responsible for parsing Bayesian networks. output_mode
-    is one of: cnf, uai, pb.'''
-    mode = get_format(filename)
-    assert mode == 'dne' or mode == 'net'
-
-    with open(filename, encoding='ISO-8859-1') as f:
-        text = f.read()
-
-    parents_dict = {}
-    probabilities_dict = {}
-    for node in re.finditer(NODE_RE, text):
-        end_of_name = node.end()
-        name = node.group(1).lstrip().rstrip()
-        values = re.split(STATE_SPLITTER_RE[mode],
-                          re.search(STATES_RE[mode],
-                                    text[end_of_name:]).group(1))
-        values_per_variable[name] = values
-        if len(values) == 2:
-            variables.add(name, 'true' if 'true' in values else values[0])
+    bn = common.BayesianNetwork(filename)
+    for variable in bn.values:
+        if len(bn.values[variable]) == 2:
+            variables.add(variable, 'true' if 'true' in bn.values[variable]
+                          else bn.values[variable][0])
         else:
-            for v in values:
-                variables.add(name, v)
-        if mode == 'dne':
-            parents_re = re.search(PARENTS_RE, text[end_of_name:]).group(1)
-            parents = [s.lstrip().rstrip() for s in parents_re.split(', ') if s != '']
-            probs_str = re.search(PROBS_RE, text[end_of_name:]).group(1)
-            probs = [p for p in re.split(PROB_SPLITTER_RE, probs_str) if p != '']
-            parents_dict[name] = parents
-            probabilities_dict[name] = probs
-
-    if mode == 'net':
-        for potential in re.finditer(POTENTIAL_RE, text):
-            header = re.findall(r'\w+', potential.group(1))
-            probabilities = re.findall(NUMBER_RE, potential.group(2))
-            parents_dict[header[0]] = header[1:]
-            probabilities_dict[header[0]] = probabilities
+            for value in bn.values[variable]:
+                variables.add(variable, value)
 
     if output_mode == 'uai':
-        return cpt2uai(parents_dict, probabilities_dict)
+        return bn, cpt2uai(bn)
     elif output_mode == 'cnf' or output_mode == 'pb':
-        return cpt2cnf(parents_dict, probabilities_dict, output_mode)
+        return bn, cpt2cnf(bn, output_mode)
     else:
         raise ValueError()
 
-def encode_inst_evidence(filename, encoding, indicators=None, variables_map=None):
+def encode_inst_evidence(values, filename, encoding, indicators=None,
+                         variables_map=None):
     if filename is None:
         return []
     instantiations = ET.parse(filename).findall('inst')
@@ -225,18 +193,12 @@ def encode_inst_evidence(filename, encoding, indicators=None, variables_map=None
     evidence = []
     for inst in instantiations:
         variable = variables_map.index(inst.attrib['id'])
-        values = values_per_variable[inst.attrib['id']]
-        value = values.index(inst.attrib['value'])
+        value = values[inst.attrib['id']].index(inst.attrib['value'])
         evidence += indicators[(variable, value)]
     return evidence
 
 def evidence_file_is_empty(evidence_file):
     return evidence_file is None or ET.parse(evidence_file).find('inst') is None
-
-def get_format(filename):
-    # Hugin and NET are equivalent formats
-    assert filename.endswith('.dne') or filename.endswith('.net') or filename.endswith('.hugin')
-    return 'net' if filename.endswith('.net') else 'dne'
 
 def format_goal(literal, encoding):
     if encoding == 'cw_pb':
@@ -244,25 +206,26 @@ def format_goal(literal, encoding):
     return '{} 0'.format(literal)
 
 def encode_cnf(args):
-    clauses, weight_clauses = parse_network(args.network, args.encoding[3:])
-    evidence_clauses = encode_inst_evidence(args.evidence, args.encoding)
+    bn, (clauses, weight_clauses) = parse_network(args.network, 'pb' if args.encoding.endswith('pb') else 'cnf')
+    evidence_clauses = encode_inst_evidence(bn.values, args.evidence, args.encoding)
     if evidence_clauses:
         clauses += evidence_clauses
     else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
         literal = variables.get_true_or_min_literal(variables.get_last_variable())
         clauses.append(format_goal(literal, args.encoding))
 
-    if args.encoding.endswith('cnf'):
-        output_cnf(args, len(variables), clauses, weight_clauses)
-    elif args.encoding.endswith('pb'):
+    if args.encoding.endswith('pb'):
         output_pb(args, len(variables), clauses, weight_clauses)
     else:
-        raise ValueError()
+        output_cnf(args, len(variables), clauses, weight_clauses)
 
 def identify_goal(text, mode):
     'Which marginal probability should we compute?'
-    goal_node, goal_node_end = [(i.group(1), i.end()) for i in re.finditer(NODE_RE, text)][-1]
-    values = re.split(STATE_SPLITTER_RE[mode], re.search(STATES_RE[mode], text[goal_node_end:]).group(1))
+    goal_node, goal_node_end = [(i.group(1), i.end())
+                                for i in re.finditer(common.NODE_RE, text)][-1]
+    values = re.split(common.STATE_SPLITTER_RE[mode],
+                      re.search(common.STATES_RE[mode],
+                                text[goal_node_end:]).group(1))
     goal_value = 'true' if 'true' in values else values[0]
     goal_value_index = values.index(goal_value)
     return goal_node, goal_value_index, goal_value
@@ -292,7 +255,7 @@ def encode_using_ace(args):
     # Identify the goal
     with open(args.network, encoding='ISO-8859-1') as f:
         text = f.read()
-    mode = get_format(args.network)
+    mode = common.get_file_format(args.network)
     goal_node, goal_value_index, goal_value = identify_goal(text, mode)
 
     if args.legacy and args.encoding != 'sbk05':
@@ -306,10 +269,10 @@ def encode_using_ace(args):
     run(ACE + ['-' + args.encoding, args.network], args.memory)
 
     # Make a variable -> list of values map
-    values = {node.group(1) : re.split(STATE_SPLITTER_RE[mode],
-                                       re.search(STATES_RE[mode],
+    values = {node.group(1) : re.split(common.STATE_SPLITTER_RE[mode],
+                                       re.search(common.STATES_RE[mode],
                                                  text[node.end():]).group(1))
-              for node in re.finditer(NODE_RE, text)}
+              for node in re.finditer(common.NODE_RE, text)}
 
     # Move weights from the LMAP file to the CNF file
     # (and convert the goal to a literal)
@@ -332,7 +295,7 @@ def encode_using_ace(args):
 
     evidence = (['{} 0'.format(goal_literal)]
                 if evidence_file_is_empty(args.evidence)
-                else encode_inst_evidence(args.evidence, args.encoding))
+                else encode_inst_evidence(values, args.evidence, args.encoding))
 
     if args.legacy:
         weight_encoding = ['w {} {}'.format(
@@ -350,7 +313,7 @@ def encode_using_ace(args):
 
 def encode_using_bn2cnf(args):
     # Translate the Bayesian network to the UAI format and run the encoder
-    encoded_clauses, variables = parse_network(args.network, 'uai')
+    bn, (encoded_clauses, variables) = parse_network(args.network, 'uai')
     uai_filename = args.network + '.uai'
     cnf_filename = args.network + '.cnf'
     weights_filename = uai_filename + '.weights'
@@ -397,13 +360,14 @@ def encode_using_bn2cnf(args):
 
     # Incorporate evidence (or select a goal)
     if not evidence_file_is_empty(args.evidence):
-        encoded_evidence = encode_inst_evidence(args.evidence, args.encoding,
-                                                indicators, variables)
+        encoded_evidence = encode_inst_evidence(bn.values, args.evidence,
+                                                args.encoding, indicators,
+                                                variables)
     else:
         # Identify the goal formula
         with open(args.network) as f:
             text = f.read()
-        goal_variable_string, goal_value, _ = identify_goal(text, get_format(args.network))
+        goal_variable_string, goal_value, _ = identify_goal(text, common.get_file_format(args.network))
         goal_variable = variables.index(goal_variable_string)
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
@@ -443,7 +407,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of weighted model counting (WMC)')
     parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
-    parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw_cnf', 'cw_pb', 'd02', 'sbk05'], help='choose a WMC encoding')
+    parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02', 'sbk05'], help='choose a WMC encoding')
     parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')
     parser.add_argument('-l', dest='legacy', action='store_true', help='legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)')
     parser.add_argument('-m', dest='memory', help="the maximum amount of virtual memory available to underlying encoders (in GiB)")
