@@ -40,24 +40,11 @@ class LiteralDict:
         return variable_and_value in self._var2lit
 
     def get_literal(self, variable, value):
-        return str(self._var2lit[(variable, value)])
-
-    # TODO: these 2 functions don't need to be there
-    def get_min_literal(self, variable):
-        return str(min(lit for lit, (var, val) in self._lit2var.items()
-                       if var == variable))
-
-    def get_true_or_min_literal(self, variable):
-        return (self.get_literal(variable, 'true') if (variable, 'true') in self
-                else self.get_min_literal(variable))
-
-    def get_literal_string(self, variable, value):
-        return (self.get_literal(variable, value)
-                if (variable, value) in self
-                else '-{}'.format(self.get_min_literal(variable)))
-
-    def get_last_variable(self):
-        return self._lit2var[self._next_lit - 1][0]
+        if (variable, value) in self:
+            return str(self._var2lit[(variable, value)])
+        min_literal = min(lit for lit, (var, val) in self._lit2var.items()
+                          if var == variable)
+        return '-{}'.format(min_literal)
 
     def __len__(self):
         return self._next_lit - 1
@@ -79,7 +66,7 @@ def construct_weights(bn, literal_dict, variable, literal,
                                       for p in bn.parents[variable]])
     clauses = []
     for row in rows_of_cpt:
-        conditions = [literal_dict.get_literal_string(parent, parent_value)
+        conditions = [literal_dict.get_literal(parent, parent_value)
                       for parent, parent_value in zip(bn.parents[variable], row)]
         p = Fraction(bn.probabilities[variable][probability_index]
                      ).limit_denominator()
@@ -107,7 +94,7 @@ def cpt2cnf(bn, literal_dict, encoding):
             weight_clauses += construct_weights(bn, literal_dict, variable, literal, index,
                                                 lambda p: 1 - p)
         else:
-            values = [literal_dict.get_literal_string(variable, v)
+            values = [literal_dict.get_literal(variable, v)
                       for v in bn.values[variable]]
             clauses += generate_clauses(values, encoding)
             for i, value in enumerate(values):
@@ -163,8 +150,8 @@ def encode_inst_evidence(values, literal_dict, filename, encoding,
         return []
     instantiations = ET.parse(filename).findall('inst')
     if indicators is None:
-        return [format_goal(literal_dict.get_literal_string(inst.attrib['id'],
-                                                         inst.attrib['value']),
+        return [format_goal(literal_dict.get_literal(inst.attrib['id'],
+                                                     inst.attrib['value']),
                             encoding)
                 for inst in instantiations]
     evidence = []
@@ -194,10 +181,8 @@ def encode_cnf(args):
     if evidence_clauses:
         clauses += evidence_clauses
     else:
-        # Add a goal clause if necessary (the first value of the last node
-        # (or 'true', if available))
-        literal = literal_dict.get_true_or_min_literal(
-            literal_dict.get_last_variable())
+        # Add a goal clause if necessary
+        literal = literal_dict.get_literal(*bn.goal())
         clauses.append(format_goal(literal, args.encoding))
 
     if args.encoding == 'cw_pb':

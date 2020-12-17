@@ -11,10 +11,15 @@ class BayesianNetwork:
     parents = {}
     values = {}
     probabilities = {}
+    _last_variable = None
 
     def goal_value(self, variable):
         return ((self.values[variable].index('true'), 'true') if 'true' in self.values[variable]
                 else (0, self.values[variable][0]))
+
+    def goal(self):
+        _, value = self.goal_value(self._last_variable)
+        return (self._last_variable, value)
 
     def __init__(self, filename):
         file_format = get_file_format(filename)
@@ -24,6 +29,7 @@ class BayesianNetwork:
         for node in re.finditer(NODE_RE, text):
             end_of_name = node.end()
             name = node.group(1).lstrip().rstrip()
+            self._last_variable = name
             self.values[name] = re.split(STATE_SPLITTER_RE[file_format],
                                          re.search(STATES_RE[file_format],
                                                    text[end_of_name:]).group(1))
