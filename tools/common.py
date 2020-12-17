@@ -4,8 +4,11 @@ import re
 
 NODE_RE = r'\nnode (\w+)'
 STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
-STATES_RE = {'dne': r'states = \(([^()]*)\)',
-             'net': r'states = \(\s*"([^()]*)"\s*\)'}
+STATES_RE = {
+    'dne': r'states = \(([^()]*)\)',
+    'net': r'states = \(\s*"([^()]*)"\s*\)'
+}
+
 
 class BayesianNetwork:
     parents = {}
@@ -14,8 +17,9 @@ class BayesianNetwork:
     _last_variable = None
 
     def goal_value(self, variable):
-        return ((self.values[variable].index('true'), 'true') if 'true' in self.values[variable]
-                else (0, self.values[variable][0]))
+        return ((self.values[variable].index('true'),
+                 'true') if 'true' in self.values[variable] else
+                (0, self.values[variable][0]))
 
     def goal(self):
         _, value = self.goal_value(self._last_variable)
@@ -30,18 +34,21 @@ class BayesianNetwork:
             end_of_name = node.end()
             name = node.group(1).lstrip().rstrip()
             self._last_variable = name
-            self.values[name] = re.split(STATE_SPLITTER_RE[file_format],
-                                         re.search(STATES_RE[file_format],
-                                                   text[end_of_name:]).group(1))
+            self.values[name] = re.split(
+                STATE_SPLITTER_RE[file_format],
+                re.search(STATES_RE[file_format], text[end_of_name:]).group(1))
             if file_format == 'dne':
-                parents_str = re.search(r'parents = \(([^()]*)\)', text[end_of_name:]).group(1)
-                self.parents[name] = [s.lstrip().rstrip()
-                                      for s in parents_str.split(', ')
-                                      if s != '']
-                probs_str = re.search(r'probs = ([^;]*);', text[end_of_name:]).group(1)
-                self.probabilities[name] = [p for p in
-                                            re.split(r'[, ()\n\t]+', probs_str)
-                                            if p != '']
+                parents_str = re.search(r'parents = \(([^()]*)\)',
+                                        text[end_of_name:]).group(1)
+                self.parents[name] = [
+                    s.lstrip().rstrip() for s in parents_str.split(', ')
+                    if s != ''
+                ]
+                probs_str = re.search(r'probs = ([^;]*);',
+                                      text[end_of_name:]).group(1)
+                self.probabilities[name] = [
+                    p for p in re.split(r'[, ()\n\t]+', probs_str) if p != ''
+                ]
 
         if file_format == 'net':
             for potential in re.finditer(r'\npotential([^{]*){([^}]*)}', text):
@@ -49,6 +56,7 @@ class BayesianNetwork:
                 probs = re.findall(r'\d+\.?\d*', potential.group(2))
                 self.parents[header[0]] = header[1:]
                 self.probabilities[header[0]] = probs
+
 
 def get_file_format(filename):
     # Hugin and NET are equivalent formats

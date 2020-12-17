@@ -10,5 +10,10 @@ for filename in os.listdir(directory):
     for inst in input_xml.findall('query/probability/evidence'):
         name = inst.find('id').text
         value = inst.find('state').text
-        inst_tag = ET.SubElement(output_xml.getroot(), 'inst', attrib={'id': name, 'value': value})
+        inst_tag = ET.SubElement(output_xml.getroot(),
+                                 'inst',
+                                 attrib={
+                                     'id': name,
+                                     'value': value
+                                 })
     output_xml.write(directory + filename[:filename.rindex('.')] + '.inst')
