@@ -1,6 +1,5 @@
 import argparse
 import itertools
-import os
 import re
 import resource
 import subprocess
@@ -20,11 +19,8 @@ ACE_LEGACY = {'d02': ACE_LEGACY_BASIC + ['-d02', '-dtHypergraph', '3'],
               'cd06': ACE_LEGACY_BASIC + ['-cd06', '-dtBnOrder']}
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
-PMC = ['deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied', '-iterate=10']
-
-# Regular expressions
-POTENTIAL_RE = r'\npotential([^{]*){([^}]*)}'
-VARIABLE_MAP_RE = r'(\d+) = (.+)'
+PMC = ['deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied',
+       '-iterate=10']
 
 class LiteralDict:
     _lit2var = {}
@@ -40,12 +36,13 @@ class LiteralDict:
     def add(self, variable, value):
         self.add_literal(variable, value, self._next_lit)
 
-    def __contains__(self, variableAndValue):
-        return variableAndValue in self._var2lit
+    def __contains__(self, variable_and_value):
+        return variable_and_value in self._var2lit
 
     def get_literal(self, variable, value):
         return str(self._var2lit[(variable, value)])
 
+    # TODO: these 2 functions don't need to be there
     def get_min_literal(self, variable):
         return str(min(lit for lit, (var, val) in self._lit2var.items()
                        if var == variable))
@@ -78,31 +75,26 @@ class LiteralDict:
 
 def construct_weights(bn, literal_dict, variable, literal,
                       probability_index, negate_probability):
-    rows_of_cpt = itertools.product(*[bn.values[p] for p in bn.parents[variable]])
+    rows_of_cpt = itertools.product(*[bn.values[p]
+                                      for p in bn.parents[variable]])
     clauses = []
-    for row_index, row in enumerate(rows_of_cpt):
+    for row in rows_of_cpt:
         conditions = [literal_dict.get_literal_string(parent, parent_value)
                       for parent, parent_value in zip(bn.parents[variable], row)]
-        p = Fraction(bn.probabilities[variable][probability_index]).limit_denominator()
-        clauses.append('w {} {} {}'.format(' '.join([literal] + conditions),
-                                           float(p), float(negate_probability(p))))
+        p = Fraction(bn.probabilities[variable][probability_index]
+                     ).limit_denominator()
+        clauses.append('w {} {} {}'.format(
+            ' '.join([literal] + conditions), float(p),
+            float(negate_probability(p))))
         probability_index += len(bn.values[variable])
     return clauses
-
-def find_goal_value(bn, literal_dict, variable):
-    if 'true' in bn.values[variable]:
-        return (bn.values[variable].index('true'),
-                literal_dict.get_literal(variable, 'true'))
-    return 0, literal_dict.get_min_literal(variable)
 
 def generate_clauses(values, encoding):
     if encoding == 'cw_pb':
         return [' '.join('+1 x{}'.format(value) for value in values) + ' = 1;']
-    else:
-        return ['{} 0'.format(' '.join(values))] + [
-            '-{} -{} 0'.format(values[i], values[j])
-            for i in range(len(values))
-            for j in range(i + 1, len(values))]
+    return ['{} 0'.format(' '.join(values))] + [
+        '-{} -{} 0'.format(values[i], values[j]) for i in range(len(values))
+        for j in range(i + 1, len(values))]
 
 def cpt2cnf(bn, literal_dict, encoding):
     'Transform a Bayesian network to a list of constraints/clauses'
@@ -110,9 +102,10 @@ def cpt2cnf(bn, literal_dict, encoding):
     weight_clauses = []
     for variable in bn.parents:
         if len(bn.values[variable]) == 2:
-            index, literal = find_goal_value(bn, literal_dict, variable)
-            weight_clauses += construct_weights(bn, literal_dict, variable,
-                                                literal, index, lambda p: 1 - p)
+            index, value = bn.goal_value(variable)
+            literal = literal_dict.get_literal(variable, value)
+            weight_clauses += construct_weights(bn, literal_dict, variable, literal, index,
+                                                lambda p: 1 - p)
         else:
             values = [literal_dict.get_literal_string(variable, v)
                       for v in bn.values[variable]]
@@ -200,8 +193,11 @@ def encode_cnf(args):
                                             args.encoding)
     if evidence_clauses:
         clauses += evidence_clauses
-    else: # Add a goal clause if necessary (the first value of the last node (or 'true', if available))
-        literal = literal_dict.get_true_or_min_literal(literal_dict.get_last_variable())
+    else:
+        # Add a goal clause if necessary (the first value of the last node
+        # (or 'true', if available))
+        literal = literal_dict.get_true_or_min_literal(
+            literal_dict.get_last_variable())
         clauses.append(format_goal(literal, args.encoding))
 
     if args.encoding == 'cw_pb':
@@ -234,7 +230,7 @@ def run(command, memory_limit = None):
         process = subprocess.run(
             command, stdout=subprocess.PIPE, preexec_fn=lambda:
             resource.setrlimit(resource.rlimit_as,
-                               (int(soft_memory_limit * mem), mem)))
+                               (int(SOFT_MEMORY_LIMIT * mem), mem)))
     else:
         process = subprocess.run(command, stdout=subprocess.PIPE)
     print('...OK')
@@ -270,7 +266,8 @@ def encode_using_ace(args):
     max_literal = 0
     literal_dict = LiteralDict()
     for line in open(args.network + '.lmap'):
-        if line.startswith('cc$I') or line.startswith('cc$C') or line.startswith('cc$P'):
+        if (line.startswith('cc$I') or line.startswith('cc$C') or
+            line.startswith('cc$P')):
             components = line.split('$')
             literal = int(components[2])
             weight = components[3]
@@ -280,7 +277,8 @@ def encode_using_ace(args):
                 variable = components[5]
                 value = int(components[6].rstrip())
                 if literal > 0:
-                    literal_dict.add_literal(variable, values[variable][value], literal)
+                    literal_dict.add_literal(variable, values[variable][value],
+                                             literal)
                 if variable == goal_node and value == goal_value_index:
                     goal_literal = literal
 
@@ -327,7 +325,7 @@ def encode_using_bn2cnf(args):
         with open(weights_filename) as f:
             for line in f:
                 words = line.split()
-                assert(len(words) == 2)
+                assert len(words) == 2
                 literal = int(words[0])
                 if literal < 0:
                     negative_weights[-literal] = words[1]
@@ -347,11 +345,12 @@ def encode_using_bn2cnf(args):
     indicators = {}
     with open(variables_filename) as f:
         text = f.read()
-    for line in re.finditer(VARIABLE_MAP_RE, text):
+    for line in re.finditer(r'(\d+) = (.+)', text):
         variable = line.group(1)
         values = [v.split(', ') for v in line.group(2)[2:-2].split('][')]
         for value in range(len(values)):
-            indicators[(int(variable), value)] = [l + ' 0' for l in values[value]]
+            indicators[(int(variable), value)] = [l + ' 0'
+                                                  for l in values[value]]
 
     # Incorporate evidence (or select a goal)
     if not evidence_file_is_empty(args.evidence):
@@ -362,7 +361,8 @@ def encode_using_bn2cnf(args):
         # Identify the goal formula
         with open(args.network) as f:
             text = f.read()
-        goal_variable_string, goal_value, _ = identify_goal(text, common.get_file_format(args.network))
+        (goal_variable_string, goal_value, _
+         ) = identify_goal(text, common.get_file_format(args.network))
         goal_variable = literal_dict.index(goal_variable_string)
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
@@ -399,8 +399,7 @@ def output_pb(args, num_variables, constraints, weights):
         f.write('\n'.join([header] + constraints + weights) + '\n')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Encode Bayesian networks into instances of weighted model counting (WMC)')
+    parser = argparse.ArgumentParser(description='Encode Bayesian networks into instances of weighted model counting (WMC)')
     parser.add_argument('network', metavar='network', help='a Bayesian network (in one of DNE/NET/Hugin formats)')
     parser.add_argument('encoding', choices=['bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02', 'sbk05'], help='choose a WMC encoding')
     parser.add_argument('-e', dest='evidence', help='evidence file (in the INST format)')

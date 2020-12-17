@@ -12,6 +12,10 @@ class BayesianNetwork:
     values = {}
     probabilities = {}
 
+    def goal_value(self, variable):
+        return ((self.values[variable].index('true'), 'true') if 'true' in self.values[variable]
+                else (0, self.values[variable][0]))
+
     def __init__(self, filename):
         file_format = get_file_format(filename)
         with open(filename, encoding='ISO-8859-1') as f:
