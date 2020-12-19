@@ -8,9 +8,9 @@ from fractions import Fraction
 import common
 
 EPSILON = 0.000001  # For comparing floating-point numbers
-SOFT_MEMORY_LIMIT = 0.95  # As a proportion of the hard limit
+SOFT_MEMORY_LIMIT = 0.95  # As a proportion of the hard memory limit
 
-# Software dependencies
+# Commands for various software dependencies
 ACE = ['deps/ace/compile', '-encodeOnly', '-noEclause']
 ACE_LEGACY_BASIC = ['deps/ace/compile', '-forceC2d']
 ACE_LEGACY = {
@@ -27,21 +27,19 @@ PMC = [
 
 
 class LiteralDict:
+    """A bidirectional map between variables of a Bayesian network and literals
+    of a Boolean formula"""
     _lit2var = {}
     _var2lit = {}
-    _next_lit = 1
+    next_lit = 1
 
-    def add_literal(self, variable, value, literal):
-        assert literal >= self._next_lit
+    def add(self, variable, value, literal=None):
+        if literal is None:
+            literal = self.next_lit
+        assert literal >= self.next_lit
         self._lit2var[literal] = (variable, value)
         self._var2lit[(variable, value)] = literal
-        self._next_lit = literal + 1
-
-    def add(self, variable, value):
-        self.add_literal(variable, value, self._next_lit)
-
-    def __contains__(self, variable_and_value):
-        return variable_and_value in self._var2lit
+        self.next_lit = literal + 1
 
     def get_literal(self, variable, value):
         if (variable, value) in self:
@@ -50,12 +48,14 @@ class LiteralDict:
                           if var == variable)
         return '-{}'.format(min_literal)
 
+    def __contains__(self, variable_and_value):
+        return variable_and_value in self._var2lit
+
     def __len__(self):
-        return self._next_lit - 1
+        return self.next_lit - 1
 
     def __init__(self, bn=None):
-        if bn is None:
-            return
+        if bn is None: return
         for variable in bn.values:
             if len(bn.values[variable]) == 2:
                 self.add(
@@ -247,6 +247,31 @@ def run(command, memory_limit=None):
     return process.stdout.decode('utf-8')
 
 
+def parse_lmap(filename, goal_node, goal_value_index, values):
+    """Parse an LMAP file into a map of literal weights, a LiteralDict object,
+    the literal that corresponds to the goal variable-value pair, and the
+    largest literal found in the file."""
+    weights = {}
+    max_literal = 0
+    literal_dict = LiteralDict()
+    for line in open(filename):
+        if (line.startswith('cc$I') or line.startswith('cc$C')
+                or line.startswith('cc$P')):
+            components = line.split('$')
+            literal = int(components[2])
+            weights[literal] = components[3]
+            max_literal = max(max_literal, abs(literal))
+            if line.startswith('cc$I'):
+                variable = components[5]
+                value = int(components[6].rstrip())
+                if literal > 0:
+                    literal_dict.add(variable, values[variable][value],
+                                     literal)
+                if variable == goal_node and value == goal_value_index:
+                    goal_literal = literal
+    return weights, literal_dict, goal_literal, max_literal
+
+
 def encode_using_ace(args):
     'The main function behind encoding using ace'
     # Identify the goal
@@ -274,28 +299,8 @@ def encode_using_ace(args):
         for node in re.finditer(common.NODE_RE, text)
     }
 
-    # Move weights from the LMAP file to the CNF file
-    # (and convert the goal to a literal)
-    weights = {}
-    max_literal = 0
-    literal_dict = LiteralDict()
-    for line in open(args.network + '.lmap'):
-        if (line.startswith('cc$I') or line.startswith('cc$C')
-                or line.startswith('cc$P')):
-            components = line.split('$')
-            literal = int(components[2])
-            weight = components[3]
-            weights[literal] = weight
-            max_literal = max(max_literal, abs(literal))
-            if line.startswith('cc$I'):
-                variable = components[5]
-                value = int(components[6].rstrip())
-                if literal > 0:
-                    literal_dict.add_literal(variable, values[variable][value],
-                                             literal)
-                if variable == goal_node and value == goal_value_index:
-                    goal_literal = literal
-
+    weights, literal_dict, goal_literal, max_literal = parse_lmap(
+        args.network + '.lmap', goal_node, goal_value_index, values)
     evidence = (['{} 0'.format(goal_literal)] if
                 common.empty_evidence(args.evidence) else encode_inst_evidence(
                     values, literal_dict, args.evidence, args.encoding))
@@ -315,7 +320,7 @@ def encode_using_ace(args):
 
     with open(args.network + '.cnf') as f:
         lines = f.readlines()
-        clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-']
+    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-']
     output_cnf(args, max_literal, clauses + evidence, weight_encoding)
 
 
