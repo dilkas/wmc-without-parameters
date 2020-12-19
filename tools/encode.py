@@ -166,14 +166,14 @@ def cpt2uai(bn):
 def encode_inst_evidence(values,
                          literal_dict,
                          filename,
-                         encoding,
+                         output_encoding,
                          indicators=None,
                          variables_map=None):
-    if filename is None:
-        return []
+    if filename is None: return []
     if indicators is None:
         return [
-            format_goal(literal_dict.get_literal(variable, value), encoding)
+            format_goal(literal_dict.get_literal(variable, value),
+                        output_encoding)
             for variable, value in common.parse_evidence(filename)
         ]
     evidence = []
@@ -272,6 +272,31 @@ def parse_lmap(filename, goal_node, goal_value_index, values):
     return weights, literal_dict, goal_literal, max_literal
 
 
+def run_legacy_ace(args, goal_node, goal_value):
+    run(
+        ACE_LEGACY[args.encoding] + [
+            args.network, '-e',
+            new_evidence_file(args.network, goal_node, goal_value)
+            if common.empty_evidence(args.evidence) else args.evidence
+        ], args.memory)
+
+
+def encode_weights(weights, max_literal, legacy_mode):
+    """Encodes a literal->weight map into either cachet (legacy_mode = True) or
+    minic2d (legacy_mode = False) weight format. Returns a list of lines that
+    can be inserted into a DIMACS CNF file."""
+    if legacy_mode:
+        return [
+            'w {} {}'.format(
+                literal, -1 if abs(float(weights[literal]) - 1) < EPSILON else
+                weights[literal]) for literal in range(1, max_literal + 1)
+        ]
+    return [
+        'c weights ' + ' '.join(l for literal in range(1, max_literal + 1)
+                                for l in [weights[literal], weights[-literal]])
+    ]
+
+
 def encode_using_ace(args):
     'The main function behind encoding using ace'
     # Identify the goal
@@ -281,12 +306,7 @@ def encode_using_ace(args):
     goal_node, goal_value_index, goal_value = identify_goal(text, mode)
 
     if args.legacy and args.encoding != 'sbk05':
-        run(
-            ACE_LEGACY[args.encoding] + [
-                args.network, '-e',
-                new_evidence_file(args.network, goal_node, goal_value)
-                if common.empty_evidence(args.evidence) else args.evidence
-            ], args.memory)
+        run_legacy_ace(args, goal_node, goal_value)
         return
 
     run(ACE + ['-' + args.encoding, args.network], args.memory)
@@ -304,19 +324,7 @@ def encode_using_ace(args):
     evidence = (['{} 0'.format(goal_literal)] if
                 common.empty_evidence(args.evidence) else encode_inst_evidence(
                     values, literal_dict, args.evidence, args.encoding))
-
-    if args.legacy:
-        weight_encoding = [
-            'w {} {}'.format(
-                literal, -1 if abs(float(weights[literal]) - 1) < EPSILON else
-                weights[literal]) for literal in range(1, max_literal + 1)
-        ]
-    else:
-        weight_encoding = [
-            'c weights ' +
-            ' '.join(l for literal in range(1, max_literal + 1)
-                     for l in [weights[literal], weights[-literal]])
-        ]
+    weight_encoding = encode_weights(weights, max_literal, args.legacy)
 
     with open(args.network + '.cnf') as f:
         lines = f.readlines()
@@ -325,8 +333,8 @@ def encode_using_ace(args):
 
 
 def reencode_bn2cnf_weights(weights_file, legacy_mode):
-    """Translate weights---as produced by bn2cnf---to the c2d format (while also
-    returning the largest literal found in the weight file)"""
+    """Translate weights---as produced by bn2cnf---to the cachet format (while
+    also returning the largest literal found in the weight file)"""
     if legacy_mode: return []
     positive_weights = {}
     negative_weights = {}
@@ -435,7 +443,7 @@ def output_pb(args, num_variables, constraints, weights):
         f.write('\n'.join([header] + constraints + weights) + '\n')
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(
         description=
         'Encode Bayesian networks into instances of weighted model counting (WMC)'
@@ -476,3 +484,7 @@ if __name__ == '__main__':
         encode_using_bn2cnf(args)
     else:
         encode_using_ace(args)
+
+
+if __name__ == '__main__':
+    main()
