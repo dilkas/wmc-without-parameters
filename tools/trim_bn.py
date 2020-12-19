@@ -20,25 +20,25 @@ def mark_ancestors(variable, parents, relevant):
 def remove_node_info(text, relevant, file_format):
     updated_text = text
     nodes = list(NODE_RE.finditer(text))
-    removed_count = 0
-    print(len(nodes))
+    removed_variables = []
     for node in nodes[::-1]:
-        print('.', end='', flush=True)
         variable_name = node.group(1)
         ending = ENDING_RE[file_format].search(text, node.end())
         if not relevant[variable_name]:
-            removed_count += 1
+            removed_variables.append(variable_name)
             updated_text = (updated_text[:node.start()] +
                             updated_text[ending.end():])
-            if file_format == 'net':  # Also delete the 'potential'
-                for potential in POTENTIAL_RE.finditer(updated_text):
-                    potential_variable = potential.group(1).split()[0][1:]
-                    if potential_variable == variable_name:
-                        updated_text = (updated_text[:potential.start(0)] +
-                                        updated_text[potential.end(0):])
+
+    # Also delete the 'potentials'
+    if file_format == 'net':
+        for potential in POTENTIAL_RE.finditer(updated_text):
+            potential_variable = potential.group(1).split()[0][1:]
+            if potential_variable in removed_variables:
+                updated_text = (updated_text[:potential.start(0)] +
+                                updated_text[potential.end(0):])
+
     print(' removed {} out of {} variables ({:.2f}%)'.format(
-        removed_count, len(nodes), 100 * removed_count / len(nodes)),
-          flush=True)
+        len(removed_variables), len(nodes), 100 * len(removed_variables) / len(nodes)), flush=True)
     return updated_text
 
 
@@ -48,7 +48,7 @@ def trim_file(network, evidence=None):
     # Mark some of the variables of the Bayesian network as relevant
     bn = common.BayesianNetwork(network)
     relevant = collections.defaultdict(bool)
-    if evidence:
+    if not common.empty_evidence(evidence):
         for variable, _ in common.parse_evidence(evidence):
             mark_ancestors(variable, bn.parents, relevant)
     else:
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     trim_directory_with_evidence('data/2004-pgm', 'trimmed_data/2004-pgm/')
     trim_directory_with_evidence('data/2005-ijcai/',
                                  'trimmed_data/2005-ijcai/')
-    trim_directory_with_evidence('data/2006-ijar/', 'trimmed_data/2005-ijar/')
+    trim_directory_with_evidence('data/2006-ijar/', 'trimmed_data/2006-ijar/')
     trim_directory_without_evidence('data/DQMR/qmr-100/',
                                     'trimmed_data/DQMR/qmr-100/')
     trim_directory_with_evidence('data/DQMR/qmr-50/',
