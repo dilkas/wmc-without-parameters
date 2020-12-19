@@ -324,13 +324,13 @@ def encode_using_ace(args):
     output_cnf(args, max_literal, clauses + evidence, weight_encoding)
 
 
-def reencode_bn2cnf_weights(weight_file, legacy_mode):
+def reencode_bn2cnf_weights(weights_file, legacy_mode):
     """Translate weights---as produced by bn2cnf---to the c2d format (while also
     returning the largest literal found in the weight file)"""
     if legacy_mode: return []
     positive_weights = {}
     negative_weights = {}
-    with open(weight_file) as f:
+    with open(weights_file) as f:
         for line in f:
             words = line.split()
             assert len(words) == 2
@@ -348,6 +348,22 @@ def reencode_bn2cnf_weights(weight_file, legacy_mode):
     ], max(positive_weights))
 
 
+def parse_bn2cnf_variables_file(variables_file):
+    """Parse the bn2cnf variables file into a
+    variable x value |-> list of literals whose conjunction corresponds to value
+    map (where each literal is represented by a DIMACS CNF line)"""
+    indicators = {}
+    with open(variables_file) as f:
+        text = f.read()
+    for line in re.finditer(r'(\d+) = (.+)', text):
+        variable = line.group(1)
+        values = [v.split(', ') for v in line.group(2)[2:-2].split('][')]
+        for value in range(len(values)):
+            indicators[(int(variable),
+                        value)] = [l + ' 0' for l in values[value]]
+    return indicators
+
+
 def encode_using_bn2cnf(args):
     'Translate the Bayesian network to the UAI format and run the encoder'
     bn = common.BayesianNetwork(args.network)
@@ -358,6 +374,7 @@ def encode_using_bn2cnf(args):
     cnf_filename = args.network + '.cnf'
     weights_filename = uai_filename + '.weights'
     variables_filename = uai_filename + '.variables'
+
     with open(uai_filename, 'w') as f:
         f.write('\n'.join(encoded_clauses) + '\n')
     run(
@@ -367,18 +384,7 @@ def encode_using_bn2cnf(args):
         ], args.memory)
     encoded_weights, max_literal = reencode_bn2cnf_weights(
         weights_filename, args.legacy)
-
-    # Map (variable, value) pairs to CNF formulas
-    # (as lists of lines in DIMACS syntax)
-    indicators = {}
-    with open(variables_filename) as f:
-        text = f.read()
-    for line in re.finditer(r'(\d+) = (.+)', text):
-        variable = line.group(1)
-        values = [v.split(', ') for v in line.group(2)[2:-2].split('][')]
-        for value in range(len(values)):
-            indicators[(int(variable),
-                        value)] = [l + ' 0' for l in values[value]]
+    indicators = parse_bn2cnf_variables_file(variables_filename)
 
     # Incorporate evidence (or select a goal)
     if not common.empty_evidence(args.evidence):
