@@ -3,13 +3,14 @@
 import re
 import xml.etree.ElementTree as ET
 
-NODE_RE = r'\nnode (\w+)'
+FILE_ENCODING = 'ISO-8859-1'
+NODE_RE = r'\n+node (\w+)'
+POTENTIAL_RE = r'\n+potential([^{]*){([^}]*)}'
 STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
 STATES_RE = {
     'dne': r'states = \(([^()]*)\)',
     'net': r'states = \(\s*"([^()]*)"\s*\)'
 }
-
 
 class BayesianNetwork:
     parents = {}
@@ -28,7 +29,7 @@ class BayesianNetwork:
 
     def __init__(self, filename):
         file_format = get_file_format(filename)
-        with open(filename, encoding='ISO-8859-1') as f:
+        with open(filename, encoding=FILE_ENCODING) as f:
             text = f.read()
 
         for node in re.finditer(NODE_RE, text):
@@ -52,7 +53,7 @@ class BayesianNetwork:
                 ]
 
         if file_format == 'net':
-            for potential in re.finditer(r'\npotential([^{]*){([^}]*)}', text):
+            for potential in re.finditer(POTENTIAL_RE, text):
                 header = re.findall(r'\w+', potential.group(1))
                 probs = re.findall(r'\d+\.?\d*', potential.group(2))
                 self.parents[header[0]] = header[1:]

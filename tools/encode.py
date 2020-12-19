@@ -250,7 +250,7 @@ def run(command, memory_limit=None):
 def encode_using_ace(args):
     'The main function behind encoding using ace'
     # Identify the goal
-    with open(args.network, encoding='ISO-8859-1') as f:
+    with open(args.network, encoding=common.FILE_ENCODING) as f:
         text = f.read()
     mode = common.get_file_format(args.network)
     goal_node, goal_value_index, goal_value = identify_goal(text, mode)
