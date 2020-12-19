@@ -324,6 +324,30 @@ def encode_using_ace(args):
     output_cnf(args, max_literal, clauses + evidence, weight_encoding)
 
 
+def reencode_bn2cnf_weights(weight_file, legacy_mode):
+    """Translate weights---as produced by bn2cnf---to the c2d format (while also
+    returning the largest literal found in the weight file)"""
+    if legacy_mode: return []
+    positive_weights = {}
+    negative_weights = {}
+    with open(weight_file) as f:
+        for line in f:
+            words = line.split()
+            assert len(words) == 2
+            literal = int(words[0])
+            if literal < 0:
+                negative_weights[-literal] = words[1]
+            else:
+                positive_weights[literal] = words[1]
+
+    return ([
+        'w {} {} {}'.format(literal, positive_weights[literal],
+                            negative_weights[literal])
+        if literal in negative_weights else 'w {} {}'.format(
+            literal, positive_weights[literal]) for literal in positive_weights
+    ], max(positive_weights))
+
+
 def encode_using_bn2cnf(args):
     'Translate the Bayesian network to the UAI format and run the encoder'
     bn = common.BayesianNetwork(args.network)
@@ -341,30 +365,8 @@ def encode_using_bn2cnf(args):
             '-i', uai_filename, '-o', cnf_filename, '-w', weights_filename,
             '-v', variables_filename
         ], args.memory)
-
-    # Translate weights to the right format
-    if args.legacy:
-        encoded_weights = []
-    else:
-        positive_weights = {}
-        negative_weights = {}
-        with open(weights_filename) as f:
-            for line in f:
-                words = line.split()
-                assert len(words) == 2
-                literal = int(words[0])
-                if literal < 0:
-                    negative_weights[-literal] = words[1]
-                else:
-                    positive_weights[literal] = words[1]
-
-        encoded_weights = [
-            'w {} {} {}'.format(literal, positive_weights[literal],
-                                negative_weights[literal])
-            if literal in negative_weights else 'w {} {}'.format(
-                literal, positive_weights[literal])
-            for literal in positive_weights
-        ]
+    encoded_weights, max_literal = reencode_bn2cnf_weights(
+        weights_filename, args.legacy)
 
     # Map (variable, value) pairs to CNF formulas
     # (as lists of lines in DIMACS syntax)
@@ -399,7 +401,7 @@ def encode_using_bn2cnf(args):
     # Put everything together and write to a file
     clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-'
                ] + encoded_evidence
-    output_cnf(args, max(positive_weights), clauses, encoded_weights)
+    output_cnf(args, max_literal, clauses, encoded_weights)
 
     if args.legacy:
         run(C2D + ['-in', cnf_filename], args.memory)
