@@ -4924,13 +4924,6 @@ potential ( pathoflengthIB3pB1pB1I_CC1_CC2_CC2_pf0I0p2I | pathoflengthIB3pB2pBlo
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( or_pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p5I_pathoflengthIB3pB2p6I_CC1_CC2_CC2 | or_pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p3I_pathoflengthIB3pB2p6I_CC1_CC2_CC2 pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p5I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( connectionblockedIA3pA2I | or_blocksI6pA2I_connectionblockedIA3pA2I_CC1 )
 {
 	data = ((	1.0	0.0	)
@@ -5291,11 +5284,6 @@ potential ( pathoflengthIA2pA2pB3I | pathoflengthIA2pA2pB3I_CC1_CC2 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( connectedIB3pA3I | pathoflengthIB3pA3p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_blocksI6pA2I_connectionblockedIA3pA2I_CC1 | or_blocksIBlock_1pA2I_connectionblockedIA3pA2I_CC1 blocksI6pA2I )
 {
 	data = (((	1.0	0.0	)
@@ -5626,11 +5614,6 @@ potential ( pathoflengthIB1pB1pA2I_CC1_CC2_CC2_pf0I2p2I | pathoflengthIB1pB2pB2I
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( connectedIB1pA3I | pathoflengthIB1pA3p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_blocksIBlock_1pA3I_blocksIBlock_1pB3I_CC1_CC0 | or_blocksIBlock_1pA2I_blocksIBlock_1pB3I_CC1_CC0 blocksIBlock_1pA3I )
 {
 	data = (((	1.0	0.0	)
@@ -5885,16 +5868,6 @@ potential ( or_blocksI6pA3I_connectionblockedIA3pA2I_CC1 | blocksIBlock_1pA3I bl
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( connectedIB1pB2I | pathoflengthIB1pB2p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( pathoflengthIB3pB3p6I | pathoflengthIB3pB3p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( pathoflengthIA3pB3p6I_CC1_CC2_CC2_pf0I5p2I | pathoflengthIA3pB2pB3I connectionblockedIB2pB3I )
 {
@@ -6229,20 +6202,6 @@ potential ( pathoflengthIB2pA3pA3I | pathoflengthIB2pA3pA3I_CC1_CC2 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( pathoflengthIA2pB1p6I_CC1_CC2 | pathoflengthIA2pB1pB3I pathoflengthIA2pB1p6I_CC1_CC2_CC2_pf0I5p2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( pathoflengthIB3pB3p6I_CC1_CC2 | pathoflengthIB3pB3pB3I or_pathoflengthIB3pB3p6I_CC1_CC2_CC2_pf0I5p4I_pathoflengthIB3pB3p6I_CC1_CC2_CC2 )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( pathoflengthIA3pB2pB2I | pathoflengthIA3pB2pB2I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
@@ -6275,11 +6234,6 @@ potential ( or_pathoflengthIA2pB3p6I_CC1_CC2_CC2_pf0I5p4I_pathoflengthIA2pB3p6I_
 		(	0.0	1.0	)));
 }
 potential ( pathoflengthIB2pB2pA3I | pathoflengthIB2pB2pA3I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( connectedIB2pB2I | pathoflengthIB2pB2p6I )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
@@ -6595,11 +6549,6 @@ potential ( or_blocksI6pB2I_connectionblockedIB2pA2I_CC1 | blocksIBlock_1pB2I bl
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( connectedIB2pB3I | pathoflengthIB2pB3p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIA3pB1pA3I_CC1_CC2_CC2_pf0I3p2I | pathoflengthIA3pB2pA2I connectionblockedIB2pB1I )
 {
 	data = (((	1.0	0.0	)
@@ -6665,11 +6614,6 @@ potential ( pathoflengthIB1pA2pB3I_CC1_CC2_CC2_pf0I4p2I | pathoflengthIB1pB2pA3I
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( pathoflengthIB3pB2p6I | pathoflengthIB3pB2p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_pathoflengthIB2pB2pB1I_CC1_CC2_CC2_pf0I0p3I_pathoflengthIB2pB2pB1I_CC1_CC2_CC2 | pathoflengthIB2pB2pB1I_CC1_CC2_CC2_pf0I0p1I pathoflengthIB2pB2pB1I_CC1_CC2_CC2_pf0I0p3I )
 {
 	data = (((	1.0	0.0	)
@@ -6728,11 +6672,6 @@ potential ( or_pathoflengthIB3pA3pB1I_CC1_CC2_CC2_pf0I0p5I_pathoflengthIB3pA3pB1
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( connectedIB3pB3I | pathoflengthIB3pB3p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( pathoflengthIB1pB3pB2I | pathoflengthIB1pB3pB2I_CC1_CC2 )
 {
@@ -6857,11 +6796,6 @@ potential ( or_blocksIBlock_1pB2I_connectionblockedIB1pB2I_CC1 | or_blocksI6pB1I
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( connectedIB1pB3I | pathoflengthIB1pB3p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIB3pB1pA3I_CC1_CC2_CC2_pf0I3p2I | pathoflengthIB3pB2pA2I connectionblockedIB2pB1I )
 {
 	data = (((	1.0	0.0	)
@@ -6950,11 +6884,6 @@ potential ( pathoflengthIB1pA3pB3I | pathoflengthIB1pA3pB3I_CC1_CC2 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( connectedIA2pA2I | pathoflengthIA2pA2p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIA3pB2pA2I_CC1_CC2_CC2_pf0I2p5I | pathoflengthIA3pB3pB2I connectionblockedIB3pB2I )
 {
 	data = (((	1.0	0.0	)
@@ -6982,11 +6911,6 @@ potential ( or_pathoflengthIB1pB2pA2I_CC1_CC2_CC2_pf0I2p3I_pathoflengthIB1pB2pA2
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( connectedIB2pB1I | pathoflengthIB2pB1p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( or_pathoflengthIB2pA2pB3I_CC1_CC2_CC2_pf0I4p4I_pathoflengthIB2pA2pB3I_CC1_CC2_CC2 | pathoflengthIB2pA2pB3I_CC1_CC2_CC2_pf0I4p2I pathoflengthIB2pA2pB3I_CC1_CC2_CC2_pf0I4p4I )
 {
@@ -7248,11 +7172,6 @@ potential ( pathoflengthIB3pB2pA2I_CC1_CC2 | pathoflengthIB3pB2pB2I or_pathoflen
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( connectedIA3pB1I | pathoflengthIA3pB1p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIA3pB3pB3I_CC1_CC2_CC2_pf0I4p2I | pathoflengthIA3pB2pA3I connectionblockedIB2pB3I )
 {
 	data = (((	1.0	0.0	)
@@ -7430,11 +7349,6 @@ potential ( pathoflengthIA2pA2p6I | pathoflengthIA2pA2p6I_CC1_CC2 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( connectedIB1pB1I | pathoflengthIB1pB1p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIA3pA2pB1I_CC1_CC2_CC2_pf0I0p4I | pathoflengthIA3pA3pBlock_1I connectionblockedIA3pA2I )
 {
 	data = (((	1.0	0.0	)
@@ -7500,13 +7414,6 @@ potential ( pathoflengthIB2pA3pA3I_CC1_CC2_CC2_pf0I3p3I | pathoflengthIB2pA2pA2I
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p5I | pathoflengthIB3pB3pB3I connectionblockedIB3pB2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	1.0	0.0	)));
-}
 potential ( pathoflengthIA3pA3p6I | pathoflengthIA3pA3p6I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
@@ -7565,11 +7472,6 @@ potential ( or_pathoflengthIA3pA2pB3I_CC1_CC2_CC2_pf0I4p4I_pathoflengthIA3pA2pB3
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( pathoflengthIB2pA3p6I | pathoflengthIB2pA3p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( pathoflengthIB1pA3pB1I_CC1_CC2_CC2_pf0I0p3I | pathoflengthIB1pA2pBlock_1I connectionblockedIA2pA3I )
 {
@@ -7703,11 +7605,6 @@ potential ( pathoflengthIB3pB2pA2I | pathoflengthIB3pB2pA2I_CC1_CC2 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( connectedIA2pB1I | pathoflengthIA2pB1p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIB1pB2pA3I_CC1_CC2 | pathoflengthIB1pB2pA2I or_pathoflengthIB1pB2pA3I_CC1_CC2_CC2_pf0I3p5I_pathoflengthIB1pB2pA3I_CC1_CC2_CC2 )
 {
 	data = (((	1.0	0.0	)
@@ -7828,13 +7725,6 @@ potential ( pathoflengthIB1pA3pA3I_CC1_CC2 | pathoflengthIB1pA3pA2I or_pathoflen
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( pathoflengthIB3pB3p6I_CC1_CC2_CC2_pf0I5p2I | pathoflengthIB3pB2pB3I connectionblockedIB2pB3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	1.0	0.0	)));
-}
 potential ( pathoflengthIA3pB1pB1I_CC1_CC2_CC2_pf0I0p2I | pathoflengthIA3pB2pBlock_1I connectionblockedIB2pB1I )
 {
 	data = (((	1.0	0.0	)
@@ -7860,13 +7750,6 @@ potential ( pathoflengthIA3pB3pB3I | pathoflengthIA3pB3pB3I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( pathoflengthIB1pA3p6I_CC1_CC2 | pathoflengthIB1pA3pB3I or_pathoflengthIB1pA3p6I_CC1_CC2_CC2_pf0I5p5I_pathoflengthIB1pA3p6I_CC1_CC2_CC2 )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( pathoflengthIA2pB3pBlock_1I | )
 {
@@ -7921,13 +7804,6 @@ potential ( pathoflengthIB2pA3pA3I_CC1_CC2 | pathoflengthIB2pA3pA2I or_pathoflen
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p3I_pathoflengthIB3pB2p6I_CC1_CC2_CC2 | pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p1I pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( pathoflengthIB3pB2pB3I | pathoflengthIB3pB2pB3I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
@@ -7939,11 +7815,6 @@ potential ( pathoflengthIB3pB2pA2I_CC1_CC2_CC2_pf0I2p1I | pathoflengthIB3pB1pB2I
 		(	1.0	0.0	))
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
-}
-potential ( pathoflengthIA2pB1p6I | pathoflengthIA2pB1p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( pathoflengthIA2pA2pB3I_CC1_CC2 | pathoflengthIA2pA2pA3I or_pathoflengthIA2pA2pB3I_CC1_CC2_CC2_pf0I4p4I_pathoflengthIA2pA2pB3I_CC1_CC2_CC2 )
 {
@@ -7987,13 +7858,6 @@ potential ( pathoflengthIA3pB1pB3I | pathoflengthIA3pB1pB3I_CC1_CC2 )
 		(	0.0	1.0	));
 }
 potential ( pathoflengthIB3pB2pA2I_CC1_CC2_CC2_pf0I2p5I | pathoflengthIB3pB3pB2I connectionblockedIB3pB2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	1.0	0.0	)));
-}
-potential ( pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p3I | pathoflengthIB3pA2pB3I connectionblockedIA2pB2I )
 {
 	data = (((	1.0	0.0	)
 		(	1.0	0.0	))
@@ -8144,11 +8008,6 @@ potential ( pathoflengthIB1pA3pB2I_CC1_CC2 | pathoflengthIB1pA3pB1I or_pathoflen
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( connectedIB3pB2I | pathoflengthIB3pB2p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIB1pB2pA3I_CC1_CC2_CC2_pf0I3p5I | pathoflengthIB1pB3pA2I connectionblockedIB3pB2I )
 {
 	data = (((	1.0	0.0	)
@@ -8251,13 +8110,6 @@ potential ( pathoflengthIB2pB2pB1I_CC1_CC2_CC2_pf0I0p1I | pathoflengthIB2pB1pBlo
 		(	1.0	0.0	)));
 }
 potential ( or_pathoflengthIB1pB2pB3I_CC1_CC2_CC2_pf0I4p5I_pathoflengthIB1pB2pB3I_CC1_CC2_CC2 | or_pathoflengthIB1pB2pB3I_CC1_CC2_CC2_pf0I4p3I_pathoflengthIB1pB2pB3I_CC1_CC2_CC2 pathoflengthIB1pB2pB3I_CC1_CC2_CC2_pf0I4p5I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( pathoflengthIB3pB2p6I_CC1_CC2 | pathoflengthIB3pB2pB3I or_pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p5I_pathoflengthIB3pB2p6I_CC1_CC2_CC2 )
 {
 	data = (((	1.0	0.0	)
 		(	0.0	1.0	))
@@ -8459,11 +8311,6 @@ potential ( or_pathoflengthIB3pB2pA3I_CC1_CC2_CC2_pf0I3p3I_pathoflengthIB3pB2pA3
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( pathoflengthIB2pB1p6I | pathoflengthIB2pB1p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_pathoflengthIB2pB3pB3I_CC1_CC2_CC2_pf0I4p4I_pathoflengthIB2pB3pB3I_CC1_CC2_CC2 | pathoflengthIB2pB3pB3I_CC1_CC2_CC2_pf0I4p2I pathoflengthIB2pB3pB3I_CC1_CC2_CC2_pf0I4p4I )
 {
 	data = (((	1.0	0.0	)
@@ -8482,13 +8329,6 @@ potential ( pathoflengthIA3pB3pB1I | pathoflengthIA3pB3pB1I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( or_pathoflengthIB2pB3p6I_CC1_CC2_CC2_pf0I5p4I_pathoflengthIB2pB3p6I_CC1_CC2_CC2 | pathoflengthIB2pB3p6I_CC1_CC2_CC2_pf0I5p2I pathoflengthIB2pB3p6I_CC1_CC2_CC2_pf0I5p4I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( blocksIBlock_1pA3I | or_blocksIBlock_1pA2I_blocksIBlock_1pB3I_CC1_CC0 )
 {
@@ -8598,11 +8438,6 @@ potential ( pathoflengthIA2pA3p6I_CC1_CC2_CC2_pf0I5p5I | pathoflengthIA2pB3pB3I 
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( connectedIB3pB1I | pathoflengthIB3pB1p6I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIB1pB1p6I | pathoflengthIB1pB1p6I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
@@ -8650,11 +8485,6 @@ potential ( or_pathoflengthIA2pA2pA2I_CC1_CC2_CC2_pf0I2p4I_pathoflengthIA2pA2pA2
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( pathoflengthIA3pB1p6I | pathoflengthIA3pB1p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( or_pathoflengthIA2pB2p6I_CC1_CC2_CC2_pf0I5p3I_pathoflengthIA2pB2p6I_CC1_CC2_CC2 | pathoflengthIA2pB2p6I_CC1_CC2_CC2_pf0I5p1I pathoflengthIA2pB2p6I_CC1_CC2_CC2_pf0I5p3I )
 {
@@ -8787,13 +8617,6 @@ potential ( or_blocksIBlock_1pB3I_connectionblockedIB2pB3I_CC1 | or_blocksI6pB2I
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( pathoflengthIB3pB3p6I_CC1_CC2_CC2_pf0I5p4I | pathoflengthIB3pA3pB3I connectionblockedIA3pB3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	1.0	0.0	)));
 }
 potential ( or_pathoflengthIA2pB2pB1I_CC1_CC2_CC2_pf0I0p5I_pathoflengthIA2pB2pB1I_CC1_CC2_CC2 | or_pathoflengthIA2pB2pB1I_CC1_CC2_CC2_pf0I0p3I_pathoflengthIA2pB2pB1I_CC1_CC2_CC2 pathoflengthIA2pB2pB1I_CC1_CC2_CC2_pf0I0p5I )
 {
@@ -9039,13 +8862,6 @@ potential ( or_pathoflengthIA3pA2p6I_CC1_CC2_CC2_pf0I5p4I_pathoflengthIA3pA2p6I_
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( pathoflengthIB2pB3p6I_CC1_CC2 | pathoflengthIB2pB3pB3I or_pathoflengthIB2pB3p6I_CC1_CC2_CC2_pf0I5p4I_pathoflengthIB2pB3p6I_CC1_CC2_CC2 )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_pathoflengthIA2pA2pB3I_CC1_CC2_CC2_pf0I4p4I_pathoflengthIA2pA2pB3I_CC1_CC2_CC2 | pathoflengthIA2pA2pB3I_CC1_CC2_CC2_pf0I4p2I pathoflengthIA2pA2pB3I_CC1_CC2_CC2_pf0I4p4I )
 {
 	data = (((	1.0	0.0	)
@@ -9113,13 +8929,6 @@ potential ( pathoflengthIA2pB2pB2I_CC1_CC2_CC2_pf0I1p3I | pathoflengthIA2pA2pB1I
 		(	1.0	0.0	))
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
-}
-potential ( or_pathoflengthIB3pB3p6I_CC1_CC2_CC2_pf0I5p4I_pathoflengthIB3pB3p6I_CC1_CC2_CC2 | pathoflengthIB3pB3p6I_CC1_CC2_CC2_pf0I5p2I pathoflengthIB3pB3p6I_CC1_CC2_CC2_pf0I5p4I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( or_pathoflengthIB1pB3pB1I_CC1_CC2_CC2_pf0I0p4I_pathoflengthIB1pB3pB1I_CC1_CC2_CC2 | pathoflengthIB1pB3pB1I_CC1_CC2_CC2_pf0I0p2I pathoflengthIB1pB3pB1I_CC1_CC2_CC2_pf0I0p4I )
 {
@@ -9517,13 +9326,6 @@ potential ( pathoflengthIB2pA2pA2I_CC1_CC2_CC2_pf0I2p2I | pathoflengthIB2pB2pB2I
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( pathoflengthIB3pB2p6I_CC1_CC2_CC2_pf0I5p1I | pathoflengthIB3pB1pB3I connectionblockedIB1pB2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	1.0	0.0	)));
-}
 potential ( pathoflengthIA3pB3pA3I | pathoflengthIA3pB3pA3I_CC1_CC2 )
 {
 	data = ((	1.0	0.0	)
@@ -9589,11 +9391,6 @@ potential ( or_pathoflengthIA3pB2pA2I_CC1_CC2_CC2_pf0I2p5I_pathoflengthIA3pB2pA2
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( pathoflengthIB1pA3p6I | pathoflengthIB1pA3p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( pathoflengthIB3pB1p6I_CC1_CC2_CC2_pf0I5p2I | pathoflengthIB3pB2pB3I connectionblockedIB2pB1I )
 {
@@ -9715,17 +9512,7 @@ potential ( pathoflengthIB1pB2pB3I_CC1_CC2_CC2_pf0I4p1I | pathoflengthIB1pB1pA3I
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( pathoflengthIB1pB2p6I | pathoflengthIB1pB2p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( pathoflengthIB2pB3pB1I | pathoflengthIB2pB3pB1I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( connectedIB2pA3I | pathoflengthIB2pA3p6I )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
@@ -9772,13 +9559,6 @@ potential ( pathoflengthIB3pB1pA2I | pathoflengthIB3pB1pA2I_CC1_CC2 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( pathoflengthIA2pB1p6I_CC1_CC2_CC2_pf0I5p2I | pathoflengthIA2pB2pB3I connectionblockedIB2pB1I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	1.0	0.0	)));
-}
 potential ( pathoflengthIA3pA2p6I_CC1_CC2_CC2_pf0I5p4I | pathoflengthIA3pA3pB3I connectionblockedIA3pA2I )
 {
 	data = (((	1.0	0.0	)
@@ -9824,11 +9604,6 @@ potential ( pathoflengthIB1pB3pA2I_CC1_CC2_CC2_pf0I2p2I | pathoflengthIB1pB2pB2I
 		(	1.0	0.0	))
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
-}
-potential ( pathoflengthIB2pB3p6I | pathoflengthIB2pB3p6I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( pathoflengthIA2pA3pB1I | pathoflengthIA2pA3pB1I_CC1_CC2 )
 {
@@ -10121,11 +9896,6 @@ potential ( pathoflengthIA3pB1pA2I_CC1_CC2_CC2_pf0I2p2I | pathoflengthIA3pB2pB2I
 		(	1.0	0.0	)));
 }
 potential ( pathoflengthIB3pA2pB1I | pathoflengthIB3pA2pB1I_CC1_CC2 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( connectedIB3pA2I | pathoflengthIB3pA2p6I )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));

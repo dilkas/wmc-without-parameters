@@ -7045,13 +7045,6 @@ potential ( matchIg6pp1pp2I_CC1_CC0_pf0I0I | true_colorIp2pc1I guess_colorIg6pp1
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( makeswhiteIg5pp3pp3I_CC1 | or_matchIg5pp3pp3I_makeswhiteIg5pp2pp3I_CC1_CC0 makeswhiteIg5pp3pp3I_CC1_CC1 )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	1.0	0.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_matchIg4pp2pp3I_matchIg4pp3pp3I_CC1_CC1_CC0 | matchIg4pp1pp3I matchIg4pp2pp3I )
 {
 	data = (((	1.0	0.0	)
@@ -7170,18 +7163,6 @@ potential ( or_makeswhiteIg5pp2pp3I_makeswhiteIg5pp3pp3I_CC1_CC1_CC0 | makeswhit
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_makeswhiteIg8pp1pp3I_whiteIg8pp1I_CC1 | or_makeswhiteIg8pp1pp2I_whiteIg8pp1I_CC1 makeswhiteIg8pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( blackIg4pp2I | or_makesblackIg4pp2pp3I_blackIg4pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( makeswhiteIg6pp1pp3I_CC1 | or_matchIg6pp3pp3I_makeswhiteIg6pp2pp3I_CC1_CC0 or_makeswhiteIg6pp1pp2I_whiteIg6pp1I_CC1 )
 {
 	data = (((	1.0	0.0	)
@@ -7189,22 +7170,10 @@ potential ( makeswhiteIg6pp1pp3I_CC1 | or_matchIg6pp3pp3I_makeswhiteIg6pp2pp3I_C
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( makeswhiteIg8pp3pp3I | makeswhiteIg8pp3pp3I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( guess_colorIg8pp1pc2I | guess_colorIg8pp1pc1I )
 {
 	data = ((	0.5	0.5	)
 		(	1.0	0.0	));
-}
-potential ( makeswhiteIg6pp3pp3I_CC1 | or_matchIg6pp3pp3I_makeswhiteIg6pp2pp3I_CC1_CC0 makeswhiteIg6pp3pp3I_CC1_CC1 )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	1.0	0.0	)
-		(	0.0	1.0	)));
 }
 potential ( or_makesblackIg8pp3pp1I_CC1_CC0_pf0I2I_makesblackIg8pp3pp1I_CC1_CC0 | or_makesblackIg8pp3pp1I_CC1_CC0_pf0I1I_makesblackIg8pp3pp1I_CC1_CC0 makesblackIg8pp3pp1I_CC1_CC0_pf0I2I )
 {
@@ -7359,13 +7328,6 @@ potential ( matchIg6pp1pp1I | or_makesblackIg6pp3pp1I_CC1_CC0_pf0I2I_makesblackI
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( or_makesblackIg2pp1pp3I_blackIg2pp1I_CC1 | or_makesblackIg2pp1pp2I_blackIg2pp1I_CC1 makesblackIg2pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( or_makesblackIg4pp2pp2I_makesblackIg4pp3pp2I_CC1_CC1_CC0 | makesblackIg4pp1pp2I makesblackIg4pp2pp2I )
 {
@@ -7797,13 +7759,6 @@ potential ( or_makeswhiteIg2pp2pp2I_makeswhiteIg2pp2pp3I_CC1_CC1_CC2_CC0 | makes
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_makesblackIg4pp2pp3I_blackIg4pp2I_CC1 | makesblackIg4pp2pp2I makesblackIg4pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( matchIg3pp3pp1I_CC1_CC0_pf0I0I | true_colorIp1pc1I guess_colorIg3pp3pc1I )
 {
 	data = (((	1.0	0.0	)
@@ -8123,18 +8078,6 @@ potential ( makesblackIg1pp1pp3I_CC1 | or_makesblackIg1pp3pp3I_CC1_CC0_pf0I2I_ma
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( or_makesblackIg1pp3pp2I_makesblackIg1pp3pp3I_CC1_CC1_CC2_CC0 | makesblackIg1pp3pp1I makesblackIg1pp3pp2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( blackIg6pp1I | or_makesblackIg6pp1pp3I_blackIg6pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg2pp1pp3I_CC1_CC0_pf0I0I | true_colorIp3pc1I guess_colorIg2pp1pc1I )
 {
 	data = (((	1.0	0.0	)
@@ -8283,13 +8226,6 @@ potential ( matchIg3pp3pp1I_CC1 | or_matchIg3pp3pp1I_CC1_CC0_pf0I2I_matchIg3pp3p
 		(	1.0	0.0	))
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
-}
-potential ( or_makeswhiteIg4pp1pp3I_whiteIg4pp1I_CC1 | or_makeswhiteIg4pp1pp2I_whiteIg4pp1I_CC1 makeswhiteIg4pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( makeswhiteIg5pp1pp2I | makeswhiteIg5pp1pp2I_CC1 )
 {
@@ -8484,18 +8420,6 @@ potential ( guess_colorIg1pp3pc1I | )
 {
 	data = (	0.6666666666666667	0.3333333333333333	);
 }
-potential ( makesblackIg1pp3pp3I | makesblackIg1pp3pp3I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( or_makesblackIg4pp1pp3I_blackIg4pp1I_CC1 | or_makesblackIg4pp1pp2I_blackIg4pp1I_CC1 makesblackIg4pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_matchIg8pp2pp1I_CC1_CC0_pf0I1I_matchIg8pp2pp1I_CC1_CC0 | matchIg8pp2pp1I_CC1_CC0_pf0I0I matchIg8pp2pp1I_CC1_CC0_pf0I1I )
 {
 	data = (((	1.0	0.0	)
@@ -8518,11 +8442,6 @@ potential ( matchIg3pp2pp1I_CC1_CC0_pf0I1I | true_colorIp1pc2I guess_colorIg3pp2
 		(	1.0	0.0	))
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
-}
-potential ( makeswhiteIg6pp3pp3I | makeswhiteIg6pp3pp3I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( makeswhiteIg1pp1pp2I | makeswhiteIg1pp1pp2I_CC1 )
 {
@@ -8609,13 +8528,6 @@ potential ( matchIg2pp3pp2I | matchIg2pp3pp2I_CC1 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( or_makeswhiteIg8pp2pp3I_makeswhiteIg8pp3pp3I_CC1_CC1_CC0 | makeswhiteIg8pp1pp3I makeswhiteIg8pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( makeswhiteIg6pp2pp1I | makeswhiteIg6pp2pp1I_CC1 )
 {
@@ -8710,22 +8622,12 @@ potential ( guess_colorIg7pp3pc2I | guess_colorIg7pp3pc1I )
 	data = ((	0.5	0.5	)
 		(	1.0	0.0	));
 }
-potential ( blackIg4pp1I | or_makesblackIg4pp1pp3I_blackIg4pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_makesblackIg8pp2pp2I_makesblackIg8pp2pp3I_CC1_CC1_CC2_CC0 | makesblackIg8pp2pp1I makesblackIg8pp2pp2I )
 {
 	data = (((	1.0	0.0	)
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( blackIg3pp1I | or_makesblackIg3pp1pp3I_blackIg3pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( makesblackIg3pp3pp3I_CC1_CC0_pf0I2I | true_colorIp3pc3I guess_colorIg3pp3pc3I )
 {
@@ -8843,11 +8745,6 @@ potential ( makeswhiteIg4pp3pp2I_CC1_CC1 | or_makeswhiteIg4pp2pp2I_makeswhiteIg4
 		(	1.0	0.0	))
 		((	1.0	0.0	)
 		(	1.0	0.0	)));
-}
-potential ( whiteIg8pp1I | or_makeswhiteIg8pp1pp3I_whiteIg8pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( makesblackIg7pp2pp3I_CC1 | or_makesblackIg7pp3pp3I_CC1_CC0_pf0I2I_makesblackIg7pp3pp3I_CC1_CC0 makesblackIg7pp2pp3I_CC1_CC1 )
 {
@@ -9451,11 +9348,6 @@ potential ( matchIg6pp2pp3I_CC1_CC0_pf0I2I | true_colorIp3pc3I guess_colorIg6pp2
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( blackIg1pp3I | makesblackIg1pp3pp3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_makesblackIg1pp3pp2I_CC1_CC0_pf0I2I_makesblackIg1pp3pp2I_CC1_CC0 | or_makesblackIg1pp3pp2I_CC1_CC0_pf0I1I_makesblackIg1pp3pp2I_CC1_CC0 makesblackIg1pp3pp2I_CC1_CC0_pf0I2I )
 {
 	data = (((	1.0	0.0	)
@@ -9784,11 +9676,6 @@ potential ( matchIg4pp2pp2I | matchIg4pp2pp2I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( whiteIg1pp1I | or_makeswhiteIg1pp1pp3I_whiteIg1pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg5pp2pp3I_CC1_CC0_pf0I2I | true_colorIp3pc3I guess_colorIg5pp2pc3I )
 {
 	data = (((	1.0	0.0	)
@@ -9922,13 +9809,6 @@ potential ( guess_colorIg5pp3pc2I | guess_colorIg5pp3pc1I )
 {
 	data = ((	0.5	0.5	)
 		(	1.0	0.0	));
-}
-potential ( or_makeswhiteIg2pp2pp3I_whiteIg2pp2I_CC1 | makeswhiteIg2pp2pp2I makeswhiteIg2pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( makeswhiteIg2pp2pp3I_CC1 | or_matchIg2pp3pp3I_makeswhiteIg2pp2pp3I_CC1_CC0 makeswhiteIg2pp2pp3I_CC1_CC1 )
 {
@@ -10167,13 +10047,6 @@ potential ( makeswhiteIg5pp2pp3I_CC1_CC1 | makeswhiteIg5pp1pp3I or_makeswhiteIg5
 		((	1.0	0.0	)
 		(	1.0	0.0	)));
 }
-potential ( or_makeswhiteIg1pp1pp3I_whiteIg1pp1I_CC1 | or_makeswhiteIg1pp1pp2I_whiteIg1pp1I_CC1 makeswhiteIg1pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( makesblackIg7pp3pp2I_CC1_CC1 | or_makesblackIg7pp2pp2I_makesblackIg7pp3pp2I_CC1_CC1_CC0 makesblackIg7pp3pp1I )
 {
 	data = (((	0.0	1.0	)
@@ -10381,11 +10254,6 @@ potential ( or_matchIg4pp1pp2I_CC1_CC0_pf0I1I_matchIg4pp1pp2I_CC1_CC0 | matchIg4
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( whiteIg4pp3I | makeswhiteIg4pp3pp3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_matchIg8pp3pp2I_CC1_CC0_pf0I2I_matchIg8pp3pp2I_CC1_CC0 | or_matchIg8pp3pp2I_CC1_CC0_pf0I1I_matchIg8pp3pp2I_CC1_CC0 matchIg8pp3pp2I_CC1_CC0_pf0I2I )
 {
 	data = (((	1.0	0.0	)
@@ -10473,11 +10341,6 @@ potential ( or_matchIg3pp1pp2I_CC1_CC0_pf0I1I_matchIg3pp1pp2I_CC1_CC0 | matchIg3
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( whiteIg6pp2I | or_makeswhiteIg6pp2pp3I_whiteIg6pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg8pp3pp1I_CC1_CC0_pf0I1I | true_colorIp1pc2I guess_colorIg8pp3pc2I )
 {
 	data = (((	1.0	0.0	)
@@ -10514,13 +10377,6 @@ potential ( matchIg4pp1pp2I_CC1_CC0_pf0I0I | true_colorIp2pc1I guess_colorIg4pp1
 	data = (((	1.0	0.0	)
 		(	1.0	0.0	))
 		((	1.0	0.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_makesblackIg5pp1pp3I_blackIg5pp1I_CC1 | or_makesblackIg5pp1pp2I_blackIg5pp1I_CC1 makesblackIg5pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
 potential ( or_makesblackIg3pp3pp2I_CC1_CC0_pf0I1I_makesblackIg3pp3pp2I_CC1_CC0 | makesblackIg3pp3pp2I_CC1_CC0_pf0I0I makesblackIg3pp3pp2I_CC1_CC0_pf0I1I )
@@ -10653,11 +10509,6 @@ potential ( matchIg6pp3pp3I_CC1_CC1 | or_matchIg6pp2pp3I_matchIg6pp3pp3I_CC1_CC1
 		(	1.0	0.0	))
 		((	1.0	0.0	)
 		(	1.0	0.0	)));
-}
-potential ( whiteIg5pp1I | or_makeswhiteIg5pp1pp3I_whiteIg5pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( or_makesblackIg6pp2pp2I_makesblackIg6pp2pp3I_CC1_CC1_CC2_CC0 | makesblackIg6pp2pp1I makesblackIg6pp2pp2I )
 {
@@ -11135,11 +10986,6 @@ potential ( makesblackIg3pp3pp2I_CC1_CC0_pf0I1I | true_colorIp2pc2I guess_colorI
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( whiteIg2pp2I | or_makeswhiteIg2pp2pp3I_whiteIg2pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg4pp2pp3I | matchIg4pp2pp3I_CC1 )
 {
 	data = ((	1.0	0.0	)
@@ -11356,13 +11202,6 @@ potential ( or_matchIg8pp3pp1I_CC1_CC0_pf0I2I_matchIg8pp3pp1I_CC1_CC0 | or_match
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( makeswhiteIg8pp3pp3I_CC1_CC1 | or_makeswhiteIg8pp2pp3I_makeswhiteIg8pp3pp3I_CC1_CC1_CC0 or_makeswhiteIg8pp3pp2I_makeswhiteIg8pp3pp3I_CC1_CC1_CC2_CC0 )
-{
-	data = (((	0.0	1.0	)
-		(	1.0	0.0	))
-		((	1.0	0.0	)
-		(	1.0	0.0	)));
-}
 potential ( matchIg3pp2pp3I_CC1_CC0_pf0I2I | true_colorIp3pc3I guess_colorIg3pp2pc3I )
 {
 	data = (((	1.0	0.0	)
@@ -11389,22 +11228,12 @@ potential ( makesblackIg2pp3pp1I_CC1_CC0_pf0I0I | true_colorIp1pc1I guess_colorI
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( blackIg1pp2I | or_makesblackIg1pp2pp3I_blackIg1pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( makesblackIg5pp1pp2I_CC1 | or_makesblackIg5pp3pp2I_CC1_CC0_pf0I2I_makesblackIg5pp3pp2I_CC1_CC0 makesblackIg5pp1pp1I )
 {
 	data = (((	1.0	0.0	)
 		(	1.0	0.0	))
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
-}
-potential ( blackIg3pp2I | or_makesblackIg3pp2pp3I_blackIg3pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( matchIg2pp1pp3I_CC1 | or_matchIg2pp1pp3I_CC1_CC0_pf0I2I_matchIg2pp1pp3I_CC1_CC0 or_matchIg2pp1pp2I_makeswhiteIg2pp2pp1I_CC1_CC0 )
 {
@@ -11500,13 +11329,6 @@ potential ( or_makeswhiteIg1pp2pp2I_makeswhiteIg1pp2pp3I_CC1_CC1_CC2_CC0 | makes
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( makesblackIg1pp3pp3I_CC1 | or_makesblackIg1pp3pp3I_CC1_CC0_pf0I2I_makesblackIg1pp3pp3I_CC1_CC0 makesblackIg1pp3pp3I_CC1_CC1 )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	1.0	0.0	)
-		(	0.0	1.0	)));
-}
 potential ( matchIg5pp2pp3I_CC1 | or_matchIg5pp2pp3I_CC1_CC0_pf0I2I_matchIg5pp2pp3I_CC1_CC0 matchIg5pp2pp3I_CC1_CC1 )
 {
 	data = (((	1.0	0.0	)
@@ -11564,13 +11386,6 @@ potential ( makeswhiteIg5pp1pp1I | or_matchIg5pp1pp3I_makeswhiteIg5pp2pp1I_CC1_C
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( makeswhiteIg8pp3pp3I_CC1 | or_matchIg8pp3pp3I_makeswhiteIg8pp2pp3I_CC1_CC0 makeswhiteIg8pp3pp3I_CC1_CC1 )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	1.0	0.0	)
-		(	0.0	1.0	)));
 }
 potential ( guess_colorIg4pp2pc3I | or_guess_colorIg4pp2pc2I_guess_colorIg4pp2pc3I_CC1_CC0 )
 {
@@ -11742,13 +11557,6 @@ potential ( makesblackIg7pp1pp2I | makesblackIg7pp1pp2I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( or_makeswhiteIg8pp2pp3I_whiteIg8pp2I_CC1 | makeswhiteIg8pp2pp2I makeswhiteIg8pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_makesblackIg8pp2pp3I_makesblackIg8pp3pp3I_CC1_CC1_CC0 | makesblackIg8pp1pp3I makesblackIg8pp2pp3I )
 {
 	data = (((	1.0	0.0	)
@@ -11761,24 +11569,12 @@ potential ( matchIg5pp3pp3I | matchIg5pp3pp3I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( or_makesblackIg7pp1pp3I_blackIg7pp1I_CC1 | or_makesblackIg7pp1pp2I_blackIg7pp1I_CC1 makesblackIg7pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( makeswhiteIg3pp2pp3I_CC1_CC1 | makeswhiteIg3pp1pp3I or_makeswhiteIg3pp2pp2I_makeswhiteIg3pp2pp3I_CC1_CC1_CC2_CC0 )
 {
 	data = (((	0.0	1.0	)
 		(	1.0	0.0	))
 		((	1.0	0.0	)
 		(	1.0	0.0	)));
-}
-potential ( whiteIg4pp1I | or_makeswhiteIg4pp1pp3I_whiteIg4pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( makeswhiteIg7pp3pp2I | makeswhiteIg7pp3pp2I_CC1 )
 {
@@ -11893,11 +11689,6 @@ potential ( or_matchIg7pp1pp3I_CC1_CC0_pf0I2I_matchIg7pp1pp3I_CC1_CC0 | or_match
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( blackIg7pp2I | or_makesblackIg7pp2pp3I_blackIg7pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( matchIg7pp1pp3I_CC1_CC0_pf0I2I | true_colorIp3pc3I guess_colorIg7pp1pc3I )
 {
@@ -12257,13 +12048,6 @@ potential ( whiteIg7pp1I | or_makeswhiteIg7pp1pp3I_whiteIg7pp1I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( or_makeswhiteIg6pp2pp3I_whiteIg6pp2I_CC1 | makeswhiteIg6pp2pp2I makeswhiteIg6pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_matchIg6pp1pp3I_makeswhiteIg6pp2pp1I_CC1_CC0 | or_matchIg6pp1pp2I_makeswhiteIg6pp2pp1I_CC1_CC0 matchIg6pp1pp3I )
 {
 	data = (((	1.0	0.0	)
@@ -12436,11 +12220,6 @@ potential ( matchIg2pp2pp3I_CC1_CC0_pf0I0I | true_colorIp3pc1I guess_colorIg2pp2
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( whiteIg4pp2I | or_makeswhiteIg4pp2pp3I_whiteIg4pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_matchIg1pp3pp2I_makeswhiteIg1pp1pp3I_CC1_CC0 | matchIg1pp3pp1I matchIg1pp3pp2I )
 {
 	data = (((	1.0	0.0	)
@@ -12607,13 +12386,6 @@ potential ( or_makesblackIg5pp3pp2I_CC1_CC0_pf0I2I_makesblackIg5pp3pp2I_CC1_CC0 
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_makeswhiteIg4pp2pp3I_whiteIg4pp2I_CC1 | makeswhiteIg4pp2pp2I makeswhiteIg4pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( makeswhiteIg2pp1pp2I | makeswhiteIg2pp1pp2I_CC1 )
 {
 	data = ((	1.0	0.0	)
@@ -12634,13 +12406,6 @@ potential ( or_matchIg1pp3pp2I_CC1_CC0_pf0I2I_matchIg1pp3pp2I_CC1_CC0 | or_match
 		(	0.0	1.0	)));
 }
 potential ( or_matchIg8pp1pp2I_CC1_CC0_pf0I2I_matchIg8pp1pp2I_CC1_CC0 | or_matchIg8pp1pp2I_CC1_CC0_pf0I1I_matchIg8pp1pp2I_CC1_CC0 matchIg8pp1pp2I_CC1_CC0_pf0I2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_makesblackIg8pp2pp3I_blackIg8pp2I_CC1 | makesblackIg8pp2pp2I makesblackIg8pp2pp3I )
 {
 	data = (((	1.0	0.0	)
 		(	0.0	1.0	))
@@ -12894,11 +12659,6 @@ potential ( makeswhiteIg6pp2pp1I_CC1 | or_matchIg6pp1pp3I_makeswhiteIg6pp2pp1I_C
 		((	0.0	1.0	)
 		(	1.0	0.0	)));
 }
-potential ( makeswhiteIg5pp3pp3I | makeswhiteIg5pp3pp3I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_matchIg7pp2pp3I_matchIg7pp3pp3I_CC1_CC1_CC0 | matchIg7pp1pp3I matchIg7pp2pp3I )
 {
 	data = (((	1.0	0.0	)
@@ -13041,11 +12801,6 @@ potential ( makesblackIg4pp3pp1I_CC1_CC0_pf0I0I | true_colorIp1pc1I guess_colorI
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( blackIg8pp2I | or_makesblackIg8pp2pp3I_blackIg8pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg3pp3pp3I | matchIg3pp3pp3I_CC1 )
 {
 	data = ((	1.0	0.0	)
@@ -13127,13 +12882,6 @@ potential ( matchIg2pp3pp3I_CC1 | or_makesblackIg2pp3pp3I_CC1_CC0_pf0I2I_makesbl
 		(	1.0	0.0	))
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
-}
-potential ( makesblackIg1pp3pp3I_CC1_CC1 | or_makesblackIg1pp2pp3I_makesblackIg1pp3pp3I_CC1_CC1_CC0 or_makesblackIg1pp3pp2I_makesblackIg1pp3pp3I_CC1_CC1_CC2_CC0 )
-{
-	data = (((	0.0	1.0	)
-		(	1.0	0.0	))
-		((	1.0	0.0	)
-		(	1.0	0.0	)));
 }
 potential ( or_matchIg5pp2pp3I_CC1_CC0_pf0I1I_matchIg5pp2pp3I_CC1_CC0 | matchIg5pp2pp3I_CC1_CC0_pf0I0I matchIg5pp2pp3I_CC1_CC0_pf0I1I )
 {
@@ -13335,11 +13083,6 @@ potential ( makesblackIg1pp1pp1I | or_makesblackIg1pp3pp1I_CC1_CC0_pf0I2I_makesb
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( blackIg5pp1I | or_makesblackIg5pp1pp3I_blackIg5pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg3pp2pp3I_CC1_CC0_pf0I1I | true_colorIp3pc2I guess_colorIg3pp2pc2I )
 {
 	data = (((	1.0	0.0	)
@@ -13372,11 +13115,6 @@ potential ( or_matchIg5pp3pp1I_CC1_CC0_pf0I1I_matchIg5pp3pp1I_CC1_CC0 | matchIg5
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( whiteIg5pp2I | or_makeswhiteIg5pp2pp3I_whiteIg5pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( or_matchIg5pp3pp1I_CC1_CC0_pf0I2I_matchIg5pp3pp1I_CC1_CC0 | or_matchIg5pp3pp1I_CC1_CC0_pf0I1I_matchIg5pp3pp1I_CC1_CC0 matchIg5pp3pp1I_CC1_CC0_pf0I2I )
 {
@@ -13471,11 +13209,6 @@ potential ( makesblackIg5pp3pp1I_CC1_CC0_pf0I2I | true_colorIp1pc3I guess_colorI
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( whiteIg5pp3I | makeswhiteIg5pp3pp3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_matchIg6pp2pp3I_matchIg6pp3pp3I_CC1_CC1_CC0 | matchIg6pp1pp3I matchIg6pp2pp3I )
 {
 	data = (((	1.0	0.0	)
@@ -13490,16 +13223,6 @@ potential ( matchIg4pp3pp3I_CC1_CC1 | or_matchIg4pp2pp3I_matchIg4pp3pp3I_CC1_CC1
 		((	1.0	0.0	)
 		(	1.0	0.0	)));
 }
-potential ( blackIg7pp1I | or_makesblackIg7pp1pp3I_blackIg7pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( blackIg2pp1I | or_makesblackIg2pp1pp3I_blackIg2pp1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( or_matchIg1pp3pp1I_CC1_CC0_pf0I1I_matchIg1pp3pp1I_CC1_CC0 | matchIg1pp3pp1I_CC1_CC0_pf0I0I matchIg1pp3pp1I_CC1_CC0_pf0I1I )
 {
 	data = (((	1.0	0.0	)
@@ -13513,11 +13236,6 @@ potential ( or_makesblackIg3pp1pp3I_blackIg3pp1I_CC1 | or_makesblackIg3pp1pp2I_b
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( whiteIg8pp2I | or_makeswhiteIg8pp2pp3I_whiteIg8pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( matchIg6pp3pp2I_CC1_CC1 | or_matchIg6pp2pp2I_matchIg6pp3pp2I_CC1_CC1_CC0 matchIg6pp3pp1I )
 {
@@ -13847,11 +13565,6 @@ potential ( makeswhiteIg7pp2pp1I | makeswhiteIg7pp2pp1I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( blackIg2pp2I | or_makesblackIg2pp2pp3I_blackIg2pp2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( makeswhiteIg1pp3pp2I_CC1 | or_matchIg1pp2pp3I_makeswhiteIg1pp1pp2I_CC1_CC0 makeswhiteIg1pp3pp2I_CC1_CC1 )
 {
 	data = (((	1.0	0.0	)
@@ -13968,11 +13681,6 @@ potential ( guess_colorIg5pp1pc2I | guess_colorIg5pp1pc1I )
 {
 	data = ((	0.5	0.5	)
 		(	1.0	0.0	));
-}
-potential ( whiteIg8pp3I | makeswhiteIg8pp3pp3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( makesblackIg7pp3pp3I | makesblackIg7pp3pp3I_CC1 )
 {
@@ -14122,13 +13830,6 @@ potential ( makeswhiteIg4pp1pp3I | makeswhiteIg4pp1pp3I_CC1 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( or_makesblackIg6pp1pp3I_blackIg6pp1I_CC1 | or_makesblackIg6pp1pp2I_blackIg6pp1I_CC1 makesblackIg6pp1pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( whiteIg2pp3I | makeswhiteIg2pp3pp3I )
 {
@@ -14381,11 +14082,6 @@ potential ( makesblackIg2pp2pp3I | makesblackIg2pp2pp3I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( whiteIg1pp3I | makeswhiteIg1pp3pp3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( matchIg3pp1pp2I_CC1_CC0_pf0I2I | true_colorIp2pc3I guess_colorIg3pp1pc3I )
 {
 	data = (((	1.0	0.0	)
@@ -14440,11 +14136,6 @@ potential ( or_matchIg3pp1pp2I_makeswhiteIg3pp2pp1I_CC1_CC0 | matchIg3pp1pp1I ma
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( whiteIg6pp3I | makeswhiteIg6pp3pp3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( makesblackIg4pp1pp1I | or_makesblackIg4pp3pp1I_CC1_CC0_pf0I2I_makesblackIg4pp3pp1I_CC1_CC0 )
 {
@@ -14511,13 +14202,6 @@ potential ( or_matchIg3pp2pp1I_CC1_CC0_pf0I1I_matchIg3pp2pp1I_CC1_CC0 | matchIg3
 		(	0.0	1.0	)));
 }
 potential ( or_makeswhiteIg4pp2pp2I_makeswhiteIg4pp2pp3I_CC1_CC1_CC2_CC0 | makeswhiteIg4pp2pp1I makeswhiteIg4pp2pp2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_makesblackIg7pp2pp3I_blackIg7pp2I_CC1 | makesblackIg7pp2pp2I makesblackIg7pp2pp3I )
 {
 	data = (((	1.0	0.0	)
 		(	0.0	1.0	))
@@ -14729,13 +14413,6 @@ potential ( makeswhiteIg4pp3pp3I_CC1 | or_matchIg4pp3pp3I_makeswhiteIg4pp2pp3I_C
 	data = (((	1.0	0.0	)
 		(	1.0	0.0	))
 		((	1.0	0.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_makesblackIg2pp2pp3I_blackIg2pp2I_CC1 | makesblackIg2pp2pp2I makesblackIg2pp2pp3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
 potential ( makeswhiteIg3pp3pp2I | makeswhiteIg3pp3pp2I_CC1 )

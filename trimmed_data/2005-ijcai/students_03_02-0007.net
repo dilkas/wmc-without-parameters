@@ -2204,24 +2204,12 @@ potential ( or_advisorIs2pPro2I_CC1_pf0I7I_advisorIs2pPro2I_CC1 | or_advisorIs2p
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_successIs2I_CC1_pf0I1I_successIs2I_CC1 | successIs2I_CC1_pf0I0I successIs2I_CC1_pf0I1I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_studfundingIs1pf_1_1I_CC1_CC2_CC1_CC2_pf0I4p5I_studfundingIs1pf_1_1I_CC1_CC2_CC1_CC2 | studfundingIs2pf_1_1I_CC1_CC2_CC1_CC2_pf0I3p4I_CC0 studfundingIs2pf_1_1I_CC1_CC2_CC1_CC2_pf0I4p5I_CC0 )
 {
 	data = (((	1.0	0.0	)
 		(	0.8571428571428572	0.14285714285714285	))
 		((	0.875	0.125	)
 		(	0.75	0.25	)));
-}
-potential ( advisorIs2pPro1I | or_advisorIs2pPro1I_CC1_pf0I11I_advisorIs2pPro1I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( or_studfundingIs1pf_2_1I_CC1_CC2_CC1_CC2_pf0I7p8I_studfundingIs1pf_2_1I_CC1_CC2_CC1_CC2 | studfundingIs2pf_2_1I_CC1_CC2_CC1_CC2_pf0I6p7I_CC0 studfundingIs2pf_2_1I_CC1_CC2_CC1_CC2_pf0I7p8I_CC0 )
 {
@@ -2342,13 +2330,6 @@ potential ( or_studfundingIs1pf_2_1I_studfundingIs1pf_3_3I_CC1_CC0 | or_studfund
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_advisorIs1pPro3I_CC1_pf0I10I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I9I_advisorIs1pPro3I_CC1 studfundingIs1pf_3_2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( studfundingIs1pf_1_3I_CC1 | or_studfundingIs1pf_1_2I_studfundingIs1pf_3_3I_CC1_CC0 studfundingIs1pf_1_3I_CC1_CC2 )
 {
 	data = (((	1.0	0.0	)
@@ -2401,13 +2382,6 @@ potential ( countIf_1_1pf_1_3I_CC1_CC2_CC2_CC2_CC2_pf0I4p6I | grantedIf_1_1I cou
 	data = (((	1.0	0.0	)
 		(	1.0	0.0	))
 		((	1.0	0.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_successIs2I_CC1_pf0I2I_successIs2I_CC1 | or_successIs2I_CC1_pf0I1I_successIs2I_CC1 successIs2I_CC1_pf0I2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
 potential ( countIf_1_2pf_2_2I_CC1_CC2_CC2 | countIf_1_3pf_2_2I countIf_1_2pf_2_2I_CC1_CC2_CC2_CC2_CC2_pf0I5p8I )
@@ -2490,13 +2464,6 @@ potential ( successIs2I_CC1_pf0I2I | advisorIs2pPro3I fameIPro3I )
 		((	0.8	0.2	)
 		(	0.30000000000000004	0.7	)));
 }
-potential ( successIs2I_CC1_pf0I0I | advisorIs2pPro1I fameIPro1I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.8	0.2	)
-		(	0.30000000000000004	0.7	)));
-}
 potential ( grantedIf_2_3I | grantedIf_2_2I )
 {
 	data = ((	1.0	0.0	)
@@ -2565,31 +2532,12 @@ potential ( countIf_1_1pf_2_3I_CC1_CC2_CC2 | countIf_1_2pf_2_3I countIf_1_1pf_2_
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_advisorIs2pPro2I_CC1_pf0I11I_advisorIs2pPro2I_CC1 | or_advisorIs2pPro2I_CC1_pf0I10I_advisorIs2pPro2I_CC1 studfundingIs2pf_3_3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( countIf_2_1pf_3_2I | countIf_2_1pf_3_2I_CC1_CC2_CC2 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( successIs2I_CC1_pf0I1I | advisorIs2pPro2I fameIPro2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.8	0.2	)
-		(	0.30000000000000004	0.7	)));
-}
 potential ( countIf_3_3pf_3_3I | grantedIf_3_3I )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( successIs2I | or_successIs2I_CC1_pf0I2I_successIs2I_CC1 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
@@ -2598,13 +2546,6 @@ potential ( or_studfundingIs1pf_1_2I_CC1_CC2_CC1_CC2_pf0I9p10I_studfundingIs1pf_
 {
 	data = (((	1.0	0.0	)
 		(	0.5	0.5	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_advisorIs1pPro3I_CC1_pf0I11I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I10I_advisorIs1pPro3I_CC1 studfundingIs1pf_3_3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
@@ -2968,11 +2909,6 @@ potential ( countIf_2_2pf_2_1I | )
 {
 	data = (	1.0	0.0	);
 }
-potential ( advisorIs2pPro2I | or_advisorIs2pPro2I_CC1_pf0I11I_advisorIs2pPro2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
 potential ( countIf_1_3pf_1_3I_CC1_CC2_CC2_CC2_CC2_pf0I6p6I | grantedIf_1_3I countIf_2_1pf_2_1I )
 {
 	data = (((	1.0	0.0	)
@@ -3018,13 +2954,6 @@ potential ( countIf_2_2pf_2_2I_CC1_CC2_CC2_CC2_CC2_pf0I8p8I | grantedIf_2_2I cou
 	data = (((	1.0	0.0	)
 		(	1.0	0.0	))
 		((	1.0	0.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_successIs1I_CC1_pf0I1I_successIs1I_CC1 | successIs1I_CC1_pf0I0I successIs1I_CC1_pf0I1I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
 potential ( studfundingIs2pf_3_2I_CC1_CC2_CC1 | countIf_3_2pf_3_2I studfundingIs2pf_3_2I_CC1_CC2_CC1_CC2_pf0I10p11I_CC0 )
@@ -3113,13 +3042,6 @@ potential ( countIf_2_2pf_2_3I_CC1_CC2_CC2_CC2_CC2_pf0I8p9I | grantedIf_2_2I cou
 		((	1.0	0.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_advisorIs1pPro3I_CC1_pf0I8I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I7I_advisorIs1pPro3I_CC1 studfundingIs1pf_2_3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( countIf_1_1pf_2_1I_CC1_CC2_CC2_CC2_CC2_pf0I4p7I | grantedIf_1_1I countIf_1_2pf_2_2I )
 {
 	data = (((	1.0	0.0	)
@@ -3174,13 +3096,6 @@ potential ( successIs1I_CC1_pf0I0I | advisorIs1pPro1I fameIPro1I )
 		(	1.0	0.0	))
 		((	0.8	0.2	)
 		(	0.30000000000000004	0.7	)));
-}
-potential ( or_advisorIs2pPro2I_CC1_pf0I9I_advisorIs2pPro2I_CC1 | or_advisorIs2pPro2I_CC1_pf0I8I_advisorIs2pPro2I_CC1 studfundingIs2pf_3_1I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( or_studfundingIs1pf_1_3I_CC1_CC2_CC1_CC2_pf0I9p10I_studfundingIs1pf_1_3I_CC1_CC2_CC1_CC2 | or_studfundingIs1pf_1_3I_CC1_CC2_CC1_CC2_pf0I8p9I_studfundingIs1pf_1_3I_CC1_CC2_CC1_CC2 studfundingIs2pf_1_3I_CC1_CC2_CC1_CC2_pf0I9p10I_CC0 )
 {
@@ -3334,13 +3249,6 @@ potential ( studfundingIs2pf_2_1I_CC1_CC2_CC1 | countIf_2_1pf_2_1I or_studfundin
 		((	0.8333333333333334	0.16666666666666666	)
 		(	0.8333333333333334	0.16666666666666666	)));
 }
-potential ( or_advisorIs2pPro2I_CC1_pf0I10I_advisorIs2pPro2I_CC1 | or_advisorIs2pPro2I_CC1_pf0I9I_advisorIs2pPro2I_CC1 studfundingIs2pf_3_2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( countIf_3_1pf_3_2I_CC1_CC2_CC2_CC2_CC2_pf0I10p11I | grantedIf_3_1I countIf_3_2pf_3_3I )
 {
 	data = (((	1.0	0.0	)
@@ -3436,13 +3344,6 @@ potential ( or_studfundingIs2pf_1_1I_CC1_CC2_CC1_CC2_pf0I6p7I_studfundingIs2pf_1
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_advisorIs1pPro3I_CC1_pf0I7I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I6I_advisorIs1pPro3I_CC1 studfundingIs1pf_2_2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( countIf_2_2pf_2_3I_CC1_CC2_CC2 | countIf_2_3pf_2_3I countIf_2_2pf_2_3I_CC1_CC2_CC2_CC2_CC2_pf0I8p9I )
 {
 	data = (((	1.0	0.0	)
@@ -3456,11 +3357,6 @@ potential ( or_studfundingIs2pf_2_1I_studfundingIs2pf_3_3I_CC1_CC0 | or_studfund
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( advisorIs1pPro3I | or_advisorIs1pPro3I_CC1_pf0I11I_advisorIs1pPro3I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( countIf_2_3pf_3_2I_CC1_CC2_CC2 | countIf_3_1pf_3_2I countIf_2_3pf_3_2I_CC1_CC2_CC2_CC2_CC2_pf0I9p11I )
 {
@@ -3498,11 +3394,6 @@ potential ( studfundingIs2pf_3_2I_CC1_CC2_CC1_CC2_pf0I10p11I_CC0 | countIf_3_2pf
 		(	1.0	0.0	)));
 }
 potential ( studfundingIs2pf_1_3I | studfundingIs2pf_1_3I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
-}
-potential ( successIs1I | or_successIs1I_CC1_pf0I2I_successIs1I_CC1 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
@@ -3570,13 +3461,6 @@ potential ( countIf_1_1pf_1_3I_CC1_CC2_CC2 | countIf_1_2pf_1_3I countIf_1_1pf_1_
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_advisorIs1pPro3I_CC1_pf0I9I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I8I_advisorIs1pPro3I_CC1 studfundingIs1pf_3_1I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_studfundingIs2pf_2_2I_CC1_CC2_CC1_CC2_pf0I9p10I_studfundingIs2pf_2_2I_CC1_CC2_CC1_CC2 | or_studfundingIs2pf_2_2I_CC1_CC2_CC1_CC2_pf0I8p9I_studfundingIs2pf_2_2I_CC1_CC2_CC1_CC2 studfundingIs2pf_2_2I_CC1_CC2_CC1_CC2_pf0I9p10I_CC0 )
 {
 	data = (((	1.0	0.0	)
@@ -3604,11 +3488,6 @@ potential ( or_studfundingIs1pf_1_1I_CC1_CC2_CC1_CC2_pf0I6p7I_studfundingIs1pf_1
 		(	0.8	0.2	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( advisorIs1pPro2I | or_advisorIs1pPro2I_CC1_pf0I11I_advisorIs1pPro2I_CC1 )
-{
-	data = ((	1.0	0.0	)
-		(	0.0	1.0	));
 }
 potential ( fameIPro1I | )
 {
@@ -3736,13 +3615,6 @@ potential ( or_advisorIs2pPro3I_CC1_pf0I8I_advisorIs2pPro3I_CC1 | or_advisorIs2p
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
-potential ( or_advisorIs2pPro1I_CC1_pf0I11I_advisorIs2pPro1I_CC1 | or_advisorIs2pPro1I_CC1_pf0I10I_advisorIs2pPro1I_CC1 studfundingIs2pf_3_3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( countIf_2_3pf_2_3I_CC1_CC2_CC2_CC2_CC2_pf0I9p9I | grantedIf_2_3I countIf_3_1pf_3_1I )
 {
 	data = (((	1.0	0.0	)
@@ -3785,13 +3657,6 @@ potential ( countIf_2_1pf_2_3I_CC1_CC2_CC2 | countIf_2_2pf_2_3I countIf_2_1pf_2_
 		(	0.0	1.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
-}
-potential ( successIs1I_CC1_pf0I2I | advisorIs1pPro3I fameIPro3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.8	0.2	)
-		(	0.30000000000000004	0.7	)));
 }
 potential ( or_advisorIs1pPro3I_CC1_pf0I5I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I4I_advisorIs1pPro3I_CC1 studfundingIs1pf_1_3I )
 {
@@ -3982,13 +3847,6 @@ potential ( studfundingIs2pf_2_2I_CC1_CC2_CC1 | countIf_2_2pf_2_2I or_studfundin
 		((	0.8	0.2	)
 		(	0.8	0.2	)));
 }
-potential ( or_advisorIs1pPro3I_CC1_pf0I6I_advisorIs1pPro3I_CC1 | or_advisorIs1pPro3I_CC1_pf0I5I_advisorIs1pPro3I_CC1 studfundingIs1pf_2_1I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( countIf_1_1pf_3_3I | countIf_1_1pf_3_3I_CC1_CC2_CC2 )
 {
 	data = ((	1.0	0.0	)
@@ -4068,13 +3926,6 @@ potential ( grantedIf_3_2I | fameIPro3I )
 {
 	data = ((	0.7	0.3	)
 		(	0.19999999999999996	0.8	));
-}
-potential ( successIs1I_CC1_pf0I1I | advisorIs1pPro2I fameIPro2I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
-		((	0.8	0.2	)
-		(	0.30000000000000004	0.7	)));
 }
 potential ( countIf_1_2pf_3_3I_CC1_CC2_CC2 | countIf_1_3pf_3_3I grantedIf_1_2I )
 {
@@ -4295,24 +4146,10 @@ potential ( studfundingIs1pf_3_1I | studfundingIs1pf_3_1I_CC1 )
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
 }
-potential ( or_advisorIs2pPro2I_CC1_pf0I8I_advisorIs2pPro2I_CC1 | or_advisorIs2pPro2I_CC1_pf0I7I_advisorIs2pPro2I_CC1 studfundingIs2pf_2_3I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
 potential ( or_studfundingIs2pf_1_2I_CC1_CC2_CC1_CC2_pf0I7p8I_studfundingIs2pf_1_2I_CC1_CC2_CC1_CC2 | or_studfundingIs2pf_1_2I_CC1_CC2_CC1_CC2_pf0I6p7I_studfundingIs2pf_1_2I_CC1_CC2_CC1_CC2 studfundingIs2pf_1_2I_CC1_CC2_CC1_CC2_pf0I7p8I_CC0 )
 {
 	data = (((	1.0	0.0	)
 		(	0.75	0.25	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
-}
-potential ( or_advisorIs1pPro2I_CC1_pf0I11I_advisorIs1pPro2I_CC1 | or_advisorIs1pPro2I_CC1_pf0I10I_advisorIs1pPro2I_CC1 studfundingIs1pf_3_3I )
-{
-	data = (((	1.0	0.0	)
-		(	1.0	0.0	))
 		((	0.0	1.0	)
 		(	0.0	1.0	)));
 }
@@ -4412,13 +4249,6 @@ potential ( countIf_3_1pf_3_3I | countIf_3_1pf_3_3I_CC1_CC2_CC2 )
 {
 	data = ((	1.0	0.0	)
 		(	0.0	1.0	));
-}
-potential ( or_successIs1I_CC1_pf0I2I_successIs1I_CC1 | or_successIs1I_CC1_pf0I1I_successIs1I_CC1 successIs1I_CC1_pf0I2I )
-{
-	data = (((	1.0	0.0	)
-		(	0.0	1.0	))
-		((	0.0	1.0	)
-		(	0.0	1.0	)));
 }
 potential ( countIf_3_1pf_3_2I | countIf_3_1pf_3_2I_CC1_CC2_CC2 )
 {
