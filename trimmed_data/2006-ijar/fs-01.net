@@ -1,0 +1,146 @@
+net
+{
+}
+
+node friendsIo1po1I
+{
+	label = "friends(o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (friendsIo1po1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause1Io1po1po1I
+{
+	label = "wclause1(o1,o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause1Io1po1po1I | friendsIo1po1I )
+{
+	data = (0.0 1.0
+	0.0 1.0 );
+}
+
+node smokesIo1I
+{
+	label = "smokes(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (smokesIo1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause2Io1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io1I_CC0 | friendsIo1po1I smokesIo1I )
+{
+	data = (1.0 0.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause2Io1I
+{
+	label = "wclause2(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause2Io1I | wclause2Io1I_CC0 )
+{
+	data = (0.8998 0.1002
+	0.0 1.0 );
+}
+
+node wclause4Io1po1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po1I_CC0 | friendsIo1po1I smokesIo1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	0.0 1.0
+	0.0 1.0 );
+}
+
+node wclause4Io1po1I
+{
+	label = "wclause4(o1,o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause4Io1po1I | wclause4Io1po1I_CC0 )
+{
+	data = (0.66713 0.33287
+	0.0 1.0 );
+}
+
+node cancerIo1I
+{
+	label = "cancer(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (cancerIo1I)
+{
+	data = (0.5 0.5 );
+}
+
+node wclause3Io1I_CC0
+{
+	label = "aux";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io1I_CC0 | smokesIo1I cancerIo1I )
+{
+	data = (0.0 1.0
+	0.0 1.0
+	1.0 0.0
+	0.0 1.0 );
+}
+
+node wclause3Io1I
+{
+	label = "wclause3(o1)";
+	position = (0 100);
+	states = ("false" "true");
+	subtype = boolean;
+}
+
+potential (wclause3Io1I | wclause3Io1I_CC0 )
+{
+	data = (0.77687 0.22313
+	0.0 1.0 );
+}

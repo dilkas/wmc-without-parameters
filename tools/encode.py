@@ -118,6 +118,10 @@ def cpt2cnf(bn, literal_dict, encoding):
 
 
 def cpt2uai(bn):
+    """Represents the Bayesian network using the UAI format. Returns a list of
+    string lines that can be written to a file and a list of variables of the
+    network, where the index of a variable in this list is the numerical
+    representation of the variable in the UAI format."""
     variables = list(bn.parents.keys())  # Fix an order on variables
     parents = [[variables.index(v) for v in bn.parents[variables[variable]]]
                for variable in range(len(variables))]
@@ -125,7 +129,7 @@ def cpt2uai(bn):
         bn.probabilities[variables[v]] for v in range(len(variables))
     ]
 
-    # The first four lines
+    # The header (first four lines)
     lines = [
         'BAYES',
         str(len(variables)), ' '.join(
@@ -375,7 +379,6 @@ def parse_bn2cnf_variables_file(variables_file):
 def encode_using_bn2cnf(args):
     'Translate the Bayesian network to the UAI format and run the encoder'
     bn = common.BayesianNetwork(args.network)
-    literal_dict = LiteralDict(bn)
     encoded_clauses, literal_dict = cpt2uai(bn)
 
     uai_filename = args.network + '.uai'

@@ -1,0 +1,492 @@
+// ~->[DNET-1]->~
+// parents = 60, children = 60
+// random seed = 764369973
+bnet toy_qmr_problem { //120 variables and 120 distributions 
+visual V1 {
+	defdispform = BELIEFBARS;
+	nodelabeling = TITLE;
+	nodefont = font {shape= "Arial"; size= 10;};
+	linkfont = font {shape= "Arial"; size= 9;};
+	windowposn = (14, 9, 441, 280);
+	CommentShowing = TRUE;
+	CommentWindowPosn = (14, 279, 717, 553);
+	resolution = 72;
+	drawingbounds = (15000, 15000);
+	showpagebreaks = FALSE;
+	usegrid = TRUE;
+	gridspace = (6, 6);
+	PrinterSetting A {
+		margins = (1270, 1270, 1270, 1270);
+		landscape = FALSE;
+		magnify = 1;
+	};
+};
+node p_1{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (100, 100);
+		height = 2;
+	};
+};
+node p_2{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (150, 100);
+		height = 2;
+	};
+};
+node p_3{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (200, 100);
+		height = 2;
+	};
+};
+node p_5{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (300, 100);
+		height = 2;
+	};
+};
+node p_8{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (450, 100);
+		height = 2;
+	};
+};
+node p_10{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (550, 100);
+		height = 2;
+	};
+};
+node p_12{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (650, 100);
+		height = 2;
+	};
+};
+node p_13{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (700, 100);
+		height = 2;
+	};
+};
+node p_16{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (850, 100);
+		height = 2;
+	};
+};
+node p_18{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (950, 100);
+		height = 2;
+	};
+};
+node p_19{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1000, 100);
+		height = 2;
+	};
+};
+node p_20{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1050, 100);
+		height = 2;
+	};
+};
+node p_22{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1150, 100);
+		height = 2;
+	};
+};
+node p_23{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1200, 100);
+		height = 2;
+	};
+};
+node p_28{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1450, 100);
+		height = 2;
+	};
+};
+node p_29{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1500, 100);
+		height = 2;
+	};
+};
+node p_30{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1550, 100);
+		height = 2;
+	};
+};
+node p_35{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1800, 100);
+		height = 2;
+	};
+};
+node p_37{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (1900, 100);
+		height = 2;
+	};
+};
+node p_39{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2000, 100);
+		height = 2;
+	};
+};
+node p_41{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2100, 100);
+		height = 2;
+	};
+};
+node p_43{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2200, 100);
+		height = 2;
+	};
+};
+node p_46{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2350, 100);
+		height = 2;
+	};
+};
+node p_49{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2500, 100);
+		height = 2;
+	};
+};
+node p_52{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2650, 100);
+		height = 2;
+	};
+};
+node p_53{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2700, 100);
+		height = 2;
+	};
+};
+node p_56{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2850, 100);
+		height = 2;
+	};
+};
+node p_59{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (3000, 100);
+		height = 2;
+	};
+};
+node c_1{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_41,  p_12,  p_28,  p_29);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (100, 300);
+		height = 2;
+	};
+};
+node c_3{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_30,  p_20,  p_23,  p_52);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (200, 300);
+		height = 2;
+	};
+};
+node c_4{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_49,  p_12,  p_18,  p_30);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (250, 300);
+		height = 2;
+	};
+};
+node c_17{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_8,  p_3,  p_39,  p_19);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (900, 300);
+		height = 2;
+	};
+};
+node c_25{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_41,  p_49,  p_29,  p_56);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (1300, 300);
+		height = 2;
+	};
+};
+node c_30{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_37,  p_35,  p_49,  p_5);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (1550, 300);
+		height = 2;
+	};
+};
+node c_37{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_2,  p_43,  p_29,  p_30);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (1900, 300);
+		height = 2;
+	};
+};
+node c_39{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_53,  p_10,  p_20,  p_22);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (2000, 300);
+		height = 2;
+	};
+};
+node c_42{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_16,  p_52,  p_12,  p_1);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (2150, 300);
+		height = 2;
+	};
+};
+node c_54{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_13,  p_23,  p_52,  p_49);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (2750, 300);
+		height = 2;
+	};
+};
+node c_59{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_46,  p_59,  p_56,  p_53);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (3000, 300);
+		height = 2;
+	};
+};
+};

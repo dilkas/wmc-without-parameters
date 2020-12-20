@@ -1,0 +1,84 @@
+// ~->[DNET-1]->~
+// parents = 100, children = 100
+// random seed = 1335823184
+bnet toy_qmr_problem { //200 variables and 200 distributions 
+visual V1 {
+	defdispform = BELIEFBARS;
+	nodelabeling = TITLE;
+	nodefont = font {shape= "Arial"; size= 10;};
+	linkfont = font {shape= "Arial"; size= 9;};
+	windowposn = (14, 9, 441, 280);
+	CommentShowing = TRUE;
+	CommentWindowPosn = (14, 279, 717, 553);
+	resolution = 72;
+	drawingbounds = (15000, 15000);
+	showpagebreaks = FALSE;
+	usegrid = TRUE;
+	gridspace = (6, 6);
+	PrinterSetting A {
+		margins = (1270, 1270, 1270, 1270);
+		landscape = FALSE;
+		magnify = 1;
+	};
+};
+node p_44{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (2250, 100);
+		height = 2;
+	};
+};
+node p_72{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (3650, 100);
+		height = 2;
+	};
+};
+node p_84{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (4250, 100);
+		height = 2;
+	};
+};
+node p_89{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ();
+	probs = (0.2, 0.8);
+	visual V1 {
+		center = (4500, 100);
+		height = 2;
+	};
+};
+node c_100{
+	kind = NATURE;
+	discrete = TRUE;
+	chance = CHANCE;
+	states = (true, false);
+	parents = ( p_44,  p_84,  p_72,  p_89);
+	probs = (((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (1, 0)))), ((((1, 0), (1, 0)), ((1, 0), (1, 0))), (((1, 0), (1, 0)), ((1, 0), (0, 1)))));
+	visual V1 {
+		center = (5050, 300);
+		height = 2;
+	};
+};
+};
