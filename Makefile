@@ -1,9 +1,9 @@
-TIMEOUT := 10
-MAX_MEMORY = 24 # in GB
-MAX_MEMORY_KB = 23907533 # 95% of MAX_MEMORY
+TIMEOUT := 5
+MAX_MEMORY = 8 # in GB
+MAX_MEMORY_KB = 7969178 # 95% of MAX_MEMORY
 EPSILON := 0.000001
 
-ALGORITHM := deps/ADDMC/counting/addmc
+ALGORITHM := deps/ADDMC/counting/addmc # Keeping this around for tests
 EVALUATE := deps/ace/evaluate
 CACHET := deps/cachet/cachet
 
@@ -25,22 +25,27 @@ all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
 
 #===============================================================================
 
+# Arguments: 1) CNF file, 2) weight format number, 3) (most of the) results filename
+define run_dpmc
+	cnf="$(1)" && $(RUN) ./deps/DPMC/lg/lg.sif "/solvers/htd-master/bin/htd_main -s 1234567 --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full" < $$cnf | ./deps/DPMC/DMC/dmc --cf=$$cnf --wf $(2) --jf=- --pf=1e-3 &> results/$(3).new_inf
+endef
+
 # The argument is the file format (dne or net)
 define run_algorithms_with_evidence
 	-cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
 	-cp data/$(basename $*).$(1) data/$*.$(1)
 	-$(ENCODE) python tools/encode.py data/$*.$(1) -e data/$* cd05 -m $(MAX_MEMORY) &> results/$*.cd05.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd05.new_inf
+	-$(call run_dpmc,data/$*.$(1).cnf,3,$*.cd05)
 	-$(ENCODE) python tools/encode.py data/$*.$(1) -e data/$* cd06 -m $(MAX_MEMORY) &> results/$*.cd06.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.cd06.new_inf
+	-$(call run_dpmc,data/$*.$(1).cnf,3,$*.cd06)
 	-$(ENCODE) python tools/encode.py data/$*.$(1) -e data/$* d02 -m $(MAX_MEMORY) &> results/$*.d02.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.d02.new_inf
+	-$(call run_dpmc,data/$*.$(1).cnf,3,$*.d02)
 	-$(ENCODE) python tools/encode.py data/$*.$(1) -e data/$* sbk05 -m $(MAX_MEMORY) &> results/$*.sbk05.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.$(1).cnf &> results/$*.sbk05.new_inf
+	-$(call run_dpmc,data/$*.$(1).cnf,3,$*.sbk05)
 	-$(ENCODE) python tools/encode.py data/$*.$(1) -e data/$* bklm16 -m $(MAX_MEMORY) &> results/$*.bklm16.new_enc
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.bklm16.new_inf
+	-$(call run_dpmc,data/$*.$(1).cnf,5,$*.bklm16)
 	-$(ENCODE) python tools/encode.py data/$*.$(1) -e data/$* cw -m $(MAX_MEMORY) &> results/$*.cw.new_enc
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.$(1).cnf &> results/$*.cw.new_inf
+	-$(call run_dpmc,data/$*.$(1).cnf,5,$*.cw)
 	-$(ENCODE) python tools/encode.py -l data/$*.$(1) -e data/$* cd05 -m $(MAX_MEMORY) &> results/$*.cd05.old_enc
 	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd05.old_inf
 	-$(ENCODE) python tools/encode.py -l data/$*.$(1) -e data/$* cd06 -m $(MAX_MEMORY) &> results/$*.cd06.old_enc
@@ -67,17 +72,17 @@ endef
 
 data/%/WITHOUT_EVIDENCE:
 	-$(ENCODE) python tools/encode.py data/$* cd05 -m $(MAX_MEMORY) &> results/$*.cd05.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd05.new_inf
+	-$(call run_dpmc,data/$*.cnf,3,$*.cd05)
 	-$(ENCODE) python tools/encode.py data/$* cd06 -m $(MAX_MEMORY) &> results/$*.cd06.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.cd06.new_inf
+	-$(call run_dpmc,data/$*.cnf,3,$*.cd06)
 	-$(ENCODE) python tools/encode.py data/$* d02 -m $(MAX_MEMORY) &> results/$*.d02.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.d02.new_inf
+	-$(call run_dpmc,data/$*.cnf,3,$*.d02)
 	-$(ENCODE) python tools/encode.py data/$* sbk05 -m $(MAX_MEMORY) &> results/$*.sbk05.new_enc
-	-$(RUN) $(ALGORITHM) --cf data/$*.cnf &> results/$*.sbk05.new_inf
+	-$(call run_dpmc,data/$*.cnf,3,$*.sbk05)
 	-$(ENCODE) python tools/encode.py data/$* bklm16 -m $(MAX_MEMORY) &> results/$*.bklm16.new_enc
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.bklm16.new_inf
+	-$(call run_dpmc,data/$*.cnf,5,$*.bklm16)
 	-$(ENCODE) python tools/encode.py data/$* cw -m $(MAX_MEMORY) &> results/$*.cw.new_enc
-	-$(RUN) $(ALGORITHM) --wf 4 --cf data/$*.cnf &> results/$*.cw.new_inf
+	-$(call run_dpmc,data/$*.cnf,5,$*.cw)
 	-$(ENCODE) python tools/encode.py -l data/$* cd05 -m $(MAX_MEMORY) &> results/$*.cd05.old_enc
 	-$(RUN) $(EVALUATE) data/$* &> results/$*.cd05.old_inf
 	-$(ENCODE) python tools/encode.py -l data/$* cd06 -m $(MAX_MEMORY) &> results/$*.cd06.old_enc
@@ -104,6 +109,11 @@ clean:
 		rm -f data/$$d/*.inst.dne ; \
 		rm -f data/$$d/*.inst.net ; \
 		rm -f data/$$d/*.uai.* ; \
+		rm -f trimmed_data/$$d/*.dne.* ; \
+		rm -f trimmed_data/$$d/*.net.* ; \
+		rm -f trimmed_data/$$d/*.inst.dne ; \
+		rm -f trimmed_data/$$d/*.inst.net ; \
+		rm -f trimmed_data/$$d/*.uai.* ; \
 	done
 
 # cd05 and cd06 are supposed to produce wrong answers

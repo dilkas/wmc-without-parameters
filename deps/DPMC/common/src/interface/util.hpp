@@ -261,7 +261,6 @@ namespace util {
     Float totalModelCount = apparentModelCount;
 
     Int totalLiteralCount = literalWeights.size();
-    if (totalLiteralCount % 2 == 1) showError("odd total literal count");
 
     Int totalVarCount = totalLiteralCount / 2;
     if (totalVarCount < projectedCnfVars.size()) showError("more projected vars than total vars");

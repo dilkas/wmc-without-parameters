@@ -228,7 +228,7 @@ def run(command, memory_limit=None):
         process = subprocess.run(command,
                                  stdout=subprocess.PIPE,
                                  preexec_fn=lambda: resource.setrlimit(
-                                     resource.rlimit_as,
+                                     resource.RLIMIT_AS,
                                      (int(SOFT_MEMORY_LIMIT * mem), mem)))
     else:
         process = subprocess.run(command, stdout=subprocess.PIPE)

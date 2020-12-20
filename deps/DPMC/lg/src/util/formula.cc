@@ -56,10 +56,10 @@ namespace util {
         continue;  // Ignore weight lines
       } else if (prefix == "w") {
         size_t variable = static_cast<size_t>(entries[0]);
-        for (size_t i = 0; i < entries.size() - 2; i++) {
-          weight_entries[variable - 1].insert(
-              abs(static_cast<int>(entries[i])));
-        }
+        if (variable > 0)
+          for (size_t i = 0; i < entries.size() - 2; i++)
+            weight_entries[variable - 1].insert(
+                abs(static_cast<int>(entries[i])));
       } else if (prefix == "") {
         // [x] [y] ... [z] 0 indicates a clause with literals (x, y, ..., z)
         if (entries.size() == 0 || entries.back() != 0) {
@@ -81,13 +81,13 @@ namespace util {
 
     // 'Weight clauses' should be added AFTER regular clauses.
     // Each 'weight clause' corresponds to a full CPT.
-    // Note: we assume that each variable has a CPT.
     for (size_t i = 0; i < weight_entries.size(); i++) {
-      assert(!weight_entries[i].empty());
-      std::vector<int> clause(weight_entries[i].begin(),
-                              weight_entries[i].end());
-      if (!result.add_clause(clause))
-        return std::nullopt;
+      if (!weight_entries[i].empty()) {
+        std::vector<int> clause(weight_entries[i].begin(),
+                                weight_entries[i].end());
+        if (!result.add_clause(clause))
+          return std::nullopt;
+      }
     }
 
     // Verify that we have parsed the correct number of clauses
