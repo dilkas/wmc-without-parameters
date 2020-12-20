@@ -66,12 +66,18 @@ class LiteralDict:
                     self.add(variable, value)
 
 
-def generate_constraints(values, encoding):
+def exactly_one_constraint(literals, encoding):
+    """Given a list of literals and encoding information, returns a list of
+    lines that implement the 'exactly one' constraint on the list of literals
+    (that can then be inserted into a CNF or a PB file)."""
     if encoding == 'cw_pb':
-        return [' '.join('+1 x{}'.format(value) for value in values) + ' = 1;']
-    return ['{} 0'.format(' '.join(values))] + [
-        '-{} -{} 0'.format(values[i], values[j]) for i in range(len(values))
-        for j in range(i + 1, len(values))
+        return [
+            ' '.join('+1 x{}'.format(literal)
+                     for literal in literals) + ' = 1;'
+        ]
+    return ['{} 0'.format(' '.join(literals))] + [
+        '-{} -{} 0'.format(literals[i], literals[j])
+        for i in range(len(literals)) for j in range(i + 1, len(literals))
     ]
 
 
@@ -110,7 +116,7 @@ def bn2cnf(bn, literal_dict, encoding):
                 literal_dict.get_literal(variable, v)
                 for v in bn.values[variable]
             ]
-            clauses += generate_constraints(values, encoding)
+            clauses += exactly_one_constraint(values, encoding)
             for i, value in enumerate(values):
                 weight_clauses += construct_weights(variable, value, i,
                                                     lambda p: 1)
@@ -163,11 +169,11 @@ def bn2uai(bn):
     return lines, variables
 
 
-def encode_goal(literal, encoding):
-    if encoding == 'cw_pb':
-        return ('1 x{} = 0;'.format(literal[1:])
-                if literal.startswith('-') else '1 x{} = 1;'.format(literal))
-    return '{} 0'.format(literal)
+def encode_single_literal(literal, encoding):
+    """Returns a string that encodes the given literal as a clause."""
+    if encoding != 'cw_pb': return '{} 0'.format(literal)
+    return ('1 x{} = 0;'.format(literal[1:])
+            if literal.startswith('-') else '1 x{} = 1;'.format(literal))
 
 
 def new_evidence_file(network_filename, variable, value):
@@ -198,8 +204,8 @@ def encode_weights(weights, max_literal, legacy_mode):
 
 
 def reencode_bn2cnf_weights(weights_file, legacy_mode):
-    """Translate weights---as produced by bn2cnf---to the cachet format (while
-    also returning the largest literal found in the weight file)"""
+    """Translates weights---as produced by bn2cnf---to the cachet format (while
+    also returning the largest literal found in the weight file)."""
     if legacy_mode: return []
     positive_weights = {}
     negative_weights = {}
@@ -239,9 +245,9 @@ def identify_goal(text, bn_format):
 
 
 def parse_bn2cnf_variables_file(variables_file):
-    """Parse the bn2cnf variables file into a
+    """Parses the bn2cnf variables file into a
     variable x value |-> list of literals whose conjunction corresponds to value
-    map (where each literal is represented by a DIMACS CNF line)"""
+    map (where each literal is represented by a DIMACS CNF line)."""
     indicators = {}
     with open(variables_file) as f:
         text = f.read()
@@ -255,7 +261,7 @@ def parse_bn2cnf_variables_file(variables_file):
 
 
 def parse_lmap(filename, goal_variable, goal_value_index, values):
-    """Parse an LMAP file into a map of literal weights, a LiteralDict object,
+    """Parses an LMAP file into a map of literal weights, a LiteralDict object,
     the literal that corresponds to the goal variable-value pair, and the
     largest literal found in the file."""
     weights = {}
@@ -376,11 +382,11 @@ def ace_encoder(args):
         args.network + '.lmap', goal_variable, goal_value_index, values)
 
     if common.empty_evidence(args.evidence):
-        evidence = [encode_goal(goal_literal, args.encoding)]
+        evidence = [encode_single_literal(goal_literal, args.encoding)]
     else:
         evidence = [
-            encode_goal(literal_dict.get_literal(variable, value),
-                        args.encoding)
+            encode_single_literal(literal_dict.get_literal(variable, value),
+                                  args.encoding)
             for variable, value in common.parse_evidence(args.evidence)
         ]
 
@@ -435,14 +441,14 @@ def my_encoder(args):
 
     if not common.empty_evidence(args.evidence):
         clauses += [
-            encode_goal(literal_dict.get_literal(variable, value),
-                        args.encoding)
+            encode_single_literal(literal_dict.get_literal(variable, value),
+                                  args.encoding)
             for variable, value in common.parse_evidence(args.evidence)
         ]
     else:
         # Add a goal clause if necessary
         literal = literal_dict.get_literal(*bn.goal())
-        clauses.append(encode_goal(literal, args.encoding))
+        clauses.append(encode_single_literal(literal, args.encoding))
 
     if args.encoding == 'cw_pb':
         write_pb_file(args, len(literal_dict), clauses, weight_clauses)
