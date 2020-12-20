@@ -31,8 +31,8 @@ def remove_node_info(text, relevant, file_format):
 
     # Also delete the 'potentials'
     if file_format == 'net':
-        for potential in POTENTIAL_RE.finditer(updated_text):
-            potential_variable = potential.group(1).split()[0][1:]
+        for potential in list(POTENTIAL_RE.finditer(updated_text))[::-1]:
+            potential_variable = re.search(r'\w+', potential.group(1)).group(0)
             if potential_variable in removed_variables:
                 updated_text = (updated_text[:potential.start(0)] +
                                 updated_text[potential.end(0):])
@@ -61,7 +61,6 @@ def trim_file(network, evidence=None):
     return text
 
 
-# TODO: removing 100% of all variables must be a bug
 def trim_directory_with_evidence(input_directory, output_directory):
     files = os.listdir(input_directory)
     for filename in files:

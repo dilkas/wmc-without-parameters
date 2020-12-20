@@ -95,7 +95,8 @@ def generate_clauses(values, encoding):
 
 
 def cpt2cnf(bn, literal_dict, encoding):
-    'Transform a Bayesian network to a list of constraints/clauses'
+    """Transforms a Bayesian network to a list of constraints/clauses. The
+    return value is divided into two parts: regular clauses and weights."""
     clauses = []
     weight_clauses = []
     for variable in bn.parents:
@@ -194,28 +195,10 @@ def format_goal(literal, encoding):
     return '{} 0'.format(literal)
 
 
-def encode_cnf(args):
-    bn = common.BayesianNetwork(args.network)
-    literal_dict = LiteralDict(bn)
-    clauses, weight_clauses = cpt2cnf(bn, literal_dict, args.encoding)
-
-    evidence_clauses = encode_inst_evidence(bn.values, literal_dict,
-                                            args.evidence, args.encoding)
-    if evidence_clauses:
-        clauses += evidence_clauses
-    else:
-        # Add a goal clause if necessary
-        literal = literal_dict.get_literal(*bn.goal())
-        clauses.append(format_goal(literal, args.encoding))
-
-    if args.encoding == 'cw_pb':
-        output_pb(args, len(literal_dict), clauses, weight_clauses)
-    else:
-        output_cnf(args, len(literal_dict), clauses, weight_clauses)
-
-
 def identify_goal(text, mode):
-    'Which marginal probability should we compute?'
+    """Looks at a Bayesian network string to determine which marginal
+    probability should be computed. Returns the name of the variable, its chosen
+    value, and the index of that value among all the values of the variable."""
     goal_node, goal_node_end = [(i.group(1), i.end())
                                 for i in re.finditer(common.NODE_RE, text)][-1]
     values = re.split(
@@ -223,20 +206,22 @@ def identify_goal(text, mode):
         re.search(common.STATES_RE[mode], text[goal_node_end:]).group(1))
     goal_value = 'true' if 'true' in values else values[0]
     goal_value_index = values.index(goal_value)
-    return goal_node, goal_value_index, goal_value
+    return goal_node, goal_value, goal_value_index
 
 
 def new_evidence_file(network_filename, variable, value):
-    'Create a new evidence file for a goal variable and value'
+    """Creates a new evidence file for a given goal variable-value pair (and
+    returns its filename)."""
     new_filename = network_filename + '.inst'
     with open(new_filename, 'w') as f:
-        f.write(
-            '<?xml version="1.0" encoding="UTF-8"?>\n<instantiation><inst id="{}" value="{}"/></instantiation>'
-            .format(variable, value))
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n<instantiation>' +
+                '<inst id="{}" value="{}"/>'.format(variable, value) +
+                '</instantiation>')
     return new_filename
 
 
 def run(command, memory_limit=None):
+    """A wrapper function for running any external program."""
     print('...Running {}...'.format(' '.join(command)), end='')
     if memory_limit:
         mem = int(memory_limit) * 1024**3
@@ -301,41 +286,6 @@ def encode_weights(weights, max_literal, legacy_mode):
     ]
 
 
-def encode_using_ace(args):
-    'The main function behind encoding using ace'
-    # Identify the goal
-    with open(args.network, encoding=common.FILE_ENCODING) as f:
-        text = f.read()
-    mode = common.get_file_format(args.network)
-    goal_node, goal_value_index, goal_value = identify_goal(text, mode)
-
-    if args.legacy and args.encoding != 'sbk05':
-        run_legacy_ace(args, goal_node, goal_value)
-        return
-
-    run(ACE + ['-' + args.encoding, args.network], args.memory)
-
-    # Make a variable -> list of values map
-    values = {
-        node.group(1):
-        re.split(common.STATE_SPLITTER_RE[mode],
-                 re.search(common.STATES_RE[mode], text[node.end():]).group(1))
-        for node in re.finditer(common.NODE_RE, text)
-    }
-
-    weights, literal_dict, goal_literal, max_literal = parse_lmap(
-        args.network + '.lmap', goal_node, goal_value_index, values)
-    evidence = (['{} 0'.format(goal_literal)] if
-                common.empty_evidence(args.evidence) else encode_inst_evidence(
-                    values, literal_dict, args.evidence, args.encoding))
-    weight_encoding = encode_weights(weights, max_literal, args.legacy)
-
-    with open(args.network + '.cnf') as f:
-        lines = f.readlines()
-    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-']
-    output_cnf(args, max_literal, clauses + evidence, weight_encoding)
-
-
 def reencode_bn2cnf_weights(weights_file, legacy_mode):
     """Translate weights---as produced by bn2cnf---to the cachet format (while
     also returning the largest literal found in the weight file)"""
@@ -376,54 +326,6 @@ def parse_bn2cnf_variables_file(variables_file):
     return indicators
 
 
-def encode_using_bn2cnf(args):
-    'Translate the Bayesian network to the UAI format and run the encoder'
-    bn = common.BayesianNetwork(args.network)
-    encoded_clauses, literal_dict = cpt2uai(bn)
-
-    uai_filename = args.network + '.uai'
-    cnf_filename = args.network + '.cnf'
-    weights_filename = uai_filename + '.weights'
-    variables_filename = uai_filename + '.variables'
-
-    with open(uai_filename, 'w') as f:
-        f.write('\n'.join(encoded_clauses) + '\n')
-    run(
-        BN2CNF + [
-            '-i', uai_filename, '-o', cnf_filename, '-w', weights_filename,
-            '-v', variables_filename
-        ], args.memory)
-    encoded_weights, max_literal = reencode_bn2cnf_weights(
-        weights_filename, args.legacy)
-    indicators = parse_bn2cnf_variables_file(variables_filename)
-
-    # Incorporate evidence (or select a goal)
-    if not common.empty_evidence(args.evidence):
-        encoded_evidence = encode_inst_evidence(bn.values, literal_dict,
-                                                args.evidence, args.encoding,
-                                                indicators, literal_dict)
-    else:
-        # Identify the goal formula
-        with open(args.network) as f:
-            text = f.read()
-        (goal_variable_string, goal_value,
-         _) = identify_goal(text, common.get_file_format(args.network))
-        goal_variable = literal_dict.index(goal_variable_string)
-        encoded_evidence = indicators[(goal_variable, goal_value)]
-
-    # Update the number of clauses
-    with open(cnf_filename) as f:
-        lines = f.read().splitlines()
-
-    # Put everything together and write to a file
-    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-'
-               ] + encoded_evidence
-    output_cnf(args, max_literal, clauses, encoded_weights)
-
-    if args.legacy:
-        run(C2D + ['-in', cnf_filename], args.memory)
-
-
 def output_cnf(args, num_variables, clauses, weights):
     header = 'p cnf {} {}'.format(num_variables, len(clauses))
     filename = args.network + '.cnf'
@@ -446,11 +348,116 @@ def output_pb(args, num_variables, constraints, weights):
         f.write('\n'.join([header] + constraints + weights) + '\n')
 
 
+def ace_encoder(args):
+    # Identify the goal
+    with open(args.network, encoding=common.FILE_ENCODING) as f:
+        text = f.read()
+    mode = common.get_file_format(args.network)
+    goal_node, goal_value, goal_value_index = identify_goal(text, mode)
+
+    if args.legacy and args.encoding != 'sbk05':
+        run_legacy_ace(args, goal_node, goal_value)
+        return
+
+    run(ACE + ['-' + args.encoding, args.network], args.memory)
+
+    # Make a variable -> list of values map
+    values = {
+        node.group(1):
+        re.split(common.STATE_SPLITTER_RE[mode],
+                 re.search(common.STATES_RE[mode], text[node.end():]).group(1))
+        for node in re.finditer(common.NODE_RE, text)
+    }
+
+    weights, literal_dict, goal_literal, max_literal = parse_lmap(
+        args.network + '.lmap', goal_node, goal_value_index, values)
+    evidence = (['{} 0'.format(goal_literal)] if
+                common.empty_evidence(args.evidence) else encode_inst_evidence(
+                    values, literal_dict, args.evidence, args.encoding))
+    weight_encoding = encode_weights(weights, max_literal, args.legacy)
+
+    with open(args.network + '.cnf') as f:
+        lines = f.readlines()
+    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-']
+    output_cnf(args, max_literal, clauses + evidence, weight_encoding)
+
+
+def run_bn2cnf(bn, bn_filename, memory_limit):
+    """Translates the given Bayesian network to the UAI format, writes it to a
+    file, and runs bn2cnf on it. Returns the list with variable ordering, as
+    compiled by cpt2uai."""
+    encoded_clauses, literal_dict = cpt2uai(bn)
+
+    with open(bn_filename + '.uai', 'w') as f:
+        f.write('\n'.join(encoded_clauses) + '\n')
+    run(
+        BN2CNF + [
+            '-i', bn_filename + '.uai', '-o', bn_filename + '.cnf', '-w',
+            bn_filename + '.uai.weights', '-v', bn_filename + '.uai.variables'
+        ], memory_limit)
+    return literal_dict
+
+
+def bn2cnf_encoder(args):
+    bn = common.BayesianNetwork(args.network)
+
+    literal_dict = run_bn2cnf(bn, args.network, args.memory)
+    encoded_weights, max_literal = reencode_bn2cnf_weights(
+        args.network + '.uai.weights', args.legacy)
+    indicators = parse_bn2cnf_variables_file(args.network + '.uai.variables')
+
+    # Incorporate evidence (or select a goal)
+    if not common.empty_evidence(args.evidence):
+        encoded_evidence = encode_inst_evidence(bn.values, literal_dict,
+                                                args.evidence, args.encoding,
+                                                indicators, literal_dict)
+    else:
+        # Identify the goal formula
+        with open(args.network) as f:
+            text = f.read()
+        (goal_variable_string,
+         _, goal_value) = identify_goal(text,
+                                        common.get_file_format(args.network))
+        goal_variable = literal_dict.index(goal_variable_string)
+        encoded_evidence = indicators[(goal_variable, goal_value)]
+
+    # Update the number of clauses
+    with open(args.network + '.cnf') as f:
+        lines = f.read().splitlines()
+
+    # Put everything together and write to a file
+    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-'
+               ] + encoded_evidence
+    output_cnf(args, max_literal, clauses, encoded_weights)
+
+    if args.legacy:
+        run(C2D + ['-in', args.network + '.cnf'], args.memory)
+
+
+def my_encoder(args):
+    bn = common.BayesianNetwork(args.network)
+    literal_dict = LiteralDict(bn)
+    clauses, weight_clauses = cpt2cnf(bn, literal_dict, args.encoding)
+
+    evidence_clauses = encode_inst_evidence(bn.values, literal_dict,
+                                            args.evidence, args.encoding)
+    if evidence_clauses:
+        clauses += evidence_clauses
+    else:
+        # Add a goal clause if necessary
+        literal = literal_dict.get_literal(*bn.goal())
+        clauses.append(format_goal(literal, args.encoding))
+
+    if args.encoding == 'cw_pb':
+        output_pb(args, len(literal_dict), clauses, weight_clauses)
+    else:
+        output_cnf(args, len(literal_dict), clauses, weight_clauses)
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description=
-        'Encode Bayesian networks into instances of weighted model counting (WMC)'
-    )
+        description='Encode Bayesian networks into instances of ' +
+        'weighted model counting (WMC)')
     parser.add_argument(
         'network',
         metavar='network',
@@ -466,15 +473,13 @@ def main():
         '-l',
         dest='legacy',
         action='store_true',
-        help=
-        'legacy mode, i.e., the encoding is compatible with the original compiler or model counter (and not ADDMC)'
-    )
+        help='legacy mode, i.e., the encoding is compatible with the ' +
+        'original compiler or model counter (and not DPMC or ADDMC)')
     parser.add_argument(
         '-m',
         dest='memory',
-        help=
-        'the maximum amount of virtual memory available to underlying encoders (in GiB)'
-    )
+        help='the maximum amount of virtual memory available to underlying ' +
+        'encoders (in GiB)')
     parser.add_argument('-p',
                         dest='preprocess',
                         action='store_true',
@@ -482,11 +487,11 @@ def main():
     args = parser.parse_args()
 
     if args.encoding.startswith('cw'):
-        encode_cnf(args)
+        my_encoder(args)
     elif args.encoding == 'bklm16':
-        encode_using_bn2cnf(args)
+        bn2cnf_encoder(args)
     else:
-        encode_using_ace(args)
+        ace_encoder(args)
 
 
 if __name__ == '__main__':
