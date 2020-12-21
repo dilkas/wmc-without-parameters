@@ -1,6 +1,6 @@
-TIMEOUT := 5
-MAX_MEMORY = 8 # in GB
-MAX_MEMORY_KB = 7969178 # 95% of MAX_MEMORY
+TIMEOUT := 1000
+MAX_MEMORY = 24 # in GB
+MAX_MEMORY_KB = 23907533 # 95% of MAX_MEMORY
 EPSILON := 0.000001
 
 ALGORITHM := deps/ADDMC/counting/addmc # Keeping this around for tests
@@ -17,7 +17,7 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/original/2004-pgm/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/Plan_Recognition/without_evidence/*.dne))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/Plan_Recognition/with_evidence/*.inst))
-all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/DQMR/qmr-100/*.dne))
+#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/DQMR/qmr-100/*.dne))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-50/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-60/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-70/*.inst))

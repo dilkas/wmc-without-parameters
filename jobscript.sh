@@ -3,7 +3,7 @@
 #$ -cwd
 #$ -pe sharedmem 16
 #$ -l h_rt=70:00:00
-#$ -l h_vmem=8G
+#$ -l h_vmem=24G
 
 . /etc/profile.d/modules.sh
 module load java/jdk/1.8.0

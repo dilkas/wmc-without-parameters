@@ -1,3 +1,8 @@
+"""This script is used for all supported encodings. It implements the cw
+encoding and wraps around external encoders Ace and bn2cnf to ensure consistent
+support for memory limits, file formats, and to work around some bugs related
+to evidence encoding in Ace."""
+
 import argparse
 import itertools
 import re
@@ -34,6 +39,8 @@ class LiteralDict:
     next_lit = 1
 
     def add(self, variable, value, literal=None):
+        """Adds a variable-value pair to the collection. If no literal is
+        provided, we select the next available literal."""
         if literal is None:
             literal = self.next_lit
         assert literal >= self.next_lit
@@ -42,6 +49,8 @@ class LiteralDict:
         self.next_lit = literal + 1
 
     def get_literal(self, variable, value):
+        """Get the literal associated with the variable-value pair
+        (as a string)."""
         if (variable, value) in self:
             return str(self._var2lit[(variable, value)])
         min_literal = min(lit for lit, (var, val) in self._lit2var.items()
@@ -49,12 +58,17 @@ class LiteralDict:
         return '-{}'.format(min_literal)
 
     def __contains__(self, variable_and_value):
+        """Checks if this variable-value pair associated with a literal"""
         return variable_and_value in self._var2lit
 
     def __len__(self):
+        """Returns the number of elements in the collection."""
         return self.next_lit - 1
 
     def __init__(self, bn=None):
+        """Given a Bayesian network, every binary variable is assigned one
+        literal, and every variable with n values is assigned n literals.
+        Otherwise, the collection is initialised as empty."""
         if bn is None:
             return
         for variable in bn.values:
@@ -96,11 +110,11 @@ def bn2cnf(bn, literal_dict, encoding):
                 literal_dict.get_literal(parent, parent_value)
                 for parent, parent_value in zip(bn.parents[variable], row)
             ]
-            p = Fraction(bn.probabilities[variable]
-                         [probability_index]).limit_denominator()
+            probability = Fraction(bn.probabilities[variable]
+                                   [probability_index]).limit_denominator()
             clauses.append('w {} {} {}'.format(
-                ' '.join([literal] + conditions), float(p),
-                float(negate_probability(p))))
+                ' '.join([literal] + conditions), float(probability),
+                float(negate_probability(probability))))
             probability_index += len(bn.values[variable])
         return clauses
 
@@ -182,10 +196,11 @@ def new_evidence_file(network_filename, variable, value):
     """Creates a new evidence file for a given goal variable-value pair (and
     returns its filename)."""
     new_filename = network_filename + '.inst'
-    with open(new_filename, 'w') as f:
-        f.write('<?xml version="1.0" encoding="UTF-8"?>\n<instantiation>' +
-                '<inst id="{}" value="{}"/>'.format(variable, value) +
-                '</instantiation>')
+    with open(new_filename, 'w') as evidence_file:
+        evidence_file.write(
+            '<?xml version="1.0" encoding="UTF-8"?>\n<instantiation>' +
+            '<inst id="{}" value="{}"/>'.format(variable, value) +
+            '</instantiation>')
     return new_filename
 
 
@@ -205,13 +220,13 @@ def encode_weights(weights, max_literal, legacy_mode):
     ]
 
 
-def reencode_bn2cnf_weights(weights_file, legacy_mode):
+def reencode_bn2cnf_weights(weights_filename, legacy_mode):
     """Translates weights---as produced by bn2cnf---to the cachet format (while
     also returning the largest literal found in the weight file)."""
     positive_weights = {}
     negative_weights = {}
-    with open(weights_file) as f:
-        for line in f:
+    with open(weights_filename) as weights_file:
+        for line in weights_file:
             words = line.split()
             assert len(words) == 2
             literal = int(words[0])
@@ -250,13 +265,13 @@ def identify_goal(text, bn_format):
     return goal_node, goal_value, goal_value_index
 
 
-def parse_bn2cnf_variables_file(variables_file):
+def parse_bn2cnf_variables_file(variables_filename):
     """Parses the bn2cnf variables file into a
     variable x value |-> list of literals whose conjunction corresponds to value
     map (where each literal is represented by a DIMACS CNF line)."""
     indicators = {}
-    with open(variables_file) as f:
-        text = f.read()
+    with open(variables_filename) as variables_file:
+        text = variables_file.read()
     for line in re.finditer(r'(\d+) = (.+)', text):
         variable = line.group(1)
         values = [v.split(', ') for v in line.group(2)[2:-2].split('][')]
@@ -315,8 +330,8 @@ def run_bn2cnf(bn, bn_filename, memory_limit):
     file, and runs bn2cnf on it. Returns the list with variable ordering, as
     compiled by bn2uai."""
     encoded_clauses, literal_dict = bn2uai(bn)
-    with open(bn_filename + '.uai', 'w') as f:
-        f.write('\n'.join(encoded_clauses) + '\n')
+    with open(bn_filename + '.uai', 'w') as network_file:
+        network_file.write('\n'.join(encoded_clauses) + '\n')
     run(
         BN2CNF + [
             '-i', bn_filename + '.uai', '-o', bn_filename + '.cnf', '-w',
@@ -326,6 +341,8 @@ def run_bn2cnf(bn, bn_filename, memory_limit):
 
 
 def run_legacy_ace(args, goal_variable, goal_value):
+    """Runs the Ace compilation script with the options used for the original
+    papers (available in Ace's readme.pdf file)."""
     run(
         ACE_LEGACY[args.encoding] + [
             args.network, '-e',
@@ -338,34 +355,41 @@ def run_legacy_ace(args, goal_variable, goal_value):
 
 
 def write_cnf_file(args, num_variables, clauses, weights):
+    """If there is a command-line flag for preprocessing, the function writes
+    the CNF file without weights, runs pmc, and writes its output together with
+    weights back to the file. Otherwise, it immediately writes the full WMC
+    instance to a file."""
     header = 'p cnf {} {}'.format(num_variables, len(clauses))
     filename = args.network + '.cnf'
     if args.preprocess:
-        with open(filename, 'w') as f:
-            f.write('\n'.join([header] + clauses) + '\n')
+        with open(filename, 'w') as cnf_file:
+            cnf_file.write('\n'.join([header] + clauses) + '\n')
         output = run(PMC + [filename], args.memory)
-        with open(filename, 'w') as f:
-            f.write(output + '\n'.join(weights) + '\n')
+        with open(filename, 'w') as cnf_file:
+            cnf_file.write(output + '\n'.join(weights) + '\n')
     else:
-        with open(filename, 'w') as f:
-            f.write('\n'.join([header] + clauses + weights) + '\n')
+        with open(filename, 'w') as cnf_file:
+            cnf_file.write('\n'.join([header] + clauses + weights) + '\n')
 
 
 def write_pb_file(args, num_variables, constraints, weights):
+    """Combines constraints with weights, adds a header, and writes everything
+    to a file."""
     header = '* #variable= {} #constraint= {}\n*'.format(
         num_variables, len(constraints))
-    filename = args.network + '.pb'
-    with open(filename, 'w') as f:
-        f.write('\n'.join([header] + constraints + weights) + '\n')
+    with open(args.network + '.pb', 'w') as pb_file:
+        pb_file.write('\n'.join([header] + constraints + weights) + '\n')
 
 
 # ==================== Main encoding functions ====================
 
 
 def ace_encoder(args):
+    """This function is responsible for the entire encoding process for all
+    encodings that use Ace."""
     # Identify the goal
-    with open(args.network, encoding=common.FILE_ENCODING) as f:
-        text = f.read()
+    with open(args.network, encoding=common.FILE_ENCODING) as network_file:
+        text = network_file.read()
     bn_format = common.get_file_format(args.network)
     goal_variable, goal_value, goal_value_index = identify_goal(
         text, bn_format)
@@ -398,13 +422,16 @@ def ace_encoder(args):
 
     weight_encoding = encode_weights(weights, max_literal, args.legacy)
 
-    with open(args.network + '.cnf') as f:
-        lines = f.readlines()
-    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-']
+    with open(args.network + '.cnf') as cnf_file:
+        clauses = [
+            l.rstrip() for l in cnf_file if l[0].isdigit() or l[0] == '-'
+        ]
     write_cnf_file(args, max_literal, clauses + evidence, weight_encoding)
 
 
 def bn2cnf_encoder(args):
+    """This function is responsible for the entire encoding process for the
+    bklm16 encoding (that uses the bn2cnf program)."""
     bn = common.BayesianNetwork(args.network)
     literal_dict = run_bn2cnf(bn, args.network, args.memory)
     encoded_weights, max_literal = reencode_bn2cnf_weights(
@@ -419,8 +446,8 @@ def bn2cnf_encoder(args):
                                             bn.values[variable].index(value))]
     else:
         # Identify the goal formula
-        with open(args.network) as f:
-            text = f.read()
+        with open(args.network) as network_file:
+            text = network_file.read()
         (goal_variable_string,
          _, goal_value) = identify_goal(text,
                                         common.get_file_format(args.network))
@@ -428,8 +455,8 @@ def bn2cnf_encoder(args):
         encoded_evidence = indicators[(goal_variable, goal_value)]
 
     # Update the number of clauses
-    with open(args.network + '.cnf') as f:
-        lines = f.read().splitlines()
+    with open(args.network + '.cnf') as cnf_file:
+        lines = cnf_file.read().splitlines()
 
     # Put everything together and write to a file
     clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-'
@@ -441,6 +468,8 @@ def bn2cnf_encoder(args):
 
 
 def my_encoder(args):
+    """This function is responsible for the entire encoding process for the cw
+    encoding (both CNF and PB versions)."""
     bn = common.BayesianNetwork(args.network)
     literal_dict = LiteralDict(bn)
     clauses, weight_clauses = bn2cnf(bn, literal_dict, args.encoding)
@@ -463,6 +492,8 @@ def my_encoder(args):
 
 
 def main():
+    """Sets up all information about command-line arguments and redirects the
+    arguments to one out of three encoder functions."""
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of ' +
         'weighted model counting (WMC)')
