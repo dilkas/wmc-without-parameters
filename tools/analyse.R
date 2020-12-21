@@ -56,6 +56,13 @@ data_sum <- rbind(data_sum, df.temp, df.temp2)
 
 # ============ Numerical investigations ================
 
+sum(data$encoding_time[startsWith(data$dataset, "Grid")]) + sum(data$inference_time[startsWith(data$dataset, "Grid")])
+sum(data$encoding_time[startsWith(data$dataset, "DQMR")]) + sum(data$inference_time[startsWith(data$dataset, "DQMR")])
+sum(data$encoding_time[startsWith(data$dataset, "Plan")]) + sum(data$inference_time[startsWith(data$dataset, "Plan")])
+sum(data$encoding_time[startsWith(data$dataset, "2004")]) + sum(data$inference_time[startsWith(data$dataset, "2004")])
+sum(data$encoding_time[startsWith(data$dataset, "2005")]) + sum(data$inference_time[startsWith(data$dataset, "2005")])
+sum(data$encoding_time[startsWith(data$dataset, "2006")]) + sum(data$inference_time[startsWith(data$dataset, "2006")])
+
 df %>% group_by(df$dataset) %>% tally()
 
 # Where answers don't match
@@ -196,6 +203,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 }
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
+# TODO: some entries seem to be messed up in the data_sum df
 df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
 df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
