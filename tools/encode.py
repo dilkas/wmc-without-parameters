@@ -208,8 +208,6 @@ def encode_weights(weights, max_literal, legacy_mode):
 def reencode_bn2cnf_weights(weights_file, legacy_mode):
     """Translates weights---as produced by bn2cnf---to the cachet format (while
     also returning the largest literal found in the weight file)."""
-    if legacy_mode:
-        return []
     positive_weights = {}
     negative_weights = {}
     with open(weights_file) as f:
@@ -222,12 +220,17 @@ def reencode_bn2cnf_weights(weights_file, legacy_mode):
             else:
                 positive_weights[literal] = words[1]
 
-    return ([
-        'w {} {} {}'.format(literal, positive_weights[literal],
-                            negative_weights[literal])
-        if literal in negative_weights else 'w {} {}'.format(
-            literal, positive_weights[literal]) for literal in positive_weights
-    ], max(positive_weights))
+    if legacy_mode:
+        weights = []
+    else:
+        weights = [
+            'w {} {} {}'.format(literal, positive_weights[literal],
+                                negative_weights[literal])
+            if literal in negative_weights else 'w {} {}'.format(
+                literal, positive_weights[literal])
+            for literal in positive_weights
+        ]
+    return weights, max(positive_weights)
 
 
 # ============ Functions primarily responsible for parsing ============

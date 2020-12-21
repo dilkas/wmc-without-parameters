@@ -17,8 +17,8 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 #all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/original/2004-pgm/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/Plan_Recognition/without_evidence/*.dne))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/Plan_Recognition/with_evidence/*.inst))
-#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/DQMR/qmr-100/*.dne))
-all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-50/*.inst))
+all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/DQMR/qmr-100/*.dne))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-50/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-60/*.inst))
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-70/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/Grid/*/*.dne))
@@ -56,6 +56,8 @@ define run_algorithms_with_evidence
 	-$(RUN) $(CACHET) data/original/$*.$(1).cnf &> results/original/$*.sbk05.old_inf
 	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
 	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$*.$(1) -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
+	-cp data/trimmed/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/trimmed/$*.$(1)
+	-cp data/trimmed/$(basename $*).$(1) data/trimmed/$*.$(1)
 	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* cd05 -m $(MAX_MEMORY) &> results/trimmed/$*.cd05.new_enc
 	-$(call run_dpmc,trimmed/$*.$(1).cnf,3,trimmed/$*.cd05)
 	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* cd06 -m $(MAX_MEMORY) &> results/trimmed/$*.cd06.new_enc
