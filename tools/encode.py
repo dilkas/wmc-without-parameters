@@ -4,6 +4,7 @@ support for memory limits, file formats, and to work around some bugs related
 to evidence encoding in Ace."""
 
 import argparse
+import collections
 import itertools
 import re
 import resource
@@ -29,6 +30,8 @@ PMC = [
     'deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied',
     '-iterate=10'
 ]
+
+Goal = collections.namedtuple('Goal', ['variable', 'value', 'value_index'])
 
 
 class LiteralDict:
@@ -262,7 +265,7 @@ def identify_goal(text, bn_format):
         re.search(common.STATES_RE[bn_format], text[goal_node_end:]).group(1))
     goal_value = 'true' if 'true' in values else values[0]
     goal_value_index = values.index(goal_value)
-    return goal_node, goal_value, goal_value_index
+    return Goal(goal_node, goal_value, goal_value_index)
 
 
 def parse_bn2cnf_variables_file(variables_filename):
@@ -281,7 +284,7 @@ def parse_bn2cnf_variables_file(variables_filename):
     return indicators
 
 
-def parse_lmap(filename, goal_variable, goal_value_index, values):
+def parse_lmap(filename, goal, values):
     """Parses an LMAP file into a map of literal weights, a LiteralDict object,
     the literal that corresponds to the goal variable-value pair, and the
     largest literal found in the file."""
@@ -301,7 +304,7 @@ def parse_lmap(filename, goal_variable, goal_value_index, values):
                 if literal > 0:
                     literal_dict.add(variable, values[variable][value],
                                      literal)
-                if variable == goal_variable and value == goal_value_index:
+                if variable == goal.variable and value == goal.value_index:
                     goal_literal = literal
     return weights, literal_dict, goal_literal, max_literal
 
@@ -340,13 +343,13 @@ def run_bn2cnf(bn, bn_filename, memory_limit):
     return literal_dict
 
 
-def run_legacy_ace(args, goal_variable, goal_value):
+def run_legacy_ace(args, goal):
     """Runs the Ace compilation script with the options used for the original
     papers (available in Ace's readme.pdf file)."""
     run(
         ACE_LEGACY[args.encoding] + [
             args.network, '-e',
-            new_evidence_file(args.network, goal_variable, goal_value)
+            new_evidence_file(args.network, goal.variable, goal.value)
             if common.empty_evidence(args.evidence) else args.evidence
         ], args.memory)
 
@@ -391,42 +394,37 @@ def ace_encoder(args):
     with open(args.network, encoding=common.FILE_ENCODING) as network_file:
         text = network_file.read()
     bn_format = common.get_file_format(args.network)
-    goal_variable, goal_value, goal_value_index = identify_goal(
-        text, bn_format)
+    goal = identify_goal(text, bn_format)
 
     if args.legacy and args.encoding != 'sbk05':
-        run_legacy_ace(args, goal_variable, goal_value)
+        run_legacy_ace(args, goal)
         return
 
     run(ACE + ['-' + args.encoding, args.network], args.memory)
 
     # Make a variable -> list of values map
-    values = {
-        node.group(1): re.split(
+    values = {}
+    for node in re.finditer(common.NODE_RE, text):
+        values[node.group(1)] = re.split(
             common.STATE_SPLITTER_RE[bn_format],
             re.search(common.STATES_RE[bn_format], text[node.end():]).group(1))
-        for node in re.finditer(common.NODE_RE, text)
-    }
 
     weights, literal_dict, goal_literal, max_literal = parse_lmap(
-        args.network + '.lmap', goal_variable, goal_value_index, values)
-
-    if common.empty_evidence(args.evidence):
-        evidence = [encode_single_literal(goal_literal, args.encoding)]
-    else:
-        evidence = [
-            encode_single_literal(literal_dict.get_literal(variable, value),
-                                  args.encoding)
-            for variable, value in common.parse_evidence(args.evidence)
-        ]
-
-    weight_encoding = encode_weights(weights, max_literal, args.legacy)
-
+        args.network + '.lmap', goal, values)
     with open(args.network + '.cnf') as cnf_file:
         clauses = [
             l.rstrip() for l in cnf_file if l[0].isdigit() or l[0] == '-'
         ]
-    write_cnf_file(args, max_literal, clauses + evidence, weight_encoding)
+    if common.empty_evidence(args.evidence):
+        clauses.append(encode_single_literal(goal_literal, args.encoding))
+    else:
+        for variable, value in common.parse_evidence(args.evidence):
+            clauses.append(
+                encode_single_literal(
+                    literal_dict.get_literal(variable, value), args.encoding))
+
+    weight_encoding = encode_weights(weights, max_literal, args.legacy)
+    write_cnf_file(args, max_literal, clauses, weight_encoding)
 
 
 def bn2cnf_encoder(args):
@@ -448,11 +446,9 @@ def bn2cnf_encoder(args):
         # Identify the goal formula
         with open(args.network) as network_file:
             text = network_file.read()
-        (goal_variable_string,
-         _, goal_value) = identify_goal(text,
-                                        common.get_file_format(args.network))
-        goal_variable = literal_dict.index(goal_variable_string)
-        encoded_evidence = indicators[(goal_variable, goal_value)]
+        goal = identify_goal(text, common.get_file_format(args.network))
+        goal_variable_index = literal_dict.index(goal.variable)
+        encoded_evidence = indicators[(goal_variable_index, goal.value_index)]
 
     # Update the number of clauses
     with open(args.network + '.cnf') as cnf_file:
