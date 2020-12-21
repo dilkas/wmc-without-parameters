@@ -422,9 +422,8 @@ def ace_encoder(args):
             clauses.append(
                 encode_single_literal(
                     literal_dict.get_literal(variable, value), args.encoding))
-
-    weight_encoding = encode_weights(weights, max_literal, args.legacy)
-    write_cnf_file(args, max_literal, clauses, weight_encoding)
+    write_cnf_file(args, max_literal, clauses,
+                   encode_weights(weights, max_literal, args.legacy))
 
 
 def bn2cnf_encoder(args):
@@ -436,27 +435,25 @@ def bn2cnf_encoder(args):
         args.network + '.uai.weights', args.legacy)
     indicators = parse_bn2cnf_variables_file(args.network + '.uai.variables')
 
+    with open(args.network + '.cnf') as cnf_file:
+        clauses = [
+            l.rstrip() for l in cnf_file if l[0].isdigit() or l[0] == '-'
+        ]
+
     # Incorporate evidence (or select a goal)
     if not common.empty_evidence(args.evidence):
-        encoded_evidence = []
         for variable, value in common.parse_evidence(args.evidence):
-            encoded_evidence += indicators[(literal_dict.index(variable),
-                                            bn.values[variable].index(value))]
+            clauses += indicators[(literal_dict.index(variable),
+                                   bn.values[variable].index(value))]
     else:
         # Identify the goal formula
         with open(args.network) as network_file:
             text = network_file.read()
         goal = identify_goal(text, common.get_file_format(args.network))
         goal_variable_index = literal_dict.index(goal.variable)
-        encoded_evidence = indicators[(goal_variable_index, goal.value_index)]
-
-    # Update the number of clauses
-    with open(args.network + '.cnf') as cnf_file:
-        lines = cnf_file.read().splitlines()
+        clauses += indicators[(goal_variable_index, goal.value_index)]
 
     # Put everything together and write to a file
-    clauses = [l.rstrip() for l in lines if l[0].isdigit() or l[0] == '-'
-               ] + encoded_evidence
     write_cnf_file(args, max_literal, clauses, encoded_weights)
 
     if args.legacy:
