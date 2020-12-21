@@ -5,6 +5,9 @@ import re
 
 import common
 
+INPUT_DIRECTORY = 'data/original'
+OUTPUT_DIRECTORY = 'data/trimmed'
+
 ENDING_RE = {'dne': re.compile(r'\n};'), 'net': re.compile(r'\n}')}
 NODE_RE = re.compile(common.NODE_RE)
 POTENTIAL_RE = re.compile(common.POTENTIAL_RE)
@@ -61,7 +64,8 @@ def trim_file(network, evidence=None):
     return text
 
 
-def trim_directory_with_evidence(input_directory, output_directory):
+def trim_directory_with_evidence(directory):
+    input_directory = os.path.join(INPUT_DIRECTORY, directory)
     files = os.listdir(input_directory)
     for filename in files:
         if filename.endswith('.inst'):
@@ -81,40 +85,29 @@ def trim_directory_with_evidence(input_directory, output_directory):
                 os.path.join(input_directory, filename))
             new_filename = filename[:filename.rindex('.')] + bn_filename[
                 bn_filename.rindex('.'):]
-            with open(os.path.join(output_directory, new_filename), 'w') as f:
+            with open(os.path.join(OUTPUT_DIRECTORY, directory, new_filename), 'w') as f:
                 f.write(new_contents)
 
 
-def trim_directory_without_evidence(input_directory, output_directory):
+def trim_directory_without_evidence(directory):
+    input_directory = os.path.join(INPUT_DIRECTORY, directory)
     for filename in os.listdir(input_directory):
         if filename.endswith('.dne') or filename.endswith('.net'):
-            new_contents = trim_file(os.path.join(input_directory, filename))
-            with open(os.path.join(output_directory, filename), 'w') as f:
+            new_contents = trim_file(input_directory, filename)
+            with open(os.path.join(OUTPUT_DIRECTORY, directory, filename), 'w') as f:
                 f.write(new_contents)
 
 
 if __name__ == '__main__':
-    trim_directory_with_evidence('data/2004-pgm', 'trimmed_data/2004-pgm/')
-    trim_directory_with_evidence('data/2005-ijcai/',
-                                 'trimmed_data/2005-ijcai/')
-    trim_directory_with_evidence('data/2006-ijar/', 'trimmed_data/2006-ijar/')
-    trim_directory_without_evidence('data/DQMR/qmr-100/',
-                                    'trimmed_data/DQMR/qmr-100/')
-    trim_directory_with_evidence('data/DQMR/qmr-50/',
-                                 'trimmed_data/DQMR/qmr-50/')
-    trim_directory_with_evidence('data/DQMR/qmr-60/',
-                                 'trimmed_data/DQMR/qmr-60/')
-    trim_directory_with_evidence('data/DQMR/qmr-70/',
-                                 'trimmed_data/DQMR/qmr-70/')
-    trim_directory_without_evidence('data/Grid/Ratio_50/',
-                                    'trimmed_data/Grid/Ratio_50/')
-    trim_directory_without_evidence('data/Grid/Ratio_75/',
-                                    'trimmed_data/Grid/Ratio_75/')
-    trim_directory_without_evidence('data/Grid/Ratio_90/',
-                                    'trimmed_data/Grid/Ratio_90/')
-    trim_directory_with_evidence(
-        'data/Plan_Recognition/with_evidence/',
-        'trimmed_data/Plan_Recognition/with_evidence/')
-    trim_directory_without_evidence(
-        'data/Plan_Recognition/without_evidence/',
-        'trimmed_data/Plan_Recognition/without_evidence/')
+    trim_directory_with_evidence('2004-pgm')
+    trim_directory_with_evidence('2005-ijcai')
+    trim_directory_with_evidence('2006-ijar')
+    trim_directory_without_evidence('DQMR/qmr-100')
+    trim_directory_with_evidence('DQMR/qmr-50')
+    trim_directory_with_evidence('DQMR/qmr-60')
+    trim_directory_with_evidence('DQMR/qmr-70')
+    trim_directory_without_evidence('Grid/Ratio_50')
+    trim_directory_without_evidence('Grid/Ratio_75')
+    trim_directory_without_evidence('Grid/Ratio_90')
+    trim_directory_with_evidence('Plan_Recognition/with_evidence')
+    trim_directory_without_evidence('Plan_Recognition/without_evidence')

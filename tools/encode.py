@@ -55,7 +55,8 @@ class LiteralDict:
         return self.next_lit - 1
 
     def __init__(self, bn=None):
-        if bn is None: return
+        if bn is None:
+            return
         for variable in bn.values:
             if len(bn.values[variable]) == 2:
                 self.add(
@@ -171,7 +172,8 @@ def bn2uai(bn):
 
 def encode_single_literal(literal, encoding):
     """Returns a string that encodes the given literal as a clause."""
-    if encoding != 'cw_pb': return '{} 0'.format(literal)
+    if encoding != 'cw_pb':
+        return '{} 0'.format(literal)
     return ('1 x{} = 0;'.format(literal[1:])
             if literal.startswith('-') else '1 x{} = 1;'.format(literal))
 
@@ -206,7 +208,8 @@ def encode_weights(weights, max_literal, legacy_mode):
 def reencode_bn2cnf_weights(weights_file, legacy_mode):
     """Translates weights---as produced by bn2cnf---to the cachet format (while
     also returning the largest literal found in the weight file)."""
-    if legacy_mode: return []
+    if legacy_mode:
+        return []
     positive_weights = {}
     negative_weights = {}
     with open(weights_file) as f:
