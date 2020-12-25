@@ -9,8 +9,6 @@ INPUT_DIRECTORY = 'data/original'
 OUTPUT_DIRECTORY = 'data/trimmed'
 
 ENDING_RE = {'dne': re.compile(r'\n};'), 'net': re.compile(r'\n}')}
-NODE_RE = re.compile(common.NODE_RE)
-POTENTIAL_RE = re.compile(common.POTENTIAL_RE)
 
 
 def mark_ancestors(variable, parents, relevant):
@@ -22,7 +20,7 @@ def mark_ancestors(variable, parents, relevant):
 
 def remove_node_info(text, relevant, file_format):
     updated_text = text
-    nodes = list(NODE_RE.finditer(text))
+    nodes = list(common.NODE_RE.finditer(text))
     removed_variables = []
     for node in nodes[::-1]:
         variable_name = node.group(1)
@@ -34,7 +32,7 @@ def remove_node_info(text, relevant, file_format):
 
     # Also delete the 'potentials'
     if file_format == 'net':
-        for potential in list(POTENTIAL_RE.finditer(updated_text))[::-1]:
+        for potential in list(common.POTENTIAL_RE.finditer(updated_text))[::-1]:
             potential_variable = re.search(r'\w+', potential.group(1)).group(0)
             if potential_variable in removed_variables:
                 updated_text = (updated_text[:potential.start(0)] +

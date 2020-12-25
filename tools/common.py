@@ -4,13 +4,14 @@ import re
 import xml.etree.ElementTree as ET
 
 FILE_ENCODING = 'ISO-8859-1'
-NODE_RE = r'\n+node (\w+)'
-POTENTIAL_RE = r'\n+potential([^{]*){([^}]*)}'
-STATE_SPLITTER_RE = {'net': r'"\s*"', 'dne': r',\s*'}
+NODE_RE = re.compile(r'\n+node (\w+)')
+POTENTIAL_RE = re.compile(r'\n+potential([^{]*){([^}]*)}')
+STATE_SPLITTER_RE = {'net': re.compile(r'"\s*"'), 'dne': re.compile(r',\s*')}
 STATES_RE = {
-    'dne': r'states = \(([^()]*)\)',
-    'net': r'states = \(\s*"([^()]*)"\s*\)'
+    'dne': re.compile(r'states = \(([^()]*)\)'),
+    'net': re.compile(r'states = \(\s*"([^()]*)"\s*\)')
 }
+
 
 class BayesianNetwork:
     parents = {}
@@ -32,13 +33,12 @@ class BayesianNetwork:
         with open(filename, encoding=FILE_ENCODING) as f:
             text = f.read()
 
-        for node in re.finditer(NODE_RE, text):
+        for node in NODE_RE.finditer(text):
             end_of_name = node.end()
             name = node.group(1).lstrip().rstrip()
             self._last_variable = name
-            self.values[name] = re.split(
-                STATE_SPLITTER_RE[file_format],
-                re.search(STATES_RE[file_format], text[end_of_name:]).group(1))
+            self.values[name] = STATE_SPLITTER_RE[file_format].split(
+                STATES_RE[file_format].search(text[end_of_name:]).group(1))
             if file_format == 'dne':
                 parents_str = re.search(r'parents = \(([^()]*)\)',
                                         text[end_of_name:]).group(1)
@@ -53,7 +53,7 @@ class BayesianNetwork:
                 ]
 
         if file_format == 'net':
-            for potential in re.finditer(POTENTIAL_RE, text):
+            for potential in POTENTIAL_RE.finditer(text):
                 header = re.findall(r'\w+', potential.group(1))
                 probs = re.findall(r'\d+\.?\d*', potential.group(2))
                 self.parents[header[0]] = header[1:]

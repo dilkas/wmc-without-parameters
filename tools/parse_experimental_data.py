@@ -19,6 +19,10 @@ def parse(filename):
                     float(time_str[colon_i + 1:]))
         elif filename.endswith('.new_inf') and line.startswith('* modelCount'):
             answer = line.split()[2]  # ADDMC answer
+        elif filename.endswith('.new_inf') and line.startswith('s wmc'):
+            answer = line.split()[2]  # DPMC answer
+        elif filename.endswith('.new_inf') and line.startswith('c seconds'):
+            time = line.split()[2]
         elif filename.endswith('.bklm16.old_inf') and line[0].isdigit():
             answer = line  # Query-DNNF answer
         elif (filename.endswith('.sbk05.old_inf')
@@ -51,28 +55,32 @@ def parse_dir(directory, additional_data={}):
     return data
 
 
-data = []
-data += parse_dir('results/original/Grid/Ratio_50/', {'dataset': 'Grid-50'})
-data += parse_dir('results/original/Grid/Ratio_75/', {'dataset': 'Grid-75'})
-data += parse_dir('results/original/Grid/Ratio_90/', {'dataset': 'Grid-90'})
-data += parse_dir('results/original/DQMR/qmr-100/', {'dataset': 'DQMR-100'})
-data += parse_dir('results/original/DQMR/qmr-50/', {'dataset': 'DQMR-50'})
-data += parse_dir('results/original/DQMR/qmr-60/', {'dataset': 'DQMR-60'})
-data += parse_dir('results/original/DQMR/qmr-70/', {'dataset': 'DQMR-70'})
-data += parse_dir('results/original/Plan_Recognition/without_evidence/',
-                  {'dataset': 'Plan Recognition'})
-data += parse_dir('results/original/Plan_Recognition/with_evidence/',
-                  {'dataset': 'Plan Recognition'})
-data += parse_dir('results/original/2004-pgm/', {'dataset': '2004-PGM'})
-data += parse_dir('results/original/2005-ijcai/', {'dataset': '2005-IJCAI'})
-data += parse_dir('results/original/2006-ijar/', {'dataset': '2006-IJAR'})
+directories = [
+    ('Grid/Ratio_50/', 'Grid-50'),
+    ('Grid/Ratio_75/', 'Grid-75'),
+    ('Grid/Ratio_90/', 'Grid-90'),
+    ('DQMR/qmr-100/', 'DQMR-100'),
+    ('DQMR/qmr-50/', 'DQMR-50'),
+    ('DQMR/qmr-60/', 'DQMR-60'),
+    ('DQMR/qmr-70/', 'DQMR-70'),
+    ('Plan_Recognition/without_evidence/', 'Plan Recognition'),
+    ('Plan_Recognition/with_evidence/', 'Plan Recognition'),
+    ('2004-pgm/', '2004-PGM'),
+    ('2005-ijcai/', '2005-IJCAI'),
+    ('2006-ijar/', '2006-IJAR'),
+]
 
-fieldnames = set()
-for d in data:
-    fieldnames.update(d.keys())
-
-with open('results/original_results.csv', 'w', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
+for type_of_data in ['original', 'trimmed']:
+    data = []
+    for directory, dataset in directories:
+        data += parse_dir(os.path.join('results', type_of_data, directory),
+                          {'dataset': dataset})
+    fieldnames = set()
     for d in data:
-        writer.writerow(d)
+        fieldnames.update(d.keys())
+    with open('results/{}_results.csv'.format(type_of_data), 'w',
+              newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for d in data:
+            writer.writerow(d)

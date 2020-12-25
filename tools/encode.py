@@ -41,7 +41,7 @@ class LiteralDict:
     _var2lit = {}
     next_lit = 1
 
-    def add(self, variable, value, literal=None):
+    def add(self, variable, value, value2=None, literal=None):
         """Adds a variable-value pair to the collection. If no literal is
         provided, we select the next available literal."""
         if literal is None:
@@ -49,16 +49,15 @@ class LiteralDict:
         assert literal >= self.next_lit
         self._lit2var[literal] = (variable, value)
         self._var2lit[(variable, value)] = literal
+        if value2 is not None:
+            self._lit2var[-literal] = (variable, value2)
+            self._var2lit[(variable, value2)] = -literal
         self.next_lit = literal + 1
 
     def get_literal(self, variable, value):
         """Get the literal associated with the variable-value pair
         (as a string)."""
-        if (variable, value) in self:
-            return str(self._var2lit[(variable, value)])
-        min_literal = min(lit for lit, (var, val) in self._lit2var.items()
-                          if var == variable)
-        return '-{}'.format(min_literal)
+        return str(self._var2lit[(variable, value)])
 
     def __contains__(self, variable_and_value):
         """Checks if this variable-value pair associated with a literal"""
@@ -76,9 +75,11 @@ class LiteralDict:
             return
         for variable in bn.values:
             if len(bn.values[variable]) == 2:
-                self.add(
-                    variable, 'true' if 'true' in bn.values[variable] else
-                    bn.values[variable][0])
+                if bn.values[variable][1] == 'true':
+                    self.add(variable, 'true', bn.values[variable][0])
+                else:
+                    self.add(variable, bn.values[variable][0],
+                             bn.values[variable][1])
             else:
                 for value in bn.values[variable]:
                     self.add(variable, value)
@@ -259,10 +260,9 @@ def identify_goal(text, bn_format):
     probability should be computed. Returns the name of the variable, its chosen
     value, and the index of that value among all the values of the variable."""
     goal_node, goal_node_end = [(i.group(1), i.end())
-                                for i in re.finditer(common.NODE_RE, text)][-1]
-    values = re.split(
-        common.STATE_SPLITTER_RE[bn_format],
-        re.search(common.STATES_RE[bn_format], text[goal_node_end:]).group(1))
+                                for i in common.NODE_RE.finditer(text)][-1]
+    values = common.STATE_SPLITTER_RE[bn_format].split(
+        common.STATES_RE[bn_format].search(text[goal_node_end:]).group(1))
     goal_value = 'true' if 'true' in values else values[0]
     goal_value_index = values.index(goal_value)
     return Goal(goal_node, goal_value, goal_value_index)
@@ -302,8 +302,9 @@ def parse_lmap(filename, goal, values):
                 variable = components[5]
                 value = int(components[6].rstrip())
                 if literal > 0:
-                    literal_dict.add(variable, values[variable][value],
-                                     literal)
+                    literal_dict.add(variable,
+                                     values[variable][value],
+                                     literal=literal)
                 if variable == goal.variable and value == goal.value_index:
                     goal_literal = literal
     return weights, literal_dict, goal_literal, max_literal
@@ -404,10 +405,9 @@ def ace_encoder(args):
 
     # Make a variable -> list of values map
     values = {}
-    for node in re.finditer(common.NODE_RE, text):
-        values[node.group(1)] = re.split(
-            common.STATE_SPLITTER_RE[bn_format],
-            re.search(common.STATES_RE[bn_format], text[node.end():]).group(1))
+    for node in common.NODE_RE.finditer(text):
+        values[node.group(1)] = common.STATE_SPLITTER_RE[bn_format].split(
+            common.STATES_RE[bn_format].search(text[node.end():]).group(1))
 
     weights, literal_dict, goal_literal, max_literal = parse_lmap(
         args.network + '.lmap', goal, values)

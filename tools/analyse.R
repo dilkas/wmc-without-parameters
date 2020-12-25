@@ -7,8 +7,17 @@ require(tikzDevice)
 require(ggpubr)
 require(tidyr)
 
-TIMEOUT <- 1000
 data <- read.csv("../results/original_results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/trimmed_results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/old_results.csv", header = TRUE, sep = ",")
+
+# TODO: remove
+data$encoding_time[data$encoding == "cw"] <- 0
+data <- data[is.na(data$answer) | data$answer < 1e-10,]
+data <- data[is.na(data$answer) | data$answer > 1e-3 & data$answer < 1,]
+
+TIMEOUT <- 1000
+data$answer[data$answer > 1] <- NA
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
 min.time <- min(min(data$encoding_time[data$encoding_time > 0]),
                 min(data$inference_time[data$inference_time > 0]))
@@ -56,6 +65,7 @@ data_sum <- rbind(data_sum, df.temp, df.temp2)
 
 # ============ Numerical investigations ================
 
+# Total time per data set (for job scheduling)
 sum(data$encoding_time[startsWith(data$dataset, "Grid")]) + sum(data$inference_time[startsWith(data$dataset, "Grid")])
 sum(data$encoding_time[startsWith(data$dataset, "DQMR")]) + sum(data$inference_time[startsWith(data$dataset, "DQMR")])
 sum(data$encoding_time[startsWith(data$dataset, "Plan")]) + sum(data$inference_time[startsWith(data$dataset, "Plan")])
@@ -66,14 +76,15 @@ sum(data$encoding_time[startsWith(data$dataset, "2006")]) + sum(data$inference_t
 df %>% group_by(df$dataset) %>% tally()
 
 # Where answers don't match
-interesting <- df[abs(df$answer_new_cw - df$answer_new_bklm16) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_new_d02) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_new_sbk05) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_old_bklm16) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_old_cd05) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_old_cd06) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_old_d02) > 0.01,]
-interesting <- df[abs(df$answer_new_cw - df$answer_old_sbk05) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_new_bklm16) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_new_cw) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_new_d02) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_new_sbk05) > 0.01,]
+
+interesting <- df[abs(df$answer_old_cd06 - df$answer_old_bklm16) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_old_cd05) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_old_d02) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_old_sbk05) > 0.01,]
 
 # Number of instances
 nrow(df)
@@ -99,12 +110,19 @@ sum(is.na(df$answer_bklm16) & is.na(df$answer_cd05) & is.na(df$answer_cd06) &
       is.na(df$answer_cw) & is.na(df$answer_d02) & !is.na(df$answer_sbk05))
 
 # Fastest
-sum(!is.na(df$answer_bklm16) & abs(df$time_bklm16 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_cd05) & abs(df$time_cd05 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_cd06) & abs(df$time_cd06 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_cw) & abs(df$time_cw - df$time_min) < 1e-5)
-sum(!is.na(df$answer_d02) & abs(df$time_d02 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_sbk05) & abs(df$time_sbk05 - df$time_min) < 1e-5)
+
+sum(!is.na(df$answer_new_bklm16) & abs(df$time_new_bklm16 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_cd05) & abs(df$time_new_cd05 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_cd06) & abs(df$time_new_cd06 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_d02) & abs(df$time_new_d02 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_sbk05) & abs(df$time_new_sbk05 - df$time_min) < 1e-5)
+
+sum(!is.na(df$answer_old_bklm16) & abs(df$time_old_bklm16 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_cd05) & abs(df$time_old_cd05 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_cd06) & abs(df$time_old_cd06 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_d02) & abs(df$time_old_d02 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_sbk05) & abs(df$time_old_sbk05 - df$time_min) < 1e-5)
 
 # Solved
 sum(!is.na(df$answer_bklm16))
@@ -204,7 +222,8 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
 # TODO: some entries seem to be messed up in the data_sum df
-df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
+# TODO: replace 'ADDMC' with 'DPMC
+df2 <- data_sum[startsWith(data_sum$dataset, "2006") & !is.na(data_sum$dataset),]
 df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
