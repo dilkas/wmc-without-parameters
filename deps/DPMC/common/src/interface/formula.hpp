@@ -30,11 +30,12 @@ protected:
   WeightFormat weightFormat;
   Int declaredVarCount = DUMMY_MIN_INT; // in cnf file
   Map<Int, Float> literalWeights;
-  vector<ADD> weights; /* conditional probability tables encoded as ADDs */
-  vector<vector<Int>> dependencies; /* how variables depend on other variables */
+  vector<ADD> weights; // conditional probability tables encoded as ADDs
+  vector<vector<Int>> dependencies; // how variables depend on other variables
   vector<Constraint*> clauses;
   vector<Int> apparentVars; // vars appearing in clauses, ordered by 1st appearance
-  vector<vector<std::string>> unparsedWeights; /* needed to compute variable ordering heuristics */
+  /* A 'map' from variables to vectors of string tokens */
+  vector<vector<std::string>> unparsedWeights;
   vector<Int> varOrdering;
 
   ADD literalToDd(Int literal, Cudd *mgr);

@@ -563,23 +563,42 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
 
   // compiles weights into DDs
   if (weightFormat == WeightFormat::CONDITIONAL) {
-    for (size_t i = 0; i < declaredVarCount; i++)
-      weights.push_back(mgr->addZero());
+    auto comparer = [](ADD left, ADD right) {
+      return left.nodeCount() > right.nodeCount();
+    };
+    vector<std::priority_queue<ADD, vector<ADD>, decltype(comparer)>> queues;
+    for (Int i = 0; i < declaredVarCount; i++)
+      queues.push_back(std::priority_queue<ADD, vector<ADD>, decltype(comparer)>(comparer));
 
     for (auto words : unparsedWeights) {
       Int literal = std::stoi(words.at(1));
-
       if (literal < 0) {
         util::showError(
-          "the first literal of any weight line must be non-negative, but " +
-          std::to_string(literal) + " is not");
+            "the first literal of any weight line must be non-negative, but " +
+            std::to_string(literal) + " is not");
       } else if (literal == 0) {
         assert(words.size() == 3);
         literalWeights[0] = std::stod(words.at(2));
+      } else {
+        queues[literal - 1].push(constructDdFromWords(mgr, literal, words));
+      }
+    }
+
+    for (auto queue : queues) {
+      if (queue.empty()) {
+        weights.push_back(mgr->addOne());
         continue;
       }
+      while (queue.size() > 1) {
+        ADD dd1 = queue.top();
+        queue.pop();
 
-      weights[literal - 1] += constructDdFromWords(mgr, literal, words);
+        ADD dd2 = queue.top();
+        queue.pop();
+
+        queue.push(dd1 + dd2);
+      }
+      weights.push_back(queue.top());
     }
     for (size_t i = 0; i < declaredVarCount; i++) {
       vector<Int> v;
