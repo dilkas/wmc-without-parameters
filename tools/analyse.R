@@ -11,13 +11,25 @@ data <- read.csv("../results/original_results.csv", header = TRUE, sep = ",")
 data <- read.csv("../results/trimmed_results.csv", header = TRUE, sep = ",")
 data <- read.csv("../results/old_results.csv", header = TRUE, sep = ",")
 
-# TODO: remove
+# TODO: remove (just for testing)
+data <- data[data$dataset != "2004-PGM",]
 data$encoding_time[data$encoding == "cw"] <- 0
 data <- data[is.na(data$answer) | data$answer < 1e-10,]
 data <- data[is.na(data$answer) | data$answer > 1e-3 & data$answer < 1,]
 
-TIMEOUT <- 1000
+# TODO: are some values lost?
 data$answer[data$answer > 1] <- NA
+temp <- data %>% right_join(data[data$encoding == "cd06" &
+                                   data$novelty == "old",
+                                 c("instance", "answer")], by = "instance") %>%
+  right_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
+temp$answer.y <- ifelse(is.na(temp$answer.y), temp$answer, temp$answer.y)
+removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y) > 0.01),]
+temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
+data <- subset(temp, select = -c(answer.y, answer))
+names(data)[names(data) == 'answer.x'] <- 'answer'
+
+TIMEOUT <- 1000
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
 min.time <- min(min(data$encoding_time[data$encoding_time > 0]),
                 min(data$inference_time[data$inference_time > 0]))
@@ -39,8 +51,20 @@ data_sum$time <- data_sum$encoding_time + data_sum$inference_time
 data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
-            fun.aggregate = sum,
+            fun.aggregate = NULL,
             value.var = c("answer", "time"))
+df$time_new_bklm16[is.na(df$time_new_bklm16)] <- 2 * TIMEOUT
+df$time_new_cd05[is.na(df$time_new_cd05)] <- 2 * TIMEOUT
+df$time_new_cd06[is.na(df$time_new_cd06)] <- 2 * TIMEOUT
+df$time_new_cw[is.na(df$time_new_cw)] <- 2 * TIMEOUT
+df$time_new_d02[is.na(df$time_new_d02)] <- 2 * TIMEOUT
+df$time_new_sbk05[is.na(df$time_new_sbk05)] <- 2 * TIMEOUT
+df$time_old_bklm16[is.na(df$time_old_bklm16)] <- 2 * TIMEOUT
+df$time_old_cd05[is.na(df$time_old_cd05)] <- 2 * TIMEOUT
+df$time_old_cd06[is.na(df$time_old_cd06)] <- 2 * TIMEOUT
+df$time_old_d02[is.na(df$time_old_d02)] <- 2 * TIMEOUT
+df$time_old_sbk05[is.na(df$time_old_sbk05)] <- 2 * TIMEOUT
+
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
 time_columns0 <- time_columns[time_columns != "time_new_cw"]
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
@@ -203,7 +227,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
                                                sep = ""))
   cumulative$time <- as.numeric(cumulative$time)
   cumulative$count <- as.numeric(cumulative$count)
-  cumulative <- cumulative[cumulative$time < TIMEOUT, ]
+  cumulative <- cumulative[cumulative$time < 2 * TIMEOUT, ]
   ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
     geom_line(aes(linetype = .data[[column_name]])) +
 #    geom_line() +
@@ -222,8 +246,9 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
 # TODO: some entries seem to be messed up in the data_sum df
-# TODO: replace 'ADDMC' with 'DPMC
-df2 <- data_sum[startsWith(data_sum$dataset, "2006") & !is.na(data_sum$dataset),]
+# TODO: replace 'ADDMC' with 'DPMC'
+df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
+df2 <- data_sum[grepl("mastermind", data_sum$instance),]
 df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
