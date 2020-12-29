@@ -9,6 +9,7 @@ def parse(filename):
         lines = f.read().splitlines()
     answer = None
     time = None
+    width = None
     for line in lines:
         stripped = line.lstrip()
         if stripped.startswith('Elapsed'):
@@ -23,6 +24,8 @@ def parse(filename):
             answer = line.split()[2]  # DPMC answer
         elif filename.endswith('.new_inf') and line.startswith('c seconds'):
             time = line.split()[2]
+        elif filename.endswith('.new_inf') and 'with ADD width' in line:
+            width = line.split()[-1]
         elif filename.endswith('.bklm16.old_inf') and line[0].isdigit():
             answer = line  # Query-DNNF answer
         elif (filename.endswith('.sbk05.old_inf')
@@ -34,15 +37,15 @@ def parse(filename):
                 answer = re.match(r'[\d\.eE-]+', line.split()[2]).group(0)
             except AttributeError:
                 answer = 'Inf'
-    return time, answer
+    return time, answer, width
 
 
 def parse_dir(directory, additional_data={}):
     data = []
     for filename in glob.glob(directory + '*inf'):
         d = additional_data.copy()
-        d['inference_time'], d['answer'] = parse(filename)
-        d['encoding_time'], _ = parse(filename[:-3] + 'enc')
+        d['inference_time'], d['answer'], d['width'] = parse(filename)
+        d['encoding_time'], _, _ = parse(filename[:-3] + 'enc')
 
         parts = filename.split('.')
         instance = (parts[0] if parts[1] in [

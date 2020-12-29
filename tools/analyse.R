@@ -6,6 +6,7 @@ require(purrr)
 require(tikzDevice)
 require(ggpubr)
 require(tidyr)
+require(viridis)
 
 data <- read.csv("../results/original_results.csv", header = TRUE, sep = ",")
 data <- read.csv("../results/trimmed_results.csv", header = TRUE, sep = ",")
@@ -17,9 +18,8 @@ data$encoding_time[data$encoding == "cw"] <- 0
 data <- data[is.na(data$answer) | data$answer < 1e-10,]
 data <- data[is.na(data$answer) | data$answer > 1e-3 & data$answer < 1,]
 
-# TODO: are some values lost?
 data$answer[data$answer > 1] <- NA
-temp <- data %>% right_join(data[data$encoding == "cd06" &
+temp <- data %>% left_join(data[data$encoding == "cd06" &
                                    data$novelty == "old",
                                  c("instance", "answer")], by = "instance") %>%
   right_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
@@ -28,6 +28,15 @@ removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y)
 temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
 data <- subset(temp, select = -c(answer.y, answer))
 names(data)[names(data) == 'answer.x'] <- 'answer'
+
+# take the width from cw and copy it to all encoding/algorithm combos
+temp <- data %>% left_join(data[data$encoding == "cw" &
+                                   data$novelty == "new",
+                                 c("instance", "width")], by = "instance")
+temp$width.x <- temp$width.y
+data <- subset(temp, select = -c(width.y))
+names(data)[names(data) == 'width.x'] <- 'width'
+data$width[is.na(data$width)] <- max(data$width, na.rm = TRUE)
 
 TIMEOUT <- 1000
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
@@ -52,7 +61,8 @@ data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time"))
+            value.var = c("answer", "time", "width"))
+#df$width_new_cw[is.na(df$width_new_cw)] <- max(df$width_new_cw, na.rm = TRUE)
 df$time_new_bklm16[is.na(df$time_new_bklm16)] <- 2 * TIMEOUT
 df$time_new_cd05[is.na(df$time_new_cd05)] <- 2 * TIMEOUT
 df$time_new_cd06[is.na(df$time_new_cd06)] <- 2 * TIMEOUT
@@ -83,8 +93,12 @@ instance_to_min_time <- df$time_min
 names(instance_to_min_time) <- df$instance
 instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
-df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1", answer = NA, time = instance_to_min_time[df$instance])
-df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0", answer = NA, time = instance_to_min_time0[df$instance])
+df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1",
+                      answer = NA, time = instance_to_min_time[df$instance],
+                      width = max(data$width))
+df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0",
+                       answer = NA, time = instance_to_min_time0[df$instance],
+                       width = max(data$width))
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 
 # ============ Numerical investigations ================
@@ -163,8 +177,8 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
                          groupby_name, max.time) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
-                                      col = .data[[groupby]],
-                                      shape = .data[[groupby]])) +
+                                      col = .data[[groupby]])) +
+#                                      shape = .data[[groupby]])) +
     geom_point(alpha = 0.5, size = 1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
     scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time)) +
@@ -175,12 +189,18 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
 #                       labels = c("0.1", "10", "1000")) +
     ylab(y_name) +
     xlab(x_name) +
-    scale_color_brewer(palette = "Dark2", name = groupby_name) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
+#    scale_color_brewer(palette = "Dark2", name = groupby_name) +
+    #scale_colour_gradientn(colours = terrain.colors(10, 1)) +
+    scale_color_viridis() +
     labs(color = groupby_name, shape = groupby_name)
 }
+
+# TODO: do include NAs
+scatter_plot(df[!is.na(df$width_new_cw)], "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
+                   "\\texttt{cw} time (s)", "width_new_cw", "Width", 2 * TIMEOUT)
 
 # Compare CW with other encodings
 p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
@@ -205,11 +225,11 @@ dev.off()
 
 # Cumulative plot
 cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
-                            linetypes) {
+                            linetypes, variable = "time") {
   times <- vector(mode = "list", length = length(column_values))
   names(times) <- column_values
   for (value in column_values) {
-    times[[value]] <- unique(df$time[df[[column_name]] == value])
+    times[[value]] <- unique(df[df[[column_name]] == value, variable])
   }
   chunks <- vector(mode = "list", length = length(column_values))
   names(chunks) <- column_values
@@ -217,7 +237,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
     chunks[[value]] <- cbind(times[[value]], value,
                              unlist(times[[value]] %>%
                                       map(function(x)
-                                        sum(df$time[df[[column_name]] == value]
+                                        sum(df[df[[column_name]] == value, variable]
                                             <= x))))
   }
   cumulative <- as.data.frame(do.call(rbind, as.list(chunks)))
@@ -249,11 +269,14 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 # TODO: replace 'ADDMC' with 'DPMC'
 df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
 df2 <- data_sum[grepl("mastermind", data_sum$instance),]
-df2 <- data_sum
+df2 <- data_sum[!is.na(data_sum$answer),]
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
                 c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3))
+cumulative_plot(df2, "encoding", "Encoding",
+                sort(unique(df2$encoding)),
+                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "width")
 dev.off()
 
 # Stacked bar plots comparing encoding and inference time

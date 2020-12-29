@@ -1,6 +1,6 @@
 TIMEOUT := 1000
-MAX_MEMORY = 24 # in GB
-MAX_MEMORY_KB = 23907533 # 95% of MAX_MEMORY
+MAX_MEMORY = 32 # in GB
+MAX_MEMORY_KB = 31876710 # 95% of MAX_MEMORY
 EPSILON := 0.000001
 
 ALGORITHM := deps/ADDMC/counting/addmc # Keeping this around for tests
@@ -27,7 +27,7 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 
 # Arguments: 1) CNF file, 2) weight format number, 3) (most of the) results filename
 define run_dpmc
-	cnf="data/$(1)" && $(RUN) ./deps/DPMC/lg/lg.sif "/solvers/htd-master/bin/htd_main -s 1234567 --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full" < $$cnf | ./deps/DPMC/DMC/dmc --cf=$$cnf --wf $(2) --jf=- --pf=1e-3 &> results/$(3).new_inf
+	cnf="data/$(1)" && ./deps/DPMC/lg/lg.sif "/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full" < $$cnf | $(RUN) ./deps/DPMC/DMC/dmc --cf=$$cnf --wf $(2) --jf=- --pf=1e-3 --jw=$(TIMEOUT) &> results/$(3).new_inf
 endef
 
 # The argument is the file format (dne or net)
@@ -56,30 +56,6 @@ define run_algorithms_with_evidence
 	-$(RUN) $(CACHET) data/original/$*.$(1).cnf &> results/original/$*.sbk05.old_inf
 	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
 	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$*.$(1) -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
-	-cp data/trimmed/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/trimmed/$*.$(1)
-	-cp data/trimmed/$(basename $*).$(1) data/trimmed/$*.$(1)
-	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* cd05 -m $(MAX_MEMORY) &> results/trimmed/$*.cd05.new_enc
-	-$(call run_dpmc,trimmed/$*.$(1).cnf,3,trimmed/$*.cd05)
-	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* cd06 -m $(MAX_MEMORY) &> results/trimmed/$*.cd06.new_enc
-	-$(call run_dpmc,trimmed/$*.$(1).cnf,3,trimmed/$*.cd06)
-	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* d02 -m $(MAX_MEMORY) &> results/trimmed/$*.d02.new_enc
-	-$(call run_dpmc,trimmed/$*.$(1).cnf,3,trimmed/$*.d02)
-	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* sbk05 -m $(MAX_MEMORY) &> results/trimmed/$*.sbk05.new_enc
-	-$(call run_dpmc,trimmed/$*.$(1).cnf,3,trimmed/$*.sbk05)
-	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* bklm16 -m $(MAX_MEMORY) &> results/trimmed/$*.bklm16.new_enc
-	-$(call run_dpmc,trimmed/$*.$(1).cnf,5,trimmed/$*.bklm16)
-	-$(ENCODE) python tools/encode.py data/trimmed/$*.$(1) -e data/trimmed/$* cw -m $(MAX_MEMORY) &> results/trimmed/$*.cw.new_enc
-	-$(call run_dpmc,trimmed/$*.$(1).cnf,5,trimmed/$*.cw)
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$*.$(1) -e data/trimmed/$* cd05 -m $(MAX_MEMORY) &> results/trimmed/$*.cd05.old_enc
-	-$(RUN) $(EVALUATE) data/trimmed/$*.$(1) &> results/trimmed/$*.cd05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$*.$(1) -e data/trimmed/$* cd06 -m $(MAX_MEMORY) &> results/trimmed/$*.cd06.old_enc
-	-$(RUN) $(EVALUATE) data/trimmed/$*.$(1) &> results/trimmed/$*.cd06.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$*.$(1) -e data/trimmed/$* d02 -m $(MAX_MEMORY) &> results/trimmed/$*.d02.old_enc
-	-$(RUN) $(EVALUATE) data/trimmed/$*.$(1) &> results/trimmed/$*.d02.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$*.$(1) -e data/trimmed/$* sbk05 -m $(MAX_MEMORY) &> results/trimmed/$*.sbk05.old_enc
-	-$(RUN) $(CACHET) data/trimmed/$*.$(1).cnf &> results/trimmed/$*.sbk05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$*.$(1) -e data/trimmed/$* bklm16 -m $(MAX_MEMORY) &> results/trimmed/$*.bklm16.old_enc
-	-$(ENCODE) python tools/bklm16_wrapper.py data/trimmed/$*.$(1) -m $(MAX_MEMORY) &> results/trimmed/$*.bklm16.old_inf
 endef
 
 data/original/%/WITHOUT_EVIDENCE:
@@ -105,28 +81,6 @@ data/original/%/WITHOUT_EVIDENCE:
 	-$(RUN) $(CACHET) data/original/$*.cnf &> results/original/$*.sbk05.old_inf
 	-$(ENCODE) python tools/encode.py -l data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
 	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
-	-$(ENCODE) python tools/encode.py data/trimmed/$* cd05 -m $(MAX_MEMORY) &> results/trimmed/$*.cd05.new_enc
-	-$(call run_dpmc,trimmed/$*.cnf,3,trimmed/$*.cd05)
-	-$(ENCODE) python tools/encode.py data/trimmed/$* cd06 -m $(MAX_MEMORY) &> results/trimmed/$*.cd06.new_enc
-	-$(call run_dpmc,trimmed/$*.cnf,3,trimmed/$*.cd06)
-	-$(ENCODE) python tools/encode.py data/trimmed/$* d02 -m $(MAX_MEMORY) &> results/trimmed/$*.d02.new_enc
-	-$(call run_dpmc,trimmed/$*.cnf,3,trimmed/$*.d02)
-	-$(ENCODE) python tools/encode.py data/trimmed/$* sbk05 -m $(MAX_MEMORY) &> results/trimmed/$*.sbk05.new_enc
-	-$(call run_dpmc,trimmed/$*.cnf,3,trimmed/$*.sbk05)
-	-$(ENCODE) python tools/encode.py data/trimmed/$* bklm16 -m $(MAX_MEMORY) &> results/trimmed/$*.bklm16.new_enc
-	-$(call run_dpmc,trimmed/$*.cnf,5,trimmed/$*.bklm16)
-	-$(ENCODE) python tools/encode.py data/trimmed/$* cw -m $(MAX_MEMORY) &> results/trimmed/$*.cw.new_enc
-	-$(call run_dpmc,trimmed/$*.cnf,5,trimmed/$*.cw)
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$* cd05 -m $(MAX_MEMORY) &> results/trimmed/$*.cd05.old_enc
-	-$(RUN) $(EVALUATE) data/trimmed/$* &> results/trimmed/$*.cd05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$* cd06 -m $(MAX_MEMORY) &> results/trimmed/$*.cd06.old_enc
-	-$(RUN) $(EVALUATE) data/trimmed/$* &> results/trimmed/$*.cd06.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$* d02 -m $(MAX_MEMORY) &> results/trimmed/$*.d02.old_enc
-	-$(RUN) $(EVALUATE) data/trimmed/$* &> results/trimmed/$*.d02.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$* sbk05 -m $(MAX_MEMORY) &> results/trimmed/$*.sbk05.old_enc
-	-$(RUN) $(CACHET) data/trimmed/$*.cnf &> results/trimmed/$*.sbk05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/trimmed/$* bklm16 -m $(MAX_MEMORY) &> results/trimmed/$*.bklm16.old_enc
-	-$(ENCODE) python tools/bklm16_wrapper.py data/trimmed/$* -m $(MAX_MEMORY) &> results/trimmed/$*.bklm16.old_inf
 
 data/original/%/DNE_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,dne)

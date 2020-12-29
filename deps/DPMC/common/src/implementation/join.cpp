@@ -317,6 +317,8 @@ void JoinTreeReader::finishReadingJoinTree(bool alarming) {
 
     printThinLine();
     printComment("After " + to_string(getSeconds(startTime)) + " seconds, finished reading last legal join tree ending on or before line " + to_string(lineIndex) + " with ADD width " + to_string(maxVarCount));
+    disarmAlarm();
+    killPlanner();
 
     if (alarming) {
       Float newTimeoutSeconds = getNewTimeoutSeconds(maxVarCount);

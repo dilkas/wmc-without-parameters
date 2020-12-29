@@ -16,4 +16,4 @@ else
   export LD_LIBRARY_PATH=$ACEDIR
   OPTIONS=''
 fi
-java $OPTIONS -DACEC2D="$ACEDIR/$C2D" -Xmx2000m -XX:CompressedClassSpaceSize=256m -classpath "$ACEDIR/ace.jar:$ACEDIR/inflib.jar:$ACEDIR/jdom.jar" edu.ucla.belief.ace.AceCompile "$@"
+java $OPTIONS -DACEC2D="$ACEDIR/$C2D" -Xmx24904m -XX:CompressedClassSpaceSize=256m -classpath "$ACEDIR/ace.jar:$ACEDIR/inflib.jar:$ACEDIR/jdom.jar" edu.ucla.belief.ace.AceCompile "$@"
