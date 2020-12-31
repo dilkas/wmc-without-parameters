@@ -46,7 +46,6 @@ class LiteralDict:
         provided, we select the next available literal."""
         if literal is None:
             literal = self.next_lit
-        assert literal >= self.next_lit
         self._lit2var[literal] = (variable, value)
         self._var2lit[(variable, value)] = literal
         if value2 is not None:
@@ -301,10 +300,9 @@ def parse_lmap(filename, goal, values):
             if line.startswith('cc$I'):
                 variable = components[5]
                 value = int(components[6].rstrip())
-                if literal > 0:
-                    literal_dict.add(variable,
-                                     values[variable][value],
-                                     literal=literal)
+                literal_dict.add(variable,
+                                 values[variable][value],
+                                 literal=literal)
                 if variable == goal.variable and value == goal.value_index:
                     goal_literal = literal
     return weights, literal_dict, goal_literal, max_literal
@@ -484,6 +482,27 @@ def my_encoder(args):
         write_cnf_file(args, len(literal_dict), clauses, weight_clauses)
 
 
+# TODO: finish
+def dimacs_encoder(args):
+    bn = common.BayesianNetwork(args.network)
+    nodes = list(bn.parents)
+    edges = set()
+    for node_i, node in enumerate(nodes):
+        edges.update(
+            frozenset([node_i, nodes.index(parent)])
+            for parent in bn.parents[node])
+        edges.update(
+            frozenset([nodes.index(parent1),
+                       nodes.index(parent2)]) for parent1 in bn.parents[node]
+            for parent2 in bn.parents[node] if parent1 != parent2)
+    print(edges)
+    lines = ['p edge {} {}'.format(len(nodes), len(edges))]
+    for edge in edges:
+        lines.append('e ' + ' '.join(n + 1 for n in edge))
+    with open(args.network + '.dimacs', 'w') as dimacs_file:
+        dimacs_file.write('\n'.join(lines) + '\n')
+
+
 def main():
     """Sets up all information about command-line arguments and redirects the
     arguments to one out of three encoder functions."""
@@ -516,9 +535,17 @@ def main():
                         dest='preprocess',
                         action='store_true',
                         help='run a preprocessor (PMC) on the CNF file')
+    parser.add_argument(
+        '-d',
+        dest='dimacs',
+        action='store_true',
+        help='generate the moralisation of the Bayesian ' +
+        'network in DIMACS format (ignoring all other arguments)')
     args = parser.parse_args()
 
-    if args.encoding.startswith('cw'):
+    if args.dimacs:
+        dimacs_encoder(args)
+    elif args.encoding.startswith('cw'):
         my_encoder(args)
     elif args.encoding == 'bklm16':
         bn2cnf_encoder(args)

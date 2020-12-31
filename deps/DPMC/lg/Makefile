@@ -2,7 +2,7 @@ appname := lg
 
 CXX := g++
 CXXFLAGS := -g -std=c++17 -O3 -DNDEBUG -I ./src -pedantic
-LDLIBS := -lboost_system -pthread
+LDLIBS := /usr/lib/libboost_system.a -pthread
 
 srcfiles := $(shell find . -name "*.cc" -not -path "./solvers/*")
 headers := $(shell find . -name "*.h" -not -path "./solvers/*")

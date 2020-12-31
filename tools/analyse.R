@@ -29,6 +29,7 @@ temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0
 data <- subset(temp, select = -c(answer.y, answer))
 names(data)[names(data) == 'answer.x'] <- 'answer'
 
+# TODO: width gets messed up when moving from data to df
 # take the width from cw and copy it to all encoding/algorithm combos
 temp <- data %>% left_join(data[data$encoding == "cw" &
                                    data$novelty == "new",
