@@ -1,4 +1,4 @@
-TIMEOUT := 10
+TIMEOUT := 100
 MAX_MEMORY = 32 # in GB
 MAX_MEMORY_KB = 31876710 # 95% of MAX_MEMORY
 EPSILON := 0.000001
@@ -6,6 +6,7 @@ EPSILON := 0.000001
 ALGORITHM := deps/ADDMC/counting/addmc # Keeping this around for tests
 EVALUATE := deps/ace/evaluate
 CACHET := deps/cachet/cachet
+HTD := deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full
 
 LIMIT := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_KB)
 RUN := $(LIMIT) && /usr/bin/time -v
@@ -24,11 +25,22 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 #all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-70/*.inst))
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/Grid/*/*.dne))
 
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/2005-ijcai/*.net))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/2006-ijar/*.net))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/2004-pgm/*.net))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Plan_Recognition/without_evidence/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Plan_Recognition/with_evidence/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-100/*.dne))
+all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-50/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-60/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-70/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Grid/*/*.dne))
+
 #===============================================================================
 
 # Arguments: 1) CNF file, 2) weight format number, 3) (most of the) results filename
 define run_dpmc
-	cnf="data/$(1)" && $(LIMIT) && ./deps/DPMC/lg/build/lg "./deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full" < $$cnf | ./deps/DPMC/DMC/dmc --cf=$$cnf --wf $(2) --jf=- --pf=1e-3 --jw=$(TIMEOUT) &> results/$(3).new_inf
+	cnf="data/$(1)" && $(LIMIT) && deps/DPMC/lg/build/lg "deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full" < $$cnf | deps/DPMC/DMC/dmc --cf=$$cnf --wf $(2) --jf=- --pf=1e-3 --jw=$(TIMEOUT) &> results/$(3).new_inf
 endef
 
 # The argument is the file format (dne or net)
@@ -88,6 +100,10 @@ data/original/%/DNE_WITH_EVIDENCE:
 
 data/original/%/NET_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,net)
+
+data/original/%/TREEWIDTH:
+	python tools/encode.py data/original/$* moralisation
+	$(LIMIT) && $(HTD) < data/original/$*.gr > results/original/$*.td
 
 #===============================================================================
 
