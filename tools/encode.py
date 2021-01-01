@@ -482,8 +482,7 @@ def my_encoder(args):
         write_cnf_file(args, len(literal_dict), clauses, weight_clauses)
 
 
-# TODO: finish
-def dimacs_encoder(args):
+def moralisation_encoder(args):
     bn = common.BayesianNetwork(args.network)
     nodes = list(bn.parents)
     edges = set()
@@ -495,12 +494,11 @@ def dimacs_encoder(args):
             frozenset([nodes.index(parent1),
                        nodes.index(parent2)]) for parent1 in bn.parents[node]
             for parent2 in bn.parents[node] if parent1 != parent2)
-    print(edges)
-    lines = ['p edge {} {}'.format(len(nodes), len(edges))]
+    lines = ['p tw {} {}'.format(len(nodes), len(edges))]
     for edge in edges:
-        lines.append('e ' + ' '.join(n + 1 for n in edge))
-    with open(args.network + '.dimacs', 'w') as dimacs_file:
-        dimacs_file.write('\n'.join(lines) + '\n')
+        lines.append(' '.join(str(n + 1) for n in edge))
+    with open(args.network + '.gr', 'w') as graph_file:
+        graph_file.write('\n'.join(lines) + '\n')
 
 
 def main():
@@ -513,10 +511,12 @@ def main():
         'network',
         metavar='network',
         help='a Bayesian network (in one of DNE/NET/Hugin formats)')
-    parser.add_argument(
-        'encoding',
-        choices=['bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02', 'sbk05'],
-        help='choose a WMC encoding')
+    parser.add_argument('encoding',
+                        choices=[
+                            'bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02',
+                            'sbk05', 'moralisation'
+                        ],
+                        help='choose a WMC encoding')
     parser.add_argument('-e',
                         dest='evidence',
                         help='evidence file (in the INST format)')
@@ -535,16 +535,10 @@ def main():
                         dest='preprocess',
                         action='store_true',
                         help='run a preprocessor (PMC) on the CNF file')
-    parser.add_argument(
-        '-d',
-        dest='dimacs',
-        action='store_true',
-        help='generate the moralisation of the Bayesian ' +
-        'network in DIMACS format (ignoring all other arguments)')
     args = parser.parse_args()
 
-    if args.dimacs:
-        dimacs_encoder(args)
+    if args.encoding == 'moralisation':
+        moralisation_encoder(args)
     elif args.encoding.startswith('cw'):
         my_encoder(args)
     elif args.encoding == 'bklm16':

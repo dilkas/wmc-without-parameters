@@ -98,6 +98,7 @@ clean:
 		rm -f data/original/$$d/*.inst.dne ; \
 		rm -f data/original/$$d/*.inst.net ; \
 		rm -f data/original/$$d/*.uai.* ; \
+		rm -f data/original/$$d/*.gr ; \
 		rm -f data/trimmed/$$d/*.dne.* ; \
 		rm -f data/trimmed/$$d/*.net.* ; \
 		rm -f data/trimmed/$$d/*.inst.dne ; \
