@@ -3,6 +3,21 @@ import glob
 import os
 import re
 
+directories = [
+    ('Grid/Ratio_50/', 'Grid-50'),
+    ('Grid/Ratio_75/', 'Grid-75'),
+    ('Grid/Ratio_90/', 'Grid-90'),
+    ('DQMR/qmr-100/', 'DQMR-100'),
+    ('DQMR/qmr-50/', 'DQMR-50'),
+    ('DQMR/qmr-60/', 'DQMR-60'),
+    ('DQMR/qmr-70/', 'DQMR-70'),
+    ('Plan_Recognition/without_evidence/', 'Plan Recognition'),
+    ('Plan_Recognition/with_evidence/', 'Plan Recognition'),
+    ('2004-pgm/', '2004-PGM'),
+    ('2005-ijcai/', '2005-IJCAI'),
+    ('2006-ijar/', '2006-IJAR'),
+]
+
 
 def parse(filename):
     with open(filename) as f:
@@ -40,13 +55,40 @@ def parse(filename):
     return time, answer, width
 
 
+def parse_td_file(filename):
+    with open(filename) as f:
+        lines = f.read().splitlines()
+    treewidth = None
+    for line in lines:
+        if line.lstrip().startswith('Improved'):
+            treewidth = line.split()[-1]
+    return treewidth
+
+
+def network_filenames(result_filename):
+    extensions = ['.dne', '.net']
+    filename = '.'.join(result_filename.split('.')[:-2])
+    possibilities = [filename]
+    basename = filename[:filename.rindex('.')]
+    possibilities += [
+        basename + '.dne', basename + '.net',
+        basename[:basename.rindex('-')] + '.dne',
+        basename[:basename.rindex('-')] + '.net'
+    ]
+    return possibilities
+
+
 def parse_dir(directory, additional_data={}):
+    treewidth = {}
+    for filename in glob.glob(directory + '*.td'):
+        if 'inst' not in filename:
+            treewidth[filename[:filename.rindex('.')]] = parse_td_file(
+                filename)
     data = []
     for filename in glob.glob(directory + '*inf'):
         d = additional_data.copy()
-        d['inference_time'], d['answer'], d['width'] = parse(filename)
+        d['inference_time'], d['answer'], d['add_width'] = parse(filename)
         d['encoding_time'], _, _ = parse(filename[:-3] + 'enc')
-
         parts = filename.split('.')
         instance = (parts[0] if parts[1] in [
             'inst', 'cd05', 'cd06', 'cw', 'sbk05', 'd02'
@@ -54,36 +96,32 @@ def parse_dir(directory, additional_data={}):
         d['instance'] = instance
         d['novelty'], _ = parts[-1].split('_')
         d['encoding'] = parts[-2]
+
+        for network_filename in network_filenames(filename):
+            if network_filename in treewidth:
+                d['treewidth'] = treewidth[network_filename]
+                break
+        if 'treewidth' not in d:
+            print('Warning: {} has no corresponding tree decomposition file.'.
+                  format(filename))
+
         data.append(d)
     return data
 
 
-directories = [
-    ('Grid/Ratio_50/', 'Grid-50'),
-    ('Grid/Ratio_75/', 'Grid-75'),
-    ('Grid/Ratio_90/', 'Grid-90'),
-    ('DQMR/qmr-100/', 'DQMR-100'),
-    ('DQMR/qmr-50/', 'DQMR-50'),
-    ('DQMR/qmr-60/', 'DQMR-60'),
-    ('DQMR/qmr-70/', 'DQMR-70'),
-    ('Plan_Recognition/without_evidence/', 'Plan Recognition'),
-    ('Plan_Recognition/with_evidence/', 'Plan Recognition'),
-    ('2004-pgm/', '2004-PGM'),
-    ('2005-ijcai/', '2005-IJCAI'),
-    ('2006-ijar/', '2006-IJAR'),
-]
-
-for type_of_data in ['original', 'trimmed']:
+def main():
     data = []
     for directory, dataset in directories:
-        data += parse_dir(os.path.join('results', type_of_data, directory),
+        data += parse_dir(os.path.join('results', 'original', directory),
                           {'dataset': dataset})
     fieldnames = set()
     for d in data:
         fieldnames.update(d.keys())
-    with open('results/{}_results.csv'.format(type_of_data), 'w',
-              newline='') as csvfile:
+    with open('results/results.csv', 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for d in data:
             writer.writerow(d)
+
+
+main()

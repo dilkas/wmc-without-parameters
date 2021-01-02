@@ -8,9 +8,7 @@ require(ggpubr)
 require(tidyr)
 require(viridis)
 
-data <- read.csv("../results/original_results.csv", header = TRUE, sep = ",")
-data <- read.csv("../results/trimmed_results.csv", header = TRUE, sep = ",")
-data <- read.csv("../results/old_results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 
 # TODO: remove (just for testing)
 data <- data[data$dataset != "2004-PGM",]
@@ -28,16 +26,6 @@ removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y)
 temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
 data <- subset(temp, select = -c(answer.y, answer))
 names(data)[names(data) == 'answer.x'] <- 'answer'
-
-# TODO: width gets messed up when moving from data to df
-# take the width from cw and copy it to all encoding/algorithm combos
-temp <- data %>% left_join(data[data$encoding == "cw" &
-                                   data$novelty == "new",
-                                 c("instance", "width")], by = "instance")
-temp$width.x <- temp$width.y
-data <- subset(temp, select = -c(width.y))
-names(data)[names(data) == 'width.x'] <- 'width'
-data$width[is.na(data$width)] <- max(data$width, na.rm = TRUE)
 
 TIMEOUT <- 1000
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
@@ -62,8 +50,8 @@ data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time", "width"))
-#df$width_new_cw[is.na(df$width_new_cw)] <- max(df$width_new_cw, na.rm = TRUE)
+            value.var = c("answer", "time", "add_width", "treewidth"))
+#df$treewidth_new_cw[is.na(df$treewidth_new_cw)] <- max(df$treewidth_new_cw, na.rm = TRUE)
 df$time_new_bklm16[is.na(df$time_new_bklm16)] <- 2 * TIMEOUT
 df$time_new_cd05[is.na(df$time_new_cd05)] <- 2 * TIMEOUT
 df$time_new_cd06[is.na(df$time_new_cd06)] <- 2 * TIMEOUT
@@ -75,6 +63,9 @@ df$time_old_cd05[is.na(df$time_old_cd05)] <- 2 * TIMEOUT
 df$time_old_cd06[is.na(df$time_old_cd06)] <- 2 * TIMEOUT
 df$time_old_d02[is.na(df$time_old_d02)] <- 2 * TIMEOUT
 df$time_old_sbk05[is.na(df$time_old_sbk05)] <- 2 * TIMEOUT
+df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
+                      function(x) max(x, na.rm = TRUE))
+df <- df %>% select(!starts_with("treewidth_"))
 
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
 time_columns0 <- time_columns[time_columns != "time_new_cw"]
@@ -96,10 +87,10 @@ instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
 df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1",
                       answer = NA, time = instance_to_min_time[df$instance],
-                      width = max(data$width))
+                      add_width= max(data$add_width), treewidth = max(data$treewidth))
 df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0",
                        answer = NA, time = instance_to_min_time0[df$instance],
-                       width = max(data$width))
+                       add_width = max(data$add_width), treewidth = max(data$treewidth))
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 
 # ============ Numerical investigations ================
@@ -175,8 +166,8 @@ sum(!is.na(df$answer_sbk05))
 
 # Scatter plot
 scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
-                         groupby_name, max.time) {
-  ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
+                         groupby_name, max.time, continuous) {
+  p <- ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
                                       col = .data[[groupby]])) +
 #                                      shape = .data[[groupby]])) +
@@ -193,40 +184,41 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
-#    scale_color_brewer(palette = "Dark2", name = groupby_name) +
-    #scale_colour_gradientn(colours = terrain.colors(10, 1)) +
-    scale_color_viridis() +
     labs(color = groupby_name, shape = groupby_name)
+  if (continuous) {
+    return(p + scale_color_viridis())
+  } else {
+    return(p + scale_color_brewer(palette = "Dark2", name = groupby_name))
+  }
 }
 
-# TODO: do include NAs
-scatter_plot(df[!is.na(df$width_new_cw)], "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{cw} time (s)", "width_new_cw", "Width", 2 * TIMEOUT)
+scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
+                   "\\texttt{cw} time (s)", "treewidth", "Treewidth", 2 * TIMEOUT, TRUE)
+scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
+                   "\\texttt{cw} time (s)", "add_width_new_cw", "ADD Width", 2 * TIMEOUT, TRUE)
 
 # Compare CW with other encodings
-p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
+scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
                    "\\texttt{cw} time (s)", "major.dataset", "Data set",
-                   2 * TIMEOUT)
-p2 <- scatter_plot(df, "time_old_d02", "time_new_d02",
+                   2 * TIMEOUT, FALSE)
+scatter_plot(df, "time_old_d02", "time_new_d02",
                    "\\texttt{old_d02} time (s)", "\\texttt{new_d02} time (s)",
-                   "major.dataset", "Data set", 2 * TIMEOUT)
+                   "major.dataset", "Data set", 2 * TIMEOUT, FALSE)
 
 # Compare encoding and inference time for old and new setups
-# TODO: export these plots separately (to add subcaptions)
-p1 <- scatter_plot(data[data$novelty == "old",], "encoding_time", "inference_time",
+scatter_plot(data[data$novelty == "old",], "encoding_time", "inference_time",
                    "Encoding time (s)", "Inference time (s)", "encoding",
-                   "Encoding", TIMEOUT)
-p2 <- scatter_plot(data[data$novelty == "new",], "encoding_time", "inference_time",
+                   "Encoding", TIMEOUT, FALSE)
+scatter_plot(data[data$novelty == "new",], "encoding_time", "inference_time",
                    "Encoding time (s)", "Inference time (s)", "encoding",
-                   "Encoding", TIMEOUT)
+                   "Encoding", TIMEOUT, FALSE)
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
-ggarrange(p2, p1, ncol = 2, common.legend = TRUE, legend = "right")
 dev.off()
 
 # Cumulative plot
 cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
-                            linetypes, variable = "time") {
+                            linetypes, variable, variable_name) {
   times <- vector(mode = "list", length = length(column_values))
   names(times) <- column_values
   for (value in column_values) {
@@ -267,17 +259,16 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
 # TODO: some entries seem to be messed up in the data_sum df
-# TODO: replace 'ADDMC' with 'DPMC'
-df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
+df2 <- data_sum[startsWith(data_sum$dataset, "2006") & !is.na(data_sum$dataset),]
 df2 <- data_sum[grepl("mastermind", data_sum$instance),]
-df2 <- data_sum[!is.na(data_sum$answer),]
+df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3))
+                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "width")
+                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "treewidth", "Treewidth")
 dev.off()
 
 # Stacked bar plots comparing encoding and inference time
@@ -289,7 +280,7 @@ data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
 data_melted$lower[data_melted$variable =="inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
 data_melted$upper[data_melted$variable =="inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
 data_melted$novelty <- factor(data_melted$novelty, levels = c("old", "new"))
-novelties <- c("Originally", "With ADDMC")
+novelties <- c("Originally", "With DPMC")
 names(novelties) <- c("old", "new")
 
 ggplot(data_melted, aes(encoding, time, fill = variable)) +

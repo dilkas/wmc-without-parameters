@@ -6,7 +6,7 @@ EPSILON := 0.000001
 ALGORITHM := deps/ADDMC/counting/addmc # Keeping this around for tests
 EVALUATE := deps/ace/evaluate
 CACHET := deps/cachet/cachet
-HTD := deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full
+HTD := deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full --output width
 
 LIMIT := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_KB)
 RUN := $(LIMIT) && /usr/bin/time -v
@@ -103,7 +103,7 @@ data/original/%/NET_WITH_EVIDENCE:
 
 data/original/%/TREEWIDTH:
 	python tools/encode.py data/original/$* moralisation
-	$(LIMIT) && $(HTD) < data/original/$*.gr > results/original/$*.td
+	-$(LIMIT) && $(HTD) < data/original/$*.gr > results/original/$*.td
 
 #===============================================================================
 
