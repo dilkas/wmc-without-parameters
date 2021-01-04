@@ -7,7 +7,7 @@ ALGORITHM := deps/DPMC/common/addmc # Keeping this around for tests
 EVALUATE := deps/ace/evaluate
 CACHET := deps/cachet/cachet
 HTD := deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full --output width
-LG := deps/DPMC/lg/build/lg "deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full"
+LG := deps/DPMC/lg/build/lg \"deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full\"
 DPMC := deps/DPMC/DMC/dmc --jf=- --pf=1e-3 --jw=$(TIMEOUT)
 
 LIMIT := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_KB)
@@ -42,7 +42,7 @@ all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-50/*.dne))
 
 # Arguments: 1) CNF file, 2) weight format number, 3) (most of the) results filename
 define run_dpmc
-	cnf="data/$(1)" && $(LIMIT) && $(LG) < $$cnf | $(DPMC) --cf=$$cnf --wf $(2) &> results/$(3).new_inf
+	cnf="data/$(1)" && $(LIMIT) && /usr/bin/time -v -f "%es" bash -c "$(LG) < $$cnf | $(DPMC) --cf=$$cnf --wf $(2)" &> results/$(3).new_inf
 endef
 
 # The argument is the file format (dne or net)

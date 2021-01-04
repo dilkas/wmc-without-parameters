@@ -26,8 +26,7 @@ def parse(filename):
     time = None
     width = None
     for line in lines:
-        stripped = line.lstrip()
-        if stripped.startswith('Elapsed'):
+        if line.lstrip().startswith('Elapsed'):
             # Time
             time_str = line.split()[7]
             colon_i = time_str.index(':')
@@ -37,8 +36,6 @@ def parse(filename):
             answer = line.split()[2]  # ADDMC answer
         elif filename.endswith('.new_inf') and line.startswith('s wmc'):
             answer = line.split()[2]  # DPMC answer
-        elif filename.endswith('.new_inf') and line.startswith('c seconds'):
-            time = line.split()[2]
         elif filename.endswith('.new_inf') and 'with ADD width' in line:
             width = line.split()[-1]
         elif filename.endswith('.bklm16.old_inf') and line[0].isdigit():
