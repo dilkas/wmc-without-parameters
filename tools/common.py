@@ -55,9 +55,11 @@ class BayesianNetwork:
         if file_format == 'net':
             for potential in POTENTIAL_RE.finditer(text):
                 header = re.findall(r'\w+', potential.group(1))
-                probs = re.findall(r'\d+\.?\d*', potential.group(2))
                 self.parents[header[0]] = header[1:]
-                self.probabilities[header[0]] = probs
+                # Remove comments
+                probability_string = re.sub(r'%.*', '', potential.group(2))
+                self.probabilities[header[0]] = re.findall(
+                    r'\d+\.?\d*', probability_string)
 
 
 def get_file_format(filename):

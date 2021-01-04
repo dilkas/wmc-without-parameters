@@ -162,56 +162,47 @@ sum(!is.na(df$answer_cw))
 sum(!is.na(df$answer_d02))
 sum(!is.na(df$answer_sbk05))
 
+max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
+interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{cw}"],
+                        y = cumulative$time[cumulative$encoding == "\\texttt{cw}"],
+                        xout = max_d02)$y
+
 # ================ Plots ==========================
 
 # Scatter plot
-scatter_plot <- function(df, x_column, y_column, x_name, y_name, groupby,
-                         groupby_name, max.time, continuous) {
-  p <- ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
+scatter_plot <- function(df, x_column, y_column, x_name, y_name,
+                         max.time) {
+  ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
-                                      col = .data[[groupby]])) +
-#                                      shape = .data[[groupby]])) +
-    geom_point(alpha = 0.5, size = 1) +
+                                      col = treewidth,
+                                      shape = major.dataset)) +
+    geom_point(alpha = 1, size = 1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
-    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time)) +
-#                       breaks = c(0.1, 10, 1000),
-#                       labels = c("0.1", "10", "1000")) +
-    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time)) +
-#                       breaks = c(0.1, 10, 1000),
-#                       labels = c("0.1", "10", "1000")) +
+    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+                       breaks = c(0.1, 10, 1000),
+                       labels = c("0.1", "10", "1000")) +
+    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+                       breaks = c(0.1, 10, 1000),
+                       labels = c("0.1", "10", "1000")) +
     ylab(y_name) +
     xlab(x_name) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
-    labs(color = groupby_name, shape = groupby_name)
-  if (continuous) {
-    return(p + scale_color_viridis())
-  } else {
-    return(p + scale_color_brewer(palette = "Dark2", name = groupby_name))
-  }
-}
+    labs(shape = "Data set", colour = "Treewidth") +
+    scale_color_viridis("Treewidth", trans = "log") + # TODO: add breaks
+    scale_shape("Data set")
+} # TODO: get the right labels
 
 scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{cw} time (s)", "treewidth", "Treewidth", 2 * TIMEOUT, TRUE)
-scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{cw} time (s)", "add_width_new_cw", "ADD Width", 2 * TIMEOUT, TRUE)
+                   "\\texttt{cw} time (s)", 2 * TIMEOUT)
 
-# Compare CW with other encodings
-scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{cw} time (s)", "major.dataset", "Data set",
-                   2 * TIMEOUT, FALSE)
-scatter_plot(df, "time_old_d02", "time_new_d02",
-                   "\\texttt{old_d02} time (s)", "\\texttt{new_d02} time (s)",
-                   "major.dataset", "Data set", 2 * TIMEOUT, FALSE)
-
-# Compare encoding and inference time for old and new setups
-scatter_plot(data[data$novelty == "old",], "encoding_time", "inference_time",
-                   "Encoding time (s)", "Inference time (s)", "encoding",
-                   "Encoding", TIMEOUT, FALSE)
-scatter_plot(data[data$novelty == "new",], "encoding_time", "inference_time",
-                   "Encoding time (s)", "Inference time (s)", "encoding",
-                   "Encoding", TIMEOUT, FALSE)
+#scatter_plot(data[data$novelty == "old",], "encoding_time", "inference_time",
+#                   "Encoding time (s)", "Inference time (s)", "encoding",
+#                   "Encoding", TIMEOUT, FALSE)
+#scatter_plot(data[data$novelty == "new",], "encoding_time", "inference_time",
+#                   "Encoding time (s)", "Inference time (s)", "encoding",
+#                   "Encoding", TIMEOUT, FALSE)
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 dev.off()
@@ -259,7 +250,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
 # TODO: some entries seem to be messed up in the data_sum df
-df2 <- data_sum[startsWith(data_sum$dataset, "2006") & !is.na(data_sum$dataset),]
+df2 <- data_sum[startsWith(data_sum$dataset, "DQMR") & !is.na(data_sum$dataset),]
 df2 <- data_sum[grepl("mastermind", data_sum$instance),]
 df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
@@ -293,8 +284,15 @@ ggplot(data_melted, aes(encoding, time, fill = variable)) +
   ylab("Time (s)") +
   labs(fill = "")
 
-# Numerical stuff
-max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
-interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{cw}"],
-                        y = cumulative$time[cumulative$encoding == "\\texttt{cw}"],
-                        xout = max_d02)$y
+# Plots that show how the combination of cw and cd06 would do (not including tree decomposition time)
+
+fusion <- data.frame(treewidth = unique(data$treewidth))
+fusion$tops <- apply(fusion, 1, function(x) nrow(df[ifelse(df$treewidth <= x, abs(df$time_new_cw - df$time_min) < 0.01, abs(df$time_old_cd06 - df$time_min) < 0.01),]))
+fusion$time <- apply(fusion, 1, function(x) sum(df$time_new_cw[df$treewidth <= x[1]]) + sum(df$time_old_cd06[df$treewidth > x[1]]))
+
+ggplot(data = fusion, aes(x = treewidth, y = tops)) + geom_line() + scale_x_continuous(trans = log10_trans())
+ggplot(data = fusion, aes(x = treewidth, y = time)) + geom_line() + scale_x_continuous(trans = log10_trans())
+sum(!is.na(df$time_min))
+sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 0.01)
+sum(!is.na(df$answer_old_cd06) & abs(df$time_old_cd06 - df$time_min) < 0.01)
+# TODO: add some horizontal lines to these plots that show the VBS, cd06, and cw scores
