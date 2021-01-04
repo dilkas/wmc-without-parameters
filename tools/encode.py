@@ -439,7 +439,7 @@ def bn2cnf_encoder(args):
                                    bn.values[variable].index(value))]
     else:
         # Identify the goal formula
-        with open(args.network) as network_file:
+        with open(args.network, encoding=common.FILE_ENCODING) as network_file:
             text = network_file.read()
         goal = identify_goal(text, common.get_file_format(args.network))
         goal_variable_index = literal_dict.index(goal.variable)
