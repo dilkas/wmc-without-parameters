@@ -217,38 +217,32 @@ def encode_weights(weights, max_literal, legacy_mode):
                 literal, -1 if abs(float(weights[literal]) - 1) < EPSILON else
                 weights[literal]) for literal in range(1, max_literal + 1)
         ]
-    return [
-        'c weights ' + ' '.join(l for literal in range(1, max_literal + 1)
-                                for l in [weights[literal], weights[-literal]])
-    ]
+    weight_line = 'c weights ' + ' '.join(
+        l for literal in range(1, max_literal + 1)
+        for l in [weights.get(literal, '1'),
+                  weights.get(-literal, '1')])
+    if 0 in weights:
+        weight_line += ' ' + weights[0]
+    return [weight_line]
 
 
 def reencode_bn2cnf_weights(weights_filename, legacy_mode):
     """Translates weights---as produced by bn2cnf---to the cachet format (while
     also returning the largest literal found in the weight file)."""
-    positive_weights = {}
-    negative_weights = {}
+    weights_map = {}
     with open(weights_filename) as weights_file:
         for line in weights_file:
             words = line.split()
             assert len(words) == 2
             literal = int(words[0])
-            if literal < 0:
-                negative_weights[-literal] = words[1]
-            else:
-                positive_weights[literal] = words[1]
+            weights_map[literal] = words[1]
 
-    if legacy_mode:
-        weights = []
-    else:
-        weights = [
-            'w {} {} {}'.format(literal, positive_weights[literal],
-                                negative_weights[literal])
-            if literal in negative_weights else 'w {} {}'.format(
-                literal, positive_weights[literal])
-            for literal in positive_weights
-        ]
-    return weights, max(positive_weights)
+    # for literal in weights_map:
+    #     if literal > 0:
+    #         assert abs(float(weights_map[literal]) + float(weights_map[-literal]) - 1) < EPSILON
+
+    return encode_weights(weights_map, max(weights_map),
+                          False), max(weights_map)
 
 
 # ============ Functions primarily responsible for parsing ============

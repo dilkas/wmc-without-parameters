@@ -441,7 +441,7 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
         }
         minic2dWeightLineIndex = lineIndex;
 
-        if (wordCount != 2 + declaredVarCount * 2) {
+        if (wordCount != 2 + declaredVarCount * 2 && wordCount != 3 + declaredVarCount * 2) {
           showError("wrong number of MINIC2D literal weights -- line " + to_string(lineIndex));
         }
 
@@ -449,6 +449,8 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
           literalWeights[var] = std::stold(words.at(var * 2));
           literalWeights[-var] = std::stold(words.at(var * 2 + 1));
         }
+        if (wordCount == 3 + declaredVarCount * 2)
+          literalWeights[0] = std::stold(words.at(wordCount - 1));
       }
     }
     else if (startWord == WEIGHT_WORD) {
@@ -572,13 +574,10 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
 
     for (auto words : unparsedWeights) {
       Int literal = std::stoi(words.at(1));
-      if (literal < 0) {
+      if (literal <= 0) {
         util::showError(
-            "the first literal of any weight line must be non-negative, but " +
+            "the first literal of any weight line must be positive, but " +
             std::to_string(literal) + " is not");
-      } else if (literal == 0) {
-        assert(words.size() == 3);
-        literalWeights[0] = std::stod(words.at(2));
       } else {
         queues[literal - 1].push(constructDdFromWords(mgr, literal, words));
       }

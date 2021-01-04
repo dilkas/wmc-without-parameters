@@ -48,15 +48,15 @@ define run_algorithms_with_evidence
 	-cp data/original/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/original/$*.$(1)
 	-cp data/original/$(basename $*).$(1) data/original/$*.$(1)
 	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,3,original/$*.cd05)
+	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.cd05)
 	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* cd06 -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,3,original/$*.cd06)
+	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.cd06)
 	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* d02 -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,3,original/$*.d02)
+	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.d02)
 	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* sbk05 -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,3,original/$*.sbk05)
+	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.sbk05)
 	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,5,original/$*.bklm16)
+	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.bklm16)
 	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* cw -m $(MAX_MEMORY) &> results/original/$*.cw.new_enc
 	-$(call run_dpmc,original/$*.$(1).cnf,5,original/$*.cw)
 	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
@@ -73,15 +73,15 @@ endef
 
 data/original/%/WITHOUT_EVIDENCE:
 	-$(ENCODE) python tools/encode.py data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
-	-$(call run_dpmc,original/$*.cnf,3,original/$*.cd05)
+	-$(call run_dpmc,original/$*.cnf,2,original/$*.cd05)
 	-$(ENCODE) python tools/encode.py data/original/$* cd06 -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
-	-$(call run_dpmc,original/$*.cnf,3,original/$*.cd06)
+	-$(call run_dpmc,original/$*.cnf,2,original/$*.cd06)
 	-$(ENCODE) python tools/encode.py data/original/$* d02 -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
-	-$(call run_dpmc,original/$*.cnf,3,original/$*.d02)
+	-$(call run_dpmc,original/$*.cnf,2,original/$*.d02)
 	-$(ENCODE) python tools/encode.py data/original/$* sbk05 -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
-	-$(call run_dpmc,original/$*.cnf,3,original/$*.sbk05)
+	-$(call run_dpmc,original/$*.cnf,2,original/$*.sbk05)
 	-$(ENCODE) python tools/encode.py data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
-	-$(call run_dpmc,original/$*.cnf,5,original/$*.bklm16)
+	-$(call run_dpmc,original/$*.cnf,2,original/$*.bklm16)
 	-$(ENCODE) python tools/encode.py data/original/$* cw -m $(MAX_MEMORY) &> results/original/$*.cw.new_enc
 	-$(call run_dpmc,original/$*.cnf,5,original/$*.cw)
 	-$(ENCODE) python tools/encode.py -l data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
