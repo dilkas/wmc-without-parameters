@@ -3,10 +3,12 @@ MAX_MEMORY = 32 # in GB
 MAX_MEMORY_KB = 31876710 # 95% of MAX_MEMORY
 EPSILON := 0.000001
 
-ALGORITHM := deps/ADDMC/counting/addmc # Keeping this around for tests
+ALGORITHM := deps/DPMC/common/addmc # Keeping this around for tests
 EVALUATE := deps/ace/evaluate
 CACHET := deps/cachet/cachet
 HTD := deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full --output width
+LG := deps/DPMC/lg/build/lg "deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full"
+DPMC := deps/DPMC/DMC/dmc --jf=- --pf=1e-3 --jw=$(TIMEOUT)
 
 LIMIT := ulimit -t $(TIMEOUT) -Sv $(MAX_MEMORY_KB)
 RUN := $(LIMIT) && /usr/bin/time -v
@@ -40,7 +42,7 @@ all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-50/*.dne))
 
 # Arguments: 1) CNF file, 2) weight format number, 3) (most of the) results filename
 define run_dpmc
-	cnf="data/$(1)" && $(LIMIT) && deps/DPMC/lg/build/lg "deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 1 --strategy challenge --print-progress --preprocessing full" < $$cnf | deps/DPMC/DMC/dmc --cf=$$cnf --wf $(2) --jf=- --pf=1e-3 --jw=$(TIMEOUT) &> results/$(3).new_inf
+	cnf="data/$(1)" && $(LIMIT) && $(LG) < $$cnf | $(DPMC) --cf=$$cnf --wf $(2) &> results/$(3).new_inf
 endef
 
 # The argument is the file format (dne or net)
@@ -124,7 +126,7 @@ clean:
 
 # arguments: 1) CNF file, 2) answer file
 define test_bklm
-	ANSWER=$$($(ALGORITHM) --wf 4 --cf $(1) | awk '/modelCount/ {print $$3}') ; \
+	ANSWER=$$($(ALGORITHM) --wf 2 --cf $(1) | awk '/s wmc/ {print $$3}') ; \
 	CORRECT_ANSWER=$$(cat $(2)) ; \
 	DIFFERENCE=$$(echo "$$ANSWER-$$CORRECT_ANSWER" | bc -l) ; \
 	APPROXIMATELY_CORRECT=$$(echo "$${DIFFERENCE#-} < $(EPSILON)" | bc -l) ; \
@@ -138,40 +140,40 @@ endef
 %.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
 # NET
 	python tools/encode.py $< cw
-	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
 	python tools/encode.py $< d02
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
 	python tools/encode.py $< sbk05
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
 	python tools/encode.py $< bklm16
 	$(call test_bklm,$<.cnf,$(word 2, $?))
 # NET with evidence
 	python tools/encode.py $< -e $(word 3, $?) cw
-	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
 	python tools/encode.py $< -e $(word 3, $?) d02
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
 	python tools/encode.py $< -e $(word 3, $?) sbk05
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
 	python tools/encode.py $< -e $(word 3, $?) bklm16
 	$(call test_bklm,$<.cnf,$(word 4, $?))
 
 %.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
 # DNE
 	python tools/encode.py $< cw
-	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
 	python tools/encode.py $< d02
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
 	python tools/encode.py $< sbk05
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
 	python tools/encode.py $< bklm16
 	$(call test_bklm,$<.cnf,$(word 2, $?))
 # DNE with evidence
 	python tools/encode.py $< -e $(word 3, $?) cw
-	$(ALGORITHM) --wf 4 --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
 	python tools/encode.py $< -e $(word 3, $?) d02
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
 	python tools/encode.py $< -e $(word 3, $?) sbk05
-	$(ALGORITHM) --cf $<.cnf | awk '/modelCount/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
 	python tools/encode.py $< -e $(word 3, $?) bklm16
 	$(call test_bklm,$<.cnf,$(word 4, $?))
 

@@ -442,7 +442,10 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
         minic2dWeightLineIndex = lineIndex;
 
         if (wordCount != 2 + declaredVarCount * 2 && wordCount != 3 + declaredVarCount * 2) {
-          showError("wrong number of MINIC2D literal weights -- line " + to_string(lineIndex));
+          showError("wrong number of MINIC2D literal weights -- line " +
+                    to_string(lineIndex) + ". Expected " +
+                    to_string(2 + declaredVarCount * 2) + " but got " +
+                    to_string(wordCount));
         }
 
         for (Int var = 1; var <= declaredVarCount; var++) {
