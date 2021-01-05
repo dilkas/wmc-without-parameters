@@ -3,6 +3,8 @@ import glob
 import os
 import re
 
+TIMEOUT = 1000
+
 directories = [
     ('Grid/Ratio_50/', 'Grid-50'),
     ('Grid/Ratio_75/', 'Grid-75'),
@@ -26,7 +28,7 @@ def parse(filename):
     time = None
     width = None
     for line in lines:
-        if line.lstrip().startswith('Elapsed'):
+        if line.lstrip().startswith('Elapsed') and not filename.endswith('.cw.new_inf'):
             # Time
             time_str = line.split()[7]
             colon_i = time_str.index(':')
@@ -38,6 +40,8 @@ def parse(filename):
             answer = line.split()[2]  # DPMC answer
         elif filename.endswith('.new_inf') and 'with ADD width' in line:
             width = line.split()[-1]
+        elif filename.endswith('.new_inf') and line.startswith('c seconds'):
+            time = line.split()[2]
         elif filename.endswith('.bklm16.old_inf') and line[0].isdigit():
             answer = line  # Query-DNNF answer
         elif (filename.endswith('.sbk05.old_inf')
