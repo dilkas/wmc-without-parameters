@@ -15,11 +15,13 @@ data <- data[data$dataset != "2004-PGM",]
 data$encoding_time[data$encoding == "cw"] <- 0
 data <- data[is.na(data$answer) | data$answer < 1e-10,]
 data <- data[is.na(data$answer) | data$answer > 1e-3 & data$answer < 1,]
+data$encoding_time <- 0
 
+# TODO: how many times does each encoding produce the wrong answer?
 temp <- data %>% left_join(data[data$encoding == "cd06" &
                                    data$novelty == "old",
                                  c("instance", "answer")], by = "instance") %>%
-  right_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
+  left_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
 temp$answer.y <- ifelse(is.na(temp$answer.y), temp$answer, temp$answer.y)
 removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y) > 0.01),]
 temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
@@ -49,7 +51,7 @@ data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time", "add_width", "treewidth"))
+            value.var = c("answer", "time", "add_width", "treewidth", "zero_proportion", "count"))
 df$time_new_bklm16[is.na(df$time_new_bklm16)] <- 2 * TIMEOUT
 df$time_new_cd05[is.na(df$time_new_cd05)] <- 2 * TIMEOUT
 df$time_new_cd06[is.na(df$time_new_cd06)] <- 2 * TIMEOUT
@@ -61,12 +63,19 @@ df$time_old_cd05[is.na(df$time_old_cd05)] <- 2 * TIMEOUT
 df$time_old_cd06[is.na(df$time_old_cd06)] <- 2 * TIMEOUT
 df$time_old_d02[is.na(df$time_old_d02)] <- 2 * TIMEOUT
 df$time_old_sbk05[is.na(df$time_old_sbk05)] <- 2 * TIMEOUT
+
 df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
                       function(x) max(x, na.rm = TRUE))
 df <- df %>% select(!starts_with("treewidth_"))
+df$zero_proportion <- apply(df %>% select(starts_with("zero_")), 1,
+                      function(x) max(x, na.rm = TRUE))
+df <- df %>% select(!starts_with("zero_proportion_"))
+df$count <- apply(df %>% select(starts_with("count_")), 1,
+                      function(x) max(x, na.rm = TRUE))
+df <- df %>% select(!starts_with("count_"))
 
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
-time_columns0 <- time_columns[time_columns != "time_new_cw"]
+time_columns0 <- time_columns[time_columns != "time_new_bklm16"]
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
 df$time_min0 <- as.numeric(apply(df, 1, function (row) min(row[time_columns0])))
 df$major.dataset <- "Non-binary"
@@ -83,12 +92,17 @@ instance_to_min_time <- df$time_min
 names(instance_to_min_time) <- df$instance
 instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
-df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS1",
+df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
                       answer = NA, time = instance_to_min_time[df$instance],
-                      add_width= max(data$add_width), treewidth = max(data$treewidth))
-df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS0",
+                      add_width= max(data$add_width), treewidth = max(data$treewidth),
+                      zero_proportion = max(data$zero_proportion),
+                      count = max(data$count))
+df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
                        answer = NA, time = instance_to_min_time0[df$instance],
-                       add_width = max(data$add_width), treewidth = max(data$treewidth))
+                       add_width = max(data$add_width),
+                       treewidth = max(data$treewidth),
+                       zero_proportion = max(data$zero_proportion),
+                       count = max(data$count))
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
@@ -128,7 +142,6 @@ for (column in answer_columns) {
 }
 
 # Fastest
-
 sum(!is.na(df$answer_new_bklm16) & abs(df$time_new_bklm16 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_new_cd05) & abs(df$time_new_cd05 - df$time_min) < 1e-5)
 sum(!is.na(df$answer_new_cd06) & abs(df$time_new_cd06 - df$time_min) < 1e-5)
@@ -153,7 +166,6 @@ sum(!is.na(df$answer_new_sbk05))
 sum(!is.na(df$answer_old_bklm16))
 sum(!is.na(df$answer_old_cd05))
 sum(!is.na(df$answer_old_cd06))
-sum(!is.na(df$answer_old_cw))
 sum(!is.na(df$answer_old_d02))
 sum(!is.na(df$answer_old_sbk05))
 
@@ -173,7 +185,7 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
                                       y = .data[[y_column]],
                                       col = treewidth,
                                       shape = major.dataset)) +
-    geom_point(alpha = 1, size = 1) +
+    geom_jitter(alpha = 1, size = 1, width = 0.1, height = 0.1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
     scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
                        breaks = c(0.1, 10, 1000),
@@ -191,8 +203,12 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     scale_shape("Data set")
 }
 
-scatter_plot(df, "time_old_cd06", "time_new_cw", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{cw} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "time_old_cd06", "time_new_bklm16", "\\texttt{old_cd06} time (s)",
+                   "\\texttt{bklm16} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "add_width_new_cw", "add_width_new_bklm16", "\\texttt{cw} width",
+                   "\\texttt{bklm16} width", max(data$add_width))
+scatter_plot(df, "treewidth", "add_width_new_bklm16", "treewidth",
+                   "\\texttt{bklm16} width", max(data$add_width))
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 dev.off()
@@ -238,18 +254,17 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 }
 
 # TODO: 11 lines in one plot is too much. Should I split it into two?
+df2 <- data_sum[startsWith(data_sum$dataset, "2004") & !is.na(data_sum$dataset),]
+df2 <- data_sum[startsWith(data_sum$dataset, "2005") & !is.na(data_sum$dataset),]
+df2 <- data_sum[startsWith(data_sum$dataset, "2006") & !is.na(data_sum$dataset),]
+df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
 df2 <- data_sum[startsWith(data_sum$dataset, "DQMR") & !is.na(data_sum$dataset),]
-df2 <- data_sum[grepl("mastermind", data_sum$instance),]
+df2 <- data_sum[startsWith(data_sum$dataset, "Plan") & !is.na(data_sum$dataset),]
 df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
                 c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")
-# TODO: cumulative plot doesn't make sense here
-cumulative_plot(df2, "encoding", "Encoding",
-                sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "treewidth", "Treewidth")
-dev.off()
 
 # Stacked bar plots comparing encoding and inference time
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
@@ -275,8 +290,8 @@ ggplot(data_melted, aes(encoding, time, fill = variable)) +
 
 # Plots that show how the combination of cw and cd06 would do (not including tree decomposition time)
 fusion <- data.frame(treewidth = unique(data$treewidth))
-fusion$tops <- apply(fusion, 1, function(x) nrow(df[ifelse(df$treewidth <= x, abs(df$time_new_cw - df$time_min) < 0.01, abs(df$time_old_cd06 - df$time_min) < 0.01),]))
-fusion$time <- apply(fusion, 1, function(x) sum(df$time_new_cw[df$treewidth <= x[1]]) + sum(df$time_old_cd06[df$treewidth > x[1]]))
+fusion$tops <- apply(fusion, 1, function(x) nrow(df[ifelse(df$treewidth <= x, abs(df$time_new_bklm16 - df$time_min) < 0.01, abs(df$time_old_cd06 - df$time_min) < 0.01),]))
+fusion$time <- apply(fusion, 1, function(x) sum(df$time_new_bklm16[df$treewidth <= x[1]]) + sum(df$time_old_cd06[df$treewidth > x[1]]))
 
 ggplot(data = fusion, aes(x = treewidth, y = tops)) + geom_line() + scale_x_continuous(trans = log10_trans())
 ggplot(data = fusion, aes(x = treewidth, y = time)) + geom_line() + scale_x_continuous(trans = log10_trans())
@@ -285,6 +300,10 @@ sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 0.01)
 sum(!is.na(df$answer_old_cd06) & abs(df$time_old_cd06 - df$time_min) < 0.01)
 # TODO: add some horizontal lines to these plots that show the VBS, cd06, and cw scores
 
-ggplot(df, aes(treewidth, time_new_cw, shape = major.dataset, colour = major.dataset)) + geom_point() +
+df$diff <- df$time_new_cw - df$time_old_cd06
+df$diff <- df$time_new_bklm16 - df$time_old_cd06
+ggplot(df, aes(treewidth, time_new_bklm16, shape = major.dataset, colour = major.dataset)) +
+#  geom_jitter(width = 0.1, height = 0.1) +
+  geom_point() +
   scale_x_continuous(trans = log10_trans()) +
   scale_y_continuous(trans = log10_trans())

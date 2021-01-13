@@ -33,7 +33,7 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 #all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Plan_Recognition/without_evidence/*.dne))
 #all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Plan_Recognition/with_evidence/*.dne))
 #all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-100/*.dne))
-all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-50/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-50/*.dne))
 #all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-60/*.dne))
 #all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-70/*.dne))
 #all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Grid/*/*.dne))
@@ -104,6 +104,7 @@ data/original/%/NET_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,net)
 
 data/original/%/TREEWIDTH:
+	python tools/encode.py data/original/$* stats
 	python tools/encode.py data/original/$* moralisation
 	-$(LIMIT) && $(HTD) < data/original/$*.gr > results/original/$*.td
 

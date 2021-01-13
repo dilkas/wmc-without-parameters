@@ -4,6 +4,7 @@ support for memory limits, file formats, and to work around some bugs related
 to evidence encoding in Ace."""
 
 import argparse
+import csv
 import collections
 import itertools
 import re
@@ -236,10 +237,6 @@ def reencode_bn2cnf_weights(weights_filename, legacy_mode):
             assert len(words) == 2
             literal = int(words[0])
             weights_map[literal] = words[1]
-
-    # for literal in weights_map:
-    #     if literal > 0:
-    #         assert abs(float(weights_map[literal]) + float(weights_map[-literal]) - 1) < EPSILON
 
     return encode_weights(weights_map, max(weights_map),
                           False), max(weights_map)
@@ -495,6 +492,20 @@ def moralisation_encoder(args):
         graph_file.write('\n'.join(lines) + '\n')
 
 
+def stats_encoder(args):
+    bn = common.BayesianNetwork(args.network)
+    probabilities = collections.Counter()
+    for _, probs in bn.probabilities.items():
+        probabilities.update([Fraction(p).limit_denominator() for p in probs])
+    total = sum(probabilities.values())
+    stats = {'count' : len(probabilities),
+             'zero_proportion' : probabilities[Fraction('0')] / total}
+    with open(args.network + '.stats', 'w') as prob_file:
+        writer = csv.DictWriter(prob_file, fieldnames=stats.keys())
+        writer.writeheader()
+        writer.writerow(stats)
+
+
 def main():
     """Sets up all information about command-line arguments and redirects the
     arguments to one out of three encoder functions."""
@@ -508,7 +519,7 @@ def main():
     parser.add_argument('encoding',
                         choices=[
                             'bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02',
-                            'sbk05', 'moralisation'
+                            'sbk05', 'moralisation', 'stats'
                         ],
                         help='choose a WMC encoding')
     parser.add_argument('-e',
@@ -533,6 +544,8 @@ def main():
 
     if args.encoding == 'moralisation':
         moralisation_encoder(args)
+    elif args.encoding == 'stats':
+        stats_encoder(args)
     elif args.encoding.startswith('cw'):
         my_encoder(args)
     elif args.encoding == 'bklm16':

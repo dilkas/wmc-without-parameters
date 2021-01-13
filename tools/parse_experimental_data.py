@@ -79,12 +79,23 @@ def network_filenames(result_filename):
     return possibilities
 
 
+def parse_stats(filename):
+    with open(filename) as stats_file:
+        reader = csv.DictReader(stats_file)
+        return next(reader)
+
+
 def parse_dir(directory, additional_data={}):
     treewidth = {}
     for filename in glob.glob(directory + '*.td'):
         if 'inst' not in filename:
             treewidth[filename[:filename.rindex('.')]] = parse_td_file(
                 filename)
+
+    stats = {}
+    for filename in glob.glob('data' + directory[directory.index('/'):] + '*.stats'):
+        stats['results' + filename[filename.index('/'):filename.rindex('.')]] = parse_stats(filename)
+
     data = []
     for filename in glob.glob(directory + '*inf'):
         d = additional_data.copy()
@@ -105,6 +116,11 @@ def parse_dir(directory, additional_data={}):
         if 'treewidth' not in d:
             print('Warning: {} has no corresponding tree decomposition file.'.
                   format(filename))
+
+        for network_filename in network_filenames(filename):
+            if network_filename in stats:
+                d.update(stats[network_filename])
+                break
 
         data.append(d)
     return data
