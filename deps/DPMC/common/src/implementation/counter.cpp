@@ -279,10 +279,6 @@ Float MonolithicCounter::computeModelCount(Cnf &cnf) {
   ADD cnfDd;
   setCnfDd(cnfDd, cnf);
 
-  if (cnf.getWeightFormat() == WeightFormat::CONDITIONAL)
-    for (auto w : cnf.getWeights())
-      cnfDd *= w;
-
   Set<Int> support = util::getSupport(cnfDd);
   for (Int ddVar : support) {
     abstract(cnfDd, ddVar, cnf.getLiteralWeights(), cnf.getWeightFormat());
@@ -327,9 +323,6 @@ void LinearCounter::setLinearClauseDds(vector<ADD> &clauseDds, Cnf &cnf) {
     ADD clauseDd = clause->getDD(mgr, cnfVarToDdVarMap);
     clauseDds.push_back(clauseDd);
   }
-  if (cnf.getWeightFormat() == WeightFormat::CONDITIONAL)
-    for (auto w : cnf.getWeights())
-      clauseDds.push_back(w);
 }
 
 void LinearCounter::constructJoinTree(const Cnf &cnf) {

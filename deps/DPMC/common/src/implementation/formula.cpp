@@ -469,11 +469,16 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
         Float weight = std::stold(words.at(2));
         literalWeights[var] = weight;
       } else if (weightFormat == WeightFormat::CONDITIONAL) {
-        unparsedWeights.push_back(words);
-        for (Int i = 1; i < words.size() - 2; i++)
-          updateApparentVars(std::stoi(words.at(i)));
-      }
-      else if (weightFormat == WeightFormat::MCC && (wordCount == 3 || wordCount == 4 && words.at(3) == LINE_END_WORD)) {
+        if (format == Format::CNF && problemLineIndex == DUMMY_MIN_INT) {
+          showError("no problem line before clause line " +
+                    to_string(lineIndex));
+        }
+        ClauseConstraint *constraint = new WeightConstraint(words,
+                                                            declaredVarCount,
+                                                            lineIndex);
+        addClause(constraint);
+        processedClauseCount++;
+      } else if (weightFormat == WeightFormat::MCC && (wordCount == 3 || wordCount == 4 && words.at(3) == LINE_END_WORD)) {
         Int literal = std::stoll(words.at(1));
 
         Int var = util::getCnfVar(literal);
@@ -565,50 +570,6 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
   }
 
   varOrdering = generateVarOrdering(varOrderingHeuristic, inverse);
-
-  // compiles weights into DDs
-  if (weightFormat == WeightFormat::CONDITIONAL) {
-    auto comparer = [](ADD left, ADD right) {
-      return left.nodeCount() > right.nodeCount();
-    };
-    vector<std::priority_queue<ADD, vector<ADD>, decltype(comparer)>> queues;
-    for (Int i = 0; i < declaredVarCount; i++)
-      queues.push_back(std::priority_queue<ADD, vector<ADD>, decltype(comparer)>(comparer));
-
-    for (auto words : unparsedWeights) {
-      Int literal = std::stoi(words.at(1));
-      if (literal <= 0) {
-        util::showError(
-            "the first literal of any weight line must be positive, but " +
-            std::to_string(literal) + " is not");
-      } else {
-        queues[literal - 1].push(constructDdFromWords(mgr, literal, words));
-      }
-    }
-
-    for (auto queue : queues) {
-      if (queue.empty()) {
-        weights.push_back(mgr->addOne());
-        continue;
-      }
-      while (queue.size() > 1) {
-        ADD dd1 = queue.top();
-        queue.pop();
-
-        ADD dd2 = queue.top();
-        queue.pop();
-
-        queue.push(dd1 + dd2);
-      }
-      weights.push_back(queue.top());
-    }
-    for (size_t i = 0; i < declaredVarCount; i++) {
-      vector<Int> v;
-      for (Int index : util::getSupport(weights[i]))
-        v.push_back(varOrdering[index]);
-      dependencies.push_back(v);
-    }
-  }
 
   if (verbosityLevel >= 1) {
     util::printRow("declaredVarCount", declaredVarCount);

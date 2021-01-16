@@ -98,16 +98,20 @@ int main(int argc, char *argv[]) {
 
   // Compile and output the new encoding
   std:: cout << "p cnf " << num_vars - decrements.size() << " " << num_clauses << std::endl;
-  for (int i = 0; i < new_literals.size(); i++) {
+  double premultiplication_constant = 1;
+  bool premultiply = false;
+  for (size_t i = 0; i < new_literals.size(); i++) {
     if (new_parameters[i] == 0) {
-      for (int literal : new_literals[i])
-        std::cout << literal << " ";
+      for (int literal : new_literals[i]) std::cout << literal << " ";
       std::cout << "0" << std::endl;
+    } else if (new_literals[i].empty()) {
+      premultiply = true;
+      premultiplication_constant *= std::stod(weights[new_parameters[i]]);
     } else {
       std::cout << "w";
-      for (int literal : new_literals[i])
-        std::cout << " " << -literal;
+      for (int literal : new_literals[i]) std::cout << " " << -literal;
       std::cout << " " << weights[new_parameters[i]] << std::endl;
     }
   }
+  if (premultiply) std::cout << "w 0 " << premultiplication_constant << std::endl;
 }

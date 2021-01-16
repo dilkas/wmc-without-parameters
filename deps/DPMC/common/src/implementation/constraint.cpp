@@ -86,6 +86,37 @@ ClauseConstraint::ClauseConstraint(const vector<Int> &literals) {
     this->literals = literals;
 }
 
+ADD WeightConstraint::getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const {
+  ADD clauseDd = mgr->addOne();
+  for (Int literal : literals) {
+    Int ddVar = cnfVarToDdVarMap.at(util::getCnfVar(literal));
+    ADD literalDd = mgr->addVar(ddVar);
+    if (!util::isPositiveLiteral(literal)) literalDd = ~literalDd;
+    clauseDd &= literalDd;
+  }
+  return mgr->constant((weight - 1)) * clauseDd + mgr->constant(1);
+}
+
+void WeightConstraint::print() const {
+    cout << "w";
+    for (Int literal : literals)
+        cout << " " << std::right << std::setw(5) << literal;
+    cout << std::right << std::setw(5) << weight << "\n";
+}
+
+WeightConstraint::WeightConstraint(const vector<string> &words,
+                                   Int declaredVarCount, Int lineIndex)
+    : ClauseConstraint(toClauseForm(words), declaredVarCount, lineIndex) {
+    weight = std::stod(words.back());
+}
+
+vector<string> toClauseForm(const vector<string> &words) {
+    vector<string> new_words(words);
+    new_words.erase(new_words.begin());
+    new_words[new_words.size() - 1] = "0";
+    return new_words;
+}
+
 void PBConstraint::addTerm(int coefficient, int variable) {
     coefficients.push_back(coefficient);
     variables.push_back(variable);

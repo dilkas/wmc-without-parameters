@@ -14,7 +14,7 @@ public:
 };
 
 class ClauseConstraint : public Constraint {
-private:
+protected:
     vector<Int> literals;
 
 public:
@@ -25,6 +25,17 @@ public:
     ClauseConstraint(const vector<string> &words, Int declaredVarCount,
                      Int lineIndex);
     ClauseConstraint(const vector<Int> &literals);
+};
+
+class WeightConstraint : public ClauseConstraint {
+private:
+    double weight;
+
+public:
+    ADD getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const override;
+    void print() const override;
+    WeightConstraint(const vector<string> &words, Int declaredVarCount,
+                     Int lineIndex);
 };
 
 class PBConstraint : public Constraint {
@@ -53,3 +64,4 @@ public:
 Set<Int> getClauseCnfVars(const vector<Constraint*> &clause,
                           const vector<vector<Int>> &dependencies,
                           Int clause_index);
+vector<string> toClauseForm(const vector<string> &words);
