@@ -1,3 +1,4 @@
+#include <cassert>
 #include <fstream>
 
 #include "../../deps/cxxopts.hpp"
@@ -6,9 +7,11 @@ enum LineType {Clause, Weight, Skip};
 
 int rename_literal(int literal, const std::map<int, int> &decrements) {
   if (literal < 0) return -rename_literal(-literal, decrements);
+  if (decrements.empty() || literal < decrements.begin()->first) return literal;
   auto it = decrements.upper_bound(literal);
-  //if (it == decrements.end()) return literal;
-  return literal - std::prev(it)->second;
+  int new_literal = literal - std::prev(it)->second;
+  assert(new_literal > 0);
+  return new_literal;
 }
 
 int main(int argc, char *argv[]) {
@@ -43,6 +46,7 @@ int main(int argc, char *argv[]) {
     if (token != "I") continue;
     std::getline(iss, token, '$');
     int indicator = std::stoi(token);
+    if (indicator <= 0) continue;
     for (int parameter = previous_indicator + 1; parameter < indicator; parameter++)
       decrements[parameter] = ++decrement;
     previous_indicator = indicator;
@@ -96,22 +100,29 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // Weight lines with weight = 1 can be removed
+  for (size_t i = 0; i < new_literals.size(); i++)
+    if (new_parameters[i] != 0 && !new_literals[i].empty() && std::stod(weights[new_parameters[i]]) == 1) {
+      new_parameters.erase(new_parameters.begin() + i);
+      new_literals.erase(new_literals.begin() + i);
+      i--;
+    }
+
   // Compile and output the new encoding
-  std:: cout << "p cnf " << num_vars - decrements.size() << " " << num_clauses << std::endl;
+  std::ofstream output(cnf_filename);
+  output << "p cnf " << num_vars - decrements.size() << " " << num_clauses << std::endl;
   double premultiplication_constant = 1;
-  bool premultiply = false;
   for (size_t i = 0; i < new_literals.size(); i++) {
     if (new_parameters[i] == 0) {
-      for (int literal : new_literals[i]) std::cout << literal << " ";
-      std::cout << "0" << std::endl;
+      for (int literal : new_literals[i]) output << literal << " ";
+      output << "0" << std::endl;
     } else if (new_literals[i].empty()) {
-      premultiply = true;
       premultiplication_constant *= std::stod(weights[new_parameters[i]]);
     } else {
-      std::cout << "w";
-      for (int literal : new_literals[i]) std::cout << " " << -literal;
-      std::cout << " " << weights[new_parameters[i]] << std::endl;
+      output << "w";
+      for (int literal : new_literals[i]) output << " " << -literal;
+      output << " " << weights[new_parameters[i]] << std::endl;
     }
   }
-  if (premultiply) std::cout << "w 0 " << premultiplication_constant << std::endl;
+  if (premultiplication_constant != 1) output << "w 0 " << premultiplication_constant << std::endl;
 }

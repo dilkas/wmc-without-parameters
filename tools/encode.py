@@ -27,6 +27,7 @@ ACE_LEGACY = {
 }
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
+CNF4DPMC = ['tools/cnf4dpmc/cnf4dpmc', '-f']
 PMC = [
     'deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied',
     '-iterate=10'
@@ -386,18 +387,18 @@ def ace_encoder(args):
     bn_format = common.get_file_format(args.network)
     goal = identify_goal(text, bn_format)
 
-    if args.legacy and args.encoding != 'sbk05':
+    if args.mode == 'legacy' and args.encoding != 'sbk05':
         run_legacy_ace(args, goal)
         return
 
     run(ACE + ['-' + args.encoding, args.network], args.memory)
 
-    # Make a variable -> list of values map
-    values = {}
+    values = {}  # Make a variable -> list of values map
     for node in common.NODE_RE.finditer(text):
         values[node.group(1)] = common.STATE_SPLITTER_RE[bn_format].split(
             common.STATES_RE[bn_format].search(text[node.end():]).group(1))
 
+    # Add evidence or goal
     weights, literal_dict, goal_literal, max_literal = parse_lmap(
         args.network + '.lmap', goal, values)
     with open(args.network + '.cnf') as cnf_file:
@@ -412,7 +413,9 @@ def ace_encoder(args):
                 encode_single_literal(
                     literal_dict.get_literal(variable, value), args.encoding))
     write_cnf_file(args, max_literal, clauses,
-                   encode_weights(weights, max_literal, args.legacy))
+                   encode_weights(weights, max_literal, args.mode == 'legacy'))
+    if (args.mode == 'optimised'):
+        run(CNF4DPMC + [args.network])
 
 
 def bn2cnf_encoder(args):
@@ -421,7 +424,7 @@ def bn2cnf_encoder(args):
     bn = common.BayesianNetwork(args.network)
     literal_dict = run_bn2cnf(bn, args.network, args.memory)
     encoded_weights, max_literal = reencode_bn2cnf_weights(
-        args.network + '.uai.weights', args.legacy)
+        args.network + '.uai.weights', args.mode == 'legacy')
     indicators = parse_bn2cnf_variables_file(args.network + '.uai.variables')
 
     with open(args.network + '.cnf') as cnf_file:
@@ -445,7 +448,7 @@ def bn2cnf_encoder(args):
     # Put everything together and write to a file
     write_cnf_file(args, max_literal, clauses, encoded_weights)
 
-    if args.legacy:
+    if args.mode == 'legacy':
         run(C2D + ['-in', args.network + '.cnf'], args.memory)
 
 
@@ -498,8 +501,10 @@ def stats_encoder(args):
     for _, probs in bn.probabilities.items():
         probabilities.update([Fraction(p).limit_denominator() for p in probs])
     total = sum(probabilities.values())
-    stats = {'count' : len(probabilities),
-             'zero_proportion' : probabilities[Fraction('0')] / total}
+    stats = {
+        'count': len(probabilities),
+        'zero_proportion': probabilities[Fraction('0')] / total
+    }
     with open(args.network + '.stats', 'w') as prob_file:
         writer = csv.DictWriter(prob_file, fieldnames=stats.keys())
         writer.writeheader()
@@ -512,25 +517,25 @@ def main():
     parser = argparse.ArgumentParser(
         description='Encode Bayesian networks into instances of ' +
         'weighted model counting (WMC)')
-    parser.add_argument(
-        'network',
-        metavar='network',
-        help='a Bayesian network (in one of DNE/NET/Hugin formats)')
     parser.add_argument('encoding',
                         choices=[
                             'bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02',
                             'sbk05', 'moralisation', 'stats'
                         ],
                         help='choose a WMC encoding')
+    parser.add_argument(
+        'mode',
+        choices=['basic', 'legacy', 'optimised'],
+        help=
+        'basic and optimised modes are for DPMC, legacy mode is for the algorithms initially used with the encodings'
+    )
+    parser.add_argument(
+        'network',
+        metavar='network',
+        help='a Bayesian network (in one of DNE/NET/Hugin formats)')
     parser.add_argument('-e',
                         dest='evidence',
                         help='evidence file (in the INST format)')
-    parser.add_argument(
-        '-l',
-        dest='legacy',
-        action='store_true',
-        help='legacy mode, i.e., the encoding is compatible with the ' +
-        'original compiler or model counter (and not DPMC or ADDMC)')
     parser.add_argument(
         '-m',
         dest='memory',

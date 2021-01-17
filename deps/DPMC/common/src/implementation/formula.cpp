@@ -469,15 +469,15 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
         Float weight = std::stold(words.at(2));
         literalWeights[var] = weight;
       } else if (weightFormat == WeightFormat::CONDITIONAL) {
-        if (format == Format::CNF && problemLineIndex == DUMMY_MIN_INT) {
-          showError("no problem line before clause line " +
-                    to_string(lineIndex));
+        if (words[1] == "0") {
+          literalWeights[0] = std::stod(words[2]);
+        } else {
+          ClauseConstraint *constraint = new WeightConstraint(words,
+                                                              declaredVarCount,
+                                                              lineIndex);
+          addClause(constraint);
+          processedClauseCount++;
         }
-        ClauseConstraint *constraint = new WeightConstraint(words,
-                                                            declaredVarCount,
-                                                            lineIndex);
-        addClause(constraint);
-        processedClauseCount++;
       } else if (weightFormat == WeightFormat::MCC && (wordCount == 3 || wordCount == 4 && words.at(3) == LINE_END_WORD)) {
         Int literal = std::stoll(words.at(1));
 

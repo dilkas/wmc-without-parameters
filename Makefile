@@ -49,52 +49,48 @@ endef
 define run_algorithms_with_evidence
 	-cp data/original/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/original/$*.$(1)
 	-cp data/original/$(basename $*).$(1) data/original/$*.$(1)
-	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
+	-$(ENCODE) python tools/encode.py cd05 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
 	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.cd05)
-	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* cd06 -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
+	-$(ENCODE) python tools/encode.py cd06 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
 	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.cd06)
-	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* d02 -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
+	-$(ENCODE) python tools/encode.py d02 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
 	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.d02)
-	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* sbk05 -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
+	-$(ENCODE) python tools/encode.py sbk05 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
 	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.sbk05)
-	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
+	-$(ENCODE) python tools/encode.py bklm16 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
 	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.bklm16)
-	-$(ENCODE) python tools/encode.py data/original/$*.$(1) -e data/original/$* cw -m $(MAX_MEMORY) &> results/original/$*.cw.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,5,original/$*.cw)
-	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
+	-$(ENCODE) python tools/encode.py cd05 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
 	-$(RUN) $(EVALUATE) data/original/$*.$(1) &> results/original/$*.cd05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* cd06 -m $(MAX_MEMORY) &> results/original/$*.cd06.old_enc
+	-$(ENCODE) python tools/encode.py cd06 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.old_enc
 	-$(RUN) $(EVALUATE) data/original/$*.$(1) &> results/original/$*.cd06.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* d02 -m $(MAX_MEMORY) &> results/original/$*.d02.old_enc
+	-$(ENCODE) python tools/encode.py d02 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.old_enc
 	-$(RUN) $(EVALUATE) data/original/$*.$(1) &> results/original/$*.d02.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* sbk05 -m $(MAX_MEMORY) &> results/original/$*.sbk05.old_enc
+	-$(ENCODE) python tools/encode.py sbk05 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.old_enc
 	-$(RUN) $(CACHET) data/original/$*.$(1).cnf &> results/original/$*.sbk05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$*.$(1) -e data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
+	-$(ENCODE) python tools/encode.py bklm16 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
 	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$*.$(1) -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
 endef
 
 data/original/%/WITHOUT_EVIDENCE:
-	-$(ENCODE) python tools/encode.py data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
+	-$(ENCODE) python tools/encode.py cd05 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
 	-$(call run_dpmc,original/$*.cnf,2,original/$*.cd05)
-	-$(ENCODE) python tools/encode.py data/original/$* cd06 -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
+	-$(ENCODE) python tools/encode.py cd06 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
 	-$(call run_dpmc,original/$*.cnf,2,original/$*.cd06)
-	-$(ENCODE) python tools/encode.py data/original/$* d02 -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
+	-$(ENCODE) python tools/encode.py d02 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
 	-$(call run_dpmc,original/$*.cnf,2,original/$*.d02)
-	-$(ENCODE) python tools/encode.py data/original/$* sbk05 -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
+	-$(ENCODE) python tools/encode.py sbk05 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
 	-$(call run_dpmc,original/$*.cnf,2,original/$*.sbk05)
-	-$(ENCODE) python tools/encode.py data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
+	-$(ENCODE) python tools/encode.py bklm16 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
 	-$(call run_dpmc,original/$*.cnf,2,original/$*.bklm16)
-	-$(ENCODE) python tools/encode.py data/original/$* cw -m $(MAX_MEMORY) &> results/original/$*.cw.new_enc
-	-$(call run_dpmc,original/$*.cnf,5,original/$*.cw)
-	-$(ENCODE) python tools/encode.py -l data/original/$* cd05 -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
+	-$(ENCODE) python tools/encode.py cd05 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
 	-$(RUN) $(EVALUATE) data/original/$* &> results/original/$*.cd05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$* cd06 -m $(MAX_MEMORY) &> results/original/$*.cd06.old_enc
+	-$(ENCODE) python tools/encode.py cd06 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.old_enc
 	-$(RUN) $(EVALUATE) data/original/$* &> results/original/$*.cd06.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$* d02 -m $(MAX_MEMORY) &> results/original/$*.d02.old_enc
+	-$(ENCODE) python tools/encode.py d02 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.old_enc
 	-$(RUN) $(EVALUATE) data/original/$* &> results/original/$*.d02.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$* sbk05 -m $(MAX_MEMORY) &> results/original/$*.sbk05.old_enc
+	-$(ENCODE) python tools/encode.py sbk05 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.old_enc
 	-$(RUN) $(CACHET) data/original/$*.cnf &> results/original/$*.sbk05.old_inf
-	-$(ENCODE) python tools/encode.py -l data/original/$* bklm16 -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
+	-$(ENCODE) python tools/encode.py bklm16 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
 	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
 
 data/original/%/DNE_WITH_EVIDENCE:
@@ -104,8 +100,8 @@ data/original/%/NET_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,net)
 
 data/original/%/TREEWIDTH:
-	python tools/encode.py data/original/$* stats
-	python tools/encode.py data/original/$* moralisation
+	python tools/encode.py stats basic data/original/$*
+	python tools/encode.py moralisation basic data/original/$*
 	-$(LIMIT) && $(HTD) < data/original/$*.gr > results/original/$*.td
 
 #===============================================================================
@@ -125,9 +121,9 @@ clean:
 		rm -f data/trimmed/$$d/*.uai.* ; \
 	done
 
-# arguments: 1) CNF file, 2) answer file
+# arguments: 1) CNF file, 2) answer file, 3) weight format
 define test_bklm
-	ANSWER=$$($(ALGORITHM) --wf 2 --cf $(1) | awk '/s wmc/ {print $$3}') ; \
+	ANSWER=$$($(ALGORITHM) --wf $(3) --cf $(1) | awk '/s wmc/ {print $$3}') ; \
 	CORRECT_ANSWER=$$(cat $(2)) ; \
 	DIFFERENCE=$$(echo "$$ANSWER-$$CORRECT_ANSWER" | bc -l) ; \
 	APPROXIMATELY_CORRECT=$$(echo "$${DIFFERENCE#-} < $(EPSILON)" | bc -l) ; \
@@ -139,44 +135,64 @@ endef
 
 # cd05 and cd06 are supposed to produce wrong answers
 %.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
-# NET
-	python tools/encode.py $< cw
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python tools/encode.py $< d02
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python tools/encode.py $< sbk05
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python tools/encode.py $< bklm16
-	$(call test_bklm,$<.cnf,$(word 2, $?))
-# NET with evidence
-	python tools/encode.py $< -e $(word 3, $?) cw
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python tools/encode.py $< -e $(word 3, $?) d02
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python tools/encode.py $< -e $(word 3, $?) sbk05
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python tools/encode.py $< -e $(word 3, $?) bklm16
-	$(call test_bklm,$<.cnf,$(word 4, $?))
+# basic NET
+	python tools/encode.py d02 basic $<
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	python tools/encode.py sbk05 basic $<
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	python tools/encode.py bklm16 basic $<
+	$(call test_bklm,$<.cnf,$(word 2, $?),2)
+# basic NET with evidence
+	python tools/encode.py d02 basic $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	python tools/encode.py sbk05 basic $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	python tools/encode.py bklm16 basic $< -e $(word 3, $?)
+	$(call test_bklm,$<.cnf,$(word 4, $?),2)
+# optimised NET
+	python tools/encode.py d02 optimised $<
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	python tools/encode.py cd05 optimised $<
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	python tools/encode.py cd06 optimised $<
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+# optimised NET with evidence
+	python tools/encode.py d02 optimised $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	python tools/encode.py cd05 optimised $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	python tools/encode.py cd06 optimised $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
 
 %.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
-# DNE
-	python tools/encode.py $< cw
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python tools/encode.py $< d02
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python tools/encode.py $< sbk05
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python tools/encode.py $< bklm16
-	$(call test_bklm,$<.cnf,$(word 2, $?))
-# DNE with evidence
-	python tools/encode.py $< -e $(word 3, $?) cw
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "CW failed on $@" && exit 1)
-	python tools/encode.py $< -e $(word 3, $?) d02
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "D02 failed on $@" && exit 1)
-	python tools/encode.py $< -e $(word 3, $?) sbk05
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "SBK05 failed on $@" && exit 1)
-	python tools/encode.py $< -e $(word 3, $?) bklm16
-	$(call test_bklm,$<.cnf,$(word 4, $?))
+# basic DNE
+	python tools/encode.py d02 basic $<
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	python tools/encode.py sbk05 basic $<
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	python tools/encode.py bklm16 basic $<
+	$(call test_bklm,$<.cnf,$(word 2, $?),2)
+# basic DNE with evidence
+	python tools/encode.py d02 basic $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	python tools/encode.py sbk05 basic $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	python tools/encode.py bklm16 basic $< -e $(word 3, $?)
+	$(call test_bklm,$<.cnf,$(word 4, $?),2)
+# optimised DNE
+	python tools/encode.py d02 optimised $<
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	python tools/encode.py cd05 optimised $<
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	python tools/encode.py cd06 optimised $<
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+# optimised DNE with evidence
+	python tools/encode.py d02 optimised $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	python tools/encode.py cd05 optimised $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	python tools/encode.py cd06 optimised $< -e $(word 3, $?)
+	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
 
 test: $(addsuffix .test, $(basename $(wildcard test_data/*.inst)))
 	@echo "Success, all tests passed."
