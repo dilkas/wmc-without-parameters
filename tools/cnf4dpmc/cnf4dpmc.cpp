@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
       if (line_type != Skip) {
         new_literals.push_back(literals);
         new_parameters.push_back(parameter_variable);
-        if (line_type == Clause) num_clauses++;
+        if (!literals.empty()) num_clauses++;
       }
     }
   }
@@ -106,6 +106,7 @@ int main(int argc, char *argv[]) {
       new_parameters.erase(new_parameters.begin() + i);
       new_literals.erase(new_literals.begin() + i);
       i--;
+      num_clauses--;
     }
 
   // Compile and output the new encoding

@@ -3,7 +3,6 @@ MAX_MEMORY = 32 # in GB
 MAX_MEMORY_KB = 31876710 # 95% of MAX_MEMORY
 EPSILON := 0.000001
 
-ALGORITHM := deps/DPMC/common/addmc # Keeping this around for tests
 EVALUATE := deps/ace/evaluate
 CACHET := deps/cachet/cachet
 HTD := deps/DPMC/lg/solvers/htd-master/bin/htd_main --opt width --iterations 0 --strategy challenge --print-progress --preprocessing full --output width
@@ -44,6 +43,12 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 define run_dpmc
 	cnf="data/$(1)" && $(LIMIT) && /usr/bin/time -v -f "%es" bash -c "$(LG) < $$cnf | $(DPMC) --cf=$$cnf --wf $(2)" &> results/$(3).new_inf
 endef
+
+# Same but without recording output to file
+define run_dpmc2
+	cnf="$(1)" && bash -c "$(LG) < $$cnf | $(DPMC) --cf=$$cnf --wf $(2)"
+endef
+
 
 # The argument is the file format (dne or net)
 define run_algorithms_with_evidence
@@ -107,6 +112,8 @@ data/original/%/TREEWIDTH:
 #===============================================================================
 
 clean:
+	-rm *.dot
+	-rm *.png
 	for d in $(DIRECTORIES) ; do \
 		rm -f data/original/$$d/*.dne.* ; \
 		rm -f data/original/$$d/*.net.* ; \
@@ -123,7 +130,7 @@ clean:
 
 # arguments: 1) CNF file, 2) answer file, 3) weight format
 define test_bklm
-	ANSWER=$$($(ALGORITHM) --wf $(3) --cf $(1) | awk '/s wmc/ {print $$3}') ; \
+	ANSWER=$$($(call run_dpmc2,$(1),$(3)) | awk '/s wmc/ {print $$3}') ; \
 	CORRECT_ANSWER=$$(cat $(2)) ; \
 	DIFFERENCE=$$(echo "$$ANSWER-$$CORRECT_ANSWER" | bc -l) ; \
 	APPROXIMATELY_CORRECT=$$(echo "$${DIFFERENCE#-} < $(EPSILON)" | bc -l) ; \
@@ -134,65 +141,68 @@ define test_bklm
 endef
 
 # cd05 and cd06 are supposed to produce wrong answers
-%.test: %.net %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
+%.test: %.net %.answer %.inst %.inst.answer tools/encode.py
 # basic NET
 	python tools/encode.py d02 basic $<
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
 	python tools/encode.py sbk05 basic $<
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
 	python tools/encode.py bklm16 basic $<
 	$(call test_bklm,$<.cnf,$(word 2, $?),2)
 # basic NET with evidence
 	python tools/encode.py d02 basic $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
 	python tools/encode.py sbk05 basic $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
 	python tools/encode.py bklm16 basic $< -e $(word 3, $?)
 	$(call test_bklm,$<.cnf,$(word 4, $?),2)
 # optimised NET
 	python tools/encode.py d02 optimised $<
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
 	python tools/encode.py cd05 optimised $<
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $<
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
 # optimised NET with evidence
 	python tools/encode.py d02 optimised $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
 	python tools/encode.py cd05 optimised $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
 
-%.test: %.dne %.answer %.inst %.inst.answer $(ALGORITHM) tools/encode.py
+%.test: %.dne %.answer %.inst %.inst.answer tools/encode.py
 # basic DNE
 	python tools/encode.py d02 basic $<
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
 	python tools/encode.py sbk05 basic $<
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
 	python tools/encode.py bklm16 basic $<
 	$(call test_bklm,$<.cnf,$(word 2, $?),2)
 # basic DNE with evidence
 	python tools/encode.py d02 basic $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic D02 failed on $@" && exit 1)
 	python tools/encode.py sbk05 basic $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 2 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,2) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "basic SBK05 failed on $@" && exit 1)
 	python tools/encode.py bklm16 basic $< -e $(word 3, $?)
 	$(call test_bklm,$<.cnf,$(word 4, $?),2)
 # optimised DNE
 	python tools/encode.py d02 optimised $<
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
 	python tools/encode.py cd05 optimised $<
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $<
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
 # optimised DNE with evidence
 	python tools/encode.py d02 optimised $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
 	python tools/encode.py cd05 optimised $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $< -e $(word 3, $?)
-	$(ALGORITHM) --wf 5 --cf $<.cnf | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
 
 test: $(addsuffix .test, $(basename $(wildcard test_data/*.inst)))
 	@echo "Success, all tests passed."
+
+compile:
+	@for f in $(shell ls ./*.dot); do dot -Tpng $${f} > $${f}.png; done

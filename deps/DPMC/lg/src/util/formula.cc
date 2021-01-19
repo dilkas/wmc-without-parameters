@@ -44,22 +44,18 @@ namespace util {
 
     int num_variables = static_cast<int>(entries[0]);
     Formula result(num_variables);
-    int num_clauses_to_parse = entries[1];
-    std::vector<std::unordered_set<int>> weight_entries(num_variables);
 
     // Parse the remaining clauses
     while (!parser.finished()) {
       entries.clear();
       std::string prefix = parser.parseLine(&entries);
 
-      if (prefix == "w" && entries.size() == 2) {
-        continue;  // Ignore weight lines
-      } else if (prefix == "w") {
-        size_t variable = static_cast<size_t>(entries[0]);
-        if (variable > 0)
-          for (size_t i = 0; i < entries.size() - 2; i++)
-            weight_entries[variable - 1].insert(
-                abs(static_cast<int>(entries[i])));
+      if (prefix == "w") {
+        if (static_cast<int>(entries[0]) != 0) {
+          std::vector<int> clause(entries.begin(), std::prev(entries.end()));
+          if (!result.add_clause(clause))
+            return std::nullopt;
+        }
       } else if (prefix == "") {
         // [x] [y] ... [z] 0 indicates a clause with literals (x, y, ..., z)
         if (entries.size() == 0 || entries.back() != 0) {
@@ -72,29 +68,11 @@ namespace util {
         if (!result.add_clause(clause)) {
             return std::nullopt;
         }
-        num_clauses_to_parse--;
       } else {
           // Unknown line
           return std::nullopt;
       }
     }
-
-    // 'Weight clauses' should be added AFTER regular clauses.
-    // Each 'weight clause' corresponds to a full CPT.
-    for (size_t i = 0; i < weight_entries.size(); i++) {
-      if (!weight_entries[i].empty()) {
-        std::vector<int> clause(weight_entries[i].begin(),
-                                weight_entries[i].end());
-        if (!result.add_clause(clause))
-          return std::nullopt;
-      }
-    }
-
-    // Verify that we have parsed the correct number of clauses
-    if (num_clauses_to_parse != 0) {
-        return std::nullopt;
-    }
-
     return result;
   }
 
