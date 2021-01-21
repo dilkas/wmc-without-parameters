@@ -52,7 +52,8 @@ namespace util {
 
       if (prefix == "w") {
         if (static_cast<int>(entries[0]) != 0) {
-          std::vector<int> clause(entries.begin(), std::prev(entries.end()));
+          std::vector<int> clause(entries.begin(),
+                                  std::prev(std::prev(entries.end())));
           if (!result.add_clause(clause))
             return std::nullopt;
         }

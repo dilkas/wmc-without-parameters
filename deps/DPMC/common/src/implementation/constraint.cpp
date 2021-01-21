@@ -94,25 +94,29 @@ ADD WeightConstraint::getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const {
     if (!util::isPositiveLiteral(literal)) literalDd = ~literalDd;
     clauseDd &= literalDd;
   }
-  return mgr->constant((weight - 1)) * clauseDd + mgr->constant(1);
+  return mgr->constant((weightT - weightF)) * clauseDd + mgr->constant(weightF);
 }
 
 void WeightConstraint::print() const {
     cout << "w";
     for (Int literal : literals)
         cout << " " << std::right << std::setw(5) << literal;
-    cout << std::right << std::setw(5) << weight << "\n";
+    cout << std::right << std::setw(5) << weightT
+         << std::right << std::setw(5) << weightF << "\n";
 }
 
 WeightConstraint::WeightConstraint(const vector<string> &words,
                                    Int declaredVarCount, Int lineIndex)
     : ClauseConstraint(toClauseForm(words), declaredVarCount, lineIndex) {
-    weight = std::stod(words.back());
+    assert(words.size() >= 4);
+    weightT = std::stod(words[words.size() - 2]);
+    weightF = std::stod(words[words.size() - 1]);
 }
 
 vector<string> toClauseForm(const vector<string> &words) {
     vector<string> new_words(words);
     new_words.erase(new_words.begin());
+    new_words.pop_back();
     new_words[new_words.size() - 1] = "0";
     return new_words;
 }

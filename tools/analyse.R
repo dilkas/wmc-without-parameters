@@ -51,7 +51,7 @@ data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time", "add_width", "treewidth", "zero_proportion", "count"))
+            value.var = c("answer", "time", "add_width", "treewidth"))
 df$time_new_bklm16[is.na(df$time_new_bklm16)] <- 2 * TIMEOUT
 df$time_new_cd05[is.na(df$time_new_cd05)] <- 2 * TIMEOUT
 df$time_new_cd06[is.na(df$time_new_cd06)] <- 2 * TIMEOUT
@@ -94,15 +94,11 @@ instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
 df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
                       answer = NA, time = instance_to_min_time[df$instance],
-                      add_width= max(data$add_width), treewidth = max(data$treewidth),
-                      zero_proportion = max(data$zero_proportion),
-                      count = max(data$count))
+                      add_width= max(data$add_width), treewidth = max(data$treewidth))
 df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
                        answer = NA, time = instance_to_min_time0[df$instance],
                        add_width = max(data$add_width),
-                       treewidth = max(data$treewidth),
-                       zero_proportion = max(data$zero_proportion),
-                       count = max(data$count))
+                       treewidth = max(data$treewidth))
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
@@ -307,3 +303,18 @@ ggplot(df, aes(treewidth, time_new_bklm16, shape = major.dataset, colour = major
   geom_point() +
   scale_x_continuous(trans = log10_trans()) +
   scale_y_continuous(trans = log10_trans())
+
+# ADD width vs treewidth
+ggplot(data, aes(treewidth, add_width, colour = encoding)) +
+  geom_point(alpha = 0.5) +
+  scale_x_continuous(trans = log10_trans()) +
+  scale_y_continuous(trans = log10_trans())
+
+ggplot(df, aes(add_width_new_bklm16, add_width_new_d02, color = major.dataset)) +
+  geom_point() +
+  scale_x_continuous(trans = log10_trans()) +
+  scale_y_continuous(trans = log10_trans()) +
+  geom_abline(slope = 1, intercept = 0, colour = "#989898")
+
+df$diff <- df$add_width_new_bklm16 - df$add_width_new_d02
+ggplot(df, aes(diff)) + geom_histogram()

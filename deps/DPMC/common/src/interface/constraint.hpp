@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include "util.hpp"
 
 class Constraint {
@@ -29,7 +30,7 @@ public:
 
 class WeightConstraint : public ClauseConstraint {
 private:
-    double weight;
+    double weightT, weightF;
 
 public:
     ADD getDD(Cudd *mgr, Map<Int, Int> &cnfVarToDdVarMap) const override;

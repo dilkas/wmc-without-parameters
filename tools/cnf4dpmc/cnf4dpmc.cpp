@@ -14,6 +14,26 @@ int rename_literal(int literal, const std::map<int, int> &decrements) {
   return new_literal;
 }
 
+void add_to_decrements(std::map<int, int> &decrements, int literal) {
+  auto it = decrements.upper_bound(literal);
+  int decrement = (it != decrements.begin()) ? std::prev(it)->second + 1 : 1;
+  for (; it != decrements.end(); it++)
+    decrements[it->first] = it->second + 1;
+  decrements[literal] = decrement;
+}
+
+void rename(std::vector<std::vector<int>> &clauses, int previous, int next) {
+  for (size_t i = 0; i < clauses.size(); i++) {
+    for (size_t j = 0; j < clauses[i].size(); j++) {
+      if (clauses[i][j] == previous) {
+        clauses[i][j] = next;
+      } else if (clauses[i][j] == -previous) {
+        clauses[i][j] = -next;
+      }
+    }
+  }
+}
+
 int main(int argc, char *argv[]) {
   cxxopts::Options options("cnf4dpmc", "Modify a CNF encoding produced by Ace to optimise it for DPMC");
   options.add_options()("f,filename", "a Bayesian network", cxxopts::value<std::string>());
@@ -88,7 +108,7 @@ int main(int argc, char *argv[]) {
           line_type = Weight;
           parameter_variable = literal;
         } else {
-          literals.push_back(rename_literal(literal, decrements));
+          literals.push_back(literal);
         }
         iss >> token;
       }
@@ -109,21 +129,69 @@ int main(int argc, char *argv[]) {
       num_clauses--;
     }
 
+  // Let's not use two 'bits' to represent two possible values
+  std::vector<std::string> new_weights;
+  assert(new_literals.size() == new_parameters.size());
+  for (size_t i = 0; i < new_literals.size() - 3; i++) {
+    if (new_parameters[i] == 0 && new_parameters[i+1] == 0 &&
+        new_literals[i].size() == 2 && new_literals[i+1].size() == 2 &&
+        new_parameters[i+2] != 0 && new_parameters[i+3] != 0 &&
+        new_literals[i+2].size() == 1 && new_literals[i+3].size() == 1) {
+      int a = std::min(new_literals[i][0], new_literals[i][1]);
+      int b = std::max(new_literals[i][0], new_literals[i][1]);
+      if (a > 0 && ((new_literals[i+1][0] == -a && new_literals[i+1][1] == -b) ||
+                    (new_literals[i+1][0] == -b && new_literals[i+1][1] == -a))) {
+        // Determine the weights of a and b
+        std::string a_weight, b_weight;
+        if (new_literals[i+2][0] == -a && new_literals[i+3][0] == -b) {
+          a_weight = weights[new_parameters[i+2]];
+          b_weight = weights[new_parameters[i+3]];
+        } else if (new_literals[i+2][0] == -b && new_literals[i+3][0] == -a) {
+          a_weight = weights[new_parameters[i+3]];
+          b_weight = weights[new_parameters[i+2]];
+        } else {
+          continue;
+        }
+
+        // Add a new clause
+        // NOTE: we assume that all variables that are due to be removed that
+        // are smaller than 'a' have already been added to 'decrements'
+        std::ostringstream oss;
+        oss << "w " << rename_literal(a, decrements) << " " << a_weight << " " << b_weight;
+        new_weights.push_back(oss.str());
+
+        // Remove these 4 clauses
+        num_clauses -= 3;
+        new_literals.erase(new_literals.begin() + i, new_literals.begin() + i + 4);
+        new_parameters.erase(new_parameters.begin() + i, new_parameters.begin() + i + 4);
+        i--;
+        rename(new_literals, b, -a);
+        add_to_decrements(decrements, b);
+      }
+    }
+  }
+
   // Compile and output the new encoding
   std::ofstream output(cnf_filename);
   output << "p cnf " << num_vars - decrements.size() << " " << num_clauses << std::endl;
   double premultiplication_constant = 1;
   for (size_t i = 0; i < new_literals.size(); i++) {
     if (new_parameters[i] == 0) {
-      for (int literal : new_literals[i]) output << literal << " ";
+      for (int literal : new_literals[i])
+        output << rename_literal(literal, decrements) << " ";
       output << "0" << std::endl;
     } else if (new_literals[i].empty()) {
       premultiplication_constant *= std::stod(weights[new_parameters[i]]);
     } else {
       output << "w";
-      for (int literal : new_literals[i]) output << " " << -literal;
-      output << " " << weights[new_parameters[i]] << std::endl;
+      for (int literal : new_literals[i]) {
+        output << " " << rename_literal(-literal, decrements);
+      }
+      output << " " << weights[new_parameters[i]] << " 1" << std::endl;
     }
   }
-  if (premultiplication_constant != 1) output << "w 0 " << premultiplication_constant << std::endl;
+  for (std::string line : new_weights)
+    output << line << std::endl;
+  if (premultiplication_constant != 1)
+    output << "w 0 " << premultiplication_constant << std::endl;
 }
