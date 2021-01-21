@@ -167,13 +167,16 @@ int main(int argc, char *argv[]) {
         new_weights.push_back(oss.str());
         num_clauses++;
       }
+      rename(new_literals, b,
+             ((new_literals[i][0] < 0 && new_literals[i][1] < 0) ||
+              (new_literals[i][0] > 0 && new_literals[i][1] > 0)) ? -a : a);
+      add_to_decrements(decrements, b);
+
       // Remove clauses
       num_clauses -= num_to_remove;
       new_literals.erase(new_literals.begin() + i, new_literals.begin() + i + num_to_remove);
       new_parameters.erase(new_parameters.begin() + i, new_parameters.begin() + i + num_to_remove);
       i--;
-      rename(new_literals, b, -a);
-      add_to_decrements(decrements, b);
     }
   }
 
