@@ -132,15 +132,21 @@ int main(int argc, char *argv[]) {
   // Let's not use two 'bits' to represent two possible values
   std::vector<std::string> new_weights;
   assert(new_literals.size() == new_parameters.size());
-  for (size_t i = 0; i < new_literals.size() - 3; i++) {
+  for (size_t i = 0; i < new_literals.size() - 1; i++) {
     if (new_parameters[i] == 0 && new_parameters[i+1] == 0 &&
         new_literals[i].size() == 2 && new_literals[i+1].size() == 2 &&
-        new_parameters[i+2] != 0 && new_parameters[i+3] != 0 &&
-        new_literals[i+2].size() == 1 && new_literals[i+3].size() == 1) {
-      int a = std::min(new_literals[i][0], new_literals[i][1]);
-      int b = std::max(new_literals[i][0], new_literals[i][1]);
-      if (a > 0 && ((new_literals[i+1][0] == -a && new_literals[i+1][1] == -b) ||
-                    (new_literals[i+1][0] == -b && new_literals[i+1][1] == -a))) {
+        ((new_literals[i+1][0] == -new_literals[i][0] &&
+          new_literals[i+1][1] == -new_literals[i][1]) ||
+         (new_literals[i+1][0] == -new_literals[i][1] &&
+          new_literals[i+1][1] == -new_literals[i][0]))) {
+      int num_to_remove = 2;
+      int a = std::min(std::abs(new_literals[i][0]), std::abs(new_literals[i][1]));
+      int b = std::max(std::abs(new_literals[i][0]), std::abs(new_literals[i][1]));
+      if (i + 3 < new_parameters.size() &&
+          new_parameters[i+2] != 0 && new_parameters[i+3] != 0 &&
+          new_literals[i+2].size() == 1 && new_literals[i+3].size() == 1) {
+        num_to_remove = 4;
+
         // Determine the weights of a and b
         std::string a_weight, b_weight;
         if (new_literals[i+2][0] == -a && new_literals[i+3][0] == -b) {
@@ -159,15 +165,15 @@ int main(int argc, char *argv[]) {
         std::ostringstream oss;
         oss << "w " << rename_literal(a, decrements) << " " << a_weight << " " << b_weight;
         new_weights.push_back(oss.str());
-
-        // Remove these 4 clauses
-        num_clauses -= 3;
-        new_literals.erase(new_literals.begin() + i, new_literals.begin() + i + 4);
-        new_parameters.erase(new_parameters.begin() + i, new_parameters.begin() + i + 4);
-        i--;
-        rename(new_literals, b, -a);
-        add_to_decrements(decrements, b);
+        num_clauses++;
       }
+      // Remove clauses
+      num_clauses -= num_to_remove;
+      new_literals.erase(new_literals.begin() + i, new_literals.begin() + i + num_to_remove);
+      new_parameters.erase(new_parameters.begin() + i, new_parameters.begin() + i + num_to_remove);
+      i--;
+      rename(new_literals, b, -a);
+      add_to_decrements(decrements, b);
     }
   }
 
