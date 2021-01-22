@@ -184,7 +184,6 @@ PBConstraint::PBConstraint(const vector<Int> &variables) {
 }
 
 Set<Int> getClauseCnfVars(const vector<Constraint *> &clause,
-                          const vector<vector<Int>> &dependencies,
                           Int clauseIndex) {
     Set<Int> cnfVars;
     auto variables = clause.at(clauseIndex)->getVariables();

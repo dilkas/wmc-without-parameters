@@ -63,6 +63,5 @@ public:
 };
 
 Set<Int> getClauseCnfVars(const vector<Constraint*> &clause,
-                          const vector<vector<Int>> &dependencies,
                           Int clause_index);
 vector<string> toClauseForm(const vector<string> &words);

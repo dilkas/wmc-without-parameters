@@ -124,8 +124,7 @@ void solving::solveOptions(
           inverseDdVarOrdering);
 
   const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds,
-                                      performanceFactor, cnf.getClauses(),
-                                      cnf.getDependencies());
+                                      performanceFactor, cnf.getClauses());
   JoinTreeCounter joinTreeCounter(
     &mgr,
     joinTreeReader.getJoinTreeRoot(),

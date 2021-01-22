@@ -227,10 +227,6 @@ const vector<ADD> &Cnf::getWeights() const {
   return weights;
 }
 
-const vector<vector<Int>> &Cnf::getDependencies() const {
-  return dependencies;
-}
-
 WeightFormat Cnf::getWeightFormat() const {
   return weightFormat;
 }

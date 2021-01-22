@@ -300,14 +300,12 @@ MonolithicCounter::MonolithicCounter(Cudd *mgr) {
 /* class LinearCounter ******************************************************/
 
 void LinearCounter::fillProjectableCnfVarSets(
-    const vector<Constraint*> &clauses,
-    const vector<vector<Int>> &dependencies) {
+    const vector<Constraint*> &clauses) {
   projectableCnfVarSets = vector<Set<Int>>(clauses.size(), Set<Int>());
 
   Set<Int> placedCnfVars; // cumulates vars placed in projectableCnfVarSets so far
   for (Int clauseIndex = clauses.size() - 1; clauseIndex >= 0; clauseIndex--) {
-    Set<Int> clauseCnfVars = getClauseCnfVars(clauses, dependencies,
-                                              clauseIndex);
+    Set<Int> clauseCnfVars = getClauseCnfVars(clauses, clauseIndex);
 
     Set<Int> placingCnfVars;
     util::differ(placingCnfVars, clauseCnfVars, placedCnfVars);
@@ -327,7 +325,7 @@ void LinearCounter::setLinearClauseDds(vector<ADD> &clauseDds, Cnf &cnf) {
 
 void LinearCounter::constructJoinTree(const Cnf &cnf) {
   const vector<Constraint*> &clauses = cnf.getClauses();
-  fillProjectableCnfVarSets(clauses, cnf.getDependencies());
+  fillProjectableCnfVarSets(clauses);
 
   vector<JoinNode *> clauseNodes;
   for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
@@ -379,9 +377,7 @@ LinearCounter::LinearCounter(Cudd *mgr) {
 
 /* class NonlinearCounter ********************************************************/
 
-void NonlinearCounter::printClusters(
-    const vector<Constraint*> &clauses,
-    const vector<vector<Int>> &dependencies) const {
+void NonlinearCounter::printClusters(const vector<Constraint*> &clauses) const {
   printThinLine();
   printComment("clusters {");
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
@@ -396,7 +392,6 @@ void NonlinearCounter::printClusters(
 }
 
 void NonlinearCounter::fillClusters(const vector<Constraint*> &clauses,
-                                    const vector<vector<Int>> &dependencies,
                                     const vector<Int> &cnfVarOrdering,
                                     bool usingMinVar) {
   clusters = vector<vector<Int>>(cnfVarOrdering.size(), vector<Int>());
@@ -435,7 +430,6 @@ void NonlinearCounter::printProjectableCnfVarSets() const {
 
 void NonlinearCounter::fillCnfVarSets(
     const vector<Constraint*> &clauses,
-    const vector<vector<Int>> &dependencies,
     bool usingMinVar) {
   occurrentCnfVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
   projectableCnfVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
@@ -443,7 +437,7 @@ void NonlinearCounter::fillCnfVarSets(
   Set<Int> placedCnfVars; // cumulates vars placed in projectableCnfVarSets so far
   for (Int clusterIndex = clusters.size() - 1; clusterIndex >= 0; clusterIndex--) {
     Set<Int> clusterCnfVars = getClusterCnfVars(clusters.at(clusterIndex),
-                                                clauses, dependencies);
+                                                clauses);
 
     occurrentCnfVarSets[clusterIndex] = clusterCnfVars;
 
@@ -456,8 +450,7 @@ void NonlinearCounter::fillCnfVarSets(
 
 Set<Int> NonlinearCounter::getProjectingDdVars(
     Int clusterIndex, bool usingMinVar, const vector<Int> &cnfVarOrdering,
-    const vector<Constraint*> &clauses,
-    const vector<vector<Int>> &dependencies) {
+    const vector<Constraint*> &clauses) {
   Set<Int> projectableCnfVars;
 
   if (usingMinVar) { // bucket elimination
@@ -465,12 +458,12 @@ Set<Int> NonlinearCounter::getProjectingDdVars(
   }
   else { // Bouquet's Method
     Set<Int> activeCnfVars = getClusterCnfVars(clusters.at(clusterIndex),
-                                               clauses, dependencies);
+                                               clauses);
 
     Set<Int> otherCnfVars;
     for (Int i = clusterIndex + 1; i < clusters.size(); i++) {
       util::unionize(otherCnfVars, getClusterCnfVars(clusters.at(i),
-                                                     clauses, dependencies));
+                                                     clauses));
     }
 
     util::differ(projectableCnfVars, activeCnfVars, otherCnfVars);
@@ -485,11 +478,10 @@ Set<Int> NonlinearCounter::getProjectingDdVars(
 
 void NonlinearCounter::fillDdClusters(
     const vector<Constraint*> &clauses,
-    const vector<vector<Int>> &dependencies,
     const vector<ADD> &weights,
     const vector<Int> &cnfVarOrdering, bool usingMinVar) {
-  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
+  fillClusters(clauses, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses);
 
   ddClusters = vector<vector<ADD>>(clusters.size(), vector<ADD>());
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
@@ -502,17 +494,16 @@ void NonlinearCounter::fillDdClusters(
 
 void NonlinearCounter::fillProjectingDdVarSets(
   const vector<Constraint*> &clauses,
-  const vector<vector<Int>> &dependencies, const vector<ADD> &weights,
+  const vector<ADD> &weights,
   const vector<Int> &cnfVarOrdering, bool usingMinVar) {
-  fillDdClusters(clauses, dependencies, weights, cnfVarOrdering, usingMinVar);
+  fillDdClusters(clauses, weights, cnfVarOrdering, usingMinVar);
 
   projectingDdVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
   for (Int clusterIndex = 0; clusterIndex < ddClusters.size(); clusterIndex++) {
     projectingDdVarSets[clusterIndex] = getProjectingDdVars(clusterIndex,
                                                             usingMinVar,
                                                             cnfVarOrdering,
-                                                            clauses,
-                                                            dependencies);
+                                                            clauses);
   }
 }
 
@@ -552,12 +543,11 @@ Int NonlinearCounter::getNewClusterIndex(const Set<Int> &remainingDdVars) const 
 void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool usingMinVar) {
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<vector<Int>> &dependencies = cnf.getDependencies();
 
-  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
+  fillClusters(clauses, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses);
 
-  fillCnfVarSets(clauses, dependencies, usingMinVar);
+  fillCnfVarSets(clauses, usingMinVar);
   if (verbosityLevel >= 2) {
     printOccurrentCnfVarSets();
     printProjectableCnfVarSets();
@@ -600,12 +590,11 @@ void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool
 void NonlinearCounter::constructJoinTreeUsingTreeClustering(const Cnf &cnf, bool usingMinVar) {
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<vector<Int>> &dependencies = cnf.getDependencies();
 
-  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
+  fillClusters(clauses, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses);
 
-  fillCnfVarSets(clauses, dependencies, usingMinVar);
+  fillCnfVarSets(clauses, usingMinVar);
   if (verbosityLevel >= 2) {
     printOccurrentCnfVarSets();
     printProjectableCnfVarSets();
@@ -667,11 +656,10 @@ Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<vector<Int>> &dependencies = cnf.getDependencies();
   const vector<ADD> &weights = cnf.getWeights();
 
-  fillClusters(clauses, dependencies, cnfVarOrdering, usingMinVar);
-  if (verbosityLevel >= 2) printClusters(clauses, dependencies);
+  fillClusters(clauses, cnfVarOrdering, usingMinVar);
+  if (verbosityLevel >= 2) printClusters(clauses);
 
   /* builds ADD for CNF: */
   ADD cnfDd = mgr->addOne();
@@ -688,7 +676,7 @@ Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
     cnfDd *= clusterDd;
 
     Set<Int> projectingDdVars = getProjectingDdVars(clusterIndex, usingMinVar,
-                                                    cnfVarOrdering, clauses, dependencies);
+                                                    cnfVarOrdering, clauses);
     abstractCube(cnfDd, projectingDdVars, cnf.getLiteralWeights(),
                  cnf.getWeightFormat());
     util::unionize(projectedCnfVars, getCnfVars(projectingDdVars));
@@ -706,11 +694,9 @@ Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf, bool usingMinVar) {
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<vector<Int>> &dependencies = cnf.getDependencies();
   const vector<ADD> &weights = cnf.getWeights();
 
-  fillProjectingDdVarSets(clauses, dependencies, weights, cnfVarOrdering,
-                          usingMinVar);
+  fillProjectingDdVarSets(clauses, weights, cnfVarOrdering, usingMinVar);
 
   /* builds ADD for CNF: */
   ADD cnfDd = mgr->addOne();
@@ -758,11 +744,10 @@ Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf) { // #MAVC
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<vector<Int>> &dependencies = cnf.getDependencies();
 
   bool usingMinVar = false;
 
-  fillProjectingDdVarSets(clauses, dependencies, cnf.getWeights(),
+  fillProjectingDdVarSets(clauses, cnf.getWeights(),
                           cnfVarOrdering, usingMinVar);
 
   vector<Set<Int>> clustersDdVars; // clusterIndex |-> ddVars
@@ -852,11 +837,10 @@ BouquetCounter::BouquetCounter(Cudd *mgr, bool usingTreeClustering,
 }
 
 Set<Int> getClusterCnfVars(const vector<Int> &cluster,
-                           const vector<Constraint *> &clauses,
-                           const vector<vector<Int>> &dependencies) {
+                           const vector<Constraint *> &clauses) {
   Set<Int> cnfVars;
   for (Int clauseIndex : cluster)
     util::unionize(cnfVars,
-                   getClauseCnfVars(clauses, dependencies, clauseIndex));
+                   getClauseCnfVars(clauses, clauseIndex));
   return cnfVars;
 }

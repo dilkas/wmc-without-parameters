@@ -242,8 +242,7 @@ void solving::solveOptions(
 
   if (outputFormat == OutputFormat::MODEL_COUNT && jtFilePath != DUMMY_STR) {
     const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds,
-                                        performanceFactor, cnf.getClauses(),
-                                        cnf.getDependencies());
+                                        performanceFactor, cnf.getClauses());
     JoinTreeCounter joinTreeCounter(
       &mgr,
       joinTreeReader.getJoinTreeRoot(),

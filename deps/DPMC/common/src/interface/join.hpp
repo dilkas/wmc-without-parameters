@@ -53,20 +53,16 @@ public:
   /* after projecting all child->projectableCnfVars and before projecting
      this->projectableCnfVars */
   virtual const Set<Int> &getApparentCnfVars(
-      const vector<Constraint*> &clauses,
-      const vector<vector<Int>> &dependencies) = 0;
-  virtual Int getMaxVarCount(const vector<Constraint*> &clauses,
-                             const vector<vector<Int>> &dependencies) = 0;
+      const vector<Constraint*> &clauses) = 0;
+  virtual Int getMaxVarCount(const vector<Constraint*> &clauses) = 0;
   virtual void printSubtree(const string &prefix = "") const = 0;
 };
 
 class JoinTerminal : public JoinNode {
 public:
   const Set<Int> &getApparentCnfVars(
-      const vector<Constraint*> &clauses,
-      const vector<vector<Int>> &dependencies) override;
-  virtual Int getMaxVarCount(const vector<Constraint*> &clauses,
-                             const vector<vector<Int>> &dependencies);
+      const vector<Constraint*> &clauses) override;
+  virtual Int getMaxVarCount(const vector<Constraint*> &clauses);
   void printSubtree(const string &prefix = "") const override;
   JoinTerminal();
 };
@@ -75,10 +71,8 @@ class JoinNonterminal : public JoinNode {
 public:
   void printNode(const string &prefix) const;
   const Set<Int> &getApparentCnfVars(
-      const vector<Constraint*> &clauses,
-      const vector<vector<Int>> &dependencies) override;
-  virtual Int getMaxVarCount(const vector<Constraint*> &clauses,
-                             const vector<vector<Int>> &dependencies);
+      const vector<Constraint*> &clauses) override;
+  virtual Int getMaxVarCount(const vector<Constraint*> &clauses);
   void printSubtree(const string &prefix = "") const override; // post-order
   void addProjectableCnfVars(const Set<Int> &cnfVars);
   JoinNonterminal(
@@ -125,7 +119,6 @@ protected:
   Int problemLineIndex = DUMMY_MIN_INT;
   Int joinTreeEndLineIndex = DUMMY_MIN_INT;
   vector<Constraint*> clauses;
-  vector<vector<Int>> dependencies;
 
   /* timer: */
   static void killPlanner(); // SIGKILL
@@ -146,7 +139,5 @@ public:
     const string &filePath,
     Float jtWaitSeconds,
     Float performanceFactor,
-    const vector<Constraint*> &clauses,
-    const vector<vector<Int>> &dependencies
-  );
+    const vector<Constraint*> &clauses);
 };

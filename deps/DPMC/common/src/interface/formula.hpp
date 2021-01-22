@@ -31,7 +31,6 @@ protected:
   Int declaredVarCount = DUMMY_MIN_INT; // in cnf file
   Map<Int, Float> literalWeights;
   vector<ADD> weights; // conditional probability tables encoded as ADDs
-  vector<vector<Int>> dependencies; // how variables depend on other variables
   vector<Constraint*> clauses;
   vector<Int> apparentVars; // vars appearing in clauses, ordered by 1st appearance
   /* A 'map' from variables to vectors of string tokens */
@@ -58,7 +57,6 @@ public:
   Map<Int, Float> getLiteralWeights() const;
   const vector<ADD> &getWeights() const;
   WeightFormat getWeightFormat() const;
-  const vector<vector<Int>> &getDependencies() const;
   Int getEmptyClauseIndex() const; // first (nonnegative) index if found else DUMMY_MIN_INT
   const vector<Constraint*> &getClauses() const;
   const vector<Int> &getApparentVars() const;
