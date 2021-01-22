@@ -541,8 +541,6 @@ private:
    */
   void readTerm(IntegerType &coeff, vector<int> &list)
   {
-      char c;
-
       list.clear();
 
       (*in) >> coeff;

@@ -35,7 +35,6 @@ protected:
   vector<Constraint*> clauses;
   vector<Int> apparentVars; // vars appearing in clauses, ordered by 1st appearance
   /* A 'map' from variables to vectors of string tokens */
-  vector<vector<std::string>> unparsedWeights;
   vector<Int> varOrdering;
 
   ADD literalToDd(Int literal, Cudd *mgr);

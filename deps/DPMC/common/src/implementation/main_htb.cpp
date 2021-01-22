@@ -109,8 +109,6 @@ void solving::solveOptions(
   Cnf cnf(cnfFilePath, Format::CNF, weightFormat, &mgr, cnfVarOrderingHeuristic,
                 inverseCnfVarOrdering);
 
-  VarOrderingHeuristic ddVarOrderingHeuristic = VarOrderingHeuristic::DUMMY_VAR_ORDERING_HEURISTIC;
-  bool inverseDdVarOrdering = false; // dummy
   switch (clusteringHeuristic) {
     case ClusteringHeuristic::MONOLITHIC: {
       MonolithicCounter monolithicCounter(&mgr);

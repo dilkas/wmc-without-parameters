@@ -48,18 +48,6 @@ Graph Cnf::getGaifmanGraph() const {
       }
     }
   }
-
-  // include variables from weight ADDs in the graph
-  for (auto words : unparsedWeights) {
-    for (Int i = 1; i < words.size(); i++) {
-      Int var1 = std::abs(std::stoi(words.at(i)));
-      for (Int j = i + 1; j < words.size() - 2; j++) {
-        Int var2 = std::abs(std::stoi(words.at(j)));
-        graph.addEdge(var1, var2);
-      }
-    }
-  }
-
   return graph;
 }
 
