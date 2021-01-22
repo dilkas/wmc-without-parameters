@@ -14,7 +14,7 @@ else
 endif
 
 CC = g++
-CFLAGS = -O2 -Wall -Iinclude
+CFLAGS = -O2 -Wall -Iinclude -no-pie
 LFLAGS = -L$(LIB) -lsat -lvtree -lnnf -lutil -lgmp
 
 C2D_PACKAGE = \"miniC2D\"
