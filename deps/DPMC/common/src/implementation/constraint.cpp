@@ -187,14 +187,8 @@ Set<Int> getClauseCnfVars(const vector<Constraint *> &clause,
                           const vector<vector<Int>> &dependencies,
                           Int clauseIndex) {
     Set<Int> cnfVars;
-    if (clauseIndex < clause.size())
-    {
-        auto variables = clause.at(clauseIndex)->getVariables();
-        copy(variables.begin(), variables.end(),
-             inserter(cnfVars, cnfVars.end()));
-    } else {
-    for (Int dependency : dependencies[clauseIndex - clause.size()])
-      cnfVars.insert(dependency);
-  }
-  return cnfVars;
+    auto variables = clause.at(clauseIndex)->getVariables();
+    copy(variables.begin(), variables.end(),
+         inserter(cnfVars, cnfVars.end()));
+    return cnfVars;
 }

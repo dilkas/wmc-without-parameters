@@ -388,11 +388,7 @@ void NonlinearCounter::printClusters(
     printComment("\t" "cluster " + to_string(clusterIndex + 1) + ":");
     for (Int clauseIndex : clusters.at(clusterIndex)) {
       cout << "c\t\t" "clause " << clauseIndex + 1 << + ":\t";
-      if (clauseIndex < clauses.size()) {
         clauses.at(clauseIndex)->print();
-      } else {
-        ClauseConstraint(dependencies[clauseIndex - clauses.size()]).print();
-      }
     }
   }
   printComment("}");
@@ -407,11 +403,6 @@ void NonlinearCounter::fillClusters(const vector<Constraint*> &clauses,
   for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     Int clusterIndex = usingMinVar ? clauses.at(clauseIndex)->getMinRank(cnfVarOrdering) : clauses.at(clauseIndex)->getMaxRank(cnfVarOrdering);
     clusters.at(clusterIndex).push_back(clauseIndex);
-  }
-  for (size_t i = 0; i < dependencies.size(); i++) {
-    Int clusterIndex = usingMinVar ? PBConstraint(dependencies[i]).getMinRank(cnfVarOrdering) : PBConstraint(dependencies[i]).getMaxRank(cnfVarOrdering);
-    clusterIndex = (clusterIndex == DUMMY_MAX_INT || clusterIndex == DUMMY_MIN_INT) ? 0 : clusterIndex;
-    clusters.at(clusterIndex).push_back(clauses.size() + i);
   }
 }
 
