@@ -117,7 +117,7 @@ ADD Counter::countSubtree(JoinNode *joinNode, const Cnf &cnf, Set<Int> &projecte
   if (joinNode->isTerminal()) {
     auto i = joinNode->getNodeIndex();
     auto clauses = cnf.getClauses();
-    return (i < clauses.size()) ? clauses.at(i)->getDD(mgr, cnfVarToDdVarMap) : cnf.getWeights().at(i - clauses.size());
+    return clauses.at(i)->getDD(mgr, cnfVarToDdVarMap);
   }
   else {
     ADD dd = mgr->addOne();
@@ -478,7 +478,6 @@ Set<Int> NonlinearCounter::getProjectingDdVars(
 
 void NonlinearCounter::fillDdClusters(
     const vector<Constraint*> &clauses,
-    const vector<ADD> &weights,
     const vector<Int> &cnfVarOrdering, bool usingMinVar) {
   fillClusters(clauses, cnfVarOrdering, usingMinVar);
   if (verbosityLevel >= 2) printClusters(clauses);
@@ -486,7 +485,7 @@ void NonlinearCounter::fillDdClusters(
   ddClusters = vector<vector<ADD>>(clusters.size(), vector<ADD>());
   for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
     for (Int clauseIndex : clusters.at(clusterIndex)) {
-      ADD clauseDd = (clauseIndex < clauses.size()) ? clauses.at(clauseIndex)->getDD(mgr, cnfVarToDdVarMap) : weights.at(clauseIndex - clauses.size());
+      ADD clauseDd = clauses.at(clauseIndex)->getDD(mgr, cnfVarToDdVarMap);
       ddClusters.at(clusterIndex).push_back(clauseDd);
     }
   }
@@ -494,9 +493,8 @@ void NonlinearCounter::fillDdClusters(
 
 void NonlinearCounter::fillProjectingDdVarSets(
   const vector<Constraint*> &clauses,
-  const vector<ADD> &weights,
   const vector<Int> &cnfVarOrdering, bool usingMinVar) {
-  fillDdClusters(clauses, weights, cnfVarOrdering, usingMinVar);
+  fillDdClusters(clauses, cnfVarOrdering, usingMinVar);
 
   projectingDdVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
   for (Int clusterIndex = 0; clusterIndex < ddClusters.size(); clusterIndex++) {
@@ -656,7 +654,6 @@ Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<ADD> &weights = cnf.getWeights();
 
   fillClusters(clauses, cnfVarOrdering, usingMinVar);
   if (verbosityLevel >= 2) printClusters(clauses);
@@ -669,7 +666,7 @@ Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
     ADD clusterDd = mgr->addOne();
     const vector<Int> &clauseIndices = clusters.at(clusterIndex);
     for (Int clauseIndex : clauseIndices) {
-      ADD clauseDd = (clauseIndex < clauses.size()) ? clauses.at(clauseIndex)->getDD(mgr, cnfVarToDdVarMap) : weights.at(clauseIndex - clauses.size());
+      ADD clauseDd = clauses.at(clauseIndex)->getDD(mgr, cnfVarToDdVarMap);
       clusterDd *= clauseDd;
     }
 
@@ -694,9 +691,8 @@ Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf, bool usingMinVar) {
 
   vector<Int> cnfVarOrdering = cnf.getVarOrdering();
   const vector<Constraint*> &clauses = cnf.getClauses();
-  const vector<ADD> &weights = cnf.getWeights();
 
-  fillProjectingDdVarSets(clauses, weights, cnfVarOrdering, usingMinVar);
+  fillProjectingDdVarSets(clauses, cnfVarOrdering, usingMinVar);
 
   /* builds ADD for CNF: */
   ADD cnfDd = mgr->addOne();
@@ -747,8 +743,7 @@ Float NonlinearCounter::countUsingTreeClustering(Cnf &cnf) { // #MAVC
 
   bool usingMinVar = false;
 
-  fillProjectingDdVarSets(clauses, cnf.getWeights(),
-                          cnfVarOrdering, usingMinVar);
+  fillProjectingDdVarSets(clauses, cnfVarOrdering, usingMinVar);
 
   vector<Set<Int>> clustersDdVars; // clusterIndex |-> ddVars
   for (const auto &ddCluster : ddClusters) {

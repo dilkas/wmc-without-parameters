@@ -223,10 +223,6 @@ vector<Int> Cnf::getVarOrdering() const {
   return varOrdering;
 }
 
-const vector<ADD> &Cnf::getWeights() const {
-  return weights;
-}
-
 WeightFormat Cnf::getWeightFormat() const {
   return weightFormat;
 }

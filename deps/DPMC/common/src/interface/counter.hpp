@@ -127,10 +127,8 @@ protected:
                                const vector<Constraint*> &clauses);
   // (if usingTreeClustering)
   void fillDdClusters(const vector<Constraint*> &clauses,
-                      const vector<ADD> &weights,
                       const vector<Int> &cnfVarOrdering, bool usingMinVar);
   void fillProjectingDdVarSets(const vector<Constraint*> &clauses,
-                               const vector<ADD> &weights,
                                const vector<Int> &cnfVarOrdering,
                                bool usingMinVar); // (if usingTreeClustering)
 
