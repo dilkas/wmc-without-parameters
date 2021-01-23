@@ -129,7 +129,7 @@ def parse_dir(directory, additional_data={}):
 def main():
     data = []
     for directory, dataset in directories:
-        data += parse_dir(os.path.join('results', 'original', directory),
+        data += parse_dir(os.path.join('results', directory),
                           {'dataset': dataset})
     fieldnames = set()
     for d in data:

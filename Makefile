@@ -1,4 +1,4 @@
-TIMEOUT := 100
+TIMEOUT := 10
 MAX_MEMORY = 32 # in GB
 MAX_MEMORY_KB = 31876710 # 95% of MAX_MEMORY
 EPSILON := 0.000001
@@ -15,27 +15,27 @@ ENCODE := ulimit -t $(TIMEOUT) && /usr/bin/time -v
 
 DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-50 DQMR/qmr-60 DQMR/qmr-70 Plan_Recognition/without_evidence Plan_Recognition/with_evidence 2004-pgm 2005-ijcai 2006-ijar ../../test_data
 
-#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/original/2005-ijcai/*.inst))
-#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/original/2006-ijar/*.inst))
-#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/original/2004-pgm/*.inst))
-#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/Plan_Recognition/without_evidence/*.dne))
-#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/Plan_Recognition/with_evidence/*.inst))
-#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/DQMR/qmr-100/*.dne))
-#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-50/*.inst))
-#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-60/*.inst))
-#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/original/DQMR/qmr-70/*.inst))
-#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/original/Grid/*/*.dne))
+#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2005-ijcai/*.inst))
+#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2006-ijar/*.inst))
+#all: $(addsuffix /NET_WITH_EVIDENCE,$(wildcard data/2004-pgm/*.inst))
+#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/Plan_Recognition/with_evidence/*.inst))
+all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/DQMR/qmr-100/*.dne))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-50/*.inst))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-60/*.inst))
+#all: $(addsuffix /DNE_WITH_EVIDENCE,$(wildcard data/DQMR/qmr-70/*.inst))
+#all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Grid/*/*.dne))
 
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/2005-ijcai/*.net))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/2006-ijar/*.net))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/2004-pgm/*.net))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Plan_Recognition/without_evidence/*.dne))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Plan_Recognition/with_evidence/*.dne))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-100/*.dne))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-50/*.dne))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-60/*.dne))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/DQMR/qmr-70/*.dne))
-#all: $(addsuffix /TREEWIDTH,$(wildcard data/original/Grid/*/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/2005-ijcai/*.net))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/2006-ijar/*.net))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/2004-pgm/*.net))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/Plan_Recognition/with_evidence/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-100/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-50/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-60/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-70/*.dne))
+#all: $(addsuffix /TREEWIDTH,$(wildcard data/Grid/*/*.dne))
 
 #===============================================================================
 
@@ -52,62 +52,70 @@ endef
 
 # The argument is the file format (dne or net)
 define run_algorithms_with_evidence
-	-cp data/original/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/original/$*.$(1)
-	-cp data/original/$(basename $*).$(1) data/original/$*.$(1)
-	-$(ENCODE) python tools/encode.py cd05 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.cd05)
-	-$(ENCODE) python tools/encode.py cd06 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.cd06)
-	-$(ENCODE) python tools/encode.py d02 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.d02)
-	-$(ENCODE) python tools/encode.py sbk05 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.sbk05)
-	-$(ENCODE) python tools/encode.py bklm16 basic data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
-	-$(call run_dpmc,original/$*.$(1).cnf,2,original/$*.bklm16)
-	-$(ENCODE) python tools/encode.py cd05 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
-	-$(RUN) $(EVALUATE) data/original/$*.$(1) &> results/original/$*.cd05.old_inf
-	-$(ENCODE) python tools/encode.py cd06 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.old_enc
-	-$(RUN) $(EVALUATE) data/original/$*.$(1) &> results/original/$*.cd06.old_inf
-	-$(ENCODE) python tools/encode.py d02 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.old_enc
-	-$(RUN) $(EVALUATE) data/original/$*.$(1) &> results/original/$*.d02.old_inf
-	-$(ENCODE) python tools/encode.py sbk05 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.old_enc
-	-$(RUN) $(CACHET) data/original/$*.$(1).cnf &> results/original/$*.sbk05.old_inf
-	-$(ENCODE) python tools/encode.py bklm16 basic -l data/original/$*.$(1) -e data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
-	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$*.$(1) -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
+	-cp data/$(shell echo $* | sed "s/-[a-z0-9]\+\.inst/\.$(1)/g") data/$*.$(1)
+	-cp data/$(basename $*).$(1) data/$*.$(1)
+	-$(ENCODE) python tools/encode.py d02 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.d02.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,2,$*.d02)
+	-$(ENCODE) python tools/encode.py sbk05 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.sbk05.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,2,$*.sbk05)
+	-$(ENCODE) python tools/encode.py bklm16 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.bklm16.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,2,$*.bklm16)
+	-$(ENCODE) python tools/encode.py cd05 legacy data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd05.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd05.old_inf
+	-$(ENCODE) python tools/encode.py cd06 legacy data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd06.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.cd06.old_inf
+	-$(ENCODE) python tools/encode.py d02 legacy data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.d02.old_enc
+	-$(RUN) $(EVALUATE) data/$*.$(1) &> results/$*.d02.old_inf
+	-$(ENCODE) python tools/encode.py sbk05 legacy data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.sbk05.old_enc
+	-$(RUN) $(CACHET) data/$*.$(1).cnf &> results/$*.sbk05.old_inf
+	-$(ENCODE) python tools/encode.py bklm16 legacy data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.bklm16.old_enc
+	-$(ENCODE) python tools/bklm16_wrapper.py data/$*.$(1) -m $(MAX_MEMORY) &> results/$*.bklm16.old_inf
+	-$(ENCODE) python tools/encode.py d02 optimised data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.d02pp.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,5,$*.d02pp)
+	-$(ENCODE) python tools/encode.py cd05 optimised data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd05pp.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,5,$*.cd05pp)
+	-$(ENCODE) python tools/encode.py cd06 optimised data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd06pp.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,5,$*.cd06pp)
+	-$(ENCODE) python tools/encode.py cd05 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd05.new_enc
+	-$(ENCODE) python tools/encode.py cd06 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd06.new_enc
 endef
 
-data/original/%/WITHOUT_EVIDENCE:
-	-$(ENCODE) python tools/encode.py cd05 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.new_enc
-	-$(call run_dpmc,original/$*.cnf,2,original/$*.cd05)
-	-$(ENCODE) python tools/encode.py cd06 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.new_enc
-	-$(call run_dpmc,original/$*.cnf,2,original/$*.cd06)
-	-$(ENCODE) python tools/encode.py d02 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.new_enc
-	-$(call run_dpmc,original/$*.cnf,2,original/$*.d02)
-	-$(ENCODE) python tools/encode.py sbk05 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.new_enc
-	-$(call run_dpmc,original/$*.cnf,2,original/$*.sbk05)
-	-$(ENCODE) python tools/encode.py bklm16 basic data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.new_enc
-	-$(call run_dpmc,original/$*.cnf,2,original/$*.bklm16)
-	-$(ENCODE) python tools/encode.py cd05 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd05.old_enc
-	-$(RUN) $(EVALUATE) data/original/$* &> results/original/$*.cd05.old_inf
-	-$(ENCODE) python tools/encode.py cd06 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.cd06.old_enc
-	-$(RUN) $(EVALUATE) data/original/$* &> results/original/$*.cd06.old_inf
-	-$(ENCODE) python tools/encode.py d02 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.d02.old_enc
-	-$(RUN) $(EVALUATE) data/original/$* &> results/original/$*.d02.old_inf
-	-$(ENCODE) python tools/encode.py sbk05 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.sbk05.old_enc
-	-$(RUN) $(CACHET) data/original/$*.cnf &> results/original/$*.sbk05.old_inf
-	-$(ENCODE) python tools/encode.py bklm16 basic -l data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_enc
-	-$(ENCODE) python tools/bklm16_wrapper.py data/original/$* -m $(MAX_MEMORY) &> results/original/$*.bklm16.old_inf
+data/%/WITHOUT_EVIDENCE:
+	-$(ENCODE) python tools/encode.py d02 basic data/$* -m $(MAX_MEMORY) &> results/$*.d02.new_enc
+	-$(call run_dpmc,$*.cnf,2,$*.d02)
+	-$(ENCODE) python tools/encode.py sbk05 basic data/$* -m $(MAX_MEMORY) &> results/$*.sbk05.new_enc
+	-$(call run_dpmc,$*.cnf,2,$*.sbk05)
+	-$(ENCODE) python tools/encode.py bklm16 basic data/$* -m $(MAX_MEMORY) &> results/$*.bklm16.new_enc
+	-$(call run_dpmc,$*.cnf,2,$*.bklm16)
+	-$(ENCODE) python tools/encode.py cd05 legacy data/$* -m $(MAX_MEMORY) &> results/$*.cd05.old_enc
+	-$(RUN) $(EVALUATE) data/$* &> results/$*.cd05.old_inf
+	-$(ENCODE) python tools/encode.py cd06 legacy data/$* -m $(MAX_MEMORY) &> results/$*.cd06.old_enc
+	-$(RUN) $(EVALUATE) data/$* &> results/$*.cd06.old_inf
+	-$(ENCODE) python tools/encode.py d02 legacy data/$* -m $(MAX_MEMORY) &> results/$*.d02.old_enc
+	-$(RUN) $(EVALUATE) data/$* &> results/$*.d02.old_inf
+	-$(ENCODE) python tools/encode.py sbk05 legacy data/$* -m $(MAX_MEMORY) &> results/$*.sbk05.old_enc
+	-$(RUN) $(CACHET) data/$*.cnf &> results/$*.sbk05.old_inf
+	-$(ENCODE) python tools/encode.py bklm16 legacy data/$* -m $(MAX_MEMORY) &> results/$*.bklm16.old_enc
+	-$(ENCODE) python tools/bklm16_wrapper.py data/$* -m $(MAX_MEMORY) &> results/$*.bklm16.old_inf
+	-$(ENCODE) python tools/encode.py d02 optimised data/$* -m $(MAX_MEMORY) &> results/$*.d02pp.new_enc
+	-$(call run_dpmc,$*.cnf,5,$*.d02pp)
+	-$(ENCODE) python tools/encode.py cd05 optimised data/$* -m $(MAX_MEMORY) &> results/$*.cd05pp.new_enc
+	-$(call run_dpmc,$*.cnf,5,$*.cd05pp)
+	-$(ENCODE) python tools/encode.py cd06 optimised data/$* -m $(MAX_MEMORY) &> results/$*.cd06pp.new_enc
+	-$(call run_dpmc,$*.cnf,5,$*.cd06pp)
+	-$(ENCODE) python tools/encode.py cd05 basic data/$* -m $(MAX_MEMORY) &> results/$*.cd05.new_enc
+	-$(ENCODE) python tools/encode.py cd06 basic data/$* -m $(MAX_MEMORY) &> results/$*.cd06.new_enc
 
-data/original/%/DNE_WITH_EVIDENCE:
+data/%/DNE_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,dne)
 
-data/original/%/NET_WITH_EVIDENCE:
+data/%/NET_WITH_EVIDENCE:
 	$(call run_algorithms_with_evidence,net)
 
-data/original/%/TREEWIDTH:
-	python tools/encode.py stats basic data/original/$*
-	python tools/encode.py moralisation basic data/original/$*
-	-$(LIMIT) && $(HTD) < data/original/$*.gr > results/original/$*.td
+data/%/TREEWIDTH:
+	python tools/encode.py stats basic data/$*
+	python tools/encode.py moralisation basic data/$*
+	-$(LIMIT) && $(HTD) < data/$*.gr > results/$*.td
 
 #===============================================================================
 
@@ -115,17 +123,12 @@ clean:
 	-rm *.dot
 	-rm *.png
 	for d in $(DIRECTORIES) ; do \
-		rm -f data/original/$$d/*.dne.* ; \
-		rm -f data/original/$$d/*.net.* ; \
-		rm -f data/original/$$d/*.inst.dne ; \
-		rm -f data/original/$$d/*.inst.net ; \
-		rm -f data/original/$$d/*.uai.* ; \
-		rm -f data/original/$$d/*.gr ; \
-		rm -f data/trimmed/$$d/*.dne.* ; \
-		rm -f data/trimmed/$$d/*.net.* ; \
-		rm -f data/trimmed/$$d/*.inst.dne ; \
-		rm -f data/trimmed/$$d/*.inst.net ; \
-		rm -f data/trimmed/$$d/*.uai.* ; \
+		rm -f data/$$d/*.dne.* ; \
+		rm -f data/$$d/*.net.* ; \
+		rm -f data/$$d/*.inst.dne ; \
+		rm -f data/$$d/*.inst.net ; \
+		rm -f data/$$d/*.uai.* ; \
+		rm -f data/$$d/*.gr ; \
 	done
 
 # arguments: 1) CNF file, 2) answer file, 3) weight format
