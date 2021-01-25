@@ -134,36 +134,55 @@ void ParseCnf(std::string cnf_filename) {
   }
 }
 
+// Are this and the next clause describe two variables that are either equal or
+// each other's complement?
+bool DuplicateVariables(size_t i) {
+  return new_parameters[i] == 0 && new_parameters[i+1] == 0 &&
+    new_literals[i].size() == 2 && new_literals[i+1].size() == 2 &&
+    ((new_literals[i+1][0] == -new_literals[i][0] &&
+      new_literals[i+1][1] == -new_literals[i][1]) ||
+     (new_literals[i+1][0] == -new_literals[i][1] &&
+      new_literals[i+1][1] == -new_literals[i][0]));
+}
+
+// Do the clauses i+2 and i+3 assign weights to a conjunction?
+bool WeightClausesFollow(size_t i) {
+  return i + 3 < new_parameters.size() && new_parameters[i+2] != 0 &&
+    new_parameters[i+3] != 0 && new_literals[i+2].size() == 1 &&
+    new_literals[i+3].size() == 1;
+}
+
+// Determine the weights of a and b
+std::tuple<std::string, std::string> DetermineWeights(size_t i, int a, int b) {
+  std::string a_weight;
+  std::string b_weight;
+  if (new_literals[i+2][0] == -a && new_literals[i+3][0] == -b) {
+    return std::make_tuple(weights[new_parameters[i+2]],
+                           weights[new_parameters[i+3]]);
+  }
+  if (new_literals[i+2][0] == -b && new_literals[i+3][0] == -a) {
+    return std::make_tuple(weights[new_parameters[i+3]],
+                           weights[new_parameters[i+2]]);
+  }
+  return std::make_tuple("", "");
+ }
+
 // Let's not use two 'bits' to represent two possible values
 void MergeVariables() {
-  assert(new_literals.size() == new_parameters.size());
   for (size_t i = 0; i < new_literals.size() - 1; i++) {
-    if (new_parameters[i] == 0 && new_parameters[i+1] == 0 &&
-        new_literals[i].size() == 2 && new_literals[i+1].size() == 2 &&
-        ((new_literals[i+1][0] == -new_literals[i][0] &&
-          new_literals[i+1][1] == -new_literals[i][1]) ||
-         (new_literals[i+1][0] == -new_literals[i][1] &&
-          new_literals[i+1][1] == -new_literals[i][0]))) {
+    if (DuplicateVariables(i)) {
       int num_to_remove = 2;
       int a = std::min(std::abs(new_literals[i][0]),
                        std::abs(new_literals[i][1]));
       int b = std::max(std::abs(new_literals[i][0]),
                        std::abs(new_literals[i][1]));
-      if (i + 3 < new_parameters.size() &&
-          new_parameters[i+2] != 0 && new_parameters[i+3] != 0 &&
-          new_literals[i+2].size() == 1 && new_literals[i+3].size() == 1) {
+      if (WeightClausesFollow(i)) {
         num_to_remove = 4;
-
-        // Determine the weights of a and b
+        // TODO: rewrite this to avoid auto
         std::string a_weight;
         std::string b_weight;
-        if (new_literals[i+2][0] == -a && new_literals[i+3][0] == -b) {
-          a_weight = weights[new_parameters[i+2]];
-          b_weight = weights[new_parameters[i+3]];
-        } else if (new_literals[i+2][0] == -b && new_literals[i+3][0] == -a) {
-          a_weight = weights[new_parameters[i+3]];
-          b_weight = weights[new_parameters[i+2]];
-        } else {
+        tie(a_weight, b_weight) = DetermineWeights(i, a, b);
+        if (a_weight == "") {
           continue;
         }
 
@@ -247,6 +266,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  assert(new_literals.size() == new_parameters.size());
   MergeVariables();
   OutputEncoding(cnf_filename);
 }
