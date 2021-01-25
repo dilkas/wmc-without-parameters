@@ -24,7 +24,7 @@ void DefaultCallback::objectiveTerm(IntegerType coeff, int idVar)
 void DefaultCallback::objectiveProduct(IntegerType coeff, vector<int> list)
 {
   cout << "[" << showpos << coeff << noshowpos << " ";
-  for (int i = 0; i < list.size(); ++i)
+  for (size_t i = 0; i < list.size(); ++i)
   {
     if (list[i] < 0)
       cout << "~x" << -list[i] << ' ';
@@ -52,7 +52,7 @@ void DefaultCallback::constraintTerm(IntegerType coeff, int idVar)
 void DefaultCallback::constraintProduct(IntegerType coeff, vector<int> list)
 {
   cout << "[" << showpos << coeff << noshowpos << " ";
-  for (int i = 0; i < list.size(); ++i)
+  for (size_t i = 0; i < list.size(); ++i)
   {
     if (list[i] < 0)
       cout << "~x" << -list[i] << ' ';
@@ -81,7 +81,7 @@ void DefaultCallback::linearizeProduct(int newSymbol, vector<int> product)
   r = 1;
   beginConstraint();
   constraintTerm(1, newSymbol);
-  for (int i = 0; i < product.size(); ++i)
+  for (size_t i = 0; i < product.size(); ++i)
     if (product[i] > 0)
     {
       constraintTerm(-1, product[i]);
@@ -118,7 +118,7 @@ void DefaultCallback::linearizeProduct(int newSymbol, vector<int> product)
   r = 0;
   beginConstraint();
   constraintTerm(-(int)product.size(), newSymbol);
-  for (int i = 0; i < product.size(); ++i)
+  for (size_t i = 0; i < product.size(); ++i)
     if (product[i] > 0)
       constraintTerm(1, product[i]);
     else

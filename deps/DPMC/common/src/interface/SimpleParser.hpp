@@ -228,7 +228,7 @@ public:
       sort(list.begin(), list.end());
 
       // is this a known product ?
-      for (int i = 0; i < list.size(); ++i)
+      for (size_t i = 0; i < list.size(); ++i)
       {
           assert(p != NULL);
 
@@ -277,7 +277,7 @@ private:
   void defineProductVariableRec(Callback &cb,
                                 vector<ProductNode> &nodes, vector<int> &list)
   {
-      for (int i = 0; i < nodes.size(); ++i)
+      for (size_t i = 0; i < nodes.size(); ++i)
       {
           list.push_back(nodes[i].lit);
           if (nodes[i].productId)
@@ -296,7 +296,7 @@ private:
    */
   void freeProductVariableRec(vector<ProductNode> &nodes)
   {
-      for (int i = 0; i < nodes.size(); ++i)
+      for (size_t i = 0; i < nodes.size(); ++i)
       {
           if (nodes[i].next)
           {

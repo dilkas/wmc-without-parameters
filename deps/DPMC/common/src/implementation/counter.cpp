@@ -61,7 +61,7 @@ const vector<Int> &Counter::getDdVarOrdering() const {
 
 void Counter::orderDdVars(Cnf &cnf) {
   ddVarToCnfVarMap = cnf.getVarOrdering();
-  for (Int ddVar = 0; ddVar < ddVarToCnfVarMap.size(); ddVar++) {
+  for (size_t ddVar = 0; ddVar < ddVarToCnfVarMap.size(); ddVar++) {
     Int cnfVar = ddVarToCnfVarMap.at(ddVar);
     cnfVarToDdVarMap[cnfVar] = ddVar;
     mgr->addVar(ddVar); // creates ddVar-th ADD var
@@ -264,7 +264,8 @@ void MonolithicCounter::setCnfDd(ADD &cnfDd, Cnf &cnf) {
 
 void MonolithicCounter::constructJoinTree(const Cnf &cnf) {
   vector<JoinNode *> terminals;
-  for (Int clauseIndex = 0; clauseIndex < cnf.getClauses().size(); clauseIndex++) {
+  for (size_t clauseIndex = 0; clauseIndex < cnf.getClauses().size();
+       clauseIndex++) {
     terminals.push_back(new JoinTerminal());
   }
 
@@ -328,13 +329,13 @@ void LinearCounter::constructJoinTree(const Cnf &cnf) {
   fillProjectableCnfVarSets(clauses);
 
   vector<JoinNode *> clauseNodes;
-  for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
+  for (size_t clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     clauseNodes.push_back(new JoinTerminal());
   }
 
   joinRoot = new JoinNonterminal({clauseNodes.at(0)}, projectableCnfVarSets.at(0));
 
-  for (Int clauseIndex = 1; clauseIndex < clauses.size(); clauseIndex++) {
+  for (size_t clauseIndex = 1; clauseIndex < clauses.size(); clauseIndex++) {
     joinRoot = new JoinNonterminal({joinRoot, clauseNodes.at(clauseIndex)}, projectableCnfVarSets.at(clauseIndex));
   }
 }
@@ -380,7 +381,8 @@ LinearCounter::LinearCounter(Cudd *mgr) {
 void NonlinearCounter::printClusters(const vector<Constraint*> &clauses) const {
   printThinLine();
   printComment("clusters {");
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     printComment("\t" "cluster " + to_string(clusterIndex + 1) + ":");
     for (Int clauseIndex : clusters.at(clusterIndex)) {
       cout << "c\t\t" "clause " << clauseIndex + 1 << + ":\t";
@@ -395,7 +397,7 @@ void NonlinearCounter::fillClusters(const vector<Constraint*> &clauses,
                                     const vector<Int> &cnfVarOrdering,
                                     bool usingMinVar) {
   clusters = vector<vector<Int>>(cnfVarOrdering.size(), vector<Int>());
-  for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
+  for (size_t clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     Int clusterIndex = usingMinVar ? clauses.at(clauseIndex)->getMinRank(cnfVarOrdering) : clauses.at(clauseIndex)->getMaxRank(cnfVarOrdering);
     clusters.at(clusterIndex).push_back(clauseIndex);
   }
@@ -403,7 +405,8 @@ void NonlinearCounter::fillClusters(const vector<Constraint*> &clauses,
 
 void NonlinearCounter::printOccurrentCnfVarSets() const {
   printComment("occurrentCnfVarSets {");
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     const Set<Int> &cnfVarSet = occurrentCnfVarSets.at(clusterIndex);
     cout << "c\t" << "cluster " << clusterIndex + 1 << ":";
     for (Int cnfVar : cnfVarSet) {
@@ -416,7 +419,8 @@ void NonlinearCounter::printOccurrentCnfVarSets() const {
 
 void NonlinearCounter::printProjectableCnfVarSets() const {
   printComment("projectableCnfVarSets {");
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     const Set<Int> &cnfVarSet = projectableCnfVarSets.at(clusterIndex);
     cout << "c\t" << "cluster " << clusterIndex + 1 << ":";
     for (Int cnfVar : cnfVarSet) {
@@ -461,7 +465,7 @@ Set<Int> NonlinearCounter::getProjectingDdVars(
                                                clauses);
 
     Set<Int> otherCnfVars;
-    for (Int i = clusterIndex + 1; i < clusters.size(); i++) {
+    for (size_t i = clusterIndex + 1; i < clusters.size(); i++) {
       util::unionize(otherCnfVars, getClusterCnfVars(clusters.at(i),
                                                      clauses));
     }
@@ -483,7 +487,8 @@ void NonlinearCounter::fillDdClusters(
   if (verbosityLevel >= 2) printClusters(clauses);
 
   ddClusters = vector<vector<ADD>>(clusters.size(), vector<ADD>());
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     for (Int clauseIndex : clusters.at(clusterIndex)) {
       ADD clauseDd = clauses.at(clauseIndex)->getDD(mgr, cnfVarToDdVarMap);
       ddClusters.at(clusterIndex).push_back(clauseDd);
@@ -497,7 +502,8 @@ void NonlinearCounter::fillProjectingDdVarSets(
   fillDdClusters(clauses, cnfVarOrdering, usingMinVar);
 
   projectingDdVarSets = vector<Set<Int>>(clusters.size(), Set<Int>());
-  for (Int clusterIndex = 0; clusterIndex < ddClusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < ddClusters.size();
+       clusterIndex++) {
     projectingDdVarSets[clusterIndex] = getProjectingDdVars(clusterIndex,
                                                             usingMinVar,
                                                             cnfVarOrdering,
@@ -507,7 +513,7 @@ void NonlinearCounter::fillProjectingDdVarSets(
 
 Int NonlinearCounter::getTargetClusterIndex(Int clusterIndex) const {
   const Set<Int> &remainingCnfVars = occurrentCnfVarSets.at(clusterIndex);
-  for (Int i = clusterIndex + 1; i < clusters.size(); i++) {
+  for (size_t i = clusterIndex + 1; i < clusters.size(); i++) {
     if (!util::isDisjoint(occurrentCnfVarSets.at(i), remainingCnfVars)) {
       return i;
     }
@@ -521,7 +527,8 @@ Int NonlinearCounter::getNewClusterIndex(const ADD &abstractedClusterDd, const v
   }
   else {
     const Set<Int> &remainingDdVars = util::getSupport(abstractedClusterDd);
-    for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+    for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+         clusterIndex++) {
       if (!util::isDisjoint(projectingDdVarSets.at(clusterIndex), remainingDdVars)) {
         return clusterIndex;
       }
@@ -530,7 +537,8 @@ Int NonlinearCounter::getNewClusterIndex(const ADD &abstractedClusterDd, const v
   }
 }
 Int NonlinearCounter::getNewClusterIndex(const Set<Int> &remainingDdVars) const { // #MAVC
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     if (!util::isDisjoint(projectingDdVarSets.at(clusterIndex), remainingDdVars)) {
       return clusterIndex;
     }
@@ -552,13 +560,14 @@ void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool
   }
 
   vector<JoinNode *> terminals;
-  for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
+  for (size_t clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     terminals.push_back(new JoinTerminal());
   }
 
   /* creates cluster nodes: */
   vector<JoinNonterminal *> clusterNodes(clusters.size(), nullptr); // null node for empty cluster
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     const vector<Int> &clauseIndices = clusters.at(clusterIndex);
     if (!clauseIndices.empty()) {
       vector<JoinNode *> children;
@@ -577,7 +586,8 @@ void NonlinearCounter::constructJoinTreeUsingListClustering(const Cnf &cnf, bool
   nonterminal->addProjectableCnfVars(projectableCnfVarSets.at(nonNullClusterNodeIndex));
   joinRoot = nonterminal;
 
-  for (Int clusterIndex = nonNullClusterNodeIndex + 1; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = nonNullClusterNodeIndex + 1;
+       clusterIndex < clusters.size(); clusterIndex++) {
     JoinNonterminal *clusterNode = clusterNodes.at(clusterIndex);
     if (clusterNode != nullptr) {
       joinRoot = new JoinNonterminal({joinRoot, clusterNode}, projectableCnfVarSets.at(clusterIndex));
@@ -599,7 +609,7 @@ void NonlinearCounter::constructJoinTreeUsingTreeClustering(const Cnf &cnf, bool
   }
 
   vector<JoinNode *> terminals;
-  for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
+  for (size_t clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     terminals.push_back(new JoinTerminal());
   }
 
@@ -661,7 +671,8 @@ Float NonlinearCounter::countUsingListClustering(Cnf &cnf, bool usingMinVar) {
   /* builds ADD for CNF: */
   ADD cnfDd = mgr->addOne();
   Set<Int> projectedCnfVars;
-  for (Int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+  for (size_t clusterIndex = 0; clusterIndex < clusters.size();
+       clusterIndex++) {
     /* builds ADD for cluster: */
     ADD clusterDd = mgr->addOne();
     const vector<Int> &clauseIndices = clusters.at(clusterIndex);

@@ -232,7 +232,7 @@ Int Cnf::getDeclaredVarCount() const { return declaredVarCount; }
 Map<Int, Float> Cnf::getLiteralWeights() const { return literalWeights; }
 
 Int Cnf::getEmptyClauseIndex() const {
-  for (Int clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
+  for (size_t clauseIndex = 0; clauseIndex < clauses.size(); clauseIndex++) {
     if (clauses.at(clauseIndex)->empty()) {
       return clauseIndex;
     }
@@ -250,7 +250,7 @@ void Cnf::printLiteralWeights() const {
 
 void Cnf::printClauses() const {
   printComment("cnf {");
-  for (Int i = 0; i < clauses.size(); i++) {
+  for (size_t i = 0; i < clauses.size(); i++) {
     cout << "c\t" "clause ";
     cout << std::right << std::setw(5) << i + 1 << " : ";
     clauses.at(i)->print();
@@ -327,7 +327,7 @@ ADD Cnf::constructDdFromWords(Cudd *mgr, Int var,
                               const vector<std::string> &words) {
   ADD positive = literalToDd(var, mgr);
   ADD negative = ~positive;
-  for (Int i = 2; i < words.size() - 2; i++) {
+  for (size_t i = 2; i < words.size() - 2; i++) {
     Int var = std::stoi(words.at(i));
     ADD varADD = literalToDd(var, mgr);
     ADD newVariable = (var > 0) ? varADD : ~varADD;
@@ -458,7 +458,9 @@ Cnf::Cnf(const string &filePath, Format format, WeightFormat weightFormat,
           addClause(constraint);
           processedClauseCount++;
         }
-      } else if (weightFormat == WeightFormat::MCC && (wordCount == 3 || wordCount == 4 && words.at(3) == LINE_END_WORD)) {
+      } else if (weightFormat == WeightFormat::MCC &&
+               (wordCount == 3 ||
+                (wordCount == 4 && words.at(3) == LINE_END_WORD))) {
         Int literal = std::stoll(words.at(1));
 
         Int var = util::getCnfVar(literal);

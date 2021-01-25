@@ -117,8 +117,8 @@ void testing::test() {
   Float bmt = bouquetTreeCounter.getModelCount(cnf);
 
   vector<Float> counts = {m, l, bel, bet, bml, bmt};
-  for (Int i = 0; i < counts.size(); i++) {
-    for (Int j = i + 1; j < counts.size(); j++) {
+  for (size_t i = 0; i < counts.size(); i++) {
+    for (size_t j = i + 1; j < counts.size(); j++) {
       if (counts.at(i) != counts.at(j)) {
         showWarning("different model counts");
       }

@@ -262,10 +262,10 @@ namespace util {
 
     Int totalLiteralCount = literalWeights.size();
 
-    Int totalVarCount = totalLiteralCount / 2;
+    size_t totalVarCount = totalLiteralCount / 2;
     if (totalVarCount < projectedCnfVars.size()) showError("more projected vars than total vars");
 
-    for (Int cnfVar = 1; cnfVar <= totalVarCount; cnfVar++) {
+    for (size_t cnfVar = 1; cnfVar <= totalVarCount; cnfVar++) {
       if (!isFound(cnfVar, projectedCnfVars)) {
         totalModelCount *= literalWeights.at(cnfVar) + literalWeights.at(-cnfVar);
       }
