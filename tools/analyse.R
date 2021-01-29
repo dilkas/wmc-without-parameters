@@ -12,7 +12,7 @@ data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 
 # TODO: remove (just for testing)
 data <- data[data$dataset != "2004-PGM",]
-data$encoding_time[data$encoding == "cw"] <- 0
+data$encoding_time[grepl("pp$", data$encoding)] <- 0
 data <- data[is.na(data$answer) | data$answer < 1e-10,]
 data <- data[is.na(data$answer) | data$answer > 1e-3 & data$answer < 1,]
 data$encoding_time <- 0
@@ -51,31 +51,23 @@ data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time", "add_width", "treewidth"))
-df$time_new_bklm16[is.na(df$time_new_bklm16)] <- 2 * TIMEOUT
-df$time_new_cd05[is.na(df$time_new_cd05)] <- 2 * TIMEOUT
-df$time_new_cd06[is.na(df$time_new_cd06)] <- 2 * TIMEOUT
-df$time_new_cw[is.na(df$time_new_cw)] <- 2 * TIMEOUT
-df$time_new_d02[is.na(df$time_new_d02)] <- 2 * TIMEOUT
-df$time_new_sbk05[is.na(df$time_new_sbk05)] <- 2 * TIMEOUT
-df$time_old_bklm16[is.na(df$time_old_bklm16)] <- 2 * TIMEOUT
-df$time_old_cd05[is.na(df$time_old_cd05)] <- 2 * TIMEOUT
-df$time_old_cd06[is.na(df$time_old_cd06)] <- 2 * TIMEOUT
-df$time_old_d02[is.na(df$time_old_d02)] <- 2 * TIMEOUT
-df$time_old_sbk05[is.na(df$time_old_sbk05)] <- 2 * TIMEOUT
-
-df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
-                      function(x) max(x, na.rm = TRUE))
-df <- df %>% select(!starts_with("treewidth_"))
-df$zero_proportion <- apply(df %>% select(starts_with("zero_")), 1,
-                      function(x) max(x, na.rm = TRUE))
-df <- df %>% select(!starts_with("zero_proportion_"))
-df$count <- apply(df %>% select(starts_with("count_")), 1,
-                      function(x) max(x, na.rm = TRUE))
-df <- df %>% select(!starts_with("count_"))
-
+            value.var = c("answer", "time", "add_width"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
-time_columns0 <- time_columns[time_columns != "time_new_bklm16"]
+time_columns0 <- time_columns[!grepl('pp$', time_columns)]
+for (column in time_columns) {
+  df[is.na(df[[column]]), column] <- 2 * TIMEOUT
+}
+
+#df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
+#                      function(x) max(x, na.rm = TRUE))
+#df <- df %>% select(!starts_with("treewidth_"))
+#df$zero_proportion <- apply(df %>% select(starts_with("zero_")), 1,
+#                      function(x) max(x, na.rm = TRUE))
+#df <- df %>% select(!starts_with("zero_proportion_"))
+#df$count <- apply(df %>% select(starts_with("count_")), 1,
+#                      function(x) max(x, na.rm = TRUE))
+#df <- df %>% select(!starts_with("count_"))
+
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
 df$time_min0 <- as.numeric(apply(df, 1, function (row) min(row[time_columns0])))
 df$major.dataset <- "Non-binary"
@@ -94,11 +86,10 @@ instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
 df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
                       answer = NA, time = instance_to_min_time[df$instance],
-                      add_width= max(data$add_width), treewidth = max(data$treewidth))
+                      add_width= max(data$add_width))
 df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
                        answer = NA, time = instance_to_min_time0[df$instance],
-                       add_width = max(data$add_width),
-                       treewidth = max(data$treewidth))
+                       add_width = max(data$add_width))
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
@@ -179,8 +170,8 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
                          max.time) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
-                                      col = treewidth,
-                                      shape = major.dataset)) +
+                                      col = dataset,
+                                      shape = dataset)) +
     geom_jitter(alpha = 1, size = 1, width = 0.1, height = 0.1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
     scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
@@ -195,16 +186,22 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
     labs(shape = "Data set", colour = "Treewidth") +
-    scale_color_viridis("Treewidth", trans = "log") + # TODO: add breaks
+#    scale_color_viridis("Treewidth", trans = "log") + # TODO: add breaks
     scale_shape("Data set")
 }
 
-scatter_plot(df, "time_old_cd06", "time_new_bklm16", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{bklm16} time (s)", 2 * TIMEOUT)
-scatter_plot(df, "add_width_new_cw", "add_width_new_bklm16", "\\texttt{cw} width",
-                   "\\texttt{bklm16} width", max(data$add_width))
+scatter_plot(df, "time_old_cd06", "time_new_cd06pp", "\\texttt{old_cd06} time (s)",
+                   "\\texttt{new_cd06++} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "time_new_d02", "time_new_d02pp", "\\texttt{d02} time (s)",
+                   "\\texttt{d02++} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "add_width_new_d02pp", "add_width_new_d02", "\\texttt{d02++} width",
+                   "\\texttt{d02} width", max(data$add_width))
+scatter_plot(df, "add_width_new_cd06pp", "add_width_new_sbk05", "\\texttt{cd06++} width",
+                   "\\texttt{sbk05} width", max(data$add_width))
 scatter_plot(df, "treewidth", "add_width_new_bklm16", "treewidth",
                    "\\texttt{bklm16} width", max(data$add_width))
+
+scatter_plot(data, "add_width", "inference_time", "ADD width", "time", 2 * TIMEOUT)
 
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 dev.off()
@@ -241,7 +238,8 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
     xlab("Time (s)") +
     ylab("Instances solved") +
 #    scale_colour_brewer(palette = "Dark2") +
-    scale_colour_manual(values = c(2, 3, 4, 1, 5, 6, 2, 3, 4, 5, 6, 7, 7)) +
+    scale_colour_manual(breaks = map(column_values, function(x)
+      paste("\\texttt{", x, "}", sep = "")), values = c(1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 7)) +
     scale_linetype_manual(breaks = map(column_values, function(x)
       paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
@@ -316,5 +314,6 @@ ggplot(df, aes(add_width_new_bklm16, add_width_new_d02, color = major.dataset)) 
   scale_y_continuous(trans = log10_trans()) +
   geom_abline(slope = 1, intercept = 0, colour = "#989898")
 
-df$diff <- df$add_width_new_bklm16 - df$add_width_new_d02
-ggplot(df, aes(diff)) + geom_histogram()
+df$diff <- df$add_width_new_d02 - df$add_width_new_d02pp
+ggplot(df, aes(diff)) + geom_density()
+ggplot(df, aes(diff)) + geom_boxplot()

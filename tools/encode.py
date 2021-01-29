@@ -415,7 +415,7 @@ def ace_encoder(args):
     write_cnf_file(args, max_literal, clauses,
                    encode_weights(weights, max_literal, args.mode == 'legacy'))
     if (args.mode == 'optimised'):
-        run(CNF4DPMC + [args.network])
+        run(CNF4DPMC + [args.network + '.cnf'])
 
 
 def bn2cnf_encoder(args):
@@ -450,6 +450,8 @@ def bn2cnf_encoder(args):
 
     if args.mode == 'legacy':
         run(C2D + ['-in', args.network + '.cnf'], args.memory)
+    elif args.mode == 'optimised':
+        run(CNF4DPMC + [args.network + '.cnf'])
 
 
 def my_encoder(args):
@@ -503,7 +505,8 @@ def stats_encoder(args):
     total = sum(probabilities.values())
     stats = {
         'count': len(probabilities),
-        'zero_proportion': probabilities[Fraction('0')] / total
+        'zero_proportion': (probabilities[Fraction('0')] +
+                            probabilities[Fraction('1')]) / total
     }
     with open(args.network + '.stats', 'w') as prob_file:
         writer = csv.DictWriter(prob_file, fieldnames=stats.keys())
