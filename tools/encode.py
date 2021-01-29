@@ -415,7 +415,7 @@ def ace_encoder(args):
     write_cnf_file(args, max_literal, clauses,
                    encode_weights(weights, max_literal, args.mode == 'legacy'))
     if (args.mode == 'optimised'):
-        run(CNF4DPMC + [args.network + '.cnf'])
+        run(CNF4DPMC + [args.network + '.cnf', '-l'])
 
 
 def bn2cnf_encoder(args):
