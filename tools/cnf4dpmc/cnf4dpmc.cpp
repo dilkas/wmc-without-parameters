@@ -3,15 +3,18 @@
 
 #include "../../deps/cxxopts.hpp"
 
-enum LineType {Clause, Weight, Skip};
-
 int num_vars = 0;
+int num_disabled = 0;
 double premultiplication_constant = 1;
-std::vector<std::vector<int>> clauses;
 std::map<int, int> decrements;
-std::vector<int> new_parameters;
-std::vector<std::string> new_weights;
 std::vector<std::string> weights;
+std::vector<std::string> new_weights;
+
+std::vector<std::vector<int>> clauses;
+// A positive integer points to the parameter variable that holds the weights
+// associated with this weight line. 0 represents a clause. -1 represents a
+// skipped/disabled clause.
+std::vector<int> new_parameters;
 
 std::string GetWeight(int literal) {
   if (literal > 0) {
@@ -129,7 +132,6 @@ void ParseCnf(std::string filename, bool fill_decrements) {
     iss >> token;
     if (token[0] == 'p') {
       iss >> token;
-      assert(token == "cnf");
       iss >> num_vars;
     } else if (token[0] == 'c') {
       iss >> token;
@@ -227,23 +229,21 @@ void MergeVariables() {
 void Transform() {
   for (size_t i = 0; i < clauses.size(); i++) {
     int parameter_variable = 0;
-    LineType line_type = Clause;
     for (auto literal : clauses[i]) {
       if (literal < 0 && decrements.find(-literal) != decrements.end()) {
-        line_type = Skip;
-        clauses.erase(clauses.begin() + i);
-        i--;
+        parameter_variable = -1;
+        num_disabled++;
         break;
       }
       if (literal > 0 && decrements.find(literal) != decrements.end()) {
-        line_type = Weight;
         parameter_variable = literal;
+        if (clauses[i].size() == 1) {
+          num_disabled++;
+        }
         break;
       }
     }
-    if (line_type != Skip) {
-      new_parameters.push_back(parameter_variable);
-    }
+    new_parameters.push_back(parameter_variable);
   }
 }
 
@@ -251,8 +251,11 @@ void Transform() {
 void OutputEncoding(std::string filename) {
   std::ofstream output(filename);
   output << "p cnf " << num_vars - decrements.size() << " "
-         << clauses.size() + new_weights.size() << std::endl;
+         << clauses.size() + new_weights.size() - num_disabled << std::endl;
   for (size_t i = 0; i < clauses.size(); i++) {
+    if (new_parameters[i] < 0) {
+      continue;
+    }
     if (new_parameters[i] == 0) {
       for (int literal : clauses[i]) {
         output << RenameLiteral(literal) << " ";
@@ -302,17 +305,16 @@ int main(int argc, char *argv[]) {
 
   // Weight lines with weight = 1 can be removed
   for (size_t i = 0; i < clauses.size(); i++) {
-    if (new_parameters[i] != 0 && !clauses[i].empty() &&
+    if (new_parameters[i] > 0 && !clauses[i].empty() &&
         std::stod(GetWeight(new_parameters[i])) == 1) {
-      new_parameters.erase(new_parameters.begin() + i);
-      clauses.erase(clauses.begin() + i);
-      i--;
+      new_parameters[i] = -1;
+      num_disabled++;
     }
   }
 
   // Merge two weight lines into one
   for (size_t i = 0; i < clauses.size() - 1; i++) {
-    if (new_parameters[i] != 0 && new_parameters[i+1] != 0 &&
+    if (new_parameters[i] > 0 && new_parameters[i+1] > 0 &&
         clauses[i].size() == 2 && clauses[i+1].size() == 2 &&
         clauses[i+1][0] == -clauses[i][0]) {
       int positive_parameter = (clauses[i][0] < 0) ?
@@ -323,14 +325,10 @@ int main(int argc, char *argv[]) {
       new_weights.push_back("w " + std::to_string(variable) + " " +
                             GetWeight(positive_parameter) + " " +
                             GetWeight(negative_parameter));
-      new_parameters.erase(new_parameters.begin() + i,
-                           new_parameters.begin() + i + 2);
-      clauses.erase(clauses.begin() + i, clauses.begin() + i + 2);
-      i--;
+      new_parameters[i] = -1;
+      new_parameters[++i] = -1;
+      num_disabled += 2;
     }
   }
-
-  assert(clauses.size() == new_parameters.size());
-  //MergeVariables();
   OutputEncoding(filename);
 }
