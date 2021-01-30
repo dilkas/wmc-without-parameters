@@ -9,7 +9,6 @@ double premultiplication_constant = 1;
 std::map<int, int> decrements;
 std::vector<std::string> weights;
 std::vector<std::string> new_weights;
-
 std::vector<std::vector<int>> clauses;
 // A positive integer points to the parameter variable that holds the weights
 // associated with this weight line. 0 represents a clause. -1 represents a
@@ -36,31 +35,7 @@ int RenameLiteral(int literal) {
   return new_literal;
 }
 
-// NOTE: Deprecated
-void AddToDecrements(int literal) {
-  auto it = decrements.upper_bound(literal);
-  int decrement = (it != decrements.begin()) ? std::prev(it)->second + 1 : 1;
-  for (; it != decrements.end(); it++) {
-    decrements[it->first] = it->second + 1;
-  }
-  decrements[literal] = decrement;
-}
-
-// NOTE: Deprecated
-void Rename(int previous, int next) {
-  for (auto & clause : clauses) {
-    for (auto & literal : clause) {
-      if (literal == previous) {
-        literal = next;
-      } else if (literal == -previous) {
-        literal = -next;
-      }
-    }
-  }
-}
-
 // Read the LMAP file, creating a map of decrements
-// NOTE: Deprecated
 void ParseLmap(std::string filename) {
   std::ifstream lmap_file(filename.substr(0, filename.length() - 3) + "lmap");
   std::string line;
@@ -145,83 +120,6 @@ void ParseCnf(std::string filename, bool fill_decrements) {
         iss >> token;
       }
       clauses.push_back(literals);
-    }
-  }
-}
-
-// Are this and the next clause describe two variables that are either equal or
-// each other's complement?
-// NOTE: Deprecated
-bool DuplicateVariables(size_t i) {
-  return new_parameters[i] == 0 && new_parameters[i+1] == 0 &&
-    clauses[i].size() == 2 && clauses[i+1].size() == 2 &&
-    ((clauses[i+1][0] == -clauses[i][0] &&
-      clauses[i+1][1] == -clauses[i][1]) ||
-     (clauses[i+1][0] == -clauses[i][1] &&
-      clauses[i+1][1] == -clauses[i][0]));
-}
-
-// Do the clauses i+2 and i+3 assign weights to a conjunction?
-// NOTE: Deprecated
-bool WeightClausesFollow(size_t i) {
-  return i + 3 < new_parameters.size() && new_parameters[i+2] != 0 &&
-    new_parameters[i+3] != 0 && clauses[i+2].size() == 1 &&
-    clauses[i+3].size() == 1;
-}
-
-// Determine the weights of a and b
-// NOTE: Deprecated
-std::tuple<std::string, std::string> DetermineWeights(size_t i, int a, int b) {
-  std::string a_weight;
-  std::string b_weight;
-  if (clauses[i+2][0] == -a && clauses[i+3][0] == -b) {
-    return std::make_tuple(GetWeight(new_parameters[i+2]),
-                           GetWeight(new_parameters[i+3]));
-  }
-  if (clauses[i+2][0] == -b && clauses[i+3][0] == -a) {
-    return std::make_tuple(GetWeight(new_parameters[i+3]),
-                           GetWeight(new_parameters[i+2]));
-  }
-  return std::make_tuple("", "");
- }
-
-// Let's not use two 'bits' to represent two possible values
-// NOTE: Deprecated
-void MergeVariables() {
-  for (size_t i = 0; i < clauses.size() - 1; i++) {
-    if (DuplicateVariables(i)) {
-      int num_to_remove = 2;
-      int a = std::min(std::abs(clauses[i][0]),
-                       std::abs(clauses[i][1]));
-      int b = std::max(std::abs(clauses[i][0]),
-                       std::abs(clauses[i][1]));
-      if (WeightClausesFollow(i)) {
-        num_to_remove = 4;
-        std::string a_weight;
-        std::string b_weight;
-        tie(a_weight, b_weight) = DetermineWeights(i, a, b);
-        if (a_weight == "") {
-          continue;
-        }
-
-        // Add a new clause
-        // NOTE: we assume that all variables that are due to be removed that
-        // are smaller than 'a' have already been added to 'decrements'
-        std::ostringstream oss;
-        oss << "w " << RenameLiteral(a) << " " << a_weight << " "
-            << b_weight;
-        new_weights.push_back(oss.str());
-      }
-      Rename(b, ((clauses[i][0] < 0 && clauses[i][1] < 0) ||
-                 (clauses[i][0] > 0 && clauses[i][1] > 0)) ? -a : a);
-      AddToDecrements(b);
-
-      // Remove clauses
-      clauses.erase(clauses.begin() + i,
-                    clauses.begin() + i + num_to_remove);
-      new_parameters.erase(new_parameters.begin() + i,
-                           new_parameters.begin() + i + num_to_remove);
-      i--;
     }
   }
 }
