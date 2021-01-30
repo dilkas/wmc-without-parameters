@@ -313,6 +313,11 @@ void JoinTreeReader::finishReadingJoinTree(bool alarming) {
     printThinLine();
     printComment("After " + to_string(getSeconds(startTime)) + " seconds, finished reading last legal join tree ending on or before line " + to_string(lineIndex) + " with ADD width " + to_string(maxVarCount));
 
+    if (--jtLimit == 0) {
+      disarmAlarm();
+      killPlanner();
+    }
+
     if (alarming) {
       Float newTimeoutSeconds = getNewTimeoutSeconds(maxVarCount);
       reviseAlarm(newTimeoutSeconds);
@@ -448,10 +453,12 @@ JoinNonterminal *JoinTreeReader::getJoinTreeRoot() const {
 JoinTreeReader::JoinTreeReader(
   const string &filePath,
   Float jtWaitSeconds,
+  Int jtLimit,
   Float performanceFactor,
   const vector<Constraint*> &clauses
 ) {
   this->jtWaitSeconds = jtWaitSeconds;
+  this->jtLimit = jtLimit;
   this->performanceFactor = performanceFactor;
   this->clauses = clauses;
 

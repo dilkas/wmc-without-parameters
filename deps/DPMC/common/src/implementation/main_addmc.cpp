@@ -15,6 +15,7 @@ void OptionDict::printOptionalOptions() const {
   util::printOutputWeightFormatOption();
   util::printJtFileOption();
   util::printJtWaitOption();
+  util::printJtLimitOption();
   util::printPerformanceFactorOption();
   util::printOutputFormatOption();
   util::printClusteringHeuristicOption();
@@ -58,6 +59,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
     (OUTPUT_WEIGHT_FORMAT_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_WEIGHT_FORMAT_CHOICE)))
     (JT_FILE_OPTION, "", cxxopts::value<string>()->default_value(DUMMY_STR))
     (JT_WAIT_DURAION_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_JT_WAIT_SECONDS)))
+    (JT_LIMIT_OPTION, "", cxxopts::value<Int>()->default_value(to_string(DEFAULT_JT_LIMIT)))
     (PERFORMANCE_FACTOR_OPTION, "performance factor", cxxopts::value<string>()->default_value(to_string(DEFAULT_PERFORMANCE_FACTOR)))
     (OUTPUT_FORMAT_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_OUTPUT_FORMAT_CHOICE)))
     (CLUSTERING_HEURISTIC_OPTION, "", cxxopts::value<string>()->default_value(to_string(DEFAULT_CLUSTERING_HEURISTIC_CHOICE)))
@@ -83,6 +85,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
   weightFormatOption = std::stoll(result[WEIGHT_FORMAT_OPTION].as<string>());
   outputWeightFormatOption = std::stoll(result[OUTPUT_WEIGHT_FORMAT_OPTION].as<string>());
   jtWaitSeconds = std::stold(result[JT_WAIT_DURAION_OPTION].as<string>());
+  jtLimit = result[JT_LIMIT_OPTION].as<Int>();
   performanceFactor = std::stold(result[PERFORMANCE_FACTOR_OPTION].as<string>());
   outputFormatOption = std::stoll(result[OUTPUT_FORMAT_OPTION].as<string>());
   clusteringHeuristicOption = std::stoll(result[CLUSTERING_HEURISTIC_OPTION].as<string>());
@@ -143,6 +146,7 @@ void solving::solveOptions(
   Int outputWeightFormatOption,
   const string &jtFilePath,
   Float jtWaitSeconds,
+  Int jtLimit,
   Float performanceFactor,
   Int outputFormatOption,
   Int clusteringHeuristicOption,
@@ -221,6 +225,7 @@ void solving::solveOptions(
     util::printRow("outputWeightFormat", util::getWeightFormatName(outputWeightFormat));
     util::printRow("jtFilePath", jtFilePath);
     util::printRow("jtWaitSeconds", jtWaitSeconds);
+    util::printRow("jtLimit", jtLimit);
     util::printRow("performanceFactor", performanceFactor);
     util::printRow("outputFormat", util::getOutputFormatName(outputFormat));
     util::printRow("clustering", util::getClusteringHeuristicName(clusteringHeuristic));
@@ -241,7 +246,7 @@ void solving::solveOptions(
   }
 
   if (outputFormat == OutputFormat::MODEL_COUNT && jtFilePath != DUMMY_STR) {
-    const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds,
+    const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds, jtLimit,
                                         performanceFactor, cnf.getClauses());
     JoinTreeCounter joinTreeCounter(
       &mgr,
@@ -315,6 +320,7 @@ void solving::solveCommand(int argc, char *argv[]) {
       optionDict.outputWeightFormatOption,
       optionDict.jtFilePath,
       optionDict.jtWaitSeconds,
+      optionDict.jtLimit,
       optionDict.performanceFactor,
       optionDict.outputFormatOption,
       optionDict.clusteringHeuristicOption,

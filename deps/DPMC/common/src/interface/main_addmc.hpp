@@ -16,6 +16,7 @@ public:
   Int outputWeightFormatOption;
   string jtFilePath;
   Float jtWaitSeconds;
+  Int jtLimit;
   Float performanceFactor;
   Int outputFormatOption;
   Int clusteringHeuristicOption;
@@ -46,6 +47,7 @@ namespace solving {
     Int outputWeightFormatOption,
     const string &jtFilePath,
     Float jtWaitSeconds,
+    Int jtLimit,
     Float performanceFactor,
     Int outputFormatOption,
     Int clusteringHeuristicOption,

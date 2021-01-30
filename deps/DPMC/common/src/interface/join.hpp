@@ -112,6 +112,7 @@ protected:
   static Int plannerPid;
 
   Float jtWaitSeconds;
+  Int jtLimit;
   Float performanceFactor;
   JoinTree *backupJoinTree = nullptr;
   JoinTree *joinTree = nullptr;
@@ -138,6 +139,7 @@ public:
   JoinTreeReader(
     const string &filePath,
     Float jtWaitSeconds,
+    Int jtLimit,
     Float performanceFactor,
     const vector<Constraint*> &clauses);
 };

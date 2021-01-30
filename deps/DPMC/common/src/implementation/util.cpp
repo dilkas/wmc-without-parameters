@@ -28,6 +28,7 @@ const string &WEIGHT_FORMAT_OPTION = "wf";
 const string &OUTPUT_WEIGHT_FORMAT_OPTION = "ow";
 const string &JT_FILE_OPTION = "jf";
 const string &JT_WAIT_DURAION_OPTION = "jw";
+const string &JT_LIMIT_OPTION = "jl";
 const string &PERFORMANCE_FACTOR_OPTION = "pf";
 const string &OUTPUT_FORMAT_OPTION = "of";
 const string &CLUSTERING_HEURISTIC_OPTION = "ch";
@@ -52,6 +53,7 @@ const std::map<Int, WeightFormat> WEIGHT_FORMAT_CHOICES = {
 const Int DEFAULT_WEIGHT_FORMAT_CHOICE = 3;
 
 const Float DEFAULT_JT_WAIT_SECONDS = 10;
+const Int DEFAULT_JT_LIMIT = 0;
 const Float DEFAULT_PERFORMANCE_FACTOR = 1e-20; // cxxopts underflow
 
 const std::map<Int, OutputFormat> OUTPUT_FORMAT_CHOICES = {
@@ -189,6 +191,11 @@ void util::printJtFileOption() {
 void util::printJtWaitOption() {
   cout << "      --" << JT_WAIT_DURAION_OPTION << std::left << std::setw(56) << "=arg  jt wait duration before jt planner is killed";
   cout << "Default arg: " << DEFAULT_JT_WAIT_SECONDS << " (seconds)\n";
+}
+
+void util::printJtLimitOption() {
+  cout << "      --" << JT_LIMIT_OPTION << std::left << std::setw(56) << "=arg  the number of join trees to to read";
+  cout << "Default arg: " << DEFAULT_JT_LIMIT << "\n";
 }
 
 void util::printPerformanceFactorOption() {

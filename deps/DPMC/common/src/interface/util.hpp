@@ -72,6 +72,7 @@ extern const string &WEIGHT_FORMAT_OPTION;
 extern const string &OUTPUT_WEIGHT_FORMAT_OPTION;
 extern const string &JT_FILE_OPTION;
 extern const string &JT_WAIT_DURAION_OPTION;
+extern const string &JT_LIMIT_OPTION;
 extern const string &PERFORMANCE_FACTOR_OPTION;//alpha in parallel tensor paper
 extern const string &OUTPUT_FORMAT_OPTION;
 extern const string &CLUSTERING_HEURISTIC_OPTION;
@@ -89,6 +90,7 @@ extern const std::map<Int, WeightFormat> WEIGHT_FORMAT_CHOICES;
 extern const Int DEFAULT_WEIGHT_FORMAT_CHOICE;
 
 extern const Float DEFAULT_JT_WAIT_SECONDS;
+extern const Int DEFAULT_JT_LIMIT;
 extern const Float DEFAULT_PERFORMANCE_FACTOR;
 
 enum class OutputFormat { WEIGHTED_FORMULA, JOIN_TREE, MODEL_COUNT };
@@ -142,6 +144,7 @@ namespace util {
   void printOutputWeightFormatOption();
   void printJtFileOption();
   void printJtWaitOption();
+  void printJtLimitOption();
   void printPerformanceFactorOption();
   void printOutputFormatOption();
   void printClusteringHeuristicOption();

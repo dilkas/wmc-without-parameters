@@ -11,6 +11,7 @@ void OptionDict::printOptionalOptions() const {
   util::printFormatOption();
   util::printWeightFormatOption();
   util::printJtWaitOption();
+  util::printJtLimitOption();
   util::printPerformanceFactorOption();
   util::printDdVarOrderingHeuristicOption();
   util::printRandomSeedOption();
@@ -38,6 +39,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
     (FORMAT_OPTION, "the format of the input file", cxxopts::value<string>()->default_value(to_string(DEFAULT_FORMAT_CHOICE)))
     (WEIGHT_FORMAT_OPTION, "weight format", cxxopts::value<string>()->default_value(to_string(DEFAULT_WEIGHT_FORMAT_CHOICE)))
     (JT_WAIT_DURAION_OPTION, "jt wait duration in seconds", cxxopts::value<Float>()->default_value(to_string(DEFAULT_JT_WAIT_SECONDS)))
+    (JT_LIMIT_OPTION, "the number of join trees to read", cxxopts::value<Int>()->default_value(to_string(DEFAULT_JT_LIMIT)))
     (PERFORMANCE_FACTOR_OPTION, "performance factor", cxxopts::value<Float>()->default_value(to_string(DEFAULT_PERFORMANCE_FACTOR)))
     (DIAGRAM_VAR_ORDER_OPTION, "diagram variable order heuristic", cxxopts::value<string>()->default_value(to_string(DEFAULT_DD_VAR_ORDERING_HEURISTIC_CHOICE)))
     (RANDOM_SEED_OPTION, "random seed", cxxopts::value<string>()->default_value(to_string(DEFAULT_RANDOM_SEED)))
@@ -56,6 +58,7 @@ OptionDict::OptionDict(int argc, char *argv[]) {
     formatOption = std::stoll(result[FORMAT_OPTION].as<string>());
     weightFormatOption = std::stoll(result[WEIGHT_FORMAT_OPTION].as<string>());
     jtWaitSeconds = (result[JT_WAIT_DURAION_OPTION].as<Float>());
+    jtLimit = result[JT_LIMIT_OPTION].as<Int>();
     performanceFactor = result[PERFORMANCE_FACTOR_OPTION].as<Float>();
     if (performanceFactor <= 0) { // cxxopts underflow
       performanceFactor = DEFAULT_PERFORMANCE_FACTOR;
@@ -75,6 +78,7 @@ void solving::solveOptions(
   Int formatOption,
   Int weightFormatOption,
   Float jtWaitSeconds,
+  Int jtLimit,
   Float performanceFactor,
   Int ddVarOrderingHeuristicOption) {
   Format format;
@@ -114,6 +118,7 @@ void solving::solveOptions(
     util::printRow("format", util::getFormatName(format));
     util::printRow("weightFormat", util::getWeightFormatName(weightFormat));
     util::printRow("jtWaitSeconds", jtWaitSeconds);
+    util::printRow("jtLimit", jtLimit);
     util::printRow("performanceFactor", performanceFactor);
     util::printRow("diagramVarOrder", util::getVarOrderingHeuristicName(ddVarOrderingHeuristic));
     util::printRow("inverseDiagramVarOrder", inverseDdVarOrdering);
@@ -123,7 +128,7 @@ void solving::solveOptions(
   Cnf cnf(cnfFilePath, format, weightFormat, &mgr, ddVarOrderingHeuristic,
           inverseDdVarOrdering);
 
-  const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds,
+  const JoinTreeReader joinTreeReader(jtFilePath, jtWaitSeconds, jtLimit,
                                       performanceFactor, cnf.getClauses());
   JoinTreeCounter joinTreeCounter(
     &mgr,
@@ -149,6 +154,7 @@ void solving::solveCommand(int argc, char *argv[]) {
       optionDict.formatOption,
       optionDict.weightFormatOption,
       optionDict.jtWaitSeconds,
+      optionDict.jtLimit,
       optionDict.performanceFactor,
       optionDict.ddVarOrderingHeuristicOption);
     cout << "\n";

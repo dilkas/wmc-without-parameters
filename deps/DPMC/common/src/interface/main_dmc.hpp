@@ -18,6 +18,7 @@ public:
   Int formatOption;
   Int weightFormatOption;
   Float jtWaitSeconds;
+  Int jtLimit;
   Float performanceFactor;
   Int ddVarOrderingHeuristicOption;
   Int randomSeedOption;
@@ -41,6 +42,7 @@ namespace solving {
     Int formatOption,
     Int weightFormatOption,
     Float jtWaitSeconds,
+    Int jtLimit,
     Float performanceFactor,
     Int ddVarOrderingHeuristicOption);
   void solveCommand(int argc, char *argv[]);
