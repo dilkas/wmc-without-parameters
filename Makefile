@@ -76,6 +76,8 @@ define run_algorithms_with_evidence
 	-$(call run_dpmc,$*.$(1).cnf,5,$*.cd05pp)
 	-$(ENCODE) python tools/encode.py cd06 optimised data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd06pp.new_enc
 	-$(call run_dpmc,$*.$(1).cnf,5,$*.cd06pp)
+	-$(ENCODE) python tools/encode.py bklm16 optimised data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.bklm16pp.new_enc
+	-$(call run_dpmc,$*.$(1).cnf,5,$*.bklm16pp)
 	-$(ENCODE) python tools/encode.py cd05 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd05.new_enc
 	-$(ENCODE) python tools/encode.py cd06 basic data/$*.$(1) -e data/$* -m $(MAX_MEMORY) &> results/$*.cd06.new_enc
 endef
@@ -103,6 +105,8 @@ data/%/WITHOUT_EVIDENCE:
 	-$(call run_dpmc,$*.cnf,5,$*.cd05pp)
 	-$(ENCODE) python tools/encode.py cd06 optimised data/$* -m $(MAX_MEMORY) &> results/$*.cd06pp.new_enc
 	-$(call run_dpmc,$*.cnf,5,$*.cd06pp)
+	-$(ENCODE) python tools/encode.py bklm16 optimised data/$* -m $(MAX_MEMORY) &> results/$*.bklm16pp.new_enc
+	-$(call run_dpmc,$*.cnf,5,$*.bklm16pp)
 	-$(ENCODE) python tools/encode.py cd05 basic data/$* -m $(MAX_MEMORY) &> results/$*.cd05.new_enc
 	-$(ENCODE) python tools/encode.py cd06 basic data/$* -m $(MAX_MEMORY) &> results/$*.cd06.new_enc
 
@@ -166,6 +170,8 @@ endef
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $<
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	python tools/encode.py bklm16 optimised $<
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised BKLM16 failed on $@" && exit 1)
 # optimised NET with evidence
 	python tools/encode.py d02 optimised $< -e $(word 3, $?)
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
@@ -173,6 +179,8 @@ endef
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $< -e $(word 3, $?)
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	python tools/encode.py bklm16 optimised $< -e $(word 3, $?)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised BKLM16 failed on $@" && exit 1)
 
 %.test: %.dne %.answer %.inst %.inst.answer tools/encode.py
 # basic DNE
@@ -196,6 +204,8 @@ endef
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $<
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	python tools/encode.py bklm16 optimised $<
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 2, $?) - >/dev/null || (echo "optimised BKLM16 failed on $@" && exit 1)
 # optimised DNE with evidence
 	python tools/encode.py d02 optimised $< -e $(word 3, $?)
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised D02 failed on $@" && exit 1)
@@ -203,6 +213,8 @@ endef
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD05 failed on $@" && exit 1)
 	python tools/encode.py cd06 optimised $< -e $(word 3, $?)
 	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised CD06 failed on $@" && exit 1)
+	python tools/encode.py bklm16 optimised $< -e $(word 3, $?)
+	$(call run_dpmc2,$<.cnf,5) | awk '/s wmc/ {print $$3}' | diff -q $(word 4, $?) - >/dev/null || (echo "optimised BKLM16 failed on $@" && exit 1)
 
 test: $(addsuffix .test, $(basename $(wildcard test_data/*.inst)))
 	@echo "Success, all tests passed."

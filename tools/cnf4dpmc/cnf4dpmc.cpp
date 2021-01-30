@@ -250,8 +250,8 @@ void Transform() {
 // Compile and output the new encoding
 void OutputEncoding(std::string filename) {
   std::ofstream output(filename);
-  output << "p cnf " << num_vars - decrements.size() << " " << clauses.size()
-         << std::endl;
+  output << "p cnf " << num_vars - decrements.size() << " "
+         << clauses.size() + new_weights.size() << std::endl;
   for (size_t i = 0; i < clauses.size(); i++) {
     if (new_parameters[i] == 0) {
       for (int literal : clauses[i]) {
@@ -306,6 +306,26 @@ int main(int argc, char *argv[]) {
         std::stod(GetWeight(new_parameters[i])) == 1) {
       new_parameters.erase(new_parameters.begin() + i);
       clauses.erase(clauses.begin() + i);
+      i--;
+    }
+  }
+
+  // Merge two weight lines into one
+  for (size_t i = 0; i < clauses.size() - 1; i++) {
+    if (new_parameters[i] != 0 && new_parameters[i+1] != 0 &&
+        clauses[i].size() == 2 && clauses[i+1].size() == 2 &&
+        clauses[i+1][0] == -clauses[i][0]) {
+      int positive_parameter = (clauses[i][0] < 0) ?
+        new_parameters[i] : new_parameters[i+1];
+      int negative_parameter = (clauses[i][0] < 0) ?
+        new_parameters[i+1] : new_parameters[i];
+      int variable = RenameLiteral(std::abs(clauses[i][0]));
+      new_weights.push_back("w " + std::to_string(variable) + " " +
+                            GetWeight(positive_parameter) + " " +
+                            GetWeight(negative_parameter));
+      new_parameters.erase(new_parameters.begin() + i,
+                           new_parameters.begin() + i + 2);
+      clauses.erase(clauses.begin() + i, clauses.begin() + i + 2);
       i--;
     }
   }

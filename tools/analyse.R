@@ -259,6 +259,9 @@ tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
                 c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")
+cumulative_plot(df2, "encoding", "Encoding",
+                sort(unique(df2$encoding)),
+                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "add_width", "ADD Width")
 
 # Stacked bar plots comparing encoding and inference time
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
