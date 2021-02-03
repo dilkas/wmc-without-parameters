@@ -504,7 +504,7 @@ def stats_encoder(args):
         probabilities.update([Fraction(p).limit_denominator() for p in probs])
     total = sum(probabilities.values())
     stats = {
-        'count': len(probabilities),
+        'num_variables': len(bn.parents),
         'zero_proportion': (probabilities[Fraction('0')] +
                             probabilities[Fraction('1')]) / total
     }

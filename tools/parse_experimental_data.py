@@ -91,6 +91,10 @@ def parse_dir(directory, additional_data={}):
         if 'inst' not in filename:
             treewidth[filename[:filename.rindex('.')]] = parse_td_file(
                 filename)
+    with open('results/tw_results.csv') as tw_file:
+        reader = csv.DictReader(tw_file)
+        for row in reader:
+            treewidth[row['instance']] = row['treewidth']
 
     stats = {}
     for filename in glob.glob('data' + directory[directory.index('/'):] + '*.stats'):

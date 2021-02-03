@@ -6,7 +6,6 @@ require(purrr)
 require(tikzDevice)
 require(ggpubr)
 require(tidyr)
-require(viridis)
 
 data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 
@@ -174,19 +173,19 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
                                       shape = dataset)) +
     geom_jitter(alpha = 1, size = 1, width = 0.1, height = 0.1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
-    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
-                       breaks = c(0.1, 10, 1000),
-                       labels = c("0.1", "10", "1000")) +
-    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time),
-                       breaks = c(0.1, 10, 1000),
-                       labels = c("0.1", "10", "1000")) +
+#    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+#                       breaks = c(0.1, 10, 1000),
+#                       labels = c("0.1", "10", "1000")) +
+#    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+#                       breaks = c(0.1, 10, 1000),
+#                       labels = c("0.1", "10", "1000")) +
     ylab(y_name) +
     xlab(x_name) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
     labs(shape = "Data set", colour = "Treewidth") +
-#    scale_color_viridis("Treewidth", trans = "log") + # TODO: add breaks
+    scale_color_distiller("Treewidth", trans = "log") + # TODO: add breaks
     scale_shape("Data set")
 }
 
@@ -264,6 +263,7 @@ cumulative_plot(df2, "encoding", "Encoding",
                 c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "add_width", "ADD Width")
 
 # Stacked bar plots comparing encoding and inference time
+# TODO: maybe side-by-side boxplots or violint/density plots might be better
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
                     measure = c("encoding_time", "inference_time")) %>%
   group_by(encoding, novelty, variable) %>%
