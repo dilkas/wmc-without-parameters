@@ -3,6 +3,7 @@ library(scales)
 library(maditr)
 
 # Note: I'm including sbk05 in changes.csv just in case. At least the way it's currently implemented, my method is unsuitable for sbk05.
+# TODO: mention some percentages of how many variables were removed (the high points should sound impressive)
 
 changes <- read.csv("../results/changes.csv", header = FALSE)
 colnames(changes) <- c("instance", "encoding", "before_variables", "before_clauses", "after_variables", "after_clauses")

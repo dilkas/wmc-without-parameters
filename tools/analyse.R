@@ -7,6 +7,7 @@ require(tikzDevice)
 require(ggpubr)
 require(tidyr)
 
+# TODO: plot treewidth vs add width
 data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 
 # TODO: remove (just for testing)
@@ -60,6 +61,7 @@ for (column in time_columns) {
 #df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
 #                      function(x) max(x, na.rm = TRUE))
 #df <- df %>% select(!starts_with("treewidth_"))
+#df$treewidth <- df$treewidth - 1
 #df$zero_proportion <- apply(df %>% select(starts_with("zero_")), 1,
 #                      function(x) max(x, na.rm = TRUE))
 #df <- df %>% select(!starts_with("zero_proportion_"))
