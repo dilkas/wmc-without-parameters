@@ -87,10 +87,10 @@ instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
 df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
                       answer = NA, time = instance_to_min_time[df$instance],
-                      add_width= max(data$add_width))
+                      add_width= max(data$add_width), treewidth = max(data$treewidth))
 df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
                        answer = NA, time = instance_to_min_time0[df$instance],
-                       add_width = max(data$add_width))
+                       add_width = max(data$add_width), treewidth = max(data$treewidth))
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
@@ -131,10 +131,11 @@ for (column in answer_columns) {
 
 # Fastest
 sum(!is.na(df$answer_new_bklm16) & abs(df$time_new_bklm16 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_new_cd05) & abs(df$time_new_cd05 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_new_cd06) & abs(df$time_new_cd06 - df$time_min) < 1e-5)
-sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_bklm16pp) & abs(df$time_new_bklm16pp - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_cd05pp) & abs(df$time_new_cd05pp - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_cd06pp) & abs(df$time_new_cd06pp - df$time_min) < 1e-5)
 sum(!is.na(df$answer_new_d02) & abs(df$time_new_d02 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_d02pp) & abs(df$time_new_d02pp - df$time_min) < 1e-5)
 sum(!is.na(df$answer_new_sbk05) & abs(df$time_new_sbk05 - df$time_min) < 1e-5)
 
 sum(!is.na(df$answer_old_bklm16) & abs(df$time_old_bklm16 - df$time_min) < 1e-5)
@@ -145,10 +146,11 @@ sum(!is.na(df$answer_old_sbk05) & abs(df$time_old_sbk05 - df$time_min) < 1e-5)
 
 # Solved
 sum(!is.na(df$answer_new_bklm16))
-sum(!is.na(df$answer_new_cd05))
-sum(!is.na(df$answer_new_cd06))
-sum(!is.na(df$answer_new_cw))
+sum(!is.na(df$answer_new_bklm16pp))
+sum(!is.na(df$answer_new_cd05pp))
+sum(!is.na(df$answer_new_cd06pp))
 sum(!is.na(df$answer_new_d02))
+sum(!is.na(df$answer_new_d02pp))
 sum(!is.na(df$answer_new_sbk05))
 
 sum(!is.na(df$answer_old_bklm16))
@@ -184,20 +186,20 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     ylab(y_name) +
     xlab(x_name) +
     coord_fixed() +
-    annotation_logticks(colour = "#b3b3b3") +
+#    annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
     labs(shape = "Data set", colour = "Treewidth") +
-    scale_color_distiller("Treewidth", trans = "log") + # TODO: add breaks
+#    scale_color_distiller("Treewidth", trans = "log") + # TODO: add breaks
     scale_shape("Data set")
 }
 
-scatter_plot(df, "time_old_cd06", "time_new_cd06pp", "\\texttt{old_cd06} time (s)",
-                   "\\texttt{new_cd06++} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\texttt{old_cd06} time (s)",
+                   "\\texttt{new_bklm16++} time (s)", 2 * TIMEOUT)
 scatter_plot(df, "time_new_d02", "time_new_d02pp", "\\texttt{d02} time (s)",
                    "\\texttt{d02++} time (s)", 2 * TIMEOUT)
 scatter_plot(df, "add_width_new_d02pp", "add_width_new_d02", "\\texttt{d02++} width",
                    "\\texttt{d02} width", max(data$add_width))
-scatter_plot(df, "add_width_new_cd06pp", "add_width_new_sbk05", "\\texttt{cd06++} width",
+scatter_plot(df, "add_width_new_bklm16pp", "add_width_new_sbk05", "\\texttt{bklm16++} width",
                    "\\texttt{sbk05} width", max(data$add_width))
 scatter_plot(df, "treewidth", "add_width_new_bklm16", "treewidth",
                    "\\texttt{bklm16} width", max(data$add_width))
@@ -240,7 +242,8 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
     ylab("Instances solved") +
 #    scale_colour_brewer(palette = "Dark2") +
     scale_colour_manual(breaks = map(column_values, function(x)
-      paste("\\texttt{", x, "}", sep = "")), values = c(1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 7)) +
+      paste("\\texttt{", x, "}", sep = "")), values = c(1, 2, 3, 4, 5, 6, 7,
+                                                        1, 3, 4, 5, 6, 7, 8, 8)) +
     scale_linetype_manual(breaks = map(column_values, function(x)
       paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
@@ -259,10 +262,10 @@ df2 <- data_sum
 tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")
+                c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "add_width", "ADD Width")
+                c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "add_width", "ADD Width")
 
 # Stacked bar plots comparing encoding and inference time
 # TODO: maybe side-by-side boxplots or violint/density plots might be better
