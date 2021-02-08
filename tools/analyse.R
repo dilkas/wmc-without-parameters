@@ -1,14 +1,14 @@
-require(ggplot2)
-require(scales)
-require(dplyr)
-require(maditr)
-require(purrr)
-require(tikzDevice)
-require(ggpubr)
-require(tidyr)
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(maditr)
+library(purrr)
+library(tikzDevice)
+library(ggpubr)
+library(tidyr)
 
 # TODO: plot treewidth vs add width
-data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/old_results.csv", header = TRUE, sep = ",")
 
 # TODO: remove (just for testing)
 data <- data[data$dataset != "2004-PGM",]
@@ -49,9 +49,12 @@ data_sum <- data_merged
 data_sum$time <- data_sum$encoding_time + data_sum$inference_time
 data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
+# df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
+#             fun.aggregate = NULL,
+#             value.var = c("answer", "time", "add_width"))
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time", "add_width"))
+            value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
 time_columns0 <- time_columns[!grepl('pp$', time_columns)]
 for (column in time_columns) {
@@ -85,12 +88,16 @@ instance_to_min_time <- df$time_min
 names(instance_to_min_time) <- df$instance
 instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
+# df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
+#                       answer = NA, time = instance_to_min_time[df$instance],
+#                       add_width= max(data$add_width), treewidth = max(data$treewidth))
+# df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
+#                        answer = NA, time = instance_to_min_time0[df$instance],
+#                        add_width = max(data$add_width), treewidth = max(data$treewidth))
 df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
-                      answer = NA, time = instance_to_min_time[df$instance],
-                      add_width= max(data$add_width), treewidth = max(data$treewidth))
+                      answer = NA, time = instance_to_min_time[df$instance])
 df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
-                       answer = NA, time = instance_to_min_time0[df$instance],
-                       add_width = max(data$add_width), treewidth = max(data$treewidth))
+                       answer = NA, time = instance_to_min_time0[df$instance])
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
@@ -259,7 +266,6 @@ df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),
 df2 <- data_sum[startsWith(data_sum$dataset, "DQMR") & !is.na(data_sum$dataset),]
 df2 <- data_sum[startsWith(data_sum$dataset, "Plan") & !is.na(data_sum$dataset),]
 df2 <- data_sum
-tikz(file = "paper/cumulative.tex", width = 3, height = 1.6)
 cumulative_plot(df2, "encoding", "Encoding",
                 sort(unique(df2$encoding)),
                 c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")

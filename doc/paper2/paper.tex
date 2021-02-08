@@ -42,6 +42,7 @@
 \newtheorem{example}{Example}
 
 \DeclareMathOperator{\im}{im}
+\Crefname{algocf}{Algorithm}{Algorithms}
 
 \makeatletter
 \newcommand{\nosemic}{\renewcommand{\@endalgocfline}{\relax}}% Drop semi-colon ;
@@ -773,13 +774,13 @@ which happen to be binary. We classify them into the following seven categories:
 \end{itemize*}
 We run ADDMC with each of the five encodings once on each Bayesian network.
 
-\begin{figure}
+\begin{figure*}[t]
   \centering
   \input{cumulative.tex}%
   \caption{Cumulative number of instances solved by ADDMC over time using each
     encoding.}
   \label{fig:cumulative}
-\end{figure}
+\end{figure*}
 
 \begin{table}
   \centering
@@ -800,7 +801,7 @@ We run ADDMC with each of the five encodings once on each Bayesian network.
   \label{tbl:tallies}
 \end{table}
 
-\begin{figure*}
+\begin{figure*}[t]
   \centering
   \input{scatter.tex}%
   \caption{ADDMC inference time using \texttt{cw} compared to \texttt{d02}
