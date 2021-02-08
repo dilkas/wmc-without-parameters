@@ -97,13 +97,24 @@
   needed to represent probability distributions with less structure. To
   demonstrate the performance benefits of conditional weights over the addition
   of extra literals, we develop a new WMC encoding for Bayesian networks and
-  adapt a state-of-the-art WMC algorithm ADDMC to the new format. Our
+  adapt a state-of-the-art WMC algorithm \textsf{ADDMC} to the new format. Our
   experiments show that the new encoding results in significantly faster
   inference on most benchmark instances. Furthermore, the same idea can be
   adapted to other WMC algorithms and other problem domains.
 \end{abstract}
 
 \section{Introduction}
+
+TODO: introduce (also talk more about how Cachet and Ace are used)
+\begin{itemize}
+\item \texttt{bklm16} \citep{DBLP:conf/ecai/BartKLM16}
+\item \textsf{query-dnnf}
+  \footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}}
+\item \textsf{DPMC} \citep{DBLP:conf/cp/DudekPV20}
+\item tackle a comparable problem, but their encoding was never implemented or
+  empirically tested (i.e., the implementation is left as future work)
+  \citep{DBLP:conf/scai/VomlelT13}
+\end{itemize}
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \citep{DBLP:conf/aaai/SangBK05}, has
@@ -151,10 +162,10 @@ discrete probability distribution but also improve inference speed. In
 Bayesian networks that uses \emph{conditional weights} on literals (in the
 spirit of conditional probabilities) that have literal-based WMC as a special
 case. We prove the correctness of the encoding and show how a state-of-the-art
-WMC solver ADDMC \citep{DBLP:conf/aaai/DudekPV20} can be adapted to the new
-format. ADDMC is a recently-proposed algorithm for WMC based on manipulating
-functions on Boolean algebras using an efficient representation for such
-functions known as algebraic decision diagrams (ADDs)
+WMC solver \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} can be adapted to the
+new format. \textsf{ADDMC} is a recently-proposed algorithm for WMC based on
+manipulating functions on Boolean algebras using an efficient representation for
+such functions known as algebraic decision diagrams (ADDs)
 \citep{DBLP:journals/fmsd/BaharFGHMPS97}. Finally, in \cref{sec:experiments}, we
 show how the new encoding results in faster inference on the vast majority of
 benchmark instances, often by one or two orders of magnitude. We explain the
@@ -183,34 +194,19 @@ authors perform two sets of experiments (that are relevant to this summary)
 normal form \citep{DBLP:journals/jancl/Darwiche01}), measuring both compilation
 time and numbers of edges in the d-DNNF diagram. The results are mostly in
 favour of \texttt{cd06}. Second, they compare the inference time of
-\texttt{sbk05} run with Cachet \citep{DBLP:conf/sat/SangBBKP04} with the compile
-times of \texttt{cd05} and \texttt{cd06}, but only on five (types of) instances.
-In these experiments, \texttt{cd06} is always faster than \texttt{cd05}, while
-the comparison with \texttt{sbk05} is mixed. Sometimes \texttt{cd06} is orders
-of magnitude faster than \texttt{sbk05}, sometimes slightly slower. The
-performance difference between \texttt{sbk05} and \texttt{cd05} is even harder
-to judge: \texttt{sbk05} is better on three out of five instances and worse on
-the remaining two. Based on this description, one would expect \texttt{cd06} to
-be faster than both \texttt{cd05} and \texttt{sbk05}, both of which should be
-faster than \texttt{d02}. The experiments in \cref{sec:experiments}, however,
-strongly disagree with this prediction, showing that the quality of an encoding
-depends strongly on the underlying search algorithm or compilation technique.
-
-% \paragraph{ADDs and their use in inference.} ADDs provide an efficient way to
-% manipulate functions from a Boolean algebra to any algebraic structure (most
-% commonly real numbers) \citep{DBLP:journals/fmsd/BaharFGHMPS97}. They have been
-% used to represent value functions in Markov decision processes (MDPs)
-% \citep{DBLP:conf/uai/HoeySHB99} and extended to handle first-order MDPs
-% \citep{DBLP:journals/ai/SannerB09} and discrete and continuous state MDPs
-% \citep{DBLP:conf/uai/SannerDB11}. The latter extension has also been used for
-% weighted model integration---an extension of WMC that can handle continuous
-% variables \citep{DBLP:conf/ijcai/KolbMSBK18}. For Bayesian networks, ADDS have
-% been used to represent each conditional probability table (CPT) as an ADD
-% \citep{DBLP:conf/icml/ZhaoMP15} and as a combination of ADDs and arithmetic
-% circuits \citep{DBLP:conf/ijcai/ChaviraD07}. ADDs are particularly advantageous
-% in this situation because of their ability to fully exploit context-specific
-% independence, i.e., the observable structure within a CPT that is not inherited
-% from the structure of the Bayesian network \citep{DBLP:conf/uai/BoutilierFGK96}.
+\texttt{sbk05} run with \textsf{Cachet} \citep{DBLP:conf/sat/SangBBKP04} with
+the compile times of \texttt{cd05} and \texttt{cd06}, but only on five (types
+of) instances. In these experiments, \texttt{cd06} is always faster than
+\texttt{cd05}, while the comparison with \texttt{sbk05} is mixed. Sometimes
+\texttt{cd06} is orders of magnitude faster than \texttt{sbk05}, sometimes
+slightly slower. The performance difference between \texttt{sbk05} and
+\texttt{cd05} is even harder to judge: \texttt{sbk05} is better on three out of
+five instances and worse on the remaining two. Based on this description, one
+would expect \texttt{cd06} to be faster than both \texttt{cd05} and
+\texttt{sbk05}, both of which should be faster than \texttt{d02}. The
+experiments in \cref{sec:experiments}, however, strongly disagree with this
+prediction, showing that the quality of an encoding depends strongly on the
+underlying search algorithm or compilation technique.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -263,9 +259,9 @@ We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
 be instrumental in defining WMC as a measure in \cref{sec:wmc_as_measure} and
 can be efficiently represented using ADDs. Furthermore, all of the operations
-are supported by the CUDD \citep{somenzi1998cudd} package that is used by ADDMC
-for ADD manipulation \citep{DBLP:conf/aaai/DudekPV20}. The definitions of
-multiplication and projection are as defined by
+are supported by the CUDD \citep{somenzi1998cudd} package that is used by
+\textsf{ADDMC} for ADD manipulation \citep{DBLP:conf/aaai/DudekPV20}. The
+definitions of multiplication and projection are as defined by
 \citet{DBLP:conf/aaai/DudekPV20}, while others are new.
 
 \begin{definition}[Operations on functions]
@@ -575,17 +571,17 @@ network in \cref{fig:example_bn}, we get:
 
 \Cref{alg:encoding} produces a function with a Boolean algebra as its domain.
 This function can be represented by an ADD
-\citep{DBLP:journals/fmsd/BaharFGHMPS97}. The core of ADDMC works by taking an
-ADD $\psi\colon 2^{U} \to \mathbb{R}_{\ge 0}$ (expressed as a product of smaller
-ADDs) and returning $(\exists_U\psi)(\emptyset)$
+\citep{DBLP:journals/fmsd/BaharFGHMPS97}. The core of \textsf{ADDMC} works by
+taking an ADD $\psi\colon 2^{U} \to \mathbb{R}_{\ge 0}$ (expressed as a product
+of smaller ADDs) and returning $(\exists_U\psi)(\emptyset)$
 \citep{DBLP:conf/aaai/DudekPV20}. In this section, we prove that the function
-$\phi$ produced by \cref{alg:encoding} can be used by ADDMC to correctly compute
-any marginal probability of the Bayesian network that was encoded as
-$\phi$.\footnote{Note that it can just as well compute \emph{any} probability
-  expressed using the random variables in $\mathcal{V}$.} We begin with
-\cref{lemma:cpt} which shows that any conditional weight function produces the
-right answer when given a valid encoding of variable-value assignments relevant
-to the CPT.
+$\phi$ produced by \cref{alg:encoding} can be used by \textsf{ADDMC} to
+correctly compute any marginal probability of the Bayesian network that was
+encoded as $\phi$.\footnote{Note that it can just as well compute \emph{any}
+  probability expressed using the random variables in $\mathcal{V}$.} We begin
+with \cref{lemma:cpt} which shows that any conditional weight function produces
+the right answer when given a valid encoding of variable-value assignments
+relevant to the CPT.
 
 \begin{restatable}{lemma}{cptlemma} \label{lemma:cpt}
   Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
@@ -620,8 +616,8 @@ probabilities for the right inputs and zero otherwise.
 \end{restatable}
 
 We end with \cref{thm:correctness} that shows how $\phi$ can be combined with an
-encoding of a single variable-value assignment so that ADDMC would compute its
-marginal probability.
+encoding of a single variable-value assignment so that \textsf{ADDMC} would
+compute its marginal probability.
 
 \begin{restatable}{theorem}{correctness} \label{thm:correctness}
   For any $X \in \mathcal{V}$ and $x \in \im X$,
@@ -640,7 +636,7 @@ for non-binary random variables are already expressed as a product of sums of
 0/1-valued functions, i.e., a kind of CNF. Disregarding these functions, each
 conditional weight function $\mathrm{CPT}_X$ is represented by a sum with a term
 for every subset of $\mathcal{E}^*(X)$. To encode these terms, we introduce
-\emph{extended weight clauses} to the WMC format used by Cachet
+\emph{extended weight clauses} to the WMC format used by \textsf{Cachet}
 \citep{DBLP:conf/sat/SangBBKP04}. For instance, here is a representation of the
 Bayesian network from \cref{fig:example_bn}:
 \[
@@ -681,49 +677,48 @@ Finally, note that the measure induced by these weights is not probabilistic
 with the additional clauses that restrict what combinations of indicator
 variables can co-occur.
 
-\subsection{Changes to ADDMC}
+\subsection{Changes to \textsf{ADDMC}}
 
 Here we describe two changes to
-ADDMC\footnote{\url{https://github.com/vardigroup/ADDMC}}
+\textsf{ADDMC}\footnote{\url{https://github.com/vardigroup/ADDMC}}
 \citep{DBLP:conf/aaai/DudekPV20} needed to adapt it to the new format.
 
-First, ADDMC constructs the \emph{Gaifman graph} \citep{gaifman1982local} of the
-input CNF formula as an aid for the algorithm's heuristics. This graph has as
-vertices the variables of the formula, and there is an edge between two
-variables $u$ and $v$ if there is a clause in the formula that contains both $u$
-and $v$. We extend this definition to functions on Boolean algebras, i.e., the
-factors of $\phi$. For any pair of distinct variables $u, v \in U$, we draw an
-edge between them in the Gaifman graph if there is a function $\alpha\colon 2^X
-\to \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v
-\in X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges
-between all distinct pairs of variables in $\mathcal{E}^*(X)$.
-
-Second, even though the function $\phi$ produced by \cref{alg:encoding} is
-constructed to have $2^U$ as its domain, sometimes the domain is effectively
-reduced to $2^V$ for some $V \subset U$ by the ADD manipulation algorithms that
-optimise the ADD representation of a function. For a simple example, consider
-$\alpha: 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as $\alpha(\{a\}) =
-\alpha(\emptyset) = 0.5$. Then $\alpha$ can be reduced to $\alpha'\colon
-2^{\emptyset} \to \mathbb{R}_{\ge 0}$ defined as $\alpha'(\emptyset) = 0.5$. To
-compensate for these reductions, for the original WMC format with a weight
-function $w\colon U \cup \{ \neg u \mid u \in U \} \to \mathbb{R}_{\ge 0}$,
-ADDMC would multiply its computed answer by $\prod_{u \in U \setminus V} w(u) +
-w(\neg u)$. With the new WMC format, we instead multiply the answer by $2^{|U
-  \setminus V|}$. Each `excluded' variable $u \in U \setminus V$ satisfies two
-properties: all weights associated with $u$ are equal to $0.5$ (otherwise the
-corresponding CPT would depend on $u$, and $u$ would not be excluded), and all
-other CPTs are independent of $u$ (or they may have a trivial dependence, where
-the probability stays the same if $u$ is replaced with its complement). Thus,
-the CPT that corresponds to $u$ still multiplies the weight of every atom in the
-Boolean algebra by $0.5$, but the number of atoms under consideration is halved.
-To correct for this, we multiply the final answer by two for every $u \in U
-\setminus V$.
+First, \textsf{ADDMC} constructs the \emph{Gaifman graph}
+of the input CNF formula as an aid for the algorithm's
+heuristics. This graph has as vertices the variables of the formula, and there
+is an edge between two variables $u$ and $v$ if there is a clause in the formula
+that contains both $u$ and $v$. We extend this definition to functions on
+Boolean algebras, i.e., the factors of $\phi$. For any pair of distinct
+variables $u, v \in U$, we draw an edge between them in the Gaifman graph if
+there is a function $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ that is a factor
+of $\phi$ such that $u \in X$ and $v \in X$. For instance, a factor such as
+$\mathrm{CPT}_X$ will enable edges between all distinct pairs of variables in
+$\mathcal{E}^*(X)$. Second, even though the function $\phi$ produced by
+\cref{alg:encoding} is constructed to have $2^U$ as its domain, sometimes the
+domain is effectively reduced to $2^V$ for some $V \subset U$ by the ADD
+manipulation algorithms that optimise the ADD representation of a function. For
+a simple example, consider $\alpha: 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as
+$\alpha(\{a\}) = \alpha(\emptyset) = 0.5$. Then $\alpha$ can be reduced to
+$\alpha'\colon 2^{\emptyset} \to \mathbb{R}_{\ge 0}$ defined as
+$\alpha'(\emptyset) = 0.5$. To compensate for these reductions, for the original
+WMC format with a weight function $w\colon U \cup \{ \neg u \mid u \in U \} \to
+\mathbb{R}_{\ge 0}$, \textsf{ADDMC} would multiply its computed answer by
+$\prod_{u \in U \setminus V} w(u) + w(\neg u)$. With the new WMC format, we
+instead multiply the answer by $2^{|U \setminus V|}$. Each `excluded' variable
+$u \in U \setminus V$ satisfies two properties: all weights associated with $u$
+are equal to $0.5$ (otherwise the corresponding CPT would depend on $u$, and $u$
+would not be excluded), and all other CPTs are independent of $u$ (or they may
+have a trivial dependence, where the probability stays the same if $u$ is
+replaced with its complement). Thus, the CPT that corresponds to $u$ still
+multiplies the weight of every atom in the Boolean algebra by $0.5$, but the
+number of atoms under consideration is halved. To correct for this, we multiply
+the final answer by two for every $u \in U \setminus V$.
 
 \section{Experimental Comparison} \label{sec:experiments}
 
 In this section, we describe an experimental study comparing the five WMC
-encodings for Bayesian networks when run with ADDMC. The experiments were run on
-servers with Intel Xeon Gold 6138 and Intel Xeon E5-2630
+encodings for Bayesian networks when run with \textsf{ADDMC}. The experiments
+were run on servers with Intel Xeon Gold 6138 and Intel Xeon E5-2630
 processors\footnote{Each instance is run on the same processor for all
   encodings.} running Scientific~Linux~7 with an \SI{8}{\gibi\byte} memory limit
 and a \SI{1000}{\second} timeout.
@@ -736,20 +731,20 @@ of $X = \mathsf{true}$. Otherwise, we pick the value of $X$ which is listed
 first and calculate its marginal probability.
 
 For all encodings other than \texttt{cw}, we use their implementation in
-Ace~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} with
-\texttt{-encodeOnly} and \texttt{-noEclause} flags. However, Ace was not used to
-encode evidence, as preliminary experiments revealed that the evidence-encoding
-implementation contains bugs that can lead to incorrect answers or a Java
-exception being thrown on some instances of the data set (and the source code is
-not publicly available). Instead, we simply list all the evidence as additional
-clauses in the encoding.
+\textsf{Ace}~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} with
+\texttt{-encodeOnly} and \texttt{-noEclause} flags. However, \textsf{Ace} was
+not used to encode evidence, as preliminary experiments revealed that the
+evidence-encoding implementation contains bugs that can lead to incorrect
+answers or a Java exception being thrown on some instances of the data set (and
+the source code is not publicly available). Instead, we simply list all the
+evidence as additional clauses in the encoding.
 
 Note that both \texttt{cd05} and \texttt{cd06} purposefully produce overly
 relaxed encodings that contain extra models and thus yield incorrect
 probabilities \citep{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}. These
 additional models are supposed to be filtered out during circuit compilation
 \citep{DBLP:conf/ijcai/ChaviraD05}, but this is not easily achievable with
-ADDMC. Nonetheless, we include both encodings in the experiments.
+\textsf{ADDMC}. Nonetheless, we include both encodings in the experiments.
 
 While encoding time itself was not measured because of different languages of
 implementation, it is worth noting that \texttt{cw} is linear in the total
@@ -757,9 +752,11 @@ number of CPT rows and so is unlikely to be slower than, e.g., \texttt{cd06},
 which relies on solving $\NP{}$-complete problems as part of the encoding process
 \citep{DBLP:conf/sat/ChaviraD06}.
 
-For experimental data, we use the Bayesian networks available with Ace and
-Cachet\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}}, most of
-which happen to be binary. We classify them into the following seven categories:
+For experimental data, we use the Bayesian networks available with \textsf{Ace}
+and
+\textsf{Cachet}\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}},
+most of which happen to be binary. We classify them into the following seven
+categories:
 \begin{itemize*}
 \item DQMR and
 \item Grid networks as described by \citet{DBLP:conf/aaai/SangBK05},
@@ -772,20 +769,21 @@ which happen to be binary. We classify them into the following seven categories:
   \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
   \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
 \end{itemize*}
-We run ADDMC with each of the five encodings once on each Bayesian network.
+We run \textsf{ADDMC} with each of the five encodings once on each Bayesian
+network.
 
 \begin{figure*}[t]
   \centering
   \input{cumulative.tex}%
-  \caption{Cumulative number of instances solved by ADDMC over time using each
-    encoding.}
+  \caption{Cumulative number of instances solved by \textsf{ADDMC} over time
+    using each encoding.}
   \label{fig:cumulative}
 \end{figure*}
 
-\begin{table}
+\begin{table} % TODO: update or remove
   \centering
-  \caption{The numbers of instances (out of 1466) solved by ADDMC with each
-    encoding (uniquely, faster than with others, and in total) under the
+  \caption{The numbers of instances (out of 1466) solved by \textsf{ADDMC} with
+    each encoding (uniquely, faster than with others, and in total) under the
     described constraints.}%
   \begin{tabular}{lrrr}
     \toprule
@@ -804,8 +802,9 @@ We run ADDMC with each of the five encodings once on each Bayesian network.
 \begin{figure*}[t]
   \centering
   \input{scatter.tex}%
-  \caption{ADDMC inference time using \texttt{cw} compared to \texttt{d02}
-    (left) and \texttt{sbk05} (right) for each instance in all data sets.}
+  \caption{\textsf{ADDMC} inference time using \texttt{cw} compared to
+    \texttt{d02} (left) and \texttt{sbk05} (right) for each instance in all data
+    sets.}
   \label{fig:scatter}
 \end{figure*}
 
@@ -821,9 +820,9 @@ that \texttt{cw} was the fastest in 935 out of the 980 (i.e.,
 the scatter plots in \cref{fig:scatter}, \texttt{cw} is particularly promising
 on Grid networks while losing to \texttt{d02} on some instances of the
 Mastermind data set. We conjecture that this is so either because the particular
-structure of the problem confuses the heuristics used by ADDMC or because these
-instances allow for significant simplifications that are exploited by
-\texttt{d02} but not \texttt{cw}.
+structure of the problem confuses the heuristics used by \textsf{ADDMC} or
+because these instances allow for significant simplifications that are exploited
+by \texttt{d02} but not \texttt{cw}.
 
 \begin{table}
   \centering
@@ -850,28 +849,29 @@ ADDs than any other encoding. However, note that these are upper bounds and most
 encodings (including \texttt{cw}) can be smaller in certain situations (e.g.,
 with binary random variables or when a CPT has repeating probabilities). We
 equate clauses and ADDs (more specifically, factors of the function $\phi$ from
-\cref{alg:encoding}) here because ADDMC interprets each clause of any WMC
-encoding as a multiplicative factor of the ADD that represents the entire WMC
-instance \citep{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings, each
-weight is also a factor, but that does not affect the asymptotic bounds in the
-table.
+\cref{alg:encoding}) here because \textsf{ADDMC} interprets each clause of any
+WMC encoding as a multiplicative factor of the ADD that represents the entire
+WMC instance \citep{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings,
+each weight is also a factor, but that does not affect the asymptotic bounds in
+the table.
 
 \section{Discussion and Conclusion}
+% TODO: mention that DPMC is the next step
 
 WMC was originally motivated by an appeal to the success of \SAT{} solvers in
 efficiently tackling an $\NP{}$-complete problem
-\citep{DBLP:conf/aaai/SangBK05}. ADDMC does not rely on \SAT{}-based algorithmic
-techniques, and our proposed format diverges even more from the DIMACS CNF
-format for Boolean formulas. To what extent are \SAT{}-based methods still
-applicable? The answer depends significantly on the problem domain. For Bayesian
-networks, the rules describing that each random variable can only be associated
-with exactly one value were still encoded as clauses. As has been noted
-previously \citep{DBLP:conf/sat/ChaviraD06}, rows in CPTs with probabilities
-equal to zero or one can be represented as clauses as well. Therefore, our work
-can be seen as proposing a middle ground between $\#\SAT{}$ and probabilistic
-inference.
+\citep{DBLP:conf/aaai/SangBK05}. \textsf{ADDMC} does not rely on \SAT{}-based
+algorithmic techniques, and our proposed format diverges even more from the
+DIMACS CNF format for Boolean formulas. To what extent are \SAT{}-based methods
+still applicable? The answer depends significantly on the problem domain. For
+Bayesian networks, the rules describing that each random variable can only be
+associated with exactly one value were still encoded as clauses. As has been
+noted previously \citep{DBLP:conf/sat/ChaviraD06}, rows in CPTs with
+probabilities equal to zero or one can be represented as clauses as well.
+Therefore, our work can be seen as proposing a middle ground between $\#\SAT{}$
+and probabilistic inference.
 
-While we chose to use ADDMC \citep{DBLP:conf/aaai/DudekPV20} as the WMC
+While we chose to use \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} as the WMC
 algorithm and Bayesian networks as a canonical example of a probabilistic
 inference task, these are only examples meant to illustrate the broader idea
 that choosing a more expressive representation of weights can outperform
@@ -880,8 +880,9 @@ work, we have provided a new theoretical perspective on the expressive power of
 WMC and illustrated the empirical benefits of that perspective. The same idea
 can be adapted to other inference problem domains such as probabilistic programs
 \citep{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089} as
-well as to search-based solvers such as Cachet \citep{DBLP:conf/sat/SangBBKP04},
-although the extension may be less straightforward for other WMC techniques.
+well as to search-based solvers such as \textsf{Cachet}
+\citep{DBLP:conf/sat/SangBBKP04}, although the extension may be less
+straightforward for other WMC techniques.
 
 \begin{contributions} % will be removed in pdf for initial submission,
                       % so you can already fill it to test with the
@@ -902,10 +903,10 @@ although the extension may be less straightforward for other WMC techniques.
     \emph{All} acknowledgements go in this section.
 \end{acknowledgements}
 
-\newpage
+\clearpage
 \bibliography{paper}
 
-\newpage
+\clearpage
 \appendix
 \section{Proofs}
 
