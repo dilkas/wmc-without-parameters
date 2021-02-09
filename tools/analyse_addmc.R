@@ -37,6 +37,7 @@ df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = min,
             value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
+df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
 for (column in time_columns) {
   df[is.na(df[[column]]), column] <- 2 * TIMEOUT
 }
@@ -137,3 +138,59 @@ p2 <- scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsf{ADDMC} + \\tex
 tikz(file = "../doc/paper2/scatter.tex", width = 6.5, height = 2.4)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "right")
 dev.off()
+
+data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
+                    measure = c("encoding_time", "inference_time")) %>%
+  group_by(encoding, novelty, variable) %>%
+  summarize(time = mean(value), lower = mean(value) - 0.1 * sd(value),
+            upper = mean(value) + 0.1 * sd(value))
+data_melted$encoding <- paste0("\\texttt{", data_melted$encoding, "}", sep = "")
+data_melted$lower[data_melted$variable =="inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
+data_melted$upper[data_melted$variable =="inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
+data_melted$novelty <- factor(data_melted$novelty, levels = c("old", "new"))
+novelties <- c("Originally", "With \\textsf{ADDMC}")
+names(novelties) <- c("old", "new")
+
+tikz(file = "../doc/paper2/melt.tex", width = 6.5, height = 2.4)
+ggplot(data_melted, aes(encoding, time, fill = variable)) +
+  geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
+  facet_grid(cols = vars(novelty), labeller = labeller(novelty = novelties)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.3, position = "identity") +
+  theme_light() +
+  scale_fill_brewer(palette = "Dark2", labels = c("Encoding", "Inference")) +
+  xlab("") +
+  ylab("Time (s)") +
+  labs(fill = "")
+dev.off()
+
+# ==================== Numerics ====================
+
+# Unique
+answer_columns <- Filter(function(x) startsWith(x, "answer_"), names(df))
+for (column in answer_columns) {
+  other_columns <- answer_columns[answer_columns != column]
+  print(column)
+  print(sum(apply(!is.na(df[[column]]) & is.na(df[,..other_columns]), 1, min)))
+}
+
+# Fastest
+sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_bklm16) & abs(df$time_new_bklm16 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_d02) & abs(df$time_new_d02 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_new_sbk05) & abs(df$time_new_sbk05 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_bklm16) & abs(df$time_old_bklm16 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_cd05) & abs(df$time_old_cd05 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_cd06) & abs(df$time_old_cd06 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_d02) & abs(df$time_old_d02 - df$time_min) < 1e-5)
+sum(!is.na(df$answer_old_sbk05) & abs(df$time_old_sbk05 - df$time_min) < 1e-5)
+
+# Solved
+sum(!is.na(df$answer_new_cw))
+sum(!is.na(df$answer_new_bklm16))
+sum(!is.na(df$answer_new_d02))
+sum(!is.na(df$answer_new_sbk05))
+sum(!is.na(df$answer_old_bklm16))
+sum(!is.na(df$answer_old_cd05))
+sum(!is.na(df$answer_old_cd06))
+sum(!is.na(df$answer_old_d02))
+sum(!is.na(df$answer_old_sbk05))

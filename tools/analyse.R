@@ -274,7 +274,6 @@ cumulative_plot(df2, "encoding", "Encoding",
                 c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "add_width", "ADD Width")
 
 # Stacked bar plots comparing encoding and inference time
-# TODO: maybe side-by-side boxplots or violint/density plots might be better
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
                     measure = c("encoding_time", "inference_time")) %>%
   group_by(encoding, novelty, variable) %>%

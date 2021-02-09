@@ -104,17 +104,7 @@
 \end{abstract}
 
 \section{Introduction}
-
-TODO: introduce (also talk more about how Cachet and Ace are used)
-\begin{itemize}
-\item \texttt{bklm16} \citep{DBLP:conf/ecai/BartKLM16}
-\item \textsf{query-dnnf}
-  \footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}}
-\item \textsf{DPMC} \citep{DBLP:conf/cp/DudekPV20}
-\item tackle a comparable problem, but their encoding was never implemented or
-  empirically tested (i.e., the implementation is left as future work)
-  \citep{DBLP:conf/scai/VomlelT13}
-\end{itemize}
+% TODO: introduce \textsf{DPMC} \citep{DBLP:conf/cp/DudekPV20}
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \citep{DBLP:conf/aaai/SangBK05}, has
@@ -173,6 +163,11 @@ performance benefits by showing how our encoding has asymptotically fewer
 variables and ADDs.
 
 \section{Related Work} \label{sec:related}
+% TODO: tackle a comparable problem, but their encoding was never implemented or
+% empirically tested (i.e., the implementation is left as future work)
+% \citep{DBLP:conf/scai/VomlelT13}
+
+% TODO: introduce \texttt{bklm16} \citep{DBLP:conf/ecai/BartKLM16}
 
 Hitherto, four techniques have been proposed for encoding Bayesian networks into
 instances of WMC. We will identify them based on the initials of authors as well
@@ -254,6 +249,9 @@ $2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
 for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
+% TODO: properly define what logical operations on ADDs do. Mistake in the
+% paper: an ADD is just a pseudo-boolean function: All operations on ADDs
+% (whatever they are) are pointwise (perhaps /\, \/, ~ may be exceptions).
 
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
@@ -402,7 +400,7 @@ encode them into instances of WMC is by adding more literals
 perspective on WMC to show that this is always possible, however, as ensuing
 sections will demonstrate, it often makes the inference task much harder in
 practice.\footnote{The proofs of this and other theoretical results can be found
-  in the technical appendix.}
+  in the appendix.}
 
 \begin{restatable}{theorem}{extendable}
   For any set $U$ and measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$, there
@@ -683,44 +681,102 @@ Here we describe two changes to
 \textsf{ADDMC}\footnote{\url{https://github.com/vardigroup/ADDMC}}
 \citep{DBLP:conf/aaai/DudekPV20} needed to adapt it to the new format.
 
-First, \textsf{ADDMC} constructs the \emph{Gaifman graph}
-of the input CNF formula as an aid for the algorithm's
-heuristics. This graph has as vertices the variables of the formula, and there
-is an edge between two variables $u$ and $v$ if there is a clause in the formula
-that contains both $u$ and $v$. We extend this definition to functions on
-Boolean algebras, i.e., the factors of $\phi$. For any pair of distinct
-variables $u, v \in U$, we draw an edge between them in the Gaifman graph if
-there is a function $\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ that is a factor
-of $\phi$ such that $u \in X$ and $v \in X$. For instance, a factor such as
-$\mathrm{CPT}_X$ will enable edges between all distinct pairs of variables in
-$\mathcal{E}^*(X)$. Second, even though the function $\phi$ produced by
-\cref{alg:encoding} is constructed to have $2^U$ as its domain, sometimes the
-domain is effectively reduced to $2^V$ for some $V \subset U$ by the ADD
-manipulation algorithms that optimise the ADD representation of a function. For
-a simple example, consider $\alpha: 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as
-$\alpha(\{a\}) = \alpha(\emptyset) = 0.5$. Then $\alpha$ can be reduced to
-$\alpha'\colon 2^{\emptyset} \to \mathbb{R}_{\ge 0}$ defined as
-$\alpha'(\emptyset) = 0.5$. To compensate for these reductions, for the original
-WMC format with a weight function $w\colon U \cup \{ \neg u \mid u \in U \} \to
-\mathbb{R}_{\ge 0}$, \textsf{ADDMC} would multiply its computed answer by
-$\prod_{u \in U \setminus V} w(u) + w(\neg u)$. With the new WMC format, we
-instead multiply the answer by $2^{|U \setminus V|}$. Each `excluded' variable
-$u \in U \setminus V$ satisfies two properties: all weights associated with $u$
-are equal to $0.5$ (otherwise the corresponding CPT would depend on $u$, and $u$
-would not be excluded), and all other CPTs are independent of $u$ (or they may
-have a trivial dependence, where the probability stays the same if $u$ is
-replaced with its complement). Thus, the CPT that corresponds to $u$ still
-multiplies the weight of every atom in the Boolean algebra by $0.5$, but the
-number of atoms under consideration is halved. To correct for this, we multiply
-the final answer by two for every $u \in U \setminus V$.
+First, \textsf{ADDMC} constructs the \emph{primal} (a.k.a. Gaifman) \emph{graph}
+of the input CNF formula as an aid for the algorithm's heuristics. This graph
+has as vertices the variables of the formula, and there is an edge between two
+variables $u$ and $v$ if there is a clause in the formula that contains both $u$
+and $v$. We extend this definition to functions on Boolean algebras, i.e., the
+factors of $\phi$. For any pair of distinct variables $u, v \in U$, we draw an
+edge between them in the primal graph if there is a function $\alpha\colon 2^X
+\to \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v
+\in X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges
+between all distinct pairs of variables in $\mathcal{E}^*(X)$. Second, even
+though the function $\phi$ produced by \cref{alg:encoding} is constructed to
+have $2^U$ as its domain, sometimes the domain is effectively reduced to $2^V$
+for some $V \subset U$ by the ADD manipulation algorithms that optimise the ADD
+representation of a function. For a simple example, consider $\alpha: 2^{\{a\}}
+\to \mathbb{R}_{\ge 0}$ defined as $\alpha(\{a\}) = \alpha(\emptyset) = 0.5$.
+Then $\alpha$ can be reduced to $\alpha'\colon 2^{\emptyset} \to \mathbb{R}_{\ge
+  0}$ defined as $\alpha'(\emptyset) = 0.5$. To compensate for these reductions,
+for the original WMC format with a weight function $w\colon U \cup \{ \neg u
+\mid u \in U \} \to \mathbb{R}_{\ge 0}$, \textsf{ADDMC} would multiply its
+computed answer by $\prod_{u \in U \setminus V} w(u) + w(\neg u)$. With the new
+WMC format, we instead multiply the answer by $2^{|U \setminus V|}$. Each
+`excluded' variable $u \in U \setminus V$ satisfies two properties: all weights
+associated with $u$ are equal to $0.5$ (otherwise the corresponding CPT would
+depend on $u$, and $u$ would not be excluded), and all other CPTs are
+independent of $u$ (or they may have a trivial dependence, where the probability
+stays the same if $u$ is replaced with its complement). Thus, the CPT that
+corresponds to $u$ still multiplies the weight of every atom in the Boolean
+algebra by $0.5$, but the number of atoms under consideration is halved. To
+correct for this, we multiply the final answer by two for every $u \in U
+\setminus V$.
 
 \section{Experimental Comparison} \label{sec:experiments}
+% TODO: introduce \textsf{query-dnnf}
+% \footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}} (also
+% talk more about how Cachet and Ace are used)
+% TODO: included original WMC algorithms
+% TODO: Even instances that are solved in less than 0.1 s are too big for edge
+% count to be efficiently calculated.
+% TODO: my plot's sbk05 data should match (and matches) the ADDMC/DPMC vs c2d
+% comparison in the paper (although my sbk05 data only roughly corresponds to
+% half of their dataset)
+% TODO: mention that both encoding and inference times are limited to 1000 s
+% TODO: mention that we don't run ADDMC+cd05 and ADDMC+cd06 because they don't produce correct answers
+
+\begin{figure*}[t]
+  \centering
+  \input{cumulative.tex}%
+  \caption{Cumulative numbers of instances solved by combinations of algorithms
+    and encodings over time.}
+  \label{fig:cumulative}
+\end{figure*}
+
+\begin{table}
+  \centering
+  \caption{The numbers of instances (out of 1466) solved by
+    each combination of algorithm and encoding (uniquely, faster than others, and in total).}%
+  \begin{tabular}{lrrr}
+    \toprule
+    Algorithm \& Encoding & Unique & Fastest & Total \\
+    \midrule
+    $\textsf{Ace} + \texttt{cd05}$ & \textcolor{gray}{0} & 55 & 1169 \\
+    $\textsf{Ace} + \texttt{cd06}$ & \textcolor{red}{34} & 218 & \textcolor{red}{1259} \\
+    $\textsf{Ace} + \texttt{d02}$ & \textcolor{gray}{0} & 46 & 993 \\
+    $\textsf{ADDMC} + \texttt{bklm16}$ & \textcolor{gray}{0} & 29 & \textcolor{blue}{617} \\
+    $\textsf{ADDMC} + \texttt{cw}$ & 14 & \textcolor{red}{770} & 919 \\
+    $\textsf{ADDMC} + \texttt{d02}$ & \textcolor{gray}{0} & \textcolor{gray}{0} & 703 \\
+    $\textsf{ADDMC} + \texttt{sbk05}$ & \textcolor{gray}{0} & \textcolor{gray}{0} & 729 \\
+    $\textsf{Cachet} + \texttt{sbk05}$ & 13 & 229 & 928 \\
+    $\textsf{query-dnnf} + \texttt{bklm16}$ & \textcolor{gray}{0} & 3 & 1017 \\
+    \bottomrule
+  \end{tabular}
+  \label{tbl:tallies}
+\end{table}
+
+\begin{figure*}[t]
+  \centering
+  \input{scatter.tex}%
+  \caption{An instance-by-instance comparison between $\textsf{ADDMC} +
+    \texttt{cw}$ and the best overall combination of algorithm and encoding
+    ($\textsf{Ace} + \texttt{cd06}$, on the left) as well as the second-best
+    encoding for \textsf{ADDMC} (\texttt{sbk05}, on the right).}
+  \label{fig:scatter}
+\end{figure*}
+
+\begin{figure*}[t]
+  \centering
+  \input{melt.tex}%
+  \caption{TODO: describe this in the text}
+  \label{fig:melted}
+\end{figure*}
 
 In this section, we describe an experimental study comparing the five WMC
 encodings for Bayesian networks when run with \textsf{ADDMC}. The experiments
 were run on servers with Intel Xeon Gold 6138 and Intel Xeon E5-2630
 processors\footnote{Each instance is run on the same processor for all
-  encodings.} running Scientific~Linux~7 with an \SI{8}{\gibi\byte} memory limit
+  encodings.} running Scientific~Linux~7 with a \SI{32}{\gibi\byte} memory limit
 and a \SI{1000}{\second} timeout.
 
 For each Bayesian network, we need to choose a probability to compute. Whenever
@@ -772,42 +828,6 @@ categories:
 We run \textsf{ADDMC} with each of the five encodings once on each Bayesian
 network.
 
-\begin{figure*}[t]
-  \centering
-  \input{cumulative.tex}%
-  \caption{Cumulative number of instances solved by \textsf{ADDMC} over time
-    using each encoding.}
-  \label{fig:cumulative}
-\end{figure*}
-
-\begin{table} % TODO: update or remove
-  \centering
-  \caption{The numbers of instances (out of 1466) solved by \textsf{ADDMC} with
-    each encoding (uniquely, faster than with others, and in total) under the
-    described constraints.}%
-  \begin{tabular}{lrrr}
-    \toprule
-    Encoding & Unique & Fastest & Total \\
-    \midrule
-    \texttt{cd05} & 2 & 3 & 380 \\
-    \texttt{cd06} & 0 & 0 & 363 \\
-    \texttt{cw} & 234 & 935 & 980 \\
-    \texttt{d02} & 40 & 111 & 797 \\
-    \texttt{sbk05} & 12 & 44 & 765 \\
-    \bottomrule
-  \end{tabular}
-  \label{tbl:tallies}
-\end{table}
-
-\begin{figure*}[t]
-  \centering
-  \input{scatter.tex}%
-  \caption{\textsf{ADDMC} inference time using \texttt{cw} compared to
-    \texttt{d02} (left) and \texttt{sbk05} (right) for each instance in all data
-    sets.}
-  \label{fig:scatter}
-\end{figure*}
-
 According to the cumulative plot in \cref{fig:cumulative}, \texttt{cw} is
 consistently able to solve more instances with any given time limit than any
 other encoding, while the order of the remaining encodings from best to worst is
@@ -824,7 +844,7 @@ structure of the problem confuses the heuristics used by \textsf{ADDMC} or
 because these instances allow for significant simplifications that are exploited
 by \texttt{d02} but not \texttt{cw}.
 
-\begin{table}
+\begin{table} % TODO: add bklm16
   \centering
   \caption{Asymptotic upper bounds on the numbers of variables and clauses/ADDs
     for each encoding.}
@@ -903,7 +923,6 @@ straightforward for other WMC techniques.
     \emph{All} acknowledgements go in this section.
 \end{acknowledgements}
 
-\clearpage
 \bibliography{paper}
 
 \clearpage
