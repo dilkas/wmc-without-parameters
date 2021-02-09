@@ -104,7 +104,6 @@
 \end{abstract}
 
 \section{Introduction}
-% TODO: introduce \textsf{DPMC} \citep{DBLP:conf/cp/DudekPV20}
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \citep{DBLP:conf/aaai/SangBK05}, has
@@ -163,24 +162,25 @@ performance benefits by showing how our encoding has asymptotically fewer
 variables and ADDs.
 
 \section{Related Work} \label{sec:related}
-% TODO: tackle a comparable problem, but their encoding was never implemented or
-% empirically tested (i.e., the implementation is left as future work)
-% \citep{DBLP:conf/scai/VomlelT13}
 
-% TODO: introduce \texttt{bklm16} \citep{DBLP:conf/ecai/BartKLM16}
+Performing inference on Bayesian networks by encoding them into instances of WMC
+is a well-established idea with a history of almost twenty years. Five encodings
+have been proposed so far (we will identify them based on the initials of
+authors as well as publications years): \texttt{d02}
+\citep{DBLP:conf/kr/Darwiche02}, \texttt{sbk05} \citep{DBLP:conf/aaai/SangBK05},
+\texttt{cd05} \citep{DBLP:conf/ijcai/ChaviraD05}, \texttt{cd06}
+\citep{DBLP:conf/sat/ChaviraD06}, and \texttt{bklm16}
+\citep{DBLP:conf/ecai/BartKLM16}\footnote{\citet{DBLP:conf/scai/VomlelT13} also
+  propose an encoding, but only for networks of a particular bipartite structure
+  and without any evaluation.}. Below we summarise the observed performance
+differences among them.
 
-Hitherto, four techniques have been proposed for encoding Bayesian networks into
-instances of WMC. We will identify them based on the initials of authors as well
-as publications years: \texttt{d02} \citep{DBLP:conf/kr/Darwiche02},
-\texttt{sbk05} \citep{DBLP:conf/aaai/SangBK05}, \texttt{cd05}
-\citep{DBLP:conf/ijcai/ChaviraD05}, and \texttt{cd06}
-\citep{DBLP:conf/sat/ChaviraD06}. Below we summarise the observed performance
-differences among them. \citet{DBLP:conf/aaai/SangBK05} claim that
+\citet{DBLP:conf/aaai/SangBK05} claim that
 \texttt{sbk05} is a smaller encoding than \texttt{d02} with respect to both the
 number of clauses and the number of variables but provide no experimental
 comparison. \citet{DBLP:conf/ijcai/ChaviraD05} compare \texttt{cd05} with
 \texttt{d02} by measuring the time it takes to compile either encoding into an
-arithmetic circuit (but do not measure inference time). The more recent encoding
+arithmetic circuit. They show that
 \texttt{cd05} always compiles faster and results in a smaller arithmetic circuit
 (as measured by the number of edges). In their subsequent paper, the same
 authors perform two sets of experiments (that are relevant to this summary)
@@ -196,12 +196,25 @@ of) instances. In these experiments, \texttt{cd06} is always faster than
 \texttt{cd06} is orders of magnitude faster than \texttt{sbk05}, sometimes
 slightly slower. The performance difference between \texttt{sbk05} and
 \texttt{cd05} is even harder to judge: \texttt{sbk05} is better on three out of
-five instances and worse on the remaining two. Based on this description, one
-would expect \texttt{cd06} to be faster than both \texttt{cd05} and
-\texttt{sbk05}, both of which should be faster than \texttt{d02}. The
-experiments in \cref{sec:experiments}, however, strongly disagree with this
-prediction, showing that the quality of an encoding depends strongly on the
-underlying search algorithm or compilation technique.
+five instances and worse on the remaining two. Finally,
+\citet{DBLP:conf/ecai/BartKLM16} introduce \texttt{bklm16} and show that it has
+both fewer variables and fewer clauses than \texttt{cd06}. Their experiments
+show \texttt{bklm16} to be superior to \texttt{cd06} with respect to both
+compilation time and encoding size when both are compiled using \textsf{c2d}
+\citep{DBLP:conf/ecai/Darwiche04} but inferior to \texttt{cd06} when
+\texttt{cd06} is compiled using
+\textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} (which still uses
+\textsf{c2d} but considers the structure of the Bayesian network along with its
+encoding).
+
+Our experiments in \cref{sec:experiments} compare the five previous encodings
+along with a newly proposed one---with originally-proposed WMC algorithms as
+well as with \textsf{ADDMC}---with respect to the total time it takes to encode
+a Bayesian network, compile it or run a WMC algorithm on it, and extract the
+(numerical) answer. We confirm some of the findings outlined in this section
+while also observing that the (relative and absolute) performance of each
+encoding depends on the WMC algorithm in use, and smaller encodings are not
+necessarily faster.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -724,6 +737,8 @@ correct for this, we multiply the final answer by two for every $u \in U
 % half of their dataset)
 % TODO: mention that both encoding and inference times are limited to 1000 s
 % TODO: mention that we don't run ADDMC+cd05 and ADDMC+cd06 because they don't produce correct answers
+% TODO: the -implicit flag is disabled for good reasons for bklm16
+% TODO: potential appendix: exact arguments to each piece of software
 
 \begin{figure*}[t]
   \centering
@@ -742,10 +757,10 @@ correct for this, we multiply the final answer by two for every $u \in U
     Algorithm \& Encoding & Unique & Fastest & Total \\
     \midrule
     $\textsf{Ace} + \texttt{cd05}$ & \textcolor{gray}{0} & 55 & 1169 \\
-    $\textsf{Ace} + \texttt{cd06}$ & \textcolor{red}{34} & 218 & \textcolor{red}{1259} \\
+    $\textsf{Ace} + \texttt{cd06}$ & \textbf{34} & 218 & \textbf{1259} \\
     $\textsf{Ace} + \texttt{d02}$ & \textcolor{gray}{0} & 46 & 993 \\
-    $\textsf{ADDMC} + \texttt{bklm16}$ & \textcolor{gray}{0} & 29 & \textcolor{blue}{617} \\
-    $\textsf{ADDMC} + \texttt{cw}$ & 14 & \textcolor{red}{770} & 919 \\
+    $\textsf{ADDMC} + \texttt{bklm16}$ & \textcolor{gray}{0} & 29 & \textcolor{gray}{617} \\
+    $\textsf{ADDMC} + \texttt{cw}$ & 14 & \textbf{770} & 919 \\
     $\textsf{ADDMC} + \texttt{d02}$ & \textcolor{gray}{0} & \textcolor{gray}{0} & 703 \\
     $\textsf{ADDMC} + \texttt{sbk05}$ & \textcolor{gray}{0} & \textcolor{gray}{0} & 729 \\
     $\textsf{Cachet} + \texttt{sbk05}$ & 13 & 229 & 928 \\
@@ -765,12 +780,15 @@ correct for this, we multiply the final answer by two for every $u \in U
   \label{fig:scatter}
 \end{figure*}
 
-\begin{figure*}[t]
-  \centering
-  \input{melt.tex}%
-  \caption{TODO: describe this in the text}
-  \label{fig:melted}
-\end{figure*}
+%\begin{figure*}[t] % TODO: describe this in the text
+%  \centering
+%  \input{melt.tex}%
+%  \caption{Average encoding and inference time of each encoding with their
+%    original WMC algorithm (on the left) and with \textsf{ADDMC} (on the right)
+%    on \emph{solved} instances. The error bars denote \SI{10}{\percent} of
+%    standard deviation.}
+%  \label{fig:melted}
+%\end{figure*}
 
 In this section, we describe an experimental study comparing the five WMC
 encodings for Bayesian networks when run with \textsf{ADDMC}. The experiments
@@ -787,7 +805,7 @@ of $X = \mathsf{true}$. Otherwise, we pick the value of $X$ which is listed
 first and calculate its marginal probability.
 
 For all encodings other than \texttt{cw}, we use their implementation in
-\textsf{Ace}~3.0\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} with
+\textsf{Ace}~3.0 with
 \texttt{-encodeOnly} and \texttt{-noEclause} flags. However, \textsf{Ace} was
 not used to encode evidence, as preliminary experiments revealed that the
 evidence-encoding implementation contains bugs that can lead to incorrect
@@ -844,16 +862,16 @@ structure of the problem confuses the heuristics used by \textsf{ADDMC} or
 because these instances allow for significant simplifications that are exploited
 by \texttt{d02} but not \texttt{cw}.
 
-\begin{table} % TODO: add bklm16
+\begin{table}
   \centering
   \caption{Asymptotic upper bounds on the numbers of variables and clauses/ADDs
     for each encoding.}
   \label{tbl:asymptotes}
-  \begin{tabular}{lcc}
+  \begin{tabular}{m{0.4\linewidth} c c}
     \toprule
     Encoding(s) & Variables & Clauses/ADDs \\
     \midrule
-    \texttt{cd05}, \texttt{cd06}, \texttt{sbk05} & $O(nv^{d+1})$ & $O(nv^{d+1})$ \\
+    \texttt{bklm16}, \texttt{cd05}, \texttt{cd06}, \texttt{sbk05} & $O(nv^{d+1})$ & $O(nv^{d+1})$ \\
     \texttt{cw} & $O(nv)$ & $O(nv^2)$ \\
     \texttt{d02} & $O(nv^{d+1})$ & $O(ndv^{d+1})$ \\
     \bottomrule
@@ -877,6 +895,8 @@ the table.
 
 \section{Discussion and Conclusion}
 % TODO: mention that DPMC is the next step
+% TODO: which algorithm comes out on top depends on the data set
+% TODO: emphasise that BN encodings have never been compared w.r.t. time before
 
 WMC was originally motivated by an appeal to the success of \SAT{} solvers in
 efficiently tackling an $\NP{}$-complete problem
