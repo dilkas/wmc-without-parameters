@@ -200,21 +200,16 @@ five instances and worse on the remaining two. Finally,
 \citet{DBLP:conf/ecai/BartKLM16} introduce \texttt{bklm16} and show that it has
 both fewer variables and fewer clauses than \texttt{cd06}. Their experiments
 show \texttt{bklm16} to be superior to \texttt{cd06} with respect to both
-compilation time and encoding size when both are compiled using \textsf{c2d}
+compilation time and encoding size when both are compiled using
+\textsf{c2d}\footnote{\url{http://reasoning.cs.ucla.edu/c2d/}}
 \citep{DBLP:conf/ecai/Darwiche04} but inferior to \texttt{cd06} when
 \texttt{cd06} is compiled using
 \textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} (which still uses
 \textsf{c2d} but considers the structure of the Bayesian network along with its
-encoding).
-
-Our experiments in \cref{sec:experiments} compare the five previous encodings
-along with a newly proposed one---with originally-proposed WMC algorithms as
-well as with \textsf{ADDMC}---with respect to the total time it takes to encode
-a Bayesian network, compile it or run a WMC algorithm on it, and extract the
-(numerical) answer. We confirm some of the findings outlined in this section
-while also observing that the (relative and absolute) performance of each
-encoding depends on the WMC algorithm in use, and smaller encodings are not
-necessarily faster.
+encoding). Our experiments in \cref{sec:experiments} confirm some of the
+findings outlined in this section while also observing that the (relative and
+absolute) performance of each encoding depends on the WMC algorithm in use, and
+smaller encodings are not necessarily faster.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -262,17 +257,16 @@ $2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
 for some model $x \in 2^U$.
 
 \subsection{The Space of Functions on Boolean Algebras}
-% TODO: properly define what logical operations on ADDs do. Mistake in the
-% paper: an ADD is just a pseudo-boolean function: All operations on ADDs
-% (whatever they are) are pointwise (perhaps /\, \/, ~ may be exceptions).
+% TODO: it would be easier to talk about pseudo-Boolean functions instead, but
+% maybe it's not necessary.
 
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
 be instrumental in defining WMC as a measure in \cref{sec:wmc_as_measure} and
 can be efficiently represented using ADDs. Furthermore, all of the operations
-are supported by the CUDD \citep{somenzi1998cudd} package that is used by
-\textsf{ADDMC} for ADD manipulation \citep{DBLP:conf/aaai/DudekPV20}. The
-definitions of multiplication and projection are as defined by
+are supported by CUDD \citep{somenzi1998cudd}---a package used by \textsf{ADDMC}
+for ADD manipulation \citep{DBLP:conf/aaai/DudekPV20}. The definitions of
+multiplication and projection are as defined by
 \citet{DBLP:conf/aaai/DudekPV20}, while others are new.
 
 \begin{definition}[Operations on functions]
@@ -298,19 +292,17 @@ definitions of multiplication and projection are as defined by
   \end{description}
 \end{definition}
 
-Note that if $U$ is any set, then $\mathcal{V} = \{ \alpha\colon 2^X \to
-\mathbb{R}_{\ge 0} \mid X \subseteq U \}$ is a semi-vector space with three
-additional operations: (non-scalar) multiplication, complement, and projection.
-Specifically, note that both addition and multiplication are both associative
-and commutative.
-
-We end the discussion on function spaces by defining several special functions:
-unit $1\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$ defined as $1(\emptyset) = 1$,
-zero $0\colon 2^\emptyset \to \mathbb{R}_{\ge 0}$ defined as $0(\emptyset) = 0$,
-and function $[a]\colon 2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as
-$[a](\emptyset) = 0$, $[a](\{a\}) = 1$ for any $a$. Henceforth, for any function
-$\alpha\colon 2^X \to \mathbb{R}_{\ge 0}$ and any set $T$, we will write
-$\alpha(T)$ to mean $\alpha(T \cap X)$.
+In summary, addition, multiplication, and scalar multiplication are defined
+pointwise, while complement and projection interact with the algebraic structure
+of the domains $2^X$ and $2^Y$. Specifically, note that both addition and
+multiplication are both associative and commutative. We end the discussion on
+function spaces by defining several special functions: unit $1\colon 2^\emptyset
+\to \mathbb{R}_{\ge 0}$ defined as $1(\emptyset) = 1$, zero $0\colon 2^\emptyset
+\to \mathbb{R}_{\ge 0}$ defined as $0(\emptyset) = 0$, and function $[a]\colon
+2^{\{a\}} \to \mathbb{R}_{\ge 0}$ defined as $[a](\emptyset) = 0$, $[a](\{a\}) =
+1$ for any $a$. Henceforth, for any function $\alpha\colon 2^X \to
+\mathbb{R}_{\ge 0}$ and any set $T$, we will write $\alpha(T)$ to mean $\alpha(T
+\cap X)$.
 
 \section{WMC as a Measure on a Boolean Algebra} \label{sec:wmc_as_measure}
 
@@ -726,19 +718,6 @@ correct for this, we multiply the final answer by two for every $u \in U
 \setminus V$.
 
 \section{Experimental Comparison} \label{sec:experiments}
-% TODO: introduce \textsf{query-dnnf}
-% \footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}} (also
-% talk more about how Cachet and Ace are used)
-% TODO: included original WMC algorithms
-% TODO: Even instances that are solved in less than 0.1 s are too big for edge
-% count to be efficiently calculated.
-% TODO: my plot's sbk05 data should match (and matches) the ADDMC/DPMC vs c2d
-% comparison in the paper (although my sbk05 data only roughly corresponds to
-% half of their dataset)
-% TODO: mention that both encoding and inference times are limited to 1000 s
-% TODO: mention that we don't run ADDMC+cd05 and ADDMC+cd06 because they don't produce correct answers
-% TODO: the -implicit flag is disabled for good reasons for bklm16
-% TODO: potential appendix: exact arguments to each piece of software
 
 \begin{figure*}[t]
   \centering
@@ -763,8 +742,8 @@ correct for this, we multiply the final answer by two for every $u \in U
     $\textsf{ADDMC} + \texttt{cw}$ & 14 & \textbf{770} & 919 \\
     $\textsf{ADDMC} + \texttt{d02}$ & \textcolor{gray}{0} & \textcolor{gray}{0} & 703 \\
     $\textsf{ADDMC} + \texttt{sbk05}$ & \textcolor{gray}{0} & \textcolor{gray}{0} & 729 \\
+    $\textsf{c2d} + \texttt{bklm16}$ & \textcolor{gray}{0} & 3 & 1017 \\
     $\textsf{Cachet} + \texttt{sbk05}$ & 13 & 229 & 928 \\
-    $\textsf{query-dnnf} + \texttt{bklm16}$ & \textcolor{gray}{0} & 3 & 1017 \\
     \bottomrule
   \end{tabular}
   \label{tbl:tallies}
@@ -790,12 +769,53 @@ correct for this, we multiply the final answer by two for every $u \in U
 %  \label{fig:melted}
 %\end{figure*}
 
-In this section, we describe an experimental study comparing the five WMC
-encodings for Bayesian networks when run with \textsf{ADDMC}. The experiments
-were run on servers with Intel Xeon Gold 6138 and Intel Xeon E5-2630
-processors\footnote{Each instance is run on the same processor for all
-  encodings.} running Scientific~Linux~7 with a \SI{32}{\gibi\byte} memory limit
-and a \SI{1000}{\second} timeout.
+% TODO: keep mentioning citations along with algorithm and encoding names
+
+In this section, we describe an experimental study comparing the six WMC
+encodings for Bayesian networks when run with both \textsf{ADDMC} and the
+WMC algorithms used in the original papers.\footnote{Both
+  \texttt{cd05} and \texttt{cd06} cannot be run with most WMC algorithms
+  including \textsf{ADDMC} because these encodings allow for additional models
+  that the WMC algorithm is supposed to ignore
+  \citep{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}.} We compare the
+encodings with respect to the total time it takes to encode a Bayesian network,
+compile it or run a WMC algorithm on it, and extract the (numerical) answer.
+Note that while all five papers that introduce other encodings include
+experimental comparisons of encoding size, that is not feasible with
+\textsf{ADDMC} as even instances that are fully solved in less than
+\SI{0.1}{\second} are too big to build the full ADD within reasonable time and
+memory limits. The experiments were run on a computing cluster with Intel Xeon
+Gold 6138 and Intel Xeon E5-2630 processors\footnote{Each instance is run on the
+  same processor for all encodings.} running Scientific~Linux~7 with a
+\SI{32}{\gibi\byte} memory limit and a \SI{1000}{\second} timeout on both
+encoding and inference. For inference, we use \textsf{Ace} for \texttt{cd05},
+\texttt{cd06}, and \texttt{d02};
+\textsf{Cachet}\footnote{\url{https://cs.rochester.edu/u/kautz/Cachet/}}
+\citep{DBLP:conf/sat/SangBBKP04} for \texttt{sbk05}; and \textsf{c2d}
+\citep{DBLP:conf/ecai/Darwiche04} for compilation and \textsf{query-dnnf}
+\footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}} for
+answer computation for \texttt{bklm16}. For encoding, we use \textsf{bn2cnf}
+\footnote{\url{http://www.cril.univ-artois.fr/KC/bn2cnf.html}} for
+\texttt{bklm16}, and \textsf{Ace} for all other encodings (except for
+\texttt{cw}, which is implemented in Python).
+
+\paragraph{Workarounds.} \textsf{Ace} was not used to encode evidence, as
+preliminary experiments revealed that the evidence-encoding implementation
+contains bugs that can lead to incorrect answers or a Java exception being
+thrown on some instances of the data set (and the source code is not publicly
+available). Instead, we simply list all the evidence as additional clauses in
+the encoding. Furthermore, to ensure that \texttt{bklm16} (whether run with
+\textsf{ADDMC} or \textsf{c2d}) returns correct answers on most instances, we
+had to disable one of the improvements that \texttt{bklm16} brings over
+\texttt{cd06}, namely, the construction of a scaling factor that `absorbs' one
+probability from each CDT \citep{DBLP:conf/ecai/BartKLM16}. For realistic
+benchmark instances, this scaling factor can easily be below $10^{-30}$, and
+thus would require arbitrary-precision floating-point arithmetic to be usable.
+Even a toy Bayesian network with seven binary independent variables with
+probabilities $0.1$ and $0.9$ is enough for \textsf{bn2cnf} to output precisely
+zero as the scaling factor. We note that this issue likely remained unnoticed
+because \citet{DBLP:conf/ecai/BartKLM16} did not attempt to compute numerical
+answers in their experiments.
 
 For each Bayesian network, we need to choose a probability to compute. Whenever
 a Bayesian network comes with an evidence file, we compute the probability of
@@ -804,33 +824,9 @@ network. If $\mathsf{true} \in \im X$, then we compute the marginal probability
 of $X = \mathsf{true}$. Otherwise, we pick the value of $X$ which is listed
 first and calculate its marginal probability.
 
-For all encodings other than \texttt{cw}, we use their implementation in
-\textsf{Ace}~3.0 with
-\texttt{-encodeOnly} and \texttt{-noEclause} flags. However, \textsf{Ace} was
-not used to encode evidence, as preliminary experiments revealed that the
-evidence-encoding implementation contains bugs that can lead to incorrect
-answers or a Java exception being thrown on some instances of the data set (and
-the source code is not publicly available). Instead, we simply list all the
-evidence as additional clauses in the encoding.
-
-Note that both \texttt{cd05} and \texttt{cd06} purposefully produce overly
-relaxed encodings that contain extra models and thus yield incorrect
-probabilities \citep{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}. These
-additional models are supposed to be filtered out during circuit compilation
-\citep{DBLP:conf/ijcai/ChaviraD05}, but this is not easily achievable with
-\textsf{ADDMC}. Nonetheless, we include both encodings in the experiments.
-
-While encoding time itself was not measured because of different languages of
-implementation, it is worth noting that \texttt{cw} is linear in the total
-number of CPT rows and so is unlikely to be slower than, e.g., \texttt{cd06},
-which relies on solving $\NP{}$-complete problems as part of the encoding process
-\citep{DBLP:conf/sat/ChaviraD06}.
-
-For experimental data, we use the Bayesian networks available with \textsf{Ace}
-and
-\textsf{Cachet}\footnote{\url{https://www.cs.rochester.edu/u/kautz/Cachet/}},
-most of which happen to be binary. We classify them into the following seven
-categories:
+\paragraph{Instances.} For experimental data, we use the Bayesian networks
+available with \textsf{Ace} and \textsf{Cachet}, most of which happen to be
+binary. We classify them into the following seven categories:
 \begin{itemize*}
 \item DQMR and
 \item Grid networks as described by \citet{DBLP:conf/aaai/SangBK05},
@@ -846,21 +842,31 @@ categories:
 We run \textsf{ADDMC} with each of the five encodings once on each Bayesian
 network.
 
-According to the cumulative plot in \cref{fig:cumulative}, \texttt{cw} is
-consistently able to solve more instances with any given time limit than any
-other encoding, while the order of the remaining encodings from best to worst is
-exactly the opposite of that in previous literature (cf. \cref{sec:related}).
-Specifically, \texttt{cw} solves the same number of instances in
-\SI{8.144}{\second} as \texttt{d02} does in \SI{1000}{\second}, which is the
-second-best encoding in our experiments. Furthermore, \cref{tbl:tallies} shows
-that \texttt{cw} was the fastest in 935 out of the 980 (i.e.,
-\SI{95.4}{\percent}) instances that it managed to solve. Finally, according to
-the scatter plots in \cref{fig:scatter}, \texttt{cw} is particularly promising
-on Grid networks while losing to \texttt{d02} on some instances of the
-Mastermind data set. We conjecture that this is so either because the particular
-structure of the problem confuses the heuristics used by \textsf{ADDMC} or
-because these instances allow for significant simplifications that are exploited
-by \texttt{d02} but not \texttt{cw}.
+%Specifically, \texttt{cw} solves the same number of
+%instances in \SI{8.144}{\second} as \texttt{d02} does in \SI{1000}{\second},
+%which is the second-best encoding in our experiments.
+
+% TODO: need to update
+\paragraph{Results.} \Cref{fig:cumulative} shows that \texttt{cd05} and
+\texttt{cd06} (when run with \textsf{Ace}) are in the lead, while \textsf{ADDMC}
+significantly underperforms when combined with any of the previous encodings.
+Our encoding \texttt{cw} significantly improves the performance of
+\textsf{ADDMC}, making $\textsf{ADDMC}+\texttt{cw}$ comparable to
+$\textsf{Ace}+\texttt{d02}$, $\textsf{c2d}+\texttt{bklm16}$, and
+$\textsf{Cachet}+\texttt{sbk05}$. Furthermore,
+\cref{tbl:tallies} shows that, while $\textsf{Ace}+\texttt{cd06}$ managed to
+solve the most instances, $\textsf{ADDMC}+\texttt{cw}$ was the best-performing
+algorithm-encoding combination on the largest number of instances. The scatter
+plot on the left hand side of \cref{fig:scatter} add to this by showing that
+\texttt{cw} is particularly promising on Grid networks and tackles all DQMR
+instances in less than a second. The scatter plot on the right hand side of
+\cref{fig:scatter} shows that \texttt{cw} is better than \texttt{sbk05} (i.e.,
+the second best performing encoding for \textsf{ADDMC}) on the majority of
+instances. Seeing how, e.g., DQMR instances are trivial for
+$\textsf{ADDMC}+\texttt{cw}$ but hard for $\textsf{Ace}+\texttt{cd06}$, and
+vice versa for Mastermind instances, we conclude that the best-performing
+algorithm-encoding combination depends significantly on (as-of-yet unknown)
+properties of the Bayesian networks.
 
 \begin{table}
   \centering
@@ -878,20 +884,24 @@ by \texttt{d02} but not \texttt{cw}.
   \end{tabular}
 \end{table}
 
-\paragraph{Explaining the performance benefits.} Let $n = |\mathcal{V}|$ be the
-number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
-|\mathrm{pa}(X)|$ the maximum in-degree (i.e., the number of parents), and $v =
-\max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
-\Cref{tbl:asymptotes} shows how \texttt{cw} has fewer variables and fewer
-ADDs than any other encoding. However, note that these are upper bounds and most
-encodings (including \texttt{cw}) can be smaller in certain situations (e.g.,
-with binary random variables or when a CPT has repeating probabilities). We
-equate clauses and ADDs (more specifically, factors of the function $\phi$ from
-\cref{alg:encoding}) here because \textsf{ADDMC} interprets each clause of any
-WMC encoding as a multiplicative factor of the ADD that represents the entire
-WMC instance \citep{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings,
-each weight is also a factor, but that does not affect the asymptotic bounds in
-the table.
+We attempt to explain what makes \textsf{ADDMC} run hundreds of times faster
+with \texttt{cw} than with any other encoding by considering asymptotic upper
+bounds on the numbers of variables and ADDs based on the size and structure of
+the Bayesian network. Let $n = |\mathcal{V}|$ be the number of vertices in the
+Bayesian network, $d = \max_{X \in \mathcal{V}} |\mathrm{pa}(X)|$ the maximum
+in-degree (i.e., the number of parents), and $v = \max_{X \in \mathcal{V}} |\im
+X|$ the maximum number of values per variable. \Cref{tbl:asymptotes} shows how
+\texttt{cw} has fewer variables and fewer ADDs than any other encoding. We
+conjecture that it is primarily the reduced number of variables that makes the
+\textsf{ADDMC} variable ordering heuristics much more effective. Note that these
+are upper bounds and most encodings (including \texttt{cw}) can be smaller in
+certain situations (e.g., with binary random variables or when a CPT has
+repeating probabilities). We equate clauses and ADDs (more specifically, factors
+of the function $\phi$ from \cref{alg:encoding}) here because \textsf{ADDMC}
+interprets each clause of any WMC encoding as a multiplicative factor of the ADD
+that represents the entire WMC instance \citep{DBLP:conf/aaai/DudekPV20}. For
+literal-weight encodings, each weight is also a factor, but that does not affect
+the asymptotic bounds in the table.
 
 \section{Discussion and Conclusion}
 % TODO: mention that DPMC is the next step
@@ -1034,4 +1044,5 @@ straightforward for other WMC techniques.
   \end{itemize}
 \end{proof}
 
+% TODO: potential appendix: exact arguments to each piece of software
 \end{document}

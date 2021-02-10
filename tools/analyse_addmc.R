@@ -56,7 +56,7 @@ data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsf{ADDMC} + \\tex
 data_sum$encoding[data_sum$encoding == "new_cw"] <- "\\textsf{ADDMC} + \\texttt{cw}"
 data_sum$encoding[data_sum$encoding == "new_d02"] <- "\\textsf{ADDMC} + \\texttt{d02}"
 data_sum$encoding[data_sum$encoding == "new_sbk05"] <- "\\textsf{ADDMC} + \\texttt{sbk05}"
-data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsf{query-dnnf} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsf{c2d} + \\texttt{bklm16}"
 data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{cd05}"
 data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
 data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
