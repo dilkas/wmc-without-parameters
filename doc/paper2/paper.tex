@@ -98,12 +98,13 @@
   demonstrate the performance benefits of conditional weights over the addition
   of extra literals, we develop a new WMC encoding for Bayesian networks and
   adapt a state-of-the-art WMC algorithm \textsf{ADDMC} to the new format. Our
-  experiments show that the new encoding results in significantly faster
-  inference on most benchmark instances. Furthermore, the same idea can be
-  adapted to other WMC algorithms and other problem domains.
+  experiments show that the new encoding significantly improves the performance
+  of the algorithm on most benchmark instances. Furthermore, the same idea can
+  be adapted to other WMC algorithms and other problem domains.
 \end{abstract}
 
 \section{Introduction}
+% TODO: keep mentioning citations along with algorithm and encoding names
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \citep{DBLP:conf/aaai/SangBK05}, has
@@ -245,10 +246,10 @@ can also be represented as Boolean algebras (e.g., using the syntax $(2^{2^U},
 \land, \lor, \neg, \bot, \top)$) with a partial order $\le$ that corresponds to
 set inclusion $\subseteq$---see \cref{tbl:notation_example} for examples of how
 various elements can be represented in both notations. Most importantly, note
-that the word \emph{atom} has completely different meanings in logic and in
-Boolean algebras. An atom in $\mathcal{L}$ is an atomic formula, i.e., an
-element of $U$, whereas an atom in a Boolean algebra is (in set-theoretic terms)
-a singleton set. For instance, an atom in $2^{2^U}$ corresponds to a model of
+that the word \emph{atom} has completely different meanings in logic and Boolean
+algebras. An atom in $\mathcal{L}$ is an atomic formula, i.e., an element of
+$U$, whereas an atom in a Boolean algebra is (in set-theoretic terms) a
+singleton set. For instance, an atom in $2^{2^U}$ corresponds to a model of
 $\mathcal{L}$, i.e., an element of $2^U$. Unless referring specifically to a
 logic, we will use the algebraic definition of an atom and refer to logical
 atoms as \emph{variables}. In the rest of the paper, for any set $U$, we will
@@ -256,9 +257,9 @@ use set-theoretic notation for $2^U$ and Boolean-algebraic notation for
 $2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
 for some model $x \in 2^U$.
 
-\subsection{The Space of Functions on Boolean Algebras}
-% TODO: it would be easier to talk about pseudo-Boolean functions instead, but
-% maybe it's not necessary.
+\subsection{Functions on Boolean Algebras}
+% TODO: maybe: it would be easier to talk about pseudo-Boolean functions
+% instead, but maybe it's not necessary.
 
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
@@ -403,7 +404,7 @@ Since many measures of interest may not be factorable, a well-known way to
 encode them into instances of WMC is by adding more literals
 \citep{DBLP:journals/ai/ChaviraD08}. We can use the measure-theoretic
 perspective on WMC to show that this is always possible, however, as ensuing
-sections will demonstrate, it often makes the inference task much harder in
+sections will demonstrate, it can make the inference task much harder in
 practice.\footnote{The proofs of this and other theoretical results can be found
   in the appendix.}
 
@@ -465,20 +466,18 @@ practice.\footnote{The proofs of this and other theoretical results can be found
 
 In this section, we describe a way to encode Bayesian networks into WMC without
 restricting oneself to factorable measures and thus having to add extra
-variables. We will refer to it as \texttt{cw}.
-
-A Bayesian network is a directed acyclic graph with random variables as vertices
-that defines a probability distribution over them. Let $\mathcal{V}$ denote this
-set of random variables. For any random variable $X \in \mathcal{V}$, let $\im
-X$ denote its set of values and $\mathrm{pa}(X)$ its set of parents. The
-full probability distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X
-\mid \mathrm{pa}(X))$ \citep{DBLP:books/daglib/0023820}. For discrete Bayesian
-networks (and we only consider discrete networks in this paper), each factor of
-this product can be represented by a CPT. See \cref{fig:example_bn} for an
-example Bayesian network that we will refer to throughout this section. For
-this network, $\mathcal{V} = \{ W, F, T \}$, $\mathrm{pa}(W) = \emptyset$,
-$\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$, $\im W = \im F = \{0, 1 \}$, and
-$\im T = \{ l, m, h \}$.
+variables. We will refer to it as \texttt{cw}. A Bayesian network is a directed
+acyclic graph with random variables as vertices that defines a probability
+distribution over them. Let $\mathcal{V}$ denote this set of random variables.
+For any random variable $X \in \mathcal{V}$, let $\im X$ denote its set of
+values and $\mathrm{pa}(X)$ its set of parents. The full probability
+distribution is then equal to $\prod_{X \in \mathcal{V}} \Pr(X \mid
+\mathrm{pa}(X))$. For discrete Bayesian networks (and we only consider discrete
+networks in this paper), each factor of this product can be represented by a
+CPT. See \cref{fig:example_bn} for an example Bayesian network that we will
+refer to throughout this section. For this network, $\mathcal{V} = \{ W, F, T
+\}$, $\mathrm{pa}(W) = \emptyset$, $\mathrm{pa}(F) = \mathrm{pa}(T) = \{ W \}$,
+$\im W = \im F = \{0, 1 \}$, and $\im T = \{ l, m, h \}$.
 
 \begin{definition}[Indicator variables]
   Let $X \in \mathcal{V}$ be a random variable. If $X$ is binary (i.e., $|\im X|
@@ -501,11 +500,10 @@ $\im T = \{ l, m, h \}$.
   set of indicator variables for $X$ and its parents in the Bayesian network.
   Finally, let $U = \bigcup_{X \in \mathcal{V}} \mathcal{E}(X)$ denote the set
   of all indicator variables for all random variables in the Bayesian network.
+  For example, in the Bayesian network from \cref{fig:example_bn},
+  $\mathcal{E}^*(T) = \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h},
+  \lambda_{W=1} \}$.
 \end{definition}
-
-For example, in the Bayesian network from \cref{fig:example_bn},
-$\mathcal{E}^*(T) = \{ \lambda_{T=l}, \lambda_{T=m}, \lambda_{T=h},
-\lambda_{W=1} \}$.
 
 \begin{algorithm}[t]
   \caption{Encoding a Bayesian network.}
@@ -574,17 +572,17 @@ network in \cref{fig:example_bn}, we get:
 
 \Cref{alg:encoding} produces a function with a Boolean algebra as its domain.
 This function can be represented by an ADD
-\citep{DBLP:journals/fmsd/BaharFGHMPS97}. The core of \textsf{ADDMC} works by
-taking an ADD $\psi\colon 2^{U} \to \mathbb{R}_{\ge 0}$ (expressed as a product
-of smaller ADDs) and returning $(\exists_U\psi)(\emptyset)$
-\citep{DBLP:conf/aaai/DudekPV20}. In this section, we prove that the function
-$\phi$ produced by \cref{alg:encoding} can be used by \textsf{ADDMC} to
-correctly compute any marginal probability of the Bayesian network that was
-encoded as $\phi$.\footnote{Note that it can just as well compute \emph{any}
-  probability expressed using the random variables in $\mathcal{V}$.} We begin
-with \cref{lemma:cpt} which shows that any conditional weight function produces
-the right answer when given a valid encoding of variable-value assignments
-relevant to the CPT.
+\citep{DBLP:journals/fmsd/BaharFGHMPS97}. \textsf{ADDMC} takes an ADD
+$\psi\colon 2^{U} \to \mathbb{R}_{\ge 0}$ (expressed as a product of smaller
+ADDs) and returns $(\exists_U\psi)(\emptyset)$ \citep{DBLP:conf/aaai/DudekPV20}.
+In this section, we prove that the function $\phi$ produced by
+\cref{alg:encoding} can be used by \textsf{ADDMC} to correctly compute any
+marginal probability of the Bayesian network that was encoded as
+$\phi$.\footnote{Note that it can just as well compute \emph{any} probability
+  expressed using the random variables in $\mathcal{V}$.} We begin with
+\cref{lemma:cpt} which shows that any conditional weight function produces the
+right answer when given a valid encoding of variable-value assignments relevant
+to the CPT.
 
 \begin{restatable}{lemma}{cptlemma} \label{lemma:cpt}
   Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
@@ -693,12 +691,12 @@ variables $u$ and $v$ if there is a clause in the formula that contains both $u$
 and $v$. We extend this definition to functions on Boolean algebras, i.e., the
 factors of $\phi$. For any pair of distinct variables $u, v \in U$, we draw an
 edge between them in the primal graph if there is a function $\alpha\colon 2^X
-\to \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u \in X$ and $v
-\in X$. For instance, a factor such as $\mathrm{CPT}_X$ will enable edges
-between all distinct pairs of variables in $\mathcal{E}^*(X)$. Second, even
-though the function $\phi$ produced by \cref{alg:encoding} is constructed to
-have $2^U$ as its domain, sometimes the domain is effectively reduced to $2^V$
-for some $V \subset U$ by the ADD manipulation algorithms that optimise the ADD
+\to \mathbb{R}_{\ge 0}$ that is a factor of $\phi$ such that $u, v \in X$. For
+instance, a factor such as $\mathrm{CPT}_X$ will enable edges between all
+distinct pairs of variables in $\mathcal{E}^*(X)$. Second, even though the
+function $\phi$ produced by \cref{alg:encoding} is constructed to have $2^U$ as
+its domain, sometimes the domain is effectively reduced to $2^V$ for some $V
+\subset U$ by the ADD manipulation algorithms that optimise the ADD
 representation of a function. For a simple example, consider $\alpha: 2^{\{a\}}
 \to \mathbb{R}_{\ge 0}$ defined as $\alpha(\{a\}) = \alpha(\emptyset) = 0.5$.
 Then $\alpha$ can be reduced to $\alpha'\colon 2^{\emptyset} \to \mathbb{R}_{\ge
@@ -759,7 +757,7 @@ correct for this, we multiply the final answer by two for every $u \in U
   \label{fig:scatter}
 \end{figure*}
 
-%\begin{figure*}[t] % TODO: describe this in the text
+%\begin{figure*}[t] % TODO: maybe not: describe this in the text
 %  \centering
 %  \input{melt.tex}%
 %  \caption{Average encoding and inference time of each encoding with their
@@ -769,11 +767,8 @@ correct for this, we multiply the final answer by two for every $u \in U
 %  \label{fig:melted}
 %\end{figure*}
 
-% TODO: keep mentioning citations along with algorithm and encoding names
-
-In this section, we describe an experimental study comparing the six WMC
-encodings for Bayesian networks when run with both \textsf{ADDMC} and the
-WMC algorithms used in the original papers.\footnote{Both
+We compare the six WMC encodings for Bayesian networks when run with both
+\textsf{ADDMC} and the WMC algorithms used in the original papers.\footnote{Both
   \texttt{cd05} and \texttt{cd06} cannot be run with most WMC algorithms
   including \textsf{ADDMC} because these encodings allow for additional models
   that the WMC algorithm is supposed to ignore
@@ -799,7 +794,7 @@ answer computation for \texttt{bklm16}. For encoding, we use \textsf{bn2cnf}
 \texttt{bklm16}, and \textsf{Ace} for all other encodings (except for
 \texttt{cw}, which is implemented in Python).
 
-\paragraph{Workarounds.} \textsf{Ace} was not used to encode evidence, as
+\textsf{Ace} was not used to encode evidence, as
 preliminary experiments revealed that the evidence-encoding implementation
 contains bugs that can lead to incorrect answers or a Java exception being
 thrown on some instances of the data set (and the source code is not publicly
@@ -824,7 +819,7 @@ network. If $\mathsf{true} \in \im X$, then we compute the marginal probability
 of $X = \mathsf{true}$. Otherwise, we pick the value of $X$ which is listed
 first and calculate its marginal probability.
 
-\paragraph{Instances.} For experimental data, we use the Bayesian networks
+For experimental data, we use the Bayesian networks
 available with \textsf{Ace} and \textsf{Cachet}, most of which happen to be
 binary. We classify them into the following seven categories:
 \begin{itemize*}
@@ -846,8 +841,7 @@ network.
 %instances in \SI{8.144}{\second} as \texttt{d02} does in \SI{1000}{\second},
 %which is the second-best encoding in our experiments.
 
-% TODO: need to update
-\paragraph{Results.} \Cref{fig:cumulative} shows that \texttt{cd05} and
+\Cref{fig:cumulative} shows that \texttt{cd05} and
 \texttt{cd06} (when run with \textsf{Ace}) are in the lead, while \textsf{ADDMC}
 significantly underperforms when combined with any of the previous encodings.
 Our encoding \texttt{cw} significantly improves the performance of
@@ -857,11 +851,11 @@ $\textsf{Cachet}+\texttt{sbk05}$. Furthermore,
 \cref{tbl:tallies} shows that, while $\textsf{Ace}+\texttt{cd06}$ managed to
 solve the most instances, $\textsf{ADDMC}+\texttt{cw}$ was the best-performing
 algorithm-encoding combination on the largest number of instances. The scatter
-plot on the left hand side of \cref{fig:scatter} add to this by showing that
+plot on the left-hand side of \cref{fig:scatter} add to this by showing that
 \texttt{cw} is particularly promising on Grid networks and tackles all DQMR
-instances in less than a second. The scatter plot on the right hand side of
+instances in less than a second. The scatter plot on the right-hand side of
 \cref{fig:scatter} shows that \texttt{cw} is better than \texttt{sbk05} (i.e.,
-the second best performing encoding for \textsf{ADDMC}) on the majority of
+the second-best encoding for \textsf{ADDMC}) on the majority of
 instances. Seeing how, e.g., DQMR instances are trivial for
 $\textsf{ADDMC}+\texttt{cw}$ but hard for $\textsf{Ace}+\texttt{cd06}$, and
 vice versa for Mastermind instances, we conclude that the best-performing
@@ -901,38 +895,41 @@ of the function $\phi$ from \cref{alg:encoding}) here because \textsf{ADDMC}
 interprets each clause of any WMC encoding as a multiplicative factor of the ADD
 that represents the entire WMC instance \citep{DBLP:conf/aaai/DudekPV20}. For
 literal-weight encodings, each weight is also a factor, but that does not affect
-the asymptotic bounds in the table.
+our asymptotic bounds.
 
-\section{Discussion and Conclusion}
-% TODO: mention that DPMC is the next step
-% TODO: which algorithm comes out on top depends on the data set
-% TODO: emphasise that BN encodings have never been compared w.r.t. time before
+\section{Conclusions and Future Work}
+% TODO: maybe: emphasise that BN encodings have never been compared w.r.t. time
+% before
 
 WMC was originally motivated by an appeal to the success of \SAT{} solvers in
 efficiently tackling an $\NP{}$-complete problem
 \citep{DBLP:conf/aaai/SangBK05}. \textsf{ADDMC} does not rely on \SAT{}-based
-algorithmic techniques, and our proposed format diverges even more from the
-DIMACS CNF format for Boolean formulas. To what extent are \SAT{}-based methods
-still applicable? The answer depends significantly on the problem domain. For
-Bayesian networks, the rules describing that each random variable can only be
-associated with exactly one value were still encoded as clauses. As has been
-noted previously \citep{DBLP:conf/sat/ChaviraD06}, rows in CPTs with
-probabilities equal to zero or one can be represented as clauses as well.
-Therefore, our work can be seen as proposing a middle ground between $\#\SAT{}$
-and probabilistic inference.
+algorithmic techniques \citep{DBLP:conf/aaai/DudekPV20}, and our proposed format
+diverges even more from the DIMACS CNF format for Boolean formulas. To what
+extent are \SAT{}-based methods still applicable? The answer depends
+significantly on the problem domain. For Bayesian networks, the rules describing
+that each random variable can only be associated with exactly one value were
+still encoded as clauses. As has been noted previously
+\citep{DBLP:conf/sat/ChaviraD06}, rows in CPTs with probabilities equal to zero
+or one can be represented as clauses as well. Therefore, our work can be seen as
+proposing a middle ground between $\#\SAT{}$ and probabilistic inference.
 
-While we chose to use \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} as the WMC
-algorithm and Bayesian networks as a canonical example of a probabilistic
-inference task, these are only examples meant to illustrate the broader idea
-that choosing a more expressive representation of weights can outperform
-increasing the size of the problem to keep the weights simple. Indeed, in this
-work, we have provided a new theoretical perspective on the expressive power of
-WMC and illustrated the empirical benefits of that perspective. The same idea
-can be adapted to other inference problem domains such as probabilistic programs
+While we chose \textsf{ADDMC} as the WMC algorithm and Bayesian networks as a
+canonical example of a probabilistic inference task, these are only examples
+meant to illustrate the broader idea that choosing a more expressive
+representation of weights can outperform increasing the size of the problem to
+keep the weights simple. Indeed, in this work, we have provided a new
+theoretical perspective on the expressive power of WMC and illustrated the
+empirical benefits of that perspective. The same idea can be adapted to other
+inference problem domains such as probabilistic programs
 \citep{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089} as
 well as to search-based solvers such as \textsf{Cachet}
-\citep{DBLP:conf/sat/SangBBKP04}, although the extension may be less
-straightforward for other WMC techniques.
+\citep{DBLP:conf/sat/SangBBKP04} and \textsf{DPMC}
+---an extension to \textsf{ADDMC} that adds support for computations based on
+tensors (rather than ADDs) and planning based on tree decompositions
+\cite{DBLP:conf/cp/DudekPV20}. Another important direction for future work is to
+develop a better understanding of what properties of Bayesian networks make an
+instance easy for some algorithm-encoding combinations more than others.
 
 \begin{contributions} % will be removed in pdf for initial submission,
                       % so you can already fill it to test with the
@@ -953,6 +950,7 @@ straightforward for other WMC techniques.
     \emph{All} acknowledgements go in this section.
 \end{acknowledgements}
 
+\clearpage
 \bibliography{paper}
 
 \clearpage
