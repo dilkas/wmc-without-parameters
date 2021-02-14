@@ -8,7 +8,7 @@ library(ggpubr)
 library(tidyr)
 
 # TODO: plot treewidth vs add width
-data <- read.csv("../results/old_results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 
 # TODO: remove (just for testing)
 data <- data[data$dataset != "2004-PGM",]
@@ -184,16 +184,16 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
                                       shape = dataset)) +
     geom_jitter(alpha = 1, size = 1, width = 0.1, height = 0.1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
-#    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
-#                       breaks = c(0.1, 10, 1000),
-#                       labels = c("0.1", "10", "1000")) +
-#    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time),
-#                       breaks = c(0.1, 10, 1000),
-#                       labels = c("0.1", "10", "1000")) +
+    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+                       breaks = c(0.1, 10, 1000),
+                       labels = c("0.1", "10", "1000")) +
+    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+                       breaks = c(0.1, 10, 1000),
+                       labels = c("0.1", "10", "1000")) +
     ylab(y_name) +
     xlab(x_name) +
     coord_fixed() +
-#    annotation_logticks(colour = "#b3b3b3") +
+    annotation_logticks(colour = "#b3b3b3") +
     theme_light() +
     labs(shape = "Data set", colour = "Treewidth") +
 #    scale_color_distiller("Treewidth", trans = "log") + # TODO: add breaks
@@ -202,8 +202,8 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
 
 scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\texttt{old_cd06} time (s)",
                    "\\texttt{new_bklm16++} time (s)", 2 * TIMEOUT)
-scatter_plot(df, "time_new_d02", "time_new_d02pp", "\\texttt{d02} time (s)",
-                   "\\texttt{d02++} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\texttt{bklm16} time (s)",
+                   "\\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 scatter_plot(df, "add_width_new_d02pp", "add_width_new_d02", "\\texttt{d02++} width",
                    "\\texttt{d02} width", max(data$add_width))
 scatter_plot(df, "add_width_new_bklm16pp", "add_width_new_sbk05", "\\texttt{bklm16++} width",

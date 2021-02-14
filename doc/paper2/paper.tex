@@ -127,14 +127,14 @@ search \citep{DBLP:conf/aaai/SangBK05}, whereas approximate solvers work by
 sampling \citep{DBLP:conf/aaai/ChakrabortyFMSV14} and performing local search
 \citep{DBLP:conf/sat/WeiS05}.
 
-The most well-studied version of WMC assigns weights to models based on
+The most well-known version of WMC assigns weights to models based on
 weights on literals, i.e., the weight of a model is the product of the weights
 of all literals in it. This simplification is motivated by the fact that the
 number of models scales exponentially with the number of atoms, so listing the
 weight of every model is intractable. However, this also severely restricts what
 probability distributions can be represented. A common way to overcome this
 limitation is by adding more literals. While we show that this is always
-possible, we also demonstrate that it can be significantly more efficient to
+possible, we demonstrate that it can be significantly more efficient to
 encode weights in a more flexible format instead.
 
 After briefly reviewing the background in \cref{sec:related}, in
@@ -146,21 +146,25 @@ the value of a measure on a Boolean algebra. We show that not all measures can
 be represented using literal-based WMC, but all Boolean algebras can be extended
 to make any measure representable in such a manner.
 
-This new measure-theoretic perspective allows us to not only encode any
-discrete probability distribution but also improve inference speed. In
-\cref{sec:bns}, we demonstrate this by developing a new WMC encoding for
-Bayesian networks that uses \emph{conditional weights} on literals (in the
-spirit of conditional probabilities) that have literal-based WMC as a special
-case. We prove the correctness of the encoding and show how a state-of-the-art
-WMC solver \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} can be adapted to the
-new format. \textsf{ADDMC} is a recently-proposed algorithm for WMC based on
+This new perspective allows us to not only encode any discrete probability
+distribution but also improve inference speed. In \cref{sec:bns} we demonstrate
+this by developing a new WMC encoding for Bayesian networks that uses
+\emph{conditional weights} on literals (in the spirit of conditional
+probabilities) that have literal-based WMC as a special case. We prove the
+correctness of the encoding and show how a state-of-the-art WMC solver
+\textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} can be adapted to the new
+format. \textsf{ADDMC} is a recently-proposed algorithm for WMC based on
 manipulating functions on Boolean algebras using an efficient representation for
 such functions known as algebraic decision diagrams (ADDs)
-\citep{DBLP:journals/fmsd/BaharFGHMPS97}. Finally, in \cref{sec:experiments}, we
-show how the new encoding results in faster inference on the vast majority of
-benchmark instances, often by one or two orders of magnitude. We explain the
-performance benefits by showing how our encoding has asymptotically fewer
-variables and ADDs.
+\citep{DBLP:journals/fmsd/BaharFGHMPS97}. \textsf{ADDMC} was already shown to be
+capable of solving instances other solvers fail at and being the fastest solver
+on the largest number of instances \citep{DBLP:conf/aaai/DudekPV20}. Our
+experiments in \cref{sec:experiments} focus on further improving the performance
+of \textsf{ADDMC} on instances that originate from Bayesian networks. We show
+how our new encoding improves inference on the vast majority of benchmark
+instances, often by one or two orders of magnitude. We explain the performance
+benefits by showing how our encoding has asymptotically fewer variables and
+ADDs.
 
 \section{Related Work} \label{sec:related}
 
@@ -193,24 +197,23 @@ favour of \texttt{cd06}. Second, they compare the inference time of
 \texttt{sbk05} run with \textsf{Cachet} \citep{DBLP:conf/sat/SangBBKP04} with
 the compile times of \texttt{cd05} and \texttt{cd06}, but only on five (types
 of) instances. In these experiments, \texttt{cd06} is always faster than
-\texttt{cd05}, while the comparison with \texttt{sbk05} is mixed. Sometimes
-\texttt{cd06} is orders of magnitude faster than \texttt{sbk05}, sometimes
-slightly slower. The performance difference between \texttt{sbk05} and
-\texttt{cd05} is even harder to judge: \texttt{sbk05} is better on three out of
-five instances and worse on the remaining two. Finally,
-\citet{DBLP:conf/ecai/BartKLM16} introduce \texttt{bklm16} and show that it has
-both fewer variables and fewer clauses than \texttt{cd06}. Their experiments
-show \texttt{bklm16} to be superior to \texttt{cd06} with respect to both
-compilation time and encoding size when both are compiled using
+\texttt{cd05}, while the comparison with \texttt{sbk05} is mixed.  The
+performance difference between \texttt{sbk05} and \texttt{cd05} is even harder
+to judge: \texttt{sbk05} is better on three out of five instances and worse on
+the remaining two. Finally, \citet{DBLP:conf/ecai/BartKLM16} introduce
+\texttt{bklm16} and show that it has both fewer variables and fewer clauses than
+\texttt{cd06}. Their experiments show \texttt{bklm16} to be superior to
+\texttt{cd06} with respect to both compilation time and encoding size when both
+are compiled using
 \textsf{c2d}\footnote{\url{http://reasoning.cs.ucla.edu/c2d/}}
 \citep{DBLP:conf/ecai/Darwiche04} but inferior to \texttt{cd06} when
 \texttt{cd06} is compiled using
 \textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}} (which still uses
 \textsf{c2d} but considers the structure of the Bayesian network along with its
 encoding). Our experiments in \cref{sec:experiments} confirm some of the
-findings outlined in this section while also observing that the (relative and
-absolute) performance of each encoding depends on the WMC algorithm in use, and
-smaller encodings are not necessarily faster.
+findings outlined in this section while also showing that the performance of
+each encoding depends on the WMC algorithm in use, and smaller encodings are not
+necessarily faster.
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
@@ -878,10 +881,10 @@ properties of the Bayesian networks.
   \end{tabular}
 \end{table}
 
-We attempt to explain what makes \textsf{ADDMC} run hundreds of times faster
-with \texttt{cw} than with any other encoding by considering asymptotic upper
-bounds on the numbers of variables and ADDs based on the size and structure of
-the Bayesian network. Let $n = |\mathcal{V}|$ be the number of vertices in the
+We can explain what makes \textsf{ADDMC} run significantly faster with
+\texttt{cw} than with any other encoding by considering asymptotic upper bounds
+on the numbers of variables and ADDs based on the size and structure of the
+Bayesian network. Let $n = |\mathcal{V}|$ be the number of vertices in the
 Bayesian network, $d = \max_{X \in \mathcal{V}} |\mathrm{pa}(X)|$ the maximum
 in-degree (i.e., the number of parents), and $v = \max_{X \in \mathcal{V}} |\im
 X|$ the maximum number of values per variable. \Cref{tbl:asymptotes} shows how

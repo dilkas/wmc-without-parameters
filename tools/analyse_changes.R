@@ -18,7 +18,7 @@ changes$dataset[grepl("Plan_Recognition", changes$instance, fixed = TRUE)] <- "O
 changes$dataset[grepl("students", changes$instance, fixed = TRUE)] <- "Other binary"
 changes$dataset[grepl("tcc4f", changes$instance, fixed = TRUE)] <- "Other binary"
 
-# Note: jitter is added because many data points have exactly the same before/after numbers
+# Note: count is used because many data points have exactly the same before/after numbers
 scatter <- function(data, x_var, y_var) {
   limits <- c(min(data[[x_var]], data[[y_var]], na.rm = TRUE), max(data[[x_var]], data[[y_var]], na.rm = TRUE))
   ggplot(data, aes(.data[[x_var]], .data[[y_var]], col = dataset)) +
@@ -36,12 +36,14 @@ scatter <- function(data, x_var, y_var) {
 # Before/after comparison of the number of variables
 # Note: the same plot for other encodings looks very similar
 scatter(changes[changes$encoding == "bklm16",], "before_variables", "after_variables")
-scatter(changes[data$encoding == "bklm16",], "before_clauses", "after_clauses")
+scatter(changes[changes$encoding == "bklm16",], "before_clauses", "after_clauses")
 
 # Comparison of encodings after optimisation
 df <- dcast(data = changes, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
             value.var = c("before_variables", "before_clauses", "after_variables", "after_clauses"))
+
+df %>% group_by(df$dataset) %>% tally()
 
 scatter(df, "after_variables_bklm16", "after_variables_cd06")
 scatter(df, "after_variables_bklm16", "after_variables_cd05")

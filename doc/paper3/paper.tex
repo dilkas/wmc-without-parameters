@@ -39,11 +39,11 @@
 
 \maketitle
 
-% TODO: make introduce an acronym: project-join tree = PJT
-\section{Main Results}
+\section{Introduction}
 
 \paragraph{Notation.} For any propositional formula $\phi$ and $p, q \in
-\mathbb{R}_{\ge 0}$,
+\mathbb{R}_{\ge 0}$, let $[\phi]^p_q\colon 2^X \to \mathbb{R}$ be a
+pseudo-Boolean function defined as
 \[
   [\phi]^p_q \coloneqq
   \begin{cases}
@@ -52,14 +52,8 @@
   \end{cases}
 \]
 
-\todo[inline]{Formal definition of a previous WMC instance (CNF, literal weight
-  function) and the new definition (set of $2^{X} \to \mathbb{R}_{\ge 0}$
-  pseudo-Boolean functions and a constant). Note that the constant idea is
-  borrowed from \texttt{bklm16}.}
-
 \paragraph{References.}
 \begin{itemize}
-\item `Apply' is quadratic \cite{DBLP:journals/tc/Bryant86}.
 \item Related work without publicly available implementations:
   \begin{itemize}
   \item direct compilation to SDDs \cite{DBLP:conf/ecsqaru/ChoiKD13}
@@ -68,6 +62,17 @@
   \end{itemize}
 \end{itemize}
 % TODO: do a literature search focused around these papers
+% TODO : use mathcal on V, L, E (and introduce them)
+% TODO: maybe use texttt for DPMC?
+
+\paragraph{Notes.}
+\begin{itemize}
+\item Apparently, the DPMC paper already shows that taking the first offered
+  decomposition tree is best.
+\item It is already well-known that WMC is FPT.
+\end{itemize}
+
+\section{Parameter Variable Elimination}
 
 \paragraph{Notes.}
 \begin{itemize}
@@ -85,13 +90,10 @@
 \item The $d$ map is constructed in $\mathcal{O}(|X_P|\log|X_P|)$ time (we want
   to use a data structure based on binary search trees rather than hashing).
 \item \texttt{rename} can be implemented in $\mathcal{O}(\log |X_P|)$ time.
-\item Apparently, the DPMC paper already shows that taking the first offered
-  decomposition tree is best.
 \item This may look like preprocessing, but all the transformations are local
   and thus can be incorporated into an encoding algorithm with no slowdown. In
   fact, if anything, the resulting algorithm would be slightly faster, as it
   would have less data to output.
-\item It is already well-known that WMC is FPT.
 \end{itemize}
 
 \begin{algorithm}
@@ -134,21 +136,23 @@
 
 \section{Parameterised Complexity of DPMC}
 
-% NOTE: By DPMC, we always mean DMC+lg.
-% TODO: maybe use texttt for DPMC?
-
-Summary:
+\paragraph{Notes.}
 \begin{itemize}
-\item We establish DPMC inference as fixed-parameter tractable.
-\item We show that, in the case of cw, the parameter is the same as in the BN lower bound,
-\item and, in the case of d02, the DPMC parameter is exponentially higher.
-\item We experimentally show that cw+DPMC is best on low-to-moderate treewidth
-  instances, and cd06+c2d overtakes cw+DPMC on higher treewidth instances.
+\item Summary of results
+  \begin{itemize}
+  \item We establish DPMC inference as fixed-parameter tractable.
+  \item We experimentally show that cw+DPMC is best on low-to-moderate treewidth
+    instances, and cd06+c2d overtakes cw+DPMC on higher treewidth instances.
+  \end{itemize}
+\item By DPMC, we always mean DMC+lg.
 \end{itemize}
 
-Define:
+\paragraph{TODO: Define:}
 \begin{itemize}
-\item treewidth of a graph,
+\item Formal definition of a previous WMC instance (CNF, literal weight
+  function) and the new definition (set of $2^{X} \to \mathbb{R}_{\ge 0}$
+  pseudo-Boolean functions and a constant). Note that the constant idea is
+  borrowed from \texttt{bklm16}.
 \item Boolean formula in CNF (perhaps this is too trivial to define),
 \item primal graph of a CNF formula (a.k.a.
   Gaifman/(variable) interaction/connectivity/clique/representing graph),
@@ -203,12 +207,28 @@ Define:
   $\mathtt{width}(T) \coloneqq \max_{n \in \mathcal{V}(T)} \mathtt{size}(n)$.
 \end{definition}
 
-\begin{theorem}[\cite{DBLP:conf/cp/DudekPV20}, paraphrased, `ADD width is equal
+\begin{theorem}[\cite{DBLP:conf/cp/DudekPV20}, rephrased, `ADD width is equal
   to the treewidth of the primal graph']
   Given a CNF formula $\phi$ with a tree decomposition of its primal graph of
   width $w$, Algorithm~2 (from \cite{DBLP:conf/cp/DudekPV20}) returns a
   PJT of $\phi$ of width at most $w+1$.
 \end{theorem}
+
+\begin{definition}[\cite{DBLP:journals/jct/RobertsonS84}, rephrased]
+  A \emph{tree decomposition} of a graph $G$ is a pair $(T, \chi)$, where $T$ is
+  a tree and $\chi\colon V(T) \to 2^{V(G)}$ is a labelling function, with the
+  following properties:
+  \begin{itemize}
+  \item $\bigcup_{t \in V(T)} \chi(t) = V(G)$;
+  \item for every edge $e \in E(G)$, there exists $t \in V(T)$ such that $e$ has
+    both endpoints in $\chi(t)$;
+  \item for all $t, t', t'' \in V(T)$, if $t'$ is on the path between $t$ and
+    $t''$, then $\chi(t) \cap \chi(t'') \subseteq \chi(t')$.
+  \end{itemize}
+  The \emph{width} of tree decomposition $(T, \chi)$ is $\max_{t \in V(T)}
+  |\chi(t)| - 1)$. The \emph{treewidth} of graph $G$ is the smallest $w$ such
+  that $G$ has a tree decomposition of width $w$.
+\end{definition}
 
 \begin{figure}
   \centering
@@ -234,7 +254,82 @@ Define:
   \caption{An example PJT with clauses $c_1, \dots, c_i, \dots, c_l$ that all
     contain the same variable, its projection node $\exists$, and a node under
     consideration $\ast$.}
+  \label{fig:example_pjt}
 \end{figure}
+
+\begin{definition}
+  Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
+  such as addition and multiplication are defined pointwise as
+  \[
+    (f+g)(Y) \coloneqq f(Y)+g(Y),
+  \]
+  and
+  \[
+    (fg)(Y) \coloneqq f(Y)g(Y)
+  \]
+  for all $Y \subseteq X$.
+\end{definition}
+% TODO: do I need to formally consider extending a pseudo-Boolean function to a
+% bigger domain?
+
+\begin{definition}
+  Let $f\colon 2^X \to \mathbb{R}$ be a pseudo-Boolean function, and $x \in X$.
+  Then $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ are \emph{restrictions} of
+  $f$ defined as
+  \[
+    f|_{x=0}(Y) \coloneqq f(Y \setminus \{x\}),
+  \]
+  and
+  \[
+    f|_{x=1}(Y) \coloneqq f(Y \cup \{x\})
+  \]
+  for all $Y \subseteq X$.
+\end{definition}
+
+\begin{definition} \label{def:projection}
+  Let $X$ be a set. For any $x \in X$, \emph{projection} $\exists_x$ is an
+  endomorphism $\exists_x\colon \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ defined
+  as
+  \[
+    \exists_xf = f|_{x=1} + f|_{x=0}
+  \]
+  for any $f\colon 2^X \to \mathbb{R}$.
+\end{definition}
+% TODO: gamma will have to point to ADDs instead (and not be a bijection)
+
+\begin{lemma}
+  Let $f,g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions represented by
+  ADDs with $n$ and $m$ nodes, respectively, and $x \in X$. Then $f+g$ and $fg$
+  can be computed in $\mathcal{O}(mn)$ time, and $\exists_xf$ can be computed in
+  $\mathcal{O}(n^2)$ time.
+\end{lemma}
+\begin{proof}
+  Addition and multiplication are implemented by \texttt{apply} algorithm which
+  takes $\mathcal{O}(mn)$ time \cite{DBLP:journals/tc/Bryant86}. Projection
+  consists of two restrictions and an addition by \cref{def:projection}. The
+  computational complexity of restriction is dominated by the reduction
+  operation that transforms a decision diagram into a minimal canonical form
+  \cite{DBLP:journals/tc/Bryant86}. While the original reduction algorithm had a
+  $\mathcal{O}(n \log n)$ complexity, caching can reduce it to $\mathcal{O}(n)$
+  \cite{somenzi1998cudd}. Either way, the complexity of projection is still
+  $\mathcal{O}(n^2)$.
+\end{proof}
+
+\begin{definition}
+  Let $(T, r, \gamma, \pi)$ be a PJT, and $X$ be the set of variables. The
+  functionality of DPMC execution (i.e., Algorithm~1 in the ADDMC paper
+  \cite{DBLP:conf/aaai/DudekPV20}) can be represented by $\delta(r)$, where
+  $\delta\colon \mathcal{V}(T) \to \mathbb{R}^{2^X}$ is a recursive function
+  defined as
+  \[
+    \delta(t) =
+    \begin{cases}
+      \gamma(t) & \text{if } t \in \mathcal{L}(T) \\
+      \exists_{\pi(t)} \prod_{u \in \mathcal{C}(t)} \delta(u) & \text{otherwise.}
+    \end{cases}
+  \]
+  The range of $\delta(r)$ then contains a single real number, i.e., the answer.
+\end{definition}
 
 \begin{lemma}
   The number of variables that can appear in the ADDs within a PJT node is $\le
@@ -245,7 +340,9 @@ Define:
   this node or in one of its ancestors. Each such variable would be in the bag
   of each clause that introduced it. By the tree decomposition properties, it
   will also be in the bag of both the projection node and the current node
-  because they are on the path between the clause nodes (see the figure).
+  because they are on the path between the clause nodes (see
+  \cref{fig:example_pjt}).
+  \todo[inline]{How do I formalise this argument?}
 \end{proof}
 
 \begin{theorem}
