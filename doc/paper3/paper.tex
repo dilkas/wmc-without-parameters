@@ -42,15 +42,50 @@
 \section{Introduction}
 
 \paragraph{Notation.} For any propositional formula $\phi$ and $p, q \in
-\mathbb{R}_{\ge 0}$, let $[\phi]^p_q\colon 2^X \to \mathbb{R}$ be a
+\mathbb{R}$, let $[\phi]^p_q\colon 2^X \to \mathbb{R}$ be a
 pseudo-Boolean function defined as
 \[
-  [\phi]^p_q \coloneqq
+  [\phi]^p_q(Y) \coloneqq
   \begin{cases}
-    p & \text{if } \phi \\
-    q & \text{otherwise.}
+    p & \text{if } Y \models \phi \\
+    q & \text{otherwise}
   \end{cases}
 \]
+for any $Y \subseteq X$.
+
+\begin{lemma} \label{lemma:add_size}
+  An ADD with $n$ variables has $\mathcal{O}(2^n)$ nodes.
+\end{lemma}
+\begin{proof}
+  An ADD with $n$ variables can be, at most, a complete binary tree of height
+  $n+1$ (as measured by the number of vertices). It would then have $2^0 + 2^1 +
+  \dots + 2^n = 2^{n=1} = \mathcal{O}(2^n)$ nodes.
+\end{proof}
+
+\begin{lemma}
+  Let $\phi$ be a conjunction of $n$ literals. Then the ADD representation of
+  $[\phi]^p_q$ can be constructed in $\mathcal{O}(2^n)$ time for any $p, q \in
+  \mathbb{R}$ such that $p \ne q$.
+\end{lemma}
+\begin{proof}
+  The ADD representation of $\phi$ itself can be constructed with a sequence of
+  $n-1$ calls to \texttt{apply} with one of the two operands in each call always
+  a literal. The number of variables in the other operand then follows the
+  sequence $1, 2, 3, \dots, n-1$. By \cref{lemma:add_size}, the numbers of nodes
+  in the ADD representations of these operands is then $\mathcal{O}(2^1),
+  \mathcal{O}(2^2), \dots, \mathcal{O}(2^{n-1})$. Since one of the operands is
+  of constant size, the overall time complexity of all calls to \texttt{apply}
+  is then
+  \[
+    \mathcal{O}(2^1) + \mathcal{O}(2^2) + \dots + \mathcal{O}(2^{n-1}) =
+    \mathcal{O}(2^n).
+  \]
+
+  Let $\alpha$ be the ADD representation of $\phi$. Then the ADD representation
+  of $[\phi]_q^p$ is $(p-q)\alpha + q$. As scalar operations can obviously be
+  implemented in linear time, the overall complexity remains $\mathcal{O}(2^n)$.
+\end{proof}
+% TODO: will need to define scalar operations on ADDs
 
 \paragraph{References.}
 \begin{itemize}
@@ -61,9 +96,6 @@ pseudo-Boolean function defined as
   \item maybe two more papers
   \end{itemize}
 \end{itemize}
-% TODO: do a literature search focused around these papers
-% TODO : use mathcal on V, L, E (and introduce them)
-% TODO: maybe use texttt for DPMC?
 
 \paragraph{Notes.}
 \begin{itemize}
@@ -147,17 +179,28 @@ pseudo-Boolean function defined as
 \item By DPMC, we always mean DMC+lg.
 \end{itemize}
 
-\paragraph{TODO: Define:}
+\paragraph{TODO}
 \begin{itemize}
-\item Formal definition of a previous WMC instance (CNF, literal weight
-  function) and the new definition (set of $2^{X} \to \mathbb{R}_{\ge 0}$
-  pseudo-Boolean functions and a constant). Note that the constant idea is
-  borrowed from \texttt{bklm16}.
-\item Boolean formula in CNF (perhaps this is too trivial to define),
-\item primal graph of a CNF formula (a.k.a.
-  Gaifman/(variable) interaction/connectivity/clique/representing graph),
-\item Bayesian network (I already have a definition of these last two),
-\item moralisation of a Bayesian network (or of any DAG),
+\item do a literature search focused around these papers
+\item use mathcal on V, L, E (and introduce them)
+\item maybe use texttt for DPMC?
+\item do I need to formally consider extending a pseudo-Boolean function to a
+  bigger domain?
+\item Define:
+  \begin{itemize}
+  \item an ADD as a DAG.
+  \item What does it mean for an ADD to `have' variables? Maybe refer to
+    pseudo-Boolean function sensitivity.
+  \item Formal definition of a previous WMC instance (CNF, literal weight
+    function) and the new definition (set of $2^{X} \to \mathbb{R}_{\ge 0}$
+    pseudo-Boolean functions and a constant). Note that the constant idea is
+    borrowed from \texttt{bklm16}.
+  \item Boolean formula in CNF (perhaps this is too trivial to define),
+  \item primal graph of a CNF formula (a.k.a.
+    Gaifman/(variable) interaction/connectivity/clique/representing graph),
+  \item Bayesian network (I already have a definition of these last two),
+  \item moralisation of a Bayesian network (or of any DAG),
+  \end{itemize}
 \end{itemize}
 
 \begin{theorem}[\cite{DBLP:conf/ecai/KwisthoutBG10}, rephrased]
@@ -166,14 +209,14 @@ pseudo-Boolean function defined as
   its moralisation (provide the exact formula).
 \end{theorem}
 
-\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}, verbatim]
+\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}, verbatim but with one change]
   Let $X$ be a set of Boolean variables and $\phi$ be a CNF formula over $X$. A
   \emph{project-join tree} (PJT) of $\phi$ is a tuple $(T, r, \gamma, \pi)$
   where:
   \begin{itemize}
   \item $T$ is a tree with root $r \in \mathcal{V}(T)$,
-  \item $\gamma\colon \mathcal{L}(T) \to \phi$ is a bijection between the leaves
-    of $T$ and the clauses of $\phi$, and
+  \item $\gamma\colon \mathcal{L}(T) \to \mathbb{R}^{2^X}$ maps leaves of $T$ to
+    pseudo-Boolean functions, and
   \item $\pi\colon \mathcal{V}(T) \setminus \mathcal{L}(T) \to 2^X$ is a
     labelling function on internal nodes.
   \end{itemize}
@@ -186,6 +229,10 @@ pseudo-Boolean function defined as
     $c$, the leaf node $\gamma^{-1}(c)$ must be a descendant of $n$ in $T$.
   \end{enumerate}
 \end{definition}
+
+Note that while Dudek et al. \cite{DBLP:conf/cp/DudekPV20} define $\gamma$ to be
+a bijection between leaves of a PJT and clauses, our definition is more
+general.
 
 \begin{definition}[\cite{DBLP:conf/cp/DudekPV20}]
   \[
@@ -203,6 +250,8 @@ pseudo-Boolean function defined as
       |\mathtt{Vars}(n) \cup \pi(n)| & \text{if } n \not\in \mathcal{L}(T).
     \end{cases}
   \]
+  (Note that $\mathtt{size}(n)$ is the number of variables that can appear
+  during the computation of $\delta(n)$ (excluding recursive calls).)
   The \emph{width} of a PJT $(T, r, \gamma, \pi)$ is
   $\mathtt{width}(T) \coloneqq \max_{n \in \mathcal{V}(T)} \mathtt{size}(n)$.
 \end{definition}
@@ -269,8 +318,6 @@ pseudo-Boolean function defined as
   \]
   for all $Y \subseteq X$.
 \end{definition}
-% TODO: do I need to formally consider extending a pseudo-Boolean function to a
-% bigger domain?
 
 \begin{definition}
   Let $f\colon 2^X \to \mathbb{R}$ be a pseudo-Boolean function, and $x \in X$.
@@ -295,9 +342,8 @@ pseudo-Boolean function defined as
   \]
   for any $f\colon 2^X \to \mathbb{R}$.
 \end{definition}
-% TODO: gamma will have to point to ADDs instead (and not be a bijection)
 
-\begin{lemma}
+\begin{lemma} \label{lemma:basic_ops}
   Let $f,g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions represented by
   ADDs with $n$ and $m$ nodes, respectively, and $x \in X$. Then $f+g$ and $fg$
   can be computed in $\mathcal{O}(mn)$ time, and $\exists_xf$ can be computed in
@@ -315,56 +361,71 @@ pseudo-Boolean function defined as
   $\mathcal{O}(n^2)$.
 \end{proof}
 
-\begin{definition}
+% NOTE: this is a rehash of equation (2) from the DPMC paper
+\begin{definition} \label{def:abstraction}
   Let $(T, r, \gamma, \pi)$ be a PJT, and $X$ be the set of variables. The
-  functionality of DPMC execution (i.e., Algorithm~1 in the ADDMC paper
-  \cite{DBLP:conf/aaai/DudekPV20}) can be represented by $\delta(r)$, where
+  functionality of DPMC execution can be represented by $\delta(r)$, where
   $\delta\colon \mathcal{V}(T) \to \mathbb{R}^{2^X}$ is a recursive function
   defined as
-  \[
+  \begin{equation} \label{eq:execution}
     \delta(t) =
     \begin{cases}
       \gamma(t) & \text{if } t \in \mathcal{L}(T) \\
       \exists_{\pi(t)} \prod_{u \in \mathcal{C}(t)} \delta(u) & \text{otherwise.}
     \end{cases}
-  \]
+  \end{equation}
   The range of $\delta(r)$ then contains a single real number, i.e., the answer.
 \end{definition}
 
-\begin{lemma}
-  The number of variables that can appear in the ADDs within a PJT node is $\le
-  k+1$.
-\end{lemma}
-\begin{proof}
-  All such variables are introduced in a `clause' below and projected either in
-  this node or in one of its ancestors. Each such variable would be in the bag
-  of each clause that introduced it. By the tree decomposition properties, it
-  will also be in the bag of both the projection node and the current node
-  because they are on the path between the clause nodes (see
-  \cref{fig:example_pjt}).
-  \todo[inline]{How do I formalise this argument?}
-\end{proof}
+% TODO: will need to rephrase this to fit my context
+\begin{theorem}[Theorem~4 in \cite{DBLP:conf/cp/DudekPV20}, almost verbatim]
+  Let $\phi$ be a CNF formula over a set $X$ of variables and $(S, \chi)$ be a
+  tree decomposition of the primal graph of $\phi$ of width $w$. Then
+  Algorithm~2 returns a PJT of $\phi$ of width at most $w+1$.
+\end{theorem}
+
+% \begin{lemma} % NOTE: this lemma is already proven above
+%   Let $(S, \chi)$ be a tree decomposition, and $(T, r, \gamma, \pi)$ be its PJT
+%   generated by Algorithm~2 in \cite{DBLP:conf/cp/DudekPV20}. For any $t \in T$,
+%   the number of variables that appear in the ADDs within a PJT node is at
+%   most $k+1$.
+% \end{lemma}
+% \begin{proof}
+%   All such variables are introduced in a `clause' below and not projected in
+%   descendants. Each such variable would be in the bag of each clause that
+%   introduced it. By the tree decomposition properties, it will also be in the
+%   bag of both the projection node and the current node because they are on the
+%   path between the clause nodes (see \cref{fig:example_pjt}).
+% \end{proof}
 
 \begin{theorem}
-  \textsc{DPMC} is FPT w.r.t. the PJT width. More specifically,
-  \textsc{DPMC} running time is $\mathcal{O}(4^km(n+k))$, where $k$ is the
-  width, $n$ is the number of clauses, and $m$ is the number of variables.
+  Let $(T, r, \gamma, \pi)$ be a PJT of width $k$. Then \textsc{DPMC} execution
+  is fixed-parameter tractable with respect to the $k$. Specifically,
+  \textsc{DPMC} execution time complexity is $\mathcal{O}(4^km(n+k))$, where $n
+  = |\mathcal{L}(T)|$ is the number of clauses/leaves, and $m$ is the number of
+  variables.
 \end{theorem}
-\begin{proof} % TODO: finish
+% TODO: start here. Use theorem 4 to show that the number of variables is
+% bounded by primal treewidth
+\begin{proof}
   \begin{itemize}
-  \item An ADD with $k$ variables can have up to $2^0 + 2^1 + \dots + 2^k =
-    2^{k+1} - 1 = \mathcal{O}(2^k)$ nodes (including leaves).
+  \item Let us consider the overall complexity of all multiplications and
+    projections throughout the recursive calls of $\delta$ in
+    \cref{def:abstraction}. Clearly, the overall complexity is the sum of the
+    complexity of operations performed within each call to $\delta$.
+  \item Let $t \in \mathcal{V}(T)$ be an arbitrary vertex of $T$. If $t$ is a
+    leaf,
+  \item The total time taken by the DPMC execution stage is the sum of the time
+    taken `inside' each PJT node. The number of such nodes is upper bounded by
+    $m$, so the total time complexity of DPMC is $\mathcal{O}(4^km(n+k))$.
   \item Multiplying $m$ ADDs can then take up to $(m-1)(2^{k+1}-1)^2 =
     \mathcal{O}(m4^k)$ (since one multiplication takes up to $(2^{k+1}-1)^2$
     time and the and the result will have up to $2^{k+1} - 1$ nodes because the
     domain stays the same).
-  \item Each projection consists of two linear operations and a quadratic
-    operation, so projecting $m$ variables will take $\mathcal{O}(4^km)$ time.
-  \item In total, operations on a PJT node with $m$ ADDs, $k$ variables, $n$ of
+  \item Then, by \cref{lemma:basic_ops}, projecting $m$ variables will take
+    $\mathcal{O}(4^km)$ time.
+  \item In total, operations on a PJT node with $m$ children, $k$ variables, $n$ of
     which are projected takes $\mathcal{O}(4^k(m+n))$ time.
-  \item The total time taken by the DPMC execution stage is the sum of the time
-    taken `inside' each PJT node. The number of such nodes is upper bounded by
-    $m$, so the total time complexity of DPMC is $\mathcal{O}(4^km(n+k))$.
   \end{itemize}
 \end{proof}
 
