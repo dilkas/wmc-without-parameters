@@ -33,6 +33,8 @@
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
+\DeclareMathOperator{\im}{im}
+
 \title{Weighted Model Counting Without Parameter Variables}
 
 \begin{document}
@@ -59,10 +61,10 @@ for any $Y \subseteq X$.
 \begin{proof}
   An ADD with $n$ variables can be, at most, a complete binary tree of height
   $n+1$ (as measured by the number of vertices). It would then have $2^0 + 2^1 +
-  \dots + 2^n = 2^{n=1} = \mathcal{O}(2^n)$ nodes.
+  \dots + 2^n = 2^{n+1} = \mathcal{O}(2^n)$ nodes.
 \end{proof}
 
-\begin{lemma}
+\begin{lemma} \label{lemma:clause_time}
   Let $\phi$ be a conjunction of $n$ literals. Then the ADD representation of
   $[\phi]^p_q$ can be constructed in $\mathcal{O}(2^n)$ time for any $p, q \in
   \mathbb{R}$ such that $p \ne q$.
@@ -85,7 +87,22 @@ for any $Y \subseteq X$.
   of $[\phi]_q^p$ is $(p-q)\alpha + q$. As scalar operations can obviously be
   implemented in linear time, the overall complexity remains $\mathcal{O}(2^n)$.
 \end{proof}
-% TODO: will need to define scalar operations on ADDs
+
+% NOTE: weights on literals other than the positive literals that correspond to
+% variables in $X_P$ are redundant as they either are equal to one or duplicate
+% an already-defined weight.
+\begin{definition}[old WMC instance]
+  An old WMC instance is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is the set
+  of indicator variables, $X_P$ is the set of parameter variables, $\phi$ is a
+  propositional formula over $X_I \cup X_P$, and $w\colon X_P \to \mathbb{R}$ is
+  the weight function.
+\end{definition}
+
+\begin{definition}[new WMC instance]
+  A new WMC instance is a tuple $(F, X, \omega)$, where $X$ is the set of
+  variables, $F$ is a set of pseudo-Boolean functions $2^X \to \mathbb{R}$, and
+  $\omega \in \mathbb{R}$ is the scaling factor.
+\end{definition}
 
 \paragraph{References.}
 \begin{itemize}
@@ -99,8 +116,8 @@ for any $Y \subseteq X$.
 
 \paragraph{Notes.}
 \begin{itemize}
-\item Apparently, the DPMC paper already shows that taking the first offered
-  decomposition tree is best.
+\item Apparently, the \textsc{DPMC} paper already shows that taking the first
+  offered decomposition tree is best.
 \item It is already well-known that WMC is FPT.
 \end{itemize}
 
@@ -132,33 +149,33 @@ for any $Y \subseteq X$.
   \caption{WMC instance transformation}
   \SetKwFunction{rename}{rename}
   \SetKwProg{Fn}{Function}{:}{}
-  \KwData{an (old-format) WMC instance $(\phi, X_I, X_P, W)$}
-  \KwResult{a (new-format) WMC instance $(\phi', \omega)$}
-  $\phi' \gets \emptyset$\;
+  \KwData{an (old-format) WMC instance $(\phi, X_I, X_P, w)$}
+  \KwResult{a (new-format) WMC instance $(F, X, \omega)$}
+  $F \gets \emptyset$\;
   $\omega \gets 1$\;
   let $d\colon X_P \to \mathbb{N}$ be defined as $v \mapsto |\{ u \in X_P \mid u
   \le v \}|$\;
   \ForEach{clause $c \in \phi$}{
-    \uIf{$c \cap X_P = \{ v \}$ for some $v$ \textnormal{\textbf{and}} $W(v) \ne
+    \uIf{$c \cap X_P = \{ v \}$ for some $v$ \textnormal{\textbf{and}} $w(v) \ne
       1$}{
-      \uIf{$|c| = 1$}{$\omega \gets \omega \times W(v)$\;}
+      \uIf{$|c| = 1$}{$\omega \gets \omega \times w(v)$\;}
       \Else{
-        $\phi' \gets \phi' \cup \left\{ \left[ \bigwedge_{l \in c \setminus
-              \{v\}} \neg l \right]^{W(v)}_1 \right\}$\;
+        $F \gets F \cup \left\{ \left[ \bigwedge_{l \in c \setminus
+              \{v\}} \neg l \right]^{w(v)}_1 \right\}$\;
       }
     }
     \ElseIf{$\{v \mid \neg v \in c\} \cap X_P  = \emptyset$}{
-      $\phi' \gets \phi' \cup \{ [c]^1_0 \}$\;
+      $F \gets F \cup \{ [c]^1_0 \}$\;
     }
   }
   \ForEach{indicator variable $v \in X_I$}{
-    \If{$\{[v]_1^p, [\neg v]_1^q\} \subseteq \phi'$ for some $p$ and $q$}{
-      $\phi' \gets \phi' \setminus \{ [v]_1^p, [\neg v]_1^q \} \cup \{ [v]_q^p
+    \If{$\{[v]_1^p, [\neg v]_1^q\} \subseteq F$ for some $p$ and $q$}{
+      $F \gets F \setminus \{ [v]_1^p, [\neg v]_1^q \} \cup \{ [v]_q^p
       \}$\;
     }
   }
-  replace every variable $v$ in $\phi'$ with $\rename{$v$}$\;
-  \Return{$(\phi', \omega)$}\;
+  replace every variable $v$ in $F$ with $\rename{$v$}$\;
+  \Return{$(F, X_I, \omega)$}\;
   \Fn{\rename{$v$}}{
     $S \gets \{u \in X_P \mid u \le v\}$\;
     \lIf{$S = \emptyset$}{\Return{$v$}}
@@ -166,28 +183,29 @@ for any $Y \subseteq X$.
   }
 \end{algorithm}
 
-\section{Parameterised Complexity of DPMC}
+\section{Parameterised Complexity of \textsc{DPMC}}
 
 \paragraph{Notes.}
 \begin{itemize}
 \item Summary of results
   \begin{itemize}
-  \item We establish DPMC inference as fixed-parameter tractable.
-  \item We experimentally show that cw+DPMC is best on low-to-moderate treewidth
-    instances, and cd06+c2d overtakes cw+DPMC on higher treewidth instances.
+  \item We establish \textsc{DPMC} inference as fixed-parameter tractable.
+  \item We experimentally show that \textsc{DPMC} is best on low-to-moderate
+    treewidth instances, and cd06+c2d overtakes on higher treewidth instances.
   \end{itemize}
-\item By DPMC, we always mean DMC+lg.
+\item By \textsc{DPMC}, we always mean DMC+lg.
 \end{itemize}
 
 \paragraph{TODO}
 \begin{itemize}
 \item do a literature search focused around these papers
-\item use mathcal on V, L, E (and introduce them)
-\item maybe use texttt for DPMC?
 \item do I need to formally consider extending a pseudo-Boolean function to a
   bigger domain?
+\item Introduce all the notation surrounding graphs ($\mathcal{V}$,
+  $\mathcal{L}$, $\mathcal{C}$, etc.) (and be consistent with its usage)
 \item Define:
   \begin{itemize}
+  \item scalar operations on ADDs
   \item an ADD as a DAG.
   \item What does it mean for an ADD to `have' variables? Maybe refer to
     pseudo-Boolean function sensitivity.
@@ -209,14 +227,14 @@ for any $Y \subseteq X$.
   its moralisation (provide the exact formula).
 \end{theorem}
 
-\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}, verbatim but with one change]
-  Let $X$ be a set of Boolean variables and $\phi$ be a CNF formula over $X$. A
-  \emph{project-join tree} (PJT) of $\phi$ is a tuple $(T, r, \gamma, \pi)$
-  where:
+\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}, with some changes]
+  Let $X$ be a set of Boolean variables, and $F$ be a set of pseudo-Boolean
+  functions $2^X \to \mathbb{R}$. A \emph{project-join tree} (PJT) of $F$ is a
+  tuple $(T, r, \gamma, \pi)$ where:
   \begin{itemize}
   \item $T$ is a tree with root $r \in \mathcal{V}(T)$,
-  \item $\gamma\colon \mathcal{L}(T) \to \mathbb{R}^{2^X}$ maps leaves of $T$ to
-    pseudo-Boolean functions, and
+  \item $\gamma\colon \mathcal{L}(T) \to F$ is a bijection between the leaves of
+    $T$ and the pseudo-Boolean functions in $F$, and
   \item $\pi\colon \mathcal{V}(T) \setminus \mathcal{L}(T) \to 2^X$ is a
     labelling function on internal nodes.
   \end{itemize}
@@ -225,16 +243,13 @@ for any $Y \subseteq X$.
   \item $\{\pi(n) : n \in \mathcal{V}(T) \setminus \mathcal{L}(T)\}$ is a
     partition of $X$, and
   \item for each internal node $n \in \mathcal{V}(T) \setminus \mathcal{L}(T)$,
-    variable $x \in \pi(n)$, and clause $c \in \phi$ such that $x$ appears in
-    $c$, the leaf node $\gamma^{-1}(c)$ must be a descendant of $n$ in $T$.
+    variable $x \in \pi(n)$, and `clause' $c \in \im \gamma$ such that $x$
+    appears in $c$, the leaf node $\gamma^{-1}(c)$ must be a descendant of $n$
+    in $T$.
   \end{enumerate}
 \end{definition}
 
-Note that while Dudek et al. \cite{DBLP:conf/cp/DudekPV20} define $\gamma$ to be
-a bijection between leaves of a PJT and clauses, our definition is more
-general.
-
-\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}]
+\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}] \label{def:size}
   \[
     \mathtt{Vars}(n) \coloneqq
     \begin{cases}
@@ -265,46 +280,19 @@ general.
 
 \begin{definition}[\cite{DBLP:journals/jct/RobertsonS84}, rephrased]
   A \emph{tree decomposition} of a graph $G$ is a pair $(T, \chi)$, where $T$ is
-  a tree and $\chi\colon V(T) \to 2^{V(G)}$ is a labelling function, with the
-  following properties:
+  a tree and $\chi\colon \mathcal{V}(T) \to 2^{\mathcal{V}(G)}$ is a labelling
+  function, with the following properties:
   \begin{itemize}
-  \item $\bigcup_{t \in V(T)} \chi(t) = V(G)$;
-  \item for every edge $e \in E(G)$, there exists $t \in V(T)$ such that $e$ has
-    both endpoints in $\chi(t)$;
-  \item for all $t, t', t'' \in V(T)$, if $t'$ is on the path between $t$ and
-    $t''$, then $\chi(t) \cap \chi(t'') \subseteq \chi(t')$.
+  \item $\bigcup_{t \in \mathcal{V}(T)} \chi(t) = \mathcal{V}(G)$;
+  \item for every edge $e \in \mathcal{E}(G)$, there exists $t \in
+    \mathcal{V}(T)$ such that $e$ has both endpoints in $\chi(t)$;
+  \item for all $t, t', t'' \in \mathcal{V}(T)$, if $t'$ is on the path between
+    $t$ and $t''$, then $\chi(t) \cap \chi(t'') \subseteq \chi(t')$.
   \end{itemize}
-  The \emph{width} of tree decomposition $(T, \chi)$ is $\max_{t \in V(T)}
-  |\chi(t)| - 1)$. The \emph{treewidth} of graph $G$ is the smallest $w$ such
-  that $G$ has a tree decomposition of width $w$.
+  The \emph{width} of tree decomposition $(T, \chi)$ is $\max_{t \in
+    \mathcal{V}(T)} |\chi(t)| - 1)$. The \emph{treewidth} of graph $G$ is the
+  smallest $w$ such that $G$ has a tree decomposition of width $w$.
 \end{definition}
-
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-    \node[circle,draw] {$\exists$}
-    child {node (a) {$\vdots$}
-      child {node[circle,draw] {$c_1$}}
-    }
-    child {node (b) {$\vdots$}
-      child {node[circle,draw] {$\ast$}
-        child {node {$\vdots$}
-          child {node[circle,draw] {$c_i$}}
-        }
-      }
-    }
-    child {node (c) {$\vdots$}
-      child {node[circle,draw] {$c_l$}}
-    }
-    ;
-    \path (a) -- (b) node[midway] {$\cdots$};
-    \path (b) -- (c) node[midway] {$\cdots$};
-  \end{tikzpicture}
-  \caption{An example PJT with clauses $c_1, \dots, c_i, \dots, c_l$ that all
-    contain the same variable, its projection node $\exists$, and a node under
-    consideration $\ast$.}
-  \label{fig:example_pjt}
-\end{figure}
 
 \begin{definition}
   Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
@@ -364,9 +352,9 @@ general.
 % NOTE: this is a rehash of equation (2) from the DPMC paper
 \begin{definition} \label{def:abstraction}
   Let $(T, r, \gamma, \pi)$ be a PJT, and $X$ be the set of variables. The
-  functionality of DPMC execution can be represented by $\delta(r)$, where
-  $\delta\colon \mathcal{V}(T) \to \mathbb{R}^{2^X}$ is a recursive function
-  defined as
+  functionality of \textsc{DPMC} execution can be represented by $\delta(r)$,
+  where $\delta\colon \mathcal{V}(T) \to \mathbb{R}^{2^X}$ is a recursive
+  function defined as
   \begin{equation} \label{eq:execution}
     \delta(t) =
     \begin{cases}
@@ -384,28 +372,14 @@ general.
   Algorithm~2 returns a PJT of $\phi$ of width at most $w+1$.
 \end{theorem}
 
-% \begin{lemma} % NOTE: this lemma is already proven above
-%   Let $(S, \chi)$ be a tree decomposition, and $(T, r, \gamma, \pi)$ be its PJT
-%   generated by Algorithm~2 in \cite{DBLP:conf/cp/DudekPV20}. For any $t \in T$,
-%   the number of variables that appear in the ADDs within a PJT node is at
-%   most $k+1$.
-% \end{lemma}
-% \begin{proof}
-%   All such variables are introduced in a `clause' below and not projected in
-%   descendants. Each such variable would be in the bag of each clause that
-%   introduced it. By the tree decomposition properties, it will also be in the
-%   bag of both the projection node and the current node because they are on the
-%   path between the clause nodes (see \cref{fig:example_pjt}).
-% \end{proof}
-
 \begin{theorem}
   Let $(T, r, \gamma, \pi)$ be a PJT of width $k$. Then \textsc{DPMC} execution
   is fixed-parameter tractable with respect to the $k$. Specifically,
-  \textsc{DPMC} execution time complexity is $\mathcal{O}(4^km(n+k))$, where $n
+  \textsc{DPMC} execution time complexity is $\mathcal{O}(4^knm)$, where $n
   = |\mathcal{L}(T)|$ is the number of clauses/leaves, and $m$ is the number of
   variables.
 \end{theorem}
-% TODO: start here. Use theorem 4 to show that the number of variables is
+% TODO: Use theorem 4 to show that the number of variables is
 % bounded by primal treewidth
 \begin{proof}
   \begin{itemize}
@@ -413,19 +387,28 @@ general.
     projections throughout the recursive calls of $\delta$ in
     \cref{def:abstraction}. Clearly, the overall complexity is the sum of the
     complexity of operations performed within each call to $\delta$.
-  \item Let $t \in \mathcal{V}(T)$ be an arbitrary vertex of $T$. If $t$ is a
-    leaf,
-  \item The total time taken by the DPMC execution stage is the sum of the time
-    taken `inside' each PJT node. The number of such nodes is upper bounded by
-    $m$, so the total time complexity of DPMC is $\mathcal{O}(4^km(n+k))$.
-  \item Multiplying $m$ ADDs can then take up to $(m-1)(2^{k+1}-1)^2 =
-    \mathcal{O}(m4^k)$ (since one multiplication takes up to $(2^{k+1}-1)^2$
-    time and the and the result will have up to $2^{k+1} - 1$ nodes because the
-    domain stays the same).
-  \item Then, by \cref{lemma:basic_ops}, projecting $m$ variables will take
-    $\mathcal{O}(4^km)$ time.
-  \item In total, operations on a PJT node with $m$ children, $k$ variables, $n$ of
-    which are projected takes $\mathcal{O}(4^k(m+n))$ time.
+  \item Let $t \in \mathcal{L}(T)$ be a leaf. Note that
+    $|\mathtt{Vars}(\gamma(t))| \le k$ by \cref{def:size}. Assuming that clauses
+    have no repeating variables, it takes $\mathcal{O}(2^k)$ time to construct
+    $\delta(t)$ by \cref{lemma:clause_time} and $\mathcal{O}(2^kn)$ time to
+    construct all leaves of the PJT.
+  \item Now let $t \in \mathcal{V}(T) \setminus \mathcal{L}(T)$ be an internal
+    vertex, in which case we perform $|\mathcal{C}(t)|-1$ multiplications and
+    $|\pi(t)|$ projections. Note that $|\mathcal{C}(t)| \le |\mathcal{L}(T)| =
+    n$, $|\pi(t)| \le k$, and the ADDs involved can have up to $k$ variables.
+    This means that each ADD has $\mathcal{O}(2^k)$ nodes (regardless of whether
+    it comes from $\mathcal{C}(t)$ or from multiplications). Each such
+    multiplication then takes $\mathcal{O}(4^k)$ time by \cref{lemma:basic_ops},
+    and so all multiplications will take $\mathcal{O}(4^kn)$ time for $t$ and
+    $\mathcal{O}(4^knm)$ time across all $t \in \mathcal{V}(T) \setminus
+    \mathcal{L}(T)$ since the number of vertices in the PJT is bounded by the
+    number of variables.
+  \item Each variable is projected exactly once and is always projected from
+    an ADD with at most $\mathcal{O}(2^k)$ nodes. Thus, the time complexity of
+    projecting all variables is $\mathcal{O}(4^km)$.
+  \item In total, we get $\mathcal{O}(2^kn)$ time for the leaves,
+    $\mathcal{O}(4^knm)$ for multiplications, and $\mathcal{O}(4^km)$ for
+    projections, resulting in $\mathcal{O}(4^knm)$ time in total.
   \end{itemize}
 \end{proof}
 

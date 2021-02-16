@@ -180,8 +180,8 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
                          max.time) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
-                                      col = dataset,
-                                      shape = dataset)) +
+                                      col = major.dataset,
+                                      shape = major.dataset)) +
     geom_jitter(alpha = 1, size = 1, width = 0.1, height = 0.1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
     scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
