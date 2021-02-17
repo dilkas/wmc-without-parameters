@@ -1,26 +1,15 @@
 \documentclass{article}
-\usepackage[ruled,vlined]{algorithm2e}
-\usepackage{amsfonts}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage[UKenglish]{babel}
-\usepackage{bm}
-\usepackage{booktabs}
 \usepackage[capitalise]{cleveref}
-\usepackage{dashbox}
 \usepackage{fullpage}
 \usepackage[utf8]{inputenc}
 \usepackage[UKenglish]{isodate}
 \usepackage{mathtools}
-\usepackage{tikz}
-\usepackage{xcolor}
-\usepackage{xfrac}
 \usepackage[backgroundcolor=lightgray]{todonotes}
-\usepackage{soul}
-\usepackage{mathrsfs}
-\usepackage{capt-of}
-\usepackage{siunitx}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
@@ -33,7 +22,7 @@
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
-\DeclareMathOperator{\im}{im}
+\crefname{enumii}{Condition}{Conditions}
 
 \title{Weighted Model Counting Without Parameter Variables}
 
@@ -55,53 +44,39 @@ pseudo-Boolean function defined as
 \]
 for any $Y \subseteq X$.
 
-\begin{lemma} \label{lemma:add_size}
-  An ADD with $n$ variables has $\mathcal{O}(2^n)$ nodes.
-\end{lemma}
-\begin{proof}
-  An ADD with $n$ variables can be, at most, a complete binary tree of height
-  $n+1$ (as measured by the number of vertices). It would then have $2^0 + 2^1 +
-  \dots + 2^n = 2^{n+1} = \mathcal{O}(2^n)$ nodes.
-\end{proof}
-
-\begin{lemma} \label{lemma:clause_time}
-  Let $\phi$ be a conjunction of $n$ literals. Then the ADD representation of
-  $[\phi]^p_q$ can be constructed in $\mathcal{O}(2^n)$ time for any $p, q \in
-  \mathbb{R}$ such that $p \ne q$.
-\end{lemma}
-\begin{proof}
-  The ADD representation of $\phi$ itself can be constructed with a sequence of
-  $n-1$ calls to \texttt{apply} with one of the two operands in each call always
-  a literal. The number of variables in the other operand then follows the
-  sequence $1, 2, 3, \dots, n-1$. By \cref{lemma:add_size}, the numbers of nodes
-  in the ADD representations of these operands is then $\mathcal{O}(2^1),
-  \mathcal{O}(2^2), \dots, \mathcal{O}(2^{n-1})$. Since one of the operands is
-  of constant size, the overall time complexity of all calls to \texttt{apply}
-  is then
-  \[
-    \mathcal{O}(2^1) + \mathcal{O}(2^2) + \dots + \mathcal{O}(2^{n-1}) =
-    \mathcal{O}(2^n).
-  \]
-
-  Let $\alpha$ be the ADD representation of $\phi$. Then the ADD representation
-  of $[\phi]_q^p$ is $(p-q)\alpha + q$. As scalar operations can obviously be
-  implemented in linear time, the overall complexity remains $\mathcal{O}(2^n)$.
-\end{proof}
-
 % NOTE: weights on literals other than the positive literals that correspond to
 % variables in $X_P$ are redundant as they either are equal to one or duplicate
 % an already-defined weight.
 \begin{definition}[old WMC instance]
-  An old WMC instance is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is the set
-  of indicator variables, $X_P$ is the set of parameter variables, $\phi$ is a
-  propositional formula over $X_I \cup X_P$, and $w\colon X_P \to \mathbb{R}$ is
-  the weight function.
-\end{definition}
+  An \emph{old WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
+  the set of indicator variables, $X_P$ is the set of parameter variables (with
+  $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula in CNF over
+  $X_I \cup X_P$, and $w\colon X_I \cup X_P \cup \{\neg x \mid x \in X_I \cup
+  X_P\} \to \mathbb{R}$ is the weight function. The \emph{answer} of the
+  instance is $\sum_{Y \models \phi} \prod_{Y \models l} w(l)$.
+\end{definition} % TODO: add a citation for this.
 
-\begin{definition}[new WMC instance]
-  A new WMC instance is a tuple $(F, X, \omega)$, where $X$ is the set of
+\begin{remark}
+  Encodings such as \texttt{cd05} and \texttt{cd06} are \emph{not} WMC
+  encodings. Instead, they encode Bayesian network inference into instances of
+  the \emph{minimum-cardinality} WMC problem, where the answer is defined to be
+  $\sum_{Y \models \phi\text{, }|Y| = k} \prod_{Y \models l}
+  w(l)$, where $k = \min_{Y \models \phi\text{, }Y \ne \emptyset}
+  |Y|$, if $k$ exists, otherwise the answer is zero. This additional
+  condition on model cardinality becomes necessary because these encodings
+  eliminate clauses of the form $p \Rightarrow i$, where $p \in X_P$ is a
+  parameter variable, and $i \in X_I$ is an indicator variable. Nonetheless, our
+  transformation algorithm still works on such encodings, although the
+  experimental results are discouraging because they use approximately twice as
+  many indicator variables. For instance, each binary variable of a Bayesian
+  network is encoded using two indicator variables while one would suffice.
+\end{remark} % TODO: perhaps add this claim as a corollary
+
+\begin{definition}[new WMC instance] \label{def:new_wmc}
+  A \emph{new WMC instance} is a tuple $(F, X, \omega)$, where $X$ is the set of
   variables, $F$ is a set of pseudo-Boolean functions $2^X \to \mathbb{R}$, and
-  $\omega \in \mathbb{R}$ is the scaling factor.
+  $\omega \in \mathbb{R}$ is the scaling factor. The \emph{answer} of the
+  instance is $\omega \cdot \left(\exists_X\prod_{f \in F}f\right)(\emptyset)$.
 \end{definition}
 
 \paragraph{References.}
@@ -147,25 +122,26 @@ for any $Y \subseteq X$.
 
 \begin{algorithm}
   \caption{WMC instance transformation}
+  \label{alg:transformation}
   \SetKwFunction{rename}{rename}
   \SetKwProg{Fn}{Function}{:}{}
   \KwData{an (old-format) WMC instance $(\phi, X_I, X_P, w)$}
   \KwResult{a (new-format) WMC instance $(F, X, \omega)$}
   $F \gets \emptyset$\;
   $\omega \gets 1$\;
-  let $d\colon X_P \to \mathbb{N}$ be defined as $v \mapsto |\{ u \in X_P \mid u
-  \le v \}|$\;
-  \ForEach{clause $c \in \phi$}{
-    \uIf{$c \cap X_P = \{ v \}$ for some $v$ \textnormal{\textbf{and}} $w(v) \ne
+  let $d\colon X_P \to \mathbb{N}$ be defined as $p \mapsto |\{ o \in X_P \mid o
+  \le p \}|$\;
+  \ForEach{clause $c \in \phi$\label{line:foreach1start}}{
+    \uIf{$c \cap X_P = \{ p \}$ for some $p$ \textnormal{\textbf{and}} $w(p) \ne
       1$}{
-      \uIf{$|c| = 1$}{$\omega \gets \omega \times w(v)$\;}
+      \uIf{$|c| = 1$}{$\omega \gets \omega \times w(p)$\;}
       \Else{
         $F \gets F \cup \left\{ \left[ \bigwedge_{l \in c \setminus
-              \{v\}} \neg l \right]^{w(v)}_1 \right\}$\;
+              \{p\}} \neg l \right]^{w(p)}_1 \right\}$\;
       }
     }
-    \ElseIf{$\{v \mid \neg v \in c\} \cap X_P  = \emptyset$}{
-      $F \gets F \cup \{ [c]^1_0 \}$\;
+    \ElseIf{$\{p \mid \neg p \in c\} \cap X_P  = \emptyset$}{
+      $F \gets F \cup \{ [c]^1_0 \}$\; \label{line:foreach1end}
     }
   }
   \ForEach{indicator variable $v \in X_I$}{
@@ -183,6 +159,128 @@ for any $Y \subseteq X$.
   }
 \end{algorithm}
 
+\subsection{Correctness}
+
+\begin{theorem}[Early Projection
+  \cite{DBLP:conf/aaai/DudekPV20,DBLP:conf/cp/DudekPV20}, verbatim]
+  Let $X$ and $Y$ be sets of variables. For all functions $f\colon 2^X \to
+  \mathbb{R}$ and $g\colon 2^Y \to \mathbb{R}$, if $x \in X \setminus Y$, then
+  $\exists_x (f \cdot g) = (\exists_x f) \cdot g$.
+\end{theorem}
+% TODO: mention that formulas, clauses, and models are all treated as sets
+
+\begin{lemma} \label{lemma:sum}
+  For any pseudo-Boolean function $f\colon 2^X \to \mathbb{R}$, $(\exists_X
+  f)(\emptyset) = \sum_{Y \subseteq X} f(Y)$.
+\end{lemma}
+\begin{proof}
+  For base case, let $X = \{x\}$. Then
+  \[
+    \exists_xf = f|_{x=1} + f|_{x=0},
+  \]
+  by \cref{def:projection} and so
+  \[
+    (\exists_xf)(\emptyset) = f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset)
+  \]
+  by \cref{def:operations}. Then
+  \[
+    f|_{x=1}(\emptyset) = f(\{x\}), \quad \text{and} \quad f|_{x=0}(\emptyset) =
+    f(\emptyset)
+  \]
+  by \cref{def:restriction}. It follows that
+  \[
+    (\exists_xf)(\emptyset) = f(\{x\}) + f(\emptyset) = \sum_{Y \subseteq \{x\}}
+    f(Y)
+  \]
+  as required. This easily extends to $|X| > 1$ by the definition of projection
+  on sets of variables. % TODO: once I've defined it, add a reference here.
+\end{proof}
+% TODO: must mention that operations like +/x are commutative, associative, etc.
+
+% NOTE: mention that this is similar (but not equal) to the DPMC/ADDMC result
+\begin{proposition}
+  Let $(\phi, X_I, X_P, w)$ be an old WMC instance. Then
+  \begin{equation}
+  \left(\left\{[c]_0^1 \;\middle|\; c \in \phi\right\} \cup \left\{[x]_{w(\neg
+        x)}^{w(x)} \;\middle|\; x \in X_I \cup X_P\right\}, X_I \cup X_P,
+    1\right) \label{eq:new_wmc}
+  \end{equation}
+  is a new WMC instance with the same answer.
+\end{proposition}
+\begin{proof}
+  The answer of \cref{eq:new_wmc} is
+  \begin{align*}
+    \left(\exists_{X_I \cup X_P} \prod_{c \in \phi} [c]_0^1 \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset) &= \sum_{Y \subseteq X_I \cup X_P} \left(\prod_{c \in \phi} [c]_0^1 \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)(Y) \\
+&= \sum_{Y \subseteq X_I \cup X_P} \underbrace{\left(\prod_{c \in \phi} [c]_0^1\right)}_f(Y) \underbrace{\left(\prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)}_g(Y)
+  \end{align*}
+  by \cref{def:new_wmc,lemma:sum,def:operations}. Note that
+  \[
+    f(Y) =
+    \begin{cases}
+      1 & \text{if } Y \models \phi, \\
+      0 & \text{otherwise},
+    \end{cases}
+    \quad
+    \text{and}
+    \quad
+    g(Y) = \prod_{Y \models l} w(l),
+  \]
+  which means that
+  \[
+    \sum_{Y \subseteq X_I \cup X_P} f(Y)g(Y) = \sum_{Y \models \phi} \prod_{Y
+      \models l} w(l)
+  \]
+  as required.
+\end{proof}
+
+\begin{theorem}[Correctness]
+  \Cref{alg:transformation}, when given an old WMC instance $(\phi, X_I, X_P,
+  w)$, returns a new WMC instance with the same answer, provided the following
+  conditions are satisfied:
+  \begin{enumerate}
+  \item for all indicator variables $i \in X_I$, $w(i) = w(\neg i) = 1$,
+  \item and either
+    \begin{enumerate}
+    \item for all parameter variables $p \in X_P$, there is a family of literals
+      $(l_i)_{i=1}^n$ such that \label{condition:d02}
+      \begin{enumerate}
+      \item $w(\neg p) = 1$,
+      \item $l_i \in X_I$ or $\neg l_i \in X_I$ for all $i = 1, \dots, n$,
+      \item and $\{ c \in \phi \mid p \in c \text{ or } \neg p \in c \} =
+        \left\{p \lor \bigvee_{i=1}^n \neg l_i \right\} \cup \{ l_i \lor \neg p
+        \mid i = 1, \dots, n \}$;
+      \end{enumerate}
+    \item or \label{condition:bklm16}
+      \begin{enumerate}
+      \item $w(p) + w(\neg p) = 1$,
+      \item there is no clause $c \in \phi$ with $\neg p \in c$,
+      \item and for any pair of clauses $c, d \in \phi$ such that $c \ne d$, $p
+        \in c$ and $p \in d$, $\mathtt{Vars}(c) \cap \mathtt{Vars}(d) = \{ p
+        \}$.
+      \end{enumerate}
+    \end{enumerate}
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  % TODO: finish the proof
+  First, let us assume that \cref{condition:d02} applies and consider the
+  collective effect of the loop on
+  \crefrange{line:foreach1start}{line:foreach1end} for: 1) clauses that have a
+  positive parameter variable, 2) clauses that have a negative parameter
+  variable (removed), 3) clauses that don't have parameter variables (left
+  unchanged).
+\end{proof}
+
+\paragraph{Notes.}
+\begin{itemize}
+\item The family of literals could be empty.
+\item This just says that $p$ is equivalent to a conjunction.
+\item The first group of conditions applies to \texttt{d02}, while the second
+  group applies to \texttt{bklm16}.
+\item For \texttt{cd05} and \texttt{cd06}, condition $2bi$ should be replaced
+  with $w(\neg p) = 1$.
+\end{itemize}
+
 \section{Parameterised Complexity of \textsc{DPMC}}
 
 \paragraph{Notes.}
@@ -194,32 +292,66 @@ for any $Y \subseteq X$.
     treewidth instances, and cd06+c2d overtakes on higher treewidth instances.
   \end{itemize}
 \item By \textsc{DPMC}, we always mean DMC+lg.
+\item The constant is inspired by the \texttt{bklm16} encoding.
 \end{itemize}
 
 \paragraph{TODO}
 \begin{itemize}
-\item do a literature search focused around these papers
-\item do I need to formally consider extending a pseudo-Boolean function to a
+\item Do I need to formally consider extending a pseudo-Boolean function to a
   bigger domain?
 \item Introduce all the notation surrounding graphs ($\mathcal{V}$,
-  $\mathcal{L}$, $\mathcal{C}$, etc.) (and be consistent with its usage)
+  $\mathcal{E}$ $\mathcal{L}$, $\mathcal{C}$, etc.) (and be consistent with its
+  usage) and formulas (variable, literal, clause, CNF, etc.)
+\item Use \cref{thm:connection} to show the connection between primal treewidth
+  and the width of the PJT (linking the complexity of BN inference with the DPMC
+  complexity).
+\item Come up with better names for old/new WMC instances.
 \item Define:
   \begin{itemize}
-  \item scalar operations on ADDs
-  \item an ADD as a DAG.
+  \item scalar operations on ADDs,
+  \item an ADD as a DAG,
   \item What does it mean for an ADD to `have' variables? Maybe refer to
     pseudo-Boolean function sensitivity.
-  \item Formal definition of a previous WMC instance (CNF, literal weight
-    function) and the new definition (set of $2^{X} \to \mathbb{R}_{\ge 0}$
-    pseudo-Boolean functions and a constant). Note that the constant idea is
-    borrowed from \texttt{bklm16}.
-  \item Boolean formula in CNF (perhaps this is too trivial to define),
   \item primal graph of a CNF formula (a.k.a.
     Gaifman/(variable) interaction/connectivity/clique/representing graph),
   \item Bayesian network (I already have a definition of these last two),
   \item moralisation of a Bayesian network (or of any DAG),
+  \item projection of a set of variables.
   \end{itemize}
 \end{itemize}
+
+\begin{lemma} \label{lemma:add_size}
+  An ADD with $n$ variables has $\mathcal{O}(2^n)$ nodes.
+\end{lemma}
+\begin{proof}
+  An ADD with $n$ variables can be, at most, a complete binary tree of height
+  $n+1$ (as measured by the number of vertices). It would then have $2^0 + 2^1 +
+  \dots + 2^n = 2^{n+1} = \mathcal{O}(2^n)$ nodes.
+\end{proof}
+
+\begin{lemma} \label{lemma:clause_time}
+  Let $\phi$ be a conjunction of $n$ literals. Then the ADD representation of
+  $[\phi]^p_q$ can be constructed in $\mathcal{O}(2^n)$ time for any $p, q \in
+  \mathbb{R}$ such that $p \ne q$.
+\end{lemma}
+\begin{proof}
+  The ADD representation of $\phi$ itself can be constructed with a sequence of
+  $n-1$ calls to \texttt{apply} with one of the two operands in each call always
+  a literal. The number of variables in the other operand then follows the
+  sequence $1, 2, 3, \dots, n-1$. By \cref{lemma:add_size}, the numbers of nodes
+  in the ADD representations of these operands is then $\mathcal{O}(2^1),
+  \mathcal{O}(2^2), \dots, \mathcal{O}(2^{n-1})$. Since one of the operands is
+  of constant size, the overall time complexity of all calls to \texttt{apply}
+  is then
+  \[
+    \mathcal{O}(2^1) + \mathcal{O}(2^2) + \dots + \mathcal{O}(2^{n-1}) =
+    \mathcal{O}(2^n).
+  \]
+
+  Let $\alpha$ be the ADD representation of $\phi$. Then the ADD representation
+  of $[\phi]_q^p$ is $(p-q)\alpha + q$. As scalar operations can obviously be
+  implemented in linear time, the overall complexity remains $\mathcal{O}(2^n)$.
+\end{proof}
 
 \begin{theorem}[\cite{DBLP:conf/ecai/KwisthoutBG10}, rephrased]
   BN Inference (for all algorithms that accept arbitrary instances) has a lower
@@ -243,7 +375,7 @@ for any $Y \subseteq X$.
   \item $\{\pi(n) : n \in \mathcal{V}(T) \setminus \mathcal{L}(T)\}$ is a
     partition of $X$, and
   \item for each internal node $n \in \mathcal{V}(T) \setminus \mathcal{L}(T)$,
-    variable $x \in \pi(n)$, and `clause' $c \in \im \gamma$ such that $x$
+    variable $x \in \pi(n)$, and `clause' $c \in F$ such that $x$
     appears in $c$, the leaf node $\gamma^{-1}(c)$ must be a descendant of $n$
     in $T$.
   \end{enumerate}
@@ -269,7 +401,7 @@ for any $Y \subseteq X$.
   during the computation of $\delta(n)$ (excluding recursive calls).)
   The \emph{width} of a PJT $(T, r, \gamma, \pi)$ is
   $\mathtt{width}(T) \coloneqq \max_{n \in \mathcal{V}(T)} \mathtt{size}(n)$.
-\end{definition}
+\end{definition} % TODO: don't actually need this much notation.
 
 \begin{theorem}[\cite{DBLP:conf/cp/DudekPV20}, rephrased, `ADD width is equal
   to the treewidth of the primal graph']
@@ -294,7 +426,7 @@ for any $Y \subseteq X$.
   smallest $w$ such that $G$ has a tree decomposition of width $w$.
 \end{definition}
 
-\begin{definition}
+\begin{definition} \label{def:operations}
   Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
   such as addition and multiplication are defined pointwise as
   \[
@@ -307,7 +439,7 @@ for any $Y \subseteq X$.
   for all $Y \subseteq X$.
 \end{definition}
 
-\begin{definition}
+\begin{definition} \label{def:restriction}
   Let $f\colon 2^X \to \mathbb{R}$ be a pseudo-Boolean function, and $x \in X$.
   Then $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ are \emph{restrictions} of
   $f$ defined as
@@ -366,27 +498,26 @@ for any $Y \subseteq X$.
 \end{definition}
 
 % TODO: will need to rephrase this to fit my context
-\begin{theorem}[Theorem~4 in \cite{DBLP:conf/cp/DudekPV20}, almost verbatim]
-  Let $\phi$ be a CNF formula over a set $X$ of variables and $(S, \chi)$ be a
-  tree decomposition of the primal graph of $\phi$ of width $w$. Then
-  Algorithm~2 returns a PJT of $\phi$ of width at most $w+1$.
+\begin{theorem}[Theorem~4 in \cite{DBLP:conf/cp/DudekPV20}, almost
+  verbatim] \label{thm:connection}
+  Let $\phi$ be a propositional formula in CNF over a set $X$ of variables and
+  $(S, \chi)$ be a tree decomposition of the primal graph of $\phi$ of width
+  $w$. Then Algorithm~2 returns a PJT of $\phi$ of width at most $w+1$.
 \end{theorem}
 
 \begin{theorem}
-  Let $(T, r, \gamma, \pi)$ be a PJT of width $k$. Then \textsc{DPMC} execution
-  is fixed-parameter tractable with respect to the $k$. Specifically,
-  \textsc{DPMC} execution time complexity is $\mathcal{O}(4^knm)$, where $n
-  = |\mathcal{L}(T)|$ is the number of clauses/leaves, and $m$ is the number of
-  variables.
+  Let $(F, X, \omega)$ be a WMC instance, and $(T, r, \gamma, \pi)$ be its PJT
+  of width $k$. Then \textsc{DPMC} execution is fixed-parameter tractable with
+  respect to $k$. Specifically, \textsc{DPMC} execution time complexity is
+  $\mathcal{O}(4^knm)$, where $n = |\mathcal{L}(T)| = |F|$, and $m = |X|$ is the
+  number of variables.
 \end{theorem}
-% TODO: Use theorem 4 to show that the number of variables is
-% bounded by primal treewidth
 \begin{proof}
   \begin{itemize}
-  \item Let us consider the overall complexity of all multiplications and
-    projections throughout the recursive calls of $\delta$ in
-    \cref{def:abstraction}. Clearly, the overall complexity is the sum of the
-    complexity of operations performed within each call to $\delta$.
+  \item We consider the complexity of constructing ADD representations of the
+    pseudo-Boolean functions in $F$ and the complexity of multiplication and
+    projection operations throughout the recursive calls of $\delta$ in
+    \cref{def:abstraction}.
   \item Let $t \in \mathcal{L}(T)$ be a leaf. Note that
     $|\mathtt{Vars}(\gamma(t))| \le k$ by \cref{def:size}. Assuming that clauses
     have no repeating variables, it takes $\mathcal{O}(2^k)$ time to construct
@@ -406,7 +537,7 @@ for any $Y \subseteq X$.
   \item Each variable is projected exactly once and is always projected from
     an ADD with at most $\mathcal{O}(2^k)$ nodes. Thus, the time complexity of
     projecting all variables is $\mathcal{O}(4^km)$.
-  \item In total, we get $\mathcal{O}(2^kn)$ time for the leaves,
+  \item In total, we get $\mathcal{O}(2^kn)$ time for constructing initial ADDs,
     $\mathcal{O}(4^knm)$ for multiplications, and $\mathcal{O}(4^km)$ for
     projections, resulting in $\mathcal{O}(4^knm)$ time in total.
   \end{itemize}
