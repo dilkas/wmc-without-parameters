@@ -116,7 +116,7 @@ df %>% group_by(df$dataset) %>% tally()
 
 # Where answers don't match
 interesting <- df[abs(df$answer_old_cd06 - df$answer_new_bklm16) > 0.01,]
-interesting <- df[abs(df$answer_old_cd06 - df$answer_new_cw) > 0.01,]
+interesting <- df[abs(df$answer_old_cd06 - df$answer_new_bklm16pp) > 0.01,]
 interesting <- df[abs(df$answer_old_cd06 - df$answer_new_d02) > 0.01,]
 interesting <- df[abs(df$answer_old_cd06 - df$answer_new_sbk05) > 0.01,]
 

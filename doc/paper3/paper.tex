@@ -162,7 +162,8 @@ for any $Y \subseteq X$.
 \subsection{Correctness}
 
 \begin{theorem}[Early Projection
-  \cite{DBLP:conf/aaai/DudekPV20,DBLP:conf/cp/DudekPV20}, verbatim]
+  \cite{DBLP:conf/aaai/DudekPV20,DBLP:conf/cp/DudekPV20},
+  verbatim] \label{thm:early}
   Let $X$ and $Y$ be sets of variables. For all functions $f\colon 2^X \to
   \mathbb{R}$ and $g\colon 2^Y \to \mathbb{R}$, if $x \in X \setminus Y$, then
   $\exists_x (f \cdot g) = (\exists_x f) \cdot g$.
@@ -198,7 +199,7 @@ for any $Y \subseteq X$.
 % TODO: must mention that operations like +/x are commutative, associative, etc.
 
 % NOTE: mention that this is similar (but not equal) to the DPMC/ADDMC result
-\begin{proposition}
+\begin{proposition} \label{prop:equivalence}
   Let $(\phi, X_I, X_P, w)$ be an old WMC instance. Then
   \begin{equation}
   \left(\left\{[c]_0^1 \;\middle|\; c \in \phi\right\} \cup \left\{[x]_{w(\neg
@@ -241,39 +242,121 @@ for any $Y \subseteq X$.
   \item for all indicator variables $i \in X_I$, $w(i) = w(\neg i) = 1$,
   \item and either
     \begin{enumerate}
-    \item for all parameter variables $p \in X_P$, there is a family of literals
-      $(l_i)_{i=1}^n$ such that \label{condition:d02}
+    \item for all parameter variables $p \in X_P$, there is a non-empty family
+      of literals $(l_i)_{i=1}^n$ such that \label{condition:d02}
       \begin{enumerate}
       \item $w(\neg p) = 1$,
       \item $l_i \in X_I$ or $\neg l_i \in X_I$ for all $i = 1, \dots, n$,
+        \label{condition:equivalence1}
       \item and $\{ c \in \phi \mid p \in c \text{ or } \neg p \in c \} =
         \left\{p \lor \bigvee_{i=1}^n \neg l_i \right\} \cup \{ l_i \lor \neg p
-        \mid i = 1, \dots, n \}$;
+        \mid i = 1, \dots, n \}$; \label{condition:equivalence2}
       \end{enumerate}
-    \item or \label{condition:bklm16}
+    \item or for all parameter variables $p \in X_P$, \label{condition:bklm16}
       \begin{enumerate}
       \item $w(p) + w(\neg p) = 1$,
-      \item there is no clause $c \in \phi$ with $\neg p \in c$,
+      \item for any clause $c \in \phi$, $|c \cap X_P| \le 1$,
+      \item there is no clause $c \in \phi$ such that $\neg p \in c$,
       \item and for any pair of clauses $c, d \in \phi$ such that $c \ne d$, $p
         \in c$ and $p \in d$, $\mathtt{Vars}(c) \cap \mathtt{Vars}(d) = \{ p
         \}$.
       \end{enumerate}
     \end{enumerate}
   \end{enumerate}
-\end{theorem}
-\begin{proof}
-  % TODO: finish the proof
-  First, let us assume that \cref{condition:d02} applies and consider the
-  collective effect of the loop on
-  \crefrange{line:foreach1start}{line:foreach1end} for: 1) clauses that have a
-  positive parameter variable, 2) clauses that have a negative parameter
-  variable (removed), 3) clauses that don't have parameter variables (left
-  unchanged).
+\end{theorem} % TODO: add parentheses around products
+% TODO: maybe give a name to (2) since it's wrong to call it an equation
+\begin{proof} % TODO: check if each condition is actually used
+  % TODO: start here: consider how the transformation changes the 'normal form'.
+  % We will show that every iteration keeps the answer the same as in the normal form.
+  By \cref{prop:equivalence},
+  \begin{equation}
+    \left(\left\{[c]_0^1 \;\middle|\; c \in \phi\right\} \cup \left\{[x]_{w(\neg
+          x)}^{w(x)} \;\middle|\; x \in X_I \cup X_P\right\}, X_I \cup X_P,
+      1\right) \label{eq:new_wmc}
+  \end{equation}
+  is a new WMC instance with the same answer as the given old WMC instance. By
+  \cref{def:new_wmc}, its answer is
+  \begin{equation} \label{eq:answer}
+    \left(\exists_{X_I \cup X_P} \prod_{c \in \phi} [c]_0^1 \prod_{x \in X_I
+        \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset)
+  \end{equation}
+  Since both \cref{condition:d02,condition:bklm16} ensure that each clause in
+  $\phi$ has at most one parameter variable, we can partition $\phi$ into
+  $\phi_* \coloneqq \{c \in \phi \mid \mathtt{Vars}(c) \cap X_P = \emptyset \}$
+  and $\phi_p \coloneqq \{ c \in \phi \mid \mathtt{Vars}(c) \cap X_P = \{ p \}
+  \}$ for all $p \in X_P$. We can then use \cref{thm:early} to reorder
+  \cref{eq:answer} into
+  \[
+    \left(\exists_{X_I} \left( \prod_{x \in X_I} [x]_{w(\neg x)}^{w(x)} \right)
+      \left( \prod_{c \in \phi_*} [c]_0^1 \right) \prod_{p \in X_P} \exists_p
+      [p]_{w(\neg p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 \right)(\emptyset).
+  \]
+
+  Let us first consider how the unfinished WMC instance $(F, X_I, \omega)$ after
+  the loop on \crefrange{line:foreach1start}{line:foreach1end} differs from
+  \cref{eq:new_wmc}. Note that \cref{alg:transformation} leaves each $c \in
+  \phi_*$ unchanged, i.e., adds $[c]_0^1$ to $F$. We can then fix an arbitrary
+  $p \in X_P$ and let $F_p$ be the set of functions added to $F$ as a
+  replacement of $\phi_p$. It is sufficient to show that
+  \begin{equation} \label{eq:to_show}
+    \omega \prod_{f \in F_p} f = \exists_p [p]_{w(\neg p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1.
+  \end{equation}
+  Note that under \cref{condition:d02},
+  \[
+    \bigwedge_{c \in \phi_p} c \equiv p \Leftrightarrow \bigwedge_{i=1}^n l_i
+  \]
+  for some family of indicator variable literals $(l_i)_{i=1}^n$. Thus,
+  \[
+    \exists_p [p]_{w(\neg p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 = \exists_p
+    [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1.
+  \]
+  If $w(p) = 1$, then
+  \begin{equation} \label{eq:bigsums}
+    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
+    \right]_0^1 = \exists_p \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
+    \right]_0^1 = \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
+    \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n
+      l_i \right]_0^1\right|_{p=0}
+  \end{equation}
+  by \cref{def:projection}. Since for any input, $\bigwedge_{i=1}^n l_i$ is
+  either true or false, exactly one of the two summands in \cref{eq:bigsums}
+  will be equal to one, and the other will be equal to zero, and so
+  \[
+    \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
+      \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n
+        l_i \right]_0^1\right|_{p=0} = 1,
+  \]
+  where $1$ is a pseudo-Boolean function that always returns one. On the other
+  side of \cref{eq:to_show}, since $F_p = \emptyset$, and $\omega$ is unchanged,
+  we get $\omega\prod_{f \in F_p} f = 1$, and so \cref{eq:to_show} is satisfied
+  under \cref{condition:d02} when $w(p) = 1$.
+
+  If $w(p) \ne 1$, then
+  \[
+    F_p = \left\{ \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} \right\},
+  \]
+  and so we want to show that
+  \[
+    \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} = \exists_p [p]_1^{w(p)}
+    \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1.
+  \]
+  By \cref{def:projection},
+  \begin{align*}
+    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 &= \left.\left( [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 \right)\right|_{p=1} + \left.\left([p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 \right)\right|_{p=0} \\
+                                                                                      &= w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[ \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i \right]_1^{w(p)}
+  \end{align*}
+  as required. This finishes the proof of the correctness of the first `foreach'
+  loop under \cref{condition:d02}.
+
+  Now let us assume \cref{condition:bklm16}. We still want to prove
+  \cref{eq:to_show}.
 \end{proof}
+% TODO: now consider the second for loop
+% TODO: condition 1 is necessary in both cases because we're ignore the weights
+% of indicator variables
 
 \paragraph{Notes.}
 \begin{itemize}
-\item The family of literals could be empty.
 \item This just says that $p$ is equivalent to a conjunction.
 \item The first group of conditions applies to \texttt{d02}, while the second
   group applies to \texttt{bklm16}.
@@ -430,11 +513,8 @@ for any $Y \subseteq X$.
   Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
   such as addition and multiplication are defined pointwise as
   \[
-    (f+g)(Y) \coloneqq f(Y)+g(Y),
-  \]
-  and
-  \[
-    (fg)(Y) \coloneqq f(Y)g(Y)
+    (f+g)(Y) \coloneqq f(Y)+g(Y), \quad \text{and} \quad (fg)(Y) \coloneqq
+    f(Y)g(Y)
   \]
   for all $Y \subseteq X$.
 \end{definition}
@@ -444,10 +524,7 @@ for any $Y \subseteq X$.
   Then $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ are \emph{restrictions} of
   $f$ defined as
   \[
-    f|_{x=0}(Y) \coloneqq f(Y \setminus \{x\}),
-  \]
-  and
-  \[
+    f|_{x=0}(Y) \coloneqq f(Y \setminus \{x\}), \quad \text{and} \quad
     f|_{x=1}(Y) \coloneqq f(Y \cup \{x\})
   \]
   for all $Y \subseteq X$.
@@ -458,7 +535,7 @@ for any $Y \subseteq X$.
   endomorphism $\exists_x\colon \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ defined
   as
   \[
-    \exists_xf = f|_{x=1} + f|_{x=0}
+    \exists_xf \coloneqq f|_{x=1} + f|_{x=0}
   \]
   for any $f\colon 2^X \to \mathbb{R}$.
 \end{definition}
@@ -488,7 +565,7 @@ for any $Y \subseteq X$.
   where $\delta\colon \mathcal{V}(T) \to \mathbb{R}^{2^X}$ is a recursive
   function defined as
   \begin{equation} \label{eq:execution}
-    \delta(t) =
+    \delta(t) \coloneqq
     \begin{cases}
       \gamma(t) & \text{if } t \in \mathcal{L}(T) \\
       \exists_{\pi(t)} \prod_{u \in \mathcal{C}(t)} \delta(u) & \text{otherwise.}
