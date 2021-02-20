@@ -1,34 +1,52 @@
-\documentclass{article}
-\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsthm}
-\usepackage[UKenglish]{babel}
-\usepackage[capitalise]{cleveref}
-\usepackage{fullpage}
-\usepackage[utf8]{inputenc}
-\usepackage[UKenglish]{isodate}
-\usepackage{mathtools}
-\usepackage[backgroundcolor=lightgray]{todonotes}
+\documentclass[runningheads]{llncs}
 
-\newtheorem{theorem}{Theorem}
-\newtheorem{proposition}{Proposition}
-\newtheorem{lemma}{Lemma}
-\newtheorem{corollary}{Corollary}
-\newtheorem{conjecture}{Conjecture}
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-\newtheorem{example}{Example}
-\theoremstyle{remark}
-\newtheorem*{remark}{Remark}
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage[capitalise]{cleveref}
 
 \crefname{enumii}{Condition}{Conditions}
 
-\title{Weighted Model Counting Without Parameter Variables}
-
 \begin{document}
 
-\maketitle
+%\title{Contribution Title\thanks{Supported by organization x.}}
+\title{Weighted Model Counting Without Parameter Variables}
+
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+
+%\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
+%Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
+%Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+
+%\authorrunning{F. Author et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+
+%\institute{Princeton University, Princeton NJ 08544, USA \and
+%Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
+%\email{lncs@springer.com}\\
+%\url{http://www.springer.com/gp/computer-science/lncs} \and
+%ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+%\email{\{abc,lncs\}@uni-heidelberg.de}}
+
+\maketitle              % typeset the header of the contribution
+
+\begin{abstract}
+  The abstract should briefly summarize the contents of the paper in
+  150--250 words.
+
+  \keywords{First keyword  \and Second keyword \and Another keyword.}
+\end{abstract}
 
 \section{Introduction}
 
@@ -44,6 +62,38 @@ variables $X$ and $p, q \in \mathbb{R}$, let $[\phi]^p_q\colon 2^X \to
 \]
 for any $Y \subseteq X$.
 
+\begin{definition} \label{def:operations}
+  Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
+  such as addition and multiplication are defined pointwise as
+  \[
+    (f+g)(Y) \coloneqq f(Y)+g(Y), \quad \text{and} \quad (fg)(Y) \coloneqq
+    f(Y)g(Y)
+  \]
+  for all $Y \subseteq X$. This means that binary operations on pseudo-Boolean
+  functions inherit properties such as associativity and commutativity.
+\end{definition}
+
+\begin{definition} \label{def:restriction}
+  Let $f\colon 2^X \to \mathbb{R}$ be a pseudo-Boolean function, and $x \in X$.
+  Then $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ are \emph{restrictions} of
+  $f$ defined as
+  \[
+    f|_{x=0}(Y) \coloneqq f(Y \setminus \{x\}), \quad \text{and} \quad
+    f|_{x=1}(Y) \coloneqq f(Y \cup \{x\})
+  \]
+  for all $Y \subseteq X$.
+\end{definition}
+
+\begin{definition} \label{def:projection}
+  Let $X$ be a set. For any $x \in X$, \emph{projection} $\exists_x$ is an
+  endomorphism $\exists_x\colon \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ defined
+  as
+  \[
+    \exists_xf \coloneqq f|_{x=1} + f|_{x=0}
+  \]
+  for any $f\colon 2^X \to \mathbb{R}$.
+\end{definition}
+
 % NOTE: ...that we will need.
 % NOTE: The proof immediately comes from the definition (of operations).
 \begin{proposition}[Basic properties] \label{prop:basic}
@@ -56,6 +106,8 @@ for any $Y \subseteq X$.
   \item $[\phi]^a_b \cdot [\phi]^c_d = [\phi]^{ac}_{bd}$;
   \item $[\phi]^1_0 \cdot [\psi]_0^1 = [\phi \land \psi]_0^1$.
   \end{itemize}
+  And for any pair of pseudo-Boolean functions $f, g \colon 2^X \to \mathbb{R}$
+  and $x \in  X$, $(fg)|_{x=i} = f|_{x=i} \cdot g|_{x=i}$ for $i = 0, 1$.
 \end{proposition}
 
 \begin{definition}[old WMC instance]
@@ -109,6 +161,11 @@ for any $Y \subseteq X$.
   variables in $X_P$ are redundant as they either are equal to one or duplicate
   an already-defined weight.
 \item Mention that formulas, clauses, and models are all treated as sets.
+\item The constant is inspired by the \texttt{bklm16} encoding.
+\item We don't make a distinction between a real number and a (pseudo-Boolean)
+  function that always returns that number.
+\item Throughout the paper, projection is assumed to have the lowest precedence
+  (e.g., $\exists_x fg = \exists_x (fg)$ and not $(\exists_xf)g$).
 \end{itemize}
 
 \section{Parameter Variable Elimination}
@@ -159,10 +216,10 @@ for any $Y \subseteq X$.
       $F \gets F \cup \{ [c]^1_0 \}$\; \label{line:foreach1end}
     }
   }
-  \ForEach{indicator variable $v \in X_I$}{
+  \ForEach{indicator variable $v \in X_I$ \label{line:foreach2start}}{
     \If{$\{[v]_1^p, [\neg v]_1^q\} \subseteq F$ for some $p$ and $q$}{
       $F \gets F \setminus \{ [v]_1^p, [\neg v]_1^q \} \cup \{ [v]_q^p
-      \}$\;
+      \}$\; \label{line:foreach2end}
     }
   }
   replace every variable $v$ in $F$ with $\rename{$v$}$\;
@@ -279,10 +336,7 @@ for any $Y \subseteq X$.
       \end{enumerate}
     \end{enumerate}
   \end{enumerate}
-\end{theorem} % TODO: add parentheses around products
-% TODO: maybe give a name to (2) since it's wrong to call it an equation
-% TODO: check if each condition is actually used. Maybe turn this into a
-% paragraph that gives an overview of the proof.
+\end{theorem}
 \begin{proof}
   By \cref{prop:equivalence},
   \begin{equation}
@@ -415,22 +469,17 @@ for any $Y \subseteq X$.
      \right]_1^{w(p)} = \prod_{c \in \phi_p} \left[ \bigwedge_{l \in c \setminus
          \{ p \}} \neg l \right]_1^{w(p)}
    \]
-   which is exactly what we needed to show.
+   which is exactly what we needed to show. This ends the proof that the
+   first loop of \cref{alg:transformation} preserves the answer under both
+   \cref{condition:d02} and \cref{condition:bklm16}. Finally, the loop on
+   \crefrange{line:foreach2start}{line:foreach2end} of \cref{alg:transformation}
+   replaces $[v]_1^p[\neg v]_1^q$ with $[v]_q^p$ (for some $v \in X_I$ and $p, q
+   \in \mathbb{R}$), but, of course,
+   \[
+     [v]_1^p[\neg v]_1^q = [v]_1^p[v]_q^1 = [v]_q^p
+   \]
+   by \cref{prop:basic}.
 \end{proof}
-% TODO: now consider the second for loop
-% TODO: condition 1 is necessary in both cases because we're ignore the weights
-% of indicator variables
-% NOTE: benefits of having the proof in the paper:
-% 1) it puts all the encodings on a common ground
-% 2) it illustrates the convenience of our notation for reasoning about (certain
-% types of) pseudo-Boolean functions (stress this!!!)
-% 3) it's too big and too important to be left for the appendix
-% NOTE: we don't make a distinction between a real number and a (PB) function
-% that always returns that number.
-% NOTE: projection is assumed to have lowest precedence (i.e., \exists_x fg =
-% \exists_x (fg) and not (\exists_x f)g).
-% TODO: need another basic property: (fg)|_{x=i} = f|_{x=i} * g|_{x=i} for i=0, 1.
-% TODO: \times -> \cdot
 
 \paragraph{Notes.}
 \begin{itemize}
@@ -439,266 +488,43 @@ for any $Y \subseteq X$.
   group applies to \texttt{bklm16}.
 \item For \texttt{cd05} and \texttt{cd06}, condition $2bi$ should be replaced
   with $w(\neg p) = 1$.
-\end{itemize}
-
-\section{Parameterised Complexity of \textsc{DPMC}}
-
-\paragraph{Notes.}
-\begin{itemize}
-\item Summary of results
+\item Benefits of having this proof in the paper:
   \begin{itemize}
-  \item We establish \textsc{DPMC} inference as fixed-parameter tractable.
-  \item We experimentally show that \textsc{DPMC} is best on low-to-moderate
-    treewidth instances, and cd06+c2d overtakes on higher treewidth instances.
+  \item It puts all encodings on a common ground.
+  \item It illustrates the convenience of our notation for reasoning about
+    (certain types of) pseudo-Boolean functions.
+  \item It's too big and too important to be left for the appendix.
   \end{itemize}
-\item By \textsc{DPMC}, we always mean DMC+lg.
-\item The constant is inspired by the \texttt{bklm16} encoding.
+\item Processors:
+  \begin{itemize}
+  \item Intel(R) Xeon(R) Gold 6138 CPU @ 2.00GHz
+  \item Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+  \item Intel(R) Xeon(R) CPU E7-4820 v2 @ 2.00GHz
+  \end{itemize}
+\item Table captions should be placed above the tables.
+\item Figures should preferably be in EPS format.
+\item the environments 'theorem', 'definition', 'lemma', 'proposition',
+  'corollary', 'remark', and 'example' are defined in the LLNCS documentclass as
+  well.
 \end{itemize}
 
 \paragraph{TODO}
 \begin{itemize}
+\item Come up with better names for old/new WMC instances.
 \item Do I need to formally consider extending a pseudo-Boolean function to a
   bigger domain?
-\item Introduce all the notation surrounding graphs ($\mathcal{V}$,
-  $\mathcal{E}$ $\mathcal{L}$, $\mathcal{C}$, etc.) (and be consistent with its
-  usage) and formulas (variable, literal, clause, CNF, etc.)
-\item Use \cref{thm:connection} to show the connection between primal treewidth
-  and the width of the PJT (linking the complexity of BN inference with the DPMC
-  complexity).
-\item Come up with better names for old/new WMC instances.
-\item Define:
-  \begin{itemize}
-  \item scalar operations on ADDs,
-  \item an ADD as a DAG,
-  \item What does it mean for an ADD to `have' variables? Maybe refer to
-    pseudo-Boolean function sensitivity.
-  \item primal graph of a CNF formula (a.k.a.
-    Gaifman/(variable) interaction/connectivity/clique/representing graph),
-  \item Bayesian network (I already have a definition of these last two),
-  \item moralisation of a Bayesian network (or of any DAG),
-  \item projection of a set of variables.
-  \end{itemize}
+\item Define scalar operations on ADDs.
+\item Define projection of a set of variables.
+\item add parentheses around products
+\item maybe give a name to (2) since it's wrong to call it an equation
+\item check if each condition is actually used. Maybe turn this into a paragraph
+  that gives an overview of the proof.
+\item condition 1 is necessary in both cases because we're ignore the weights of
+  indicator variables
+\item maybe do more summations over domains in proofs
 \end{itemize}
 
-\begin{lemma} \label{lemma:add_size}
-  An ADD with $n$ variables has $\mathcal{O}(2^n)$ nodes.
-\end{lemma}
-\begin{proof}
-  An ADD with $n$ variables can be, at most, a complete binary tree of height
-  $n+1$ (as measured by the number of vertices). It would then have $2^0 + 2^1 +
-  \dots + 2^n = 2^{n+1} = \mathcal{O}(2^n)$ nodes.
-\end{proof}
-
-\begin{lemma} \label{lemma:clause_time}
-  Let $\phi$ be a conjunction of $n$ literals. Then the ADD representation of
-  $[\phi]^p_q$ can be constructed in $\mathcal{O}(2^n)$ time for any $p, q \in
-  \mathbb{R}$ such that $p \ne q$.
-\end{lemma}
-\begin{proof}
-  The ADD representation of $\phi$ itself can be constructed with a sequence of
-  $n-1$ calls to \texttt{apply} with one of the two operands in each call always
-  a literal. The number of variables in the other operand then follows the
-  sequence $1, 2, 3, \dots, n-1$. By \cref{lemma:add_size}, the numbers of nodes
-  in the ADD representations of these operands is then $\mathcal{O}(2^1),
-  \mathcal{O}(2^2), \dots, \mathcal{O}(2^{n-1})$. Since one of the operands is
-  of constant size, the overall time complexity of all calls to \texttt{apply}
-  is then
-  \[
-    \mathcal{O}(2^1) + \mathcal{O}(2^2) + \dots + \mathcal{O}(2^{n-1}) =
-    \mathcal{O}(2^n).
-  \]
-
-  Let $\alpha$ be the ADD representation of $\phi$. Then the ADD representation
-  of $[\phi]_q^p$ is $(p-q)\alpha + q$. As scalar operations can obviously be
-  implemented in linear time, the overall complexity remains $\mathcal{O}(2^n)$.
-\end{proof}
-
-\begin{theorem}[\cite{DBLP:conf/ecai/KwisthoutBG10}, rephrased]
-  BN Inference (for all algorithms that accept arbitrary instances) has a lower
-  bound that's linear in the size of the BN and exponential in the treewidth of
-  its moralisation (provide the exact formula).
-\end{theorem}
-
-\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}, with some changes]
-  Let $X$ be a set of Boolean variables, and $F$ be a set of pseudo-Boolean
-  functions $2^X \to \mathbb{R}$. A \emph{project-join tree} (PJT) of $F$ is a
-  tuple $(T, r, \gamma, \pi)$ where:
-  \begin{itemize}
-  \item $T$ is a tree with root $r \in \mathcal{V}(T)$,
-  \item $\gamma\colon \mathcal{L}(T) \to F$ is a bijection between the leaves of
-    $T$ and the pseudo-Boolean functions in $F$, and
-  \item $\pi\colon \mathcal{V}(T) \setminus \mathcal{L}(T) \to 2^X$ is a
-    labelling function on internal nodes.
-  \end{itemize}
-  Moreover, $(T, r, \gamma, \pi)$ must satisfy the following two properties:
-  \begin{enumerate}
-  \item $\{\pi(n) : n \in \mathcal{V}(T) \setminus \mathcal{L}(T)\}$ is a
-    partition of $X$, and
-  \item for each internal node $n \in \mathcal{V}(T) \setminus \mathcal{L}(T)$,
-    variable $x \in \pi(n)$, and `clause' $c \in F$ such that $x$
-    appears in $c$, the leaf node $\gamma^{-1}(c)$ must be a descendant of $n$
-    in $T$.
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}[\cite{DBLP:conf/cp/DudekPV20}] \label{def:size}
-  \[
-    \mathtt{Vars}(n) \coloneqq
-    \begin{cases}
-      \mathtt{Vars}(\gamma(n)) & \text{if } n \in \mathcal{L}(T) \\
-      \left( \bigcup_{o \in \mathcal{C}(n)} \mathtt{Vars}(o) \right) \setminus
-      \pi(n) & \text{if } n \not\in \mathcal{L}(T).
-    \end{cases}
-  \]
-  \[
-    \mathtt{size}(n) \coloneqq
-    \begin{cases}
-      |\mathtt{Vars}(n)| & \text{if } n \in \mathcal{L}(T) \\
-      |\mathtt{Vars}(n) \cup \pi(n)| & \text{if } n \not\in \mathcal{L}(T).
-    \end{cases}
-  \]
-  (Note that $\mathtt{size}(n)$ is the number of variables that can appear
-  during the computation of $\delta(n)$ (excluding recursive calls).)
-  The \emph{width} of a PJT $(T, r, \gamma, \pi)$ is
-  $\mathtt{width}(T) \coloneqq \max_{n \in \mathcal{V}(T)} \mathtt{size}(n)$.
-\end{definition} % TODO: don't actually need this much notation.
-
-\begin{theorem}[\cite{DBLP:conf/cp/DudekPV20}, rephrased, `ADD width is equal
-  to the treewidth of the primal graph']
-  Given a CNF formula $\phi$ with a tree decomposition of its primal graph of
-  width $w$, Algorithm~2 (from \cite{DBLP:conf/cp/DudekPV20}) returns a
-  PJT of $\phi$ of width at most $w+1$.
-\end{theorem}
-
-\begin{definition}[\cite{DBLP:journals/jct/RobertsonS84}, rephrased]
-  A \emph{tree decomposition} of a graph $G$ is a pair $(T, \chi)$, where $T$ is
-  a tree and $\chi\colon \mathcal{V}(T) \to 2^{\mathcal{V}(G)}$ is a labelling
-  function, with the following properties:
-  \begin{itemize}
-  \item $\bigcup_{t \in \mathcal{V}(T)} \chi(t) = \mathcal{V}(G)$;
-  \item for every edge $e \in \mathcal{E}(G)$, there exists $t \in
-    \mathcal{V}(T)$ such that $e$ has both endpoints in $\chi(t)$;
-  \item for all $t, t', t'' \in \mathcal{V}(T)$, if $t'$ is on the path between
-    $t$ and $t''$, then $\chi(t) \cap \chi(t'') \subseteq \chi(t')$.
-  \end{itemize}
-  The \emph{width} of tree decomposition $(T, \chi)$ is $\max_{t \in
-    \mathcal{V}(T)} |\chi(t)| - 1)$. The \emph{treewidth} of graph $G$ is the
-  smallest $w$ such that $G$ has a tree decomposition of width $w$.
-\end{definition}
-
-\begin{definition} \label{def:operations}
-  Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
-  such as addition and multiplication are defined pointwise as
-  \[
-    (f+g)(Y) \coloneqq f(Y)+g(Y), \quad \text{and} \quad (fg)(Y) \coloneqq
-    f(Y)g(Y)
-  \]
-  for all $Y \subseteq X$. This means that binary operations on pseudo-Boolean
-  functions inherit properties such as associativity and commutativity.
-\end{definition}
-
-\begin{definition} \label{def:restriction}
-  Let $f\colon 2^X \to \mathbb{R}$ be a pseudo-Boolean function, and $x \in X$.
-  Then $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ are \emph{restrictions} of
-  $f$ defined as
-  \[
-    f|_{x=0}(Y) \coloneqq f(Y \setminus \{x\}), \quad \text{and} \quad
-    f|_{x=1}(Y) \coloneqq f(Y \cup \{x\})
-  \]
-  for all $Y \subseteq X$.
-\end{definition}
-
-\begin{definition} \label{def:projection}
-  Let $X$ be a set. For any $x \in X$, \emph{projection} $\exists_x$ is an
-  endomorphism $\exists_x\colon \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ defined
-  as
-  \[
-    \exists_xf \coloneqq f|_{x=1} + f|_{x=0}
-  \]
-  for any $f\colon 2^X \to \mathbb{R}$.
-\end{definition}
-
-\begin{lemma} \label{lemma:basic_ops}
-  Let $f,g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions represented by
-  ADDs with $n$ and $m$ nodes, respectively, and $x \in X$. Then $f+g$ and $fg$
-  can be computed in $\mathcal{O}(mn)$ time, and $\exists_xf$ can be computed in
-  $\mathcal{O}(n^2)$ time.
-\end{lemma}
-\begin{proof}
-  Addition and multiplication are implemented by \texttt{apply} algorithm which
-  takes $\mathcal{O}(mn)$ time \cite{DBLP:journals/tc/Bryant86}. Projection
-  consists of two restrictions and an addition by \cref{def:projection}. The
-  computational complexity of restriction is dominated by the reduction
-  operation that transforms a decision diagram into a minimal canonical form
-  \cite{DBLP:journals/tc/Bryant86}. While the original reduction algorithm had a
-  $\mathcal{O}(n \log n)$ complexity, caching can reduce it to $\mathcal{O}(n)$
-  \cite{somenzi1998cudd}. Either way, the complexity of projection is still
-  $\mathcal{O}(n^2)$.
-\end{proof}
-
-% NOTE: this is a rehash of equation (2) from the DPMC paper
-\begin{definition} \label{def:abstraction}
-  Let $(T, r, \gamma, \pi)$ be a PJT, and $X$ be the set of variables. The
-  functionality of \textsc{DPMC} execution can be represented by $\delta(r)$,
-  where $\delta\colon \mathcal{V}(T) \to \mathbb{R}^{2^X}$ is a recursive
-  function defined as
-  \begin{equation} \label{eq:execution}
-    \delta(t) \coloneqq
-    \begin{cases}
-      \gamma(t) & \text{if } t \in \mathcal{L}(T) \\
-      \exists_{\pi(t)} \prod_{u \in \mathcal{C}(t)} \delta(u) & \text{otherwise.}
-    \end{cases}
-  \end{equation}
-  The range of $\delta(r)$ then contains a single real number, i.e., the answer.
-\end{definition}
-
-% TODO: will need to rephrase this to fit my context
-\begin{theorem}[Theorem~4 in \cite{DBLP:conf/cp/DudekPV20}, almost
-  verbatim] \label{thm:connection}
-  Let $\phi$ be a propositional formula in CNF over a set $X$ of variables and
-  $(S, \chi)$ be a tree decomposition of the primal graph of $\phi$ of width
-  $w$. Then Algorithm~2 returns a PJT of $\phi$ of width at most $w+1$.
-\end{theorem}
-
-\begin{theorem}
-  Let $(F, X, \omega)$ be a WMC instance, and $(T, r, \gamma, \pi)$ be its PJT
-  of width $k$. Then \textsc{DPMC} execution is fixed-parameter tractable with
-  respect to $k$. Specifically, \textsc{DPMC} execution time complexity is
-  $\mathcal{O}(4^knm)$, where $n = |\mathcal{L}(T)| = |F|$, and $m = |X|$ is the
-  number of variables.
-\end{theorem}
-\begin{proof}
-  \begin{itemize}
-  \item We consider the complexity of constructing ADD representations of the
-    pseudo-Boolean functions in $F$ and the complexity of multiplication and
-    projection operations throughout the recursive calls of $\delta$ in
-    \cref{def:abstraction}.
-  \item Let $t \in \mathcal{L}(T)$ be a leaf. Note that
-    $|\mathtt{Vars}(\gamma(t))| \le k$ by \cref{def:size}. Assuming that clauses
-    have no repeating variables, it takes $\mathcal{O}(2^k)$ time to construct
-    $\delta(t)$ by \cref{lemma:clause_time} and $\mathcal{O}(2^kn)$ time to
-    construct all leaves of the PJT.
-  \item Now let $t \in \mathcal{V}(T) \setminus \mathcal{L}(T)$ be an internal
-    vertex, in which case we perform $|\mathcal{C}(t)|-1$ multiplications and
-    $|\pi(t)|$ projections. Note that $|\mathcal{C}(t)| \le |\mathcal{L}(T)| =
-    n$, $|\pi(t)| \le k$, and the ADDs involved can have up to $k$ variables.
-    This means that each ADD has $\mathcal{O}(2^k)$ nodes (regardless of whether
-    it comes from $\mathcal{C}(t)$ or from multiplications). Each such
-    multiplication then takes $\mathcal{O}(4^k)$ time by \cref{lemma:basic_ops},
-    and so all multiplications will take $\mathcal{O}(4^kn)$ time for $t$ and
-    $\mathcal{O}(4^knm)$ time across all $t \in \mathcal{V}(T) \setminus
-    \mathcal{L}(T)$ since the number of vertices in the PJT is bounded by the
-    number of variables.
-  \item Each variable is projected exactly once and is always projected from
-    an ADD with at most $\mathcal{O}(2^k)$ nodes. Thus, the time complexity of
-    projecting all variables is $\mathcal{O}(4^km)$.
-  \item In total, we get $\mathcal{O}(2^kn)$ time for constructing initial ADDs,
-    $\mathcal{O}(4^knm)$ for multiplications, and $\mathcal{O}(4^km)$ for
-    projections, resulting in $\mathcal{O}(4^knm)$ time in total.
-  \end{itemize}
-\end{proof}
-
-\bibliographystyle{acm}
+\bibliographystyle{splncs04}
 \bibliography{paper}
 
 \end{document}
