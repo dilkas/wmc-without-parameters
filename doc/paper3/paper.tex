@@ -32,9 +32,9 @@
 
 \section{Introduction}
 
-\paragraph{Notation.} For any propositional formula $\phi$ and $p, q \in
-\mathbb{R}$, let $[\phi]^p_q\colon 2^X \to \mathbb{R}$ be a
-pseudo-Boolean function defined as
+\paragraph{Notation.} For any propositional formula $\phi$ over a set of
+variables $X$ and $p, q \in \mathbb{R}$, let $[\phi]^p_q\colon 2^X \to
+\mathbb{R}$ be a pseudo-Boolean function defined as
 \[
   [\phi]^p_q(Y) \coloneqq
   \begin{cases}
@@ -44,9 +44,20 @@ pseudo-Boolean function defined as
 \]
 for any $Y \subseteq X$.
 
-% NOTE: weights on literals other than the positive literals that correspond to
-% variables in $X_P$ are redundant as they either are equal to one or duplicate
-% an already-defined weight.
+% NOTE: ...that we will need.
+% NOTE: The proof immediately comes from the definition (of operations).
+\begin{proposition}[Basic properties] \label{prop:basic}
+  For any propositional formulas $\phi$ and $\psi$, and $a, b, c, d \in
+  \mathbb{R}$,
+  \begin{itemize}
+  \item $[\phi]^a_b = [\neg \phi]^b_a$;
+  \item $c + [\phi]^a_b = [\phi]^{a+c}_{b+c}$;
+  \item $c \cdot [\phi]^a_b = [\phi]^{ac}_{bc}$;
+  \item $[\phi]^a_b \cdot [\phi]^c_d = [\phi]^{ac}_{bd}$;
+  \item $[\phi]^1_0 \cdot [\psi]_0^1 = [\phi \land \psi]_0^1$.
+  \end{itemize}
+\end{proposition}
+
 \begin{definition}[old WMC instance]
   An \emph{old WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
   the set of indicator variables, $X_P$ is the set of parameter variables (with
@@ -94,6 +105,10 @@ for any $Y \subseteq X$.
 \item Apparently, the \textsc{DPMC} paper already shows that taking the first
   offered decomposition tree is best.
 \item It is already well-known that WMC is FPT.
+\item Weights on literals other than the positive literals that correspond to
+  variables in $X_P$ are redundant as they either are equal to one or duplicate
+  an already-defined weight.
+\item Mention that formulas, clauses, and models are all treated as sets.
 \end{itemize}
 
 \section{Parameter Variable Elimination}
@@ -168,7 +183,6 @@ for any $Y \subseteq X$.
   \mathbb{R}$ and $g\colon 2^Y \to \mathbb{R}$, if $x \in X \setminus Y$, then
   $\exists_x (f \cdot g) = (\exists_x f) \cdot g$.
 \end{theorem}
-% TODO: mention that formulas, clauses, and models are all treated as sets
 
 \begin{lemma} \label{lemma:sum}
   For any pseudo-Boolean function $f\colon 2^X \to \mathbb{R}$, $(\exists_X
@@ -196,7 +210,6 @@ for any $Y \subseteq X$.
   as required. This easily extends to $|X| > 1$ by the definition of projection
   on sets of variables. % TODO: once I've defined it, add a reference here.
 \end{proof}
-% TODO: must mention that operations like +/x are commutative, associative, etc.
 
 % NOTE: mention that this is similar (but not equal) to the DPMC/ADDMC result
 \begin{proposition} \label{prop:equivalence}
@@ -257,17 +270,20 @@ for any $Y \subseteq X$.
       \item $w(p) + w(\neg p) = 1$,
       \item for any clause $c \in \phi$, $|c \cap X_P| \le 1$,
       \item there is no clause $c \in \phi$ such that $\neg p \in c$,
-      \item and for any pair of clauses $c, d \in \phi$ such that $c \ne d$, $p
-        \in c$ and $p \in d$, $\mathtt{Vars}(c) \cap \mathtt{Vars}(d) = \{ p
-        \}$.
+      \item if $\{ p \} \in \phi$, then there is no clause $c \in \phi$ such
+        that $c \ne \{ p \}$ and $p \in c$, \label{cond:just_parameter}
+        % 'prime implicants are logically disjoint'
+      \item and for any $c, d \in \phi$ such that $c \ne d$, $p \in c$ and $p
+        \in d$, $\bigwedge_{l \in c \setminus \{ p \}} \neg l \land \bigwedge_{l
+          \in d \setminus \{ p \}} \neg l$ is false. \label{cond:disjoint}
       \end{enumerate}
     \end{enumerate}
   \end{enumerate}
 \end{theorem} % TODO: add parentheses around products
 % TODO: maybe give a name to (2) since it's wrong to call it an equation
-\begin{proof} % TODO: check if each condition is actually used
-  % TODO: start here: consider how the transformation changes the 'normal form'.
-  % We will show that every iteration keeps the answer the same as in the normal form.
+% TODO: check if each condition is actually used. Maybe turn this into a
+% paragraph that gives an overview of the proof.
+\begin{proof}
   By \cref{prop:equivalence},
   \begin{equation}
     \left(\left\{[c]_0^1 \;\middle|\; c \in \phi\right\} \cup \left\{[x]_{w(\neg
@@ -335,7 +351,7 @@ for any $Y \subseteq X$.
   \[
     F_p = \left\{ \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} \right\},
   \]
-  and so we want to show that
+  and $\omega = 1$, and so we want to show that
   \[
     \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} = \exists_p [p]_1^{w(p)}
     \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1.
@@ -349,11 +365,72 @@ for any $Y \subseteq X$.
   loop under \cref{condition:d02}.
 
   Now let us assume \cref{condition:bklm16}. We still want to prove
-  \cref{eq:to_show}.
+  \cref{eq:to_show}. If $w(p) = 1$, then $F_p = \emptyset$, and $\omega = 1$,
+  and so the left-hand side of \cref{eq:to_show} is equal to one. Then the
+  right-hand side is
+  \[
+    \exists_p [p]_0^1 \prod_{c \in \phi_p} [c]_0^1 = \exists_p \left[ p \land
+      \bigwedge_{c \in \phi_p} c \right]_0^1 = \exists_p [p]_0^1 = 0 + 1 = 1
+  \]
+  by \cref{prop:basic,def:projection}, and because $p \in c$ for every clause $c
+  \in \phi_p$.
+
+  If $w(p) \ne 1$, and $\{ p \} \in \phi_p$, then, by
+  \cref{cond:just_parameter}, $\phi_p = \{ \{ p \} \}$, and
+  \cref{alg:transformation} produces $F_p = \emptyset$ and $\omega = w(p)$, and
+  so
+  \[
+    \omega \prod_{f \in F_p} f = w(p).
+  \]
+  Whereas on the other side of \cref{eq:to_show},
+  \[
+    \exists_p [p]_{w(\neg p)}^{w(p)} [p]_0^1 = \exists_p [p]^{w(p)}_0 = w(p)
+  \]
+  by \cref{prop:basic,def:projection}.
+
+  The only remaining case is when $w(p) \ne 1$ and $\{ p \} \not \in \phi_p$.
+  Then $\omega = 1$, and
+  \[
+    F_p = \left\{ \left[\bigwedge_{l \in c \setminus \{ p \}} \neg
+        l\right]_1^{w(p)} \;\middle|\; c \in \phi_p \right\},
+  \]
+  so need to show that
+  \[
+    \prod_{c \in \phi_p} \left[\bigwedge_{l \in c \setminus \{ p \}} \neg
+      l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p}
+    [c]_0^1.
+  \]
+  We can rearrange the right-hand-side as
+  \begin{align*}
+    \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[\bigwedge_{c \in \phi_p} c\right]_0^1 = \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
+                                                               &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 = w(p) + \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^{1-w(p)} \\
+                                                               &= \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_{w(p)}^1 = \left[ \neg \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \neg(c \setminus \{ p \}) \right]_1^{w(p)} \\
+                                                               &= \left[ \bigvee_{c \in \phi_p} \neg \bigvee_{l \in c \setminus \{ p \}} l \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l \right]_1^{w(p)}
+  \end{align*}
+   by \cref{prop:basic,def:projection}. By \cref{cond:disjoint}, $\bigwedge_{l
+     \in c \setminus \{ p \}} \neg l$ can be true for at most one $c \in
+   \phi_p$, and so
+   \[
+     \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l
+     \right]_1^{w(p)} = \prod_{c \in \phi_p} \left[ \bigwedge_{l \in c \setminus
+         \{ p \}} \neg l \right]_1^{w(p)}
+   \]
+   which is exactly what we needed to show.
 \end{proof}
 % TODO: now consider the second for loop
 % TODO: condition 1 is necessary in both cases because we're ignore the weights
 % of indicator variables
+% NOTE: benefits of having the proof in the paper:
+% 1) it puts all the encodings on a common ground
+% 2) it illustrates the convenience of our notation for reasoning about (certain
+% types of) pseudo-Boolean functions (stress this!!!)
+% 3) it's too big and too important to be left for the appendix
+% NOTE: we don't make a distinction between a real number and a (PB) function
+% that always returns that number.
+% NOTE: projection is assumed to have lowest precedence (i.e., \exists_x fg =
+% \exists_x (fg) and not (\exists_x f)g).
+% TODO: need another basic property: (fg)|_{x=i} = f|_{x=i} * g|_{x=i} for i=0, 1.
+% TODO: \times -> \cdot
 
 \paragraph{Notes.}
 \begin{itemize}
@@ -516,7 +593,8 @@ for any $Y \subseteq X$.
     (f+g)(Y) \coloneqq f(Y)+g(Y), \quad \text{and} \quad (fg)(Y) \coloneqq
     f(Y)g(Y)
   \]
-  for all $Y \subseteq X$.
+  for all $Y \subseteq X$. This means that binary operations on pseudo-Boolean
+  functions inherit properties such as associativity and commutativity.
 \end{definition}
 
 \begin{definition} \label{def:restriction}
