@@ -22,9 +22,7 @@ changes$dataset[grepl("tcc4f", changes$instance, fixed = TRUE)] <- "Other binary
 scatter <- function(data, x_var, y_var) {
   limits <- c(min(data[[x_var]], data[[y_var]], na.rm = TRUE), max(data[[x_var]], data[[y_var]], na.rm = TRUE))
   ggplot(data, aes(.data[[x_var]], .data[[y_var]], col = dataset)) +
-#    geom_point() +
     geom_count() +
-#    geom_jitter(width = 0.1, height = 0.1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
     scale_x_continuous(trans = log10_trans(), limits = limits) +
     scale_y_continuous(trans = log10_trans(), limits = limits) +

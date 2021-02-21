@@ -50,6 +50,8 @@
 
 \section{Introduction}
 
+\section{Pseudo-Boolean Functions}
+
 \paragraph{Notation.} For any propositional formula $\phi$ over a set of
 variables $X$ and $p, q \in \mathbb{R}$, let $[\phi]^p_q\colon 2^X \to
 \mathbb{R}$ be a pseudo-Boolean function defined as
@@ -62,41 +64,47 @@ variables $X$ and $p, q \in \mathbb{R}$, let $[\phi]^p_q\colon 2^X \to
 \]
 for any $Y \subseteq X$.
 
-\begin{definition} \label{def:operations}
-  Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions. Operations
-  such as addition and multiplication are defined pointwise as
+\begin{definition}[Operations] \label{def:operations}
+  Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions, $x, y \in X$,
+  $Y = \{y_i\}_{i=1}^n \subseteq X$, and $r \in \mathbb{R}$. Operations such as
+  addition and multiplication are defined pointwise as
   \[
-    (f+g)(Y) \coloneqq f(Y)+g(Y), \quad \text{and} \quad (fg)(Y) \coloneqq
-    f(Y)g(Y)
+    (f+g)(Y) \coloneqq f(Y)+g(Y), \quad \text{and} \quad (f \cdot g)(Y)
+    \coloneqq f(Y) \cdot g(Y).
   \]
-  for all $Y \subseteq X$. This means that binary operations on pseudo-Boolean
-  functions inherit properties such as associativity and commutativity.
-\end{definition}
+  Note that this means that binary operations on pseudo-Boolean functions
+  inherit properties such as associativity and commutativity. By not
+  distinguishing between a real number and a pseudo-Boolean function that always
+  returns that number, we can use the same definitions to define \emph{scalar}
+  operations as
+  \[
+    (r+f)(Y) = r+f(Y), \quad \text{and} \quad (r \cdot f)(Y) = r \cdot f(Y).
+  \]
 
-\begin{definition} \label{def:restriction}
-  Let $f\colon 2^X \to \mathbb{R}$ be a pseudo-Boolean function, and $x \in X$.
-  Then $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ are \emph{restrictions} of
-  $f$ defined as
+  \emph{Restrictions} $f|_{x=0}, f|_{x=1}\colon 2^X \to \mathbb{R}$ of $f$ are
+  defined as
   \[
     f|_{x=0}(Y) \coloneqq f(Y \setminus \{x\}), \quad \text{and} \quad
     f|_{x=1}(Y) \coloneqq f(Y \cup \{x\})
   \]
   for all $Y \subseteq X$.
-\end{definition}
 
-\begin{definition} \label{def:projection}
-  Let $X$ be a set. For any $x \in X$, \emph{projection} $\exists_x$ is an
-  endomorphism $\exists_x\colon \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ defined
-  as
+  \emph{Projection} $\exists_x$ is an endomorphism $\exists_x\colon
+  \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ defined as
   \[
-    \exists_xf \coloneqq f|_{x=1} + f|_{x=0}
+    \exists_xf \coloneqq f|_{x=1} + f|_{x=0}.
   \]
-  for any $f\colon 2^X \to \mathbb{R}$.
+  Since projection is commutative (i.e., $\exists_x\exists_yf =
+  \exists_y\exists_xf$) \cite{DBLP:conf/aaai/DudekPV20,DBLP:conf/cp/DudekPV20},
+  we can define $\exists_Y\colon \mathbb{R}^{2^X} \to \mathbb{R}^{2^X}$ as
+  $\exists_Y \coloneqq \exists_{y_1}\exists_{y_2}\dots\exists_{y_n}$. Throughout
+  the paper, projection is assumed to have the lowest precedence (e.g.,
+  $\exists_x fg = \exists_x (fg)$).
 \end{definition}
 
 % NOTE: ...that we will need.
 % NOTE: The proof immediately comes from the definition (of operations).
-\begin{proposition}[Basic properties] \label{prop:basic}
+\begin{proposition}[Basic Properties] \label{prop:basic}
   For any propositional formulas $\phi$ and $\psi$, and $a, b, c, d \in
   \mathbb{R}$,
   \begin{itemize}
@@ -110,14 +118,35 @@ for any $Y \subseteq X$.
   and $x \in  X$, $(fg)|_{x=i} = f|_{x=i} \cdot g|_{x=i}$ for $i = 0, 1$.
 \end{proposition}
 
-\begin{definition}[old WMC instance]
-  An \emph{old WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
+\paragraph{References.}
+\begin{itemize}
+\item Related work without publicly available implementations:
+  \begin{itemize}
+  \item direct compilation to SDDs \cite{DBLP:conf/ecsqaru/ChoiKD13}
+  \item direct compilation to PSDDs, also eliminating parameter variables (a thesis)
+  \item maybe two more papers
+  \end{itemize}
+\end{itemize}
+
+\paragraph{TODO: Mention}
+\begin{itemize}
+\item Weights on literals other than the positive literals that correspond to
+  variables in $X_P$ are redundant as they either are equal to one or duplicate
+  an already-defined weight.
+\item Mention that formulas, clauses, and models are all treated as sets.
+\end{itemize}
+
+\section{Weighted Model Counting}
+
+\begin{definition}[WMC Instance \cite{DBLP:journals/ai/ChaviraD08} (TODO: not
+  exactly though)]
+  A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
   the set of indicator variables, $X_P$ is the set of parameter variables (with
   $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula in CNF over
   $X_I \cup X_P$, and $w\colon X_I \cup X_P \cup \{\neg x \mid x \in X_I \cup
   X_P\} \to \mathbb{R}$ is the weight function. The \emph{answer} of the
   instance is $\sum_{Y \models \phi} \prod_{Y \models l} w(l)$.
-\end{definition} % TODO: add a citation for this.
+\end{definition}
 
 \begin{remark}
   Encodings such as \texttt{cd05} and \texttt{cd06} are \emph{not} WMC
@@ -133,40 +162,18 @@ for any $Y \subseteq X$.
   experimental results are discouraging because they use approximately twice as
   many indicator variables. For instance, each binary variable of a Bayesian
   network is encoded using two indicator variables while one would suffice.
-\end{remark} % TODO: perhaps add this claim as a corollary
+\end{remark}
 
-\begin{definition}[new WMC instance] \label{def:new_wmc}
-  A \emph{new WMC instance} is a tuple $(F, X, \omega)$, where $X$ is the set of
-  variables, $F$ is a set of pseudo-Boolean functions $2^X \to \mathbb{R}$, and
-  $\omega \in \mathbb{R}$ is the scaling factor. The \emph{answer} of the
-  instance is $\omega \cdot \left(\exists_X\prod_{f \in F}f\right)(\emptyset)$.
+\begin{definition}[PBP Instance] \label{def:new_wmc}
+  A \emph{pseudo-Boolean projection} (PBP) instance is a tuple $(F, X, \omega)$,
+  where $X$ is the set of variables, $F$ is a set of pseudo-Boolean functions
+  $2^X \to \mathbb{R}$, and $\omega \in \mathbb{R}$ is the scaling factor. The
+  \emph{answer} of the instance is $\omega \cdot \left(\exists_X\prod_{f \in
+      F}f\right)(\emptyset)$.
 \end{definition}
 
-\paragraph{References.}
-\begin{itemize}
-\item Related work without publicly available implementations:
-  \begin{itemize}
-  \item direct compilation to SDDs \cite{DBLP:conf/ecsqaru/ChoiKD13}
-  \item direct compilation to PSDDs, also eliminating parameter variables (a thesis)
-  \item maybe two more papers
-  \end{itemize}
-\end{itemize}
-
-\paragraph{Notes.}
-\begin{itemize}
-\item Apparently, the \textsc{DPMC} paper already shows that taking the first
-  offered decomposition tree is best.
-\item It is already well-known that WMC is FPT.
-\item Weights on literals other than the positive literals that correspond to
-  variables in $X_P$ are redundant as they either are equal to one or duplicate
-  an already-defined weight.
-\item Mention that formulas, clauses, and models are all treated as sets.
-\item The constant is inspired by the \texttt{bklm16} encoding.
-\item We don't make a distinction between a real number and a (pseudo-Boolean)
-  function that always returns that number.
-\item Throughout the paper, projection is assumed to have the lowest precedence
-  (e.g., $\exists_x fg = \exists_x (fg)$ and not $(\exists_xf)g$).
-\end{itemize}
+NOTE: The constant is inspired by the \texttt{bklm16}
+\cite{DBLP:conf/ecai/BartKLM16} encoding.
 
 \section{Parameter Variable Elimination}
 
@@ -192,13 +199,13 @@ for any $Y \subseteq X$.
   would have less data to output.
 \end{itemize}
 
-\begin{algorithm}
+\begin{algorithm}[t]
   \caption{WMC instance transformation}
   \label{alg:transformation}
   \SetKwFunction{rename}{rename}
   \SetKwProg{Fn}{Function}{:}{}
-  \KwData{an (old-format) WMC instance $(\phi, X_I, X_P, w)$}
-  \KwResult{a (new-format) WMC instance $(F, X, \omega)$}
+  \KwData{WMC instance $(\phi, X_I, X_P, w)$}
+  \KwResult{PBP instance $(F, X, \omega)$}
   $F \gets \emptyset$\;
   $\omega \gets 1$\;
   let $d\colon X_P \to \mathbb{N}$ be defined as $p \mapsto |\{ o \in X_P \mid o
@@ -231,7 +238,7 @@ for any $Y \subseteq X$.
   }
 \end{algorithm}
 
-\subsection{Correctness}
+\subsection{Proof of Correctness}
 
 \begin{theorem}[Early Projection
   \cite{DBLP:conf/aaai/DudekPV20,DBLP:conf/cp/DudekPV20},
@@ -242,49 +249,39 @@ for any $Y \subseteq X$.
 \end{theorem}
 
 \begin{lemma} \label{lemma:sum}
-  For any pseudo-Boolean function $f\colon 2^X \to \mathbb{R}$, $(\exists_X
-  f)(\emptyset) = \sum_{Y \subseteq X} f(Y)$.
+  For any pseudo-Boolean function $f\colon 2^X \to \mathbb{R}$,
+  \[
+    (\exists_X f)(\emptyset) = \sum_{Y \subseteq X} f(Y).
+  \]
 \end{lemma}
 \begin{proof}
   For base case, let $X = \{x\}$. Then
   \[
-    \exists_xf = f|_{x=1} + f|_{x=0},
+    (\exists_xf)(\emptyset) = (f|_{x=1} + f|_{x=0})(\emptyset) =
+    f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset) = f(\{x\}) + f(\emptyset) =
+    \sum_{Y \subseteq \{x\}} f(Y).
   \]
-  by \cref{def:projection} and so
-  \[
-    (\exists_xf)(\emptyset) = f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset)
-  \]
-  by \cref{def:operations}. Then
-  \[
-    f|_{x=1}(\emptyset) = f(\{x\}), \quad \text{and} \quad f|_{x=0}(\emptyset) =
-    f(\emptyset)
-  \]
-  by \cref{def:restriction}. It follows that
-  \[
-    (\exists_xf)(\emptyset) = f(\{x\}) + f(\emptyset) = \sum_{Y \subseteq \{x\}}
-    f(Y)
-  \]
-  as required. This easily extends to $|X| > 1$ by the definition of projection
-  on sets of variables. % TODO: once I've defined it, add a reference here.
+  This easily extends to $|X| > 1$ by the definition of projection on sets of
+  variables.
 \end{proof}
 
 % NOTE: mention that this is similar (but not equal) to the DPMC/ADDMC result
 \begin{proposition} \label{prop:equivalence}
-  Let $(\phi, X_I, X_P, w)$ be an old WMC instance. Then
+  Let $(\phi, X_I, X_P, w)$ be a WMC instance. Then
   \begin{equation}
   \left(\left\{[c]_0^1 \;\middle|\; c \in \phi\right\} \cup \left\{[x]_{w(\neg
         x)}^{w(x)} \;\middle|\; x \in X_I \cup X_P\right\}, X_I \cup X_P,
     1\right) \label{eq:new_wmc}
   \end{equation}
-  is a new WMC instance with the same answer.
+  is a PBP instance with the same answer.
 \end{proposition}
 \begin{proof}
   The answer of \cref{eq:new_wmc} is
   \begin{align*}
-    \left(\exists_{X_I \cup X_P} \prod_{c \in \phi} [c]_0^1 \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset) &= \sum_{Y \subseteq X_I \cup X_P} \left(\prod_{c \in \phi} [c]_0^1 \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)(Y) \\
+    \left(\exists_{X_I \cup X_P} \left(\prod_{c \in \phi} [c]_0^1\right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset) &= \sum_{Y \subseteq X_I \cup X_P} \left(\left(\prod_{c \in \phi} [c]_0^1 \right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)(Y) \\
 &= \sum_{Y \subseteq X_I \cup X_P} \underbrace{\left(\prod_{c \in \phi} [c]_0^1\right)}_f(Y) \underbrace{\left(\prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)}_g(Y)
   \end{align*}
-  by \cref{def:new_wmc,lemma:sum,def:operations}. Note that
+  by \cref{lemma:sum}. Note that
   \[
     f(Y) =
     \begin{cases}
@@ -305,8 +302,8 @@ for any $Y \subseteq X$.
 \end{proof}
 
 \begin{theorem}[Correctness]
-  \Cref{alg:transformation}, when given an old WMC instance $(\phi, X_I, X_P,
-  w)$, returns a new WMC instance with the same answer, provided the following
+  \Cref{alg:transformation}, when given a WMC instance $(\phi, X_I, X_P,
+  w)$, returns PBP instance with the same answer, provided the following
   conditions are satisfied:
   \begin{enumerate}
   \item for all indicator variables $i \in X_I$, $w(i) = w(\neg i) = 1$,
@@ -342,20 +339,19 @@ for any $Y \subseteq X$.
   \begin{equation}
     \left(\left\{[c]_0^1 \;\middle|\; c \in \phi\right\} \cup \left\{[x]_{w(\neg
           x)}^{w(x)} \;\middle|\; x \in X_I \cup X_P\right\}, X_I \cup X_P,
-      1\right) \label{eq:new_wmc}
+      1\right) \label{eq:new_wmc2}
   \end{equation}
-  is a new WMC instance with the same answer as the given old WMC instance. By
+  is a PBP instance with the same answer as the given WMC instance. By
   \cref{def:new_wmc}, its answer is
   \begin{equation} \label{eq:answer}
-    \left(\exists_{X_I \cup X_P} \prod_{c \in \phi} [c]_0^1 \prod_{x \in X_I
-        \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset)
+    \left(\exists_{X_I \cup X_P} \left( \prod_{c \in \phi} [c]_0^1 \right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset)
   \end{equation}
   Since both \cref{condition:d02,condition:bklm16} ensure that each clause in
   $\phi$ has at most one parameter variable, we can partition $\phi$ into
   $\phi_* \coloneqq \{c \in \phi \mid \mathtt{Vars}(c) \cap X_P = \emptyset \}$
   and $\phi_p \coloneqq \{ c \in \phi \mid \mathtt{Vars}(c) \cap X_P = \{ p \}
   \}$ for all $p \in X_P$. We can then use \cref{thm:early} to reorder
-  \cref{eq:answer} into
+  \eqref{eq:answer} into
   \[
     \left(\exists_{X_I} \left( \prod_{x \in X_I} [x]_{w(\neg x)}^{w(x)} \right)
       \left( \prod_{c \in \phi_*} [c]_0^1 \right) \prod_{p \in X_P} \exists_p
@@ -364,7 +360,7 @@ for any $Y \subseteq X$.
 
   Let us first consider how the unfinished WMC instance $(F, X_I, \omega)$ after
   the loop on \crefrange{line:foreach1start}{line:foreach1end} differs from
-  \cref{eq:new_wmc}. Note that \cref{alg:transformation} leaves each $c \in
+  \eqref{eq:new_wmc2}. Note that \cref{alg:transformation} leaves each $c \in
   \phi_*$ unchanged, i.e., adds $[c]_0^1$ to $F$. We can then fix an arbitrary
   $p \in X_P$ and let $F_p$ be the set of functions added to $F$ as a
   replacement of $\phi_p$. It is sufficient to show that
@@ -386,11 +382,11 @@ for any $Y \subseteq X$.
     \right]_0^1 = \exists_p \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
     \right]_0^1 = \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
     \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n
-      l_i \right]_0^1\right|_{p=0}
+      l_i \right]_0^1\right|_{p=0}.
   \end{equation}
-  by \cref{def:projection}. Since for any input, $\bigwedge_{i=1}^n l_i$ is
-  either true or false, exactly one of the two summands in \cref{eq:bigsums}
-  will be equal to one, and the other will be equal to zero, and so
+  Since for any input, $\bigwedge_{i=1}^n l_i$ is either true or false, exactly
+  one of the two summands in \cref{eq:bigsums} will be equal to one, and the
+  other will be equal to zero, and so
   \[
     \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
       \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n
@@ -408,15 +404,15 @@ for any $Y \subseteq X$.
   and $\omega = 1$, and so we want to show that
   \[
     \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} = \exists_p [p]_1^{w(p)}
-    \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1.
+    \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1,
   \]
-  By \cref{def:projection},
+  and indeed
   \begin{align*}
     \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 &= \left.\left( [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 \right)\right|_{p=1} + \left.\left([p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 \right)\right|_{p=0} \\
-                                                                                      &= w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[ \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i \right]_1^{w(p)}
+                                                                                      &= w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[ \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i \right]_1^{w(p)}.
   \end{align*}
-  as required. This finishes the proof of the correctness of the first `foreach'
-  loop under \cref{condition:d02}.
+  This finishes the proof of the correctness of the first `foreach' loop under
+  \cref{condition:d02}.
 
   Now let us assume \cref{condition:bklm16}. We still want to prove
   \cref{eq:to_show}. If $w(p) = 1$, then $F_p = \emptyset$, and $\omega = 1$,
@@ -426,22 +422,16 @@ for any $Y \subseteq X$.
     \exists_p [p]_0^1 \prod_{c \in \phi_p} [c]_0^1 = \exists_p \left[ p \land
       \bigwedge_{c \in \phi_p} c \right]_0^1 = \exists_p [p]_0^1 = 0 + 1 = 1
   \]
-  by \cref{prop:basic,def:projection}, and because $p \in c$ for every clause $c
-  \in \phi_p$.
+  since $p \in c$ for every clause $c \in \phi_p$.
 
   If $w(p) \ne 1$, and $\{ p \} \in \phi_p$, then, by
   \cref{cond:just_parameter}, $\phi_p = \{ \{ p \} \}$, and
   \cref{alg:transformation} produces $F_p = \emptyset$ and $\omega = w(p)$, and
   so
   \[
-    \omega \prod_{f \in F_p} f = w(p).
+    \exists_p [p]_{w(\neg p)}^{w(p)} [p]_0^1 = \exists_p [p]^{w(p)}_0 = w(p) =
+    \omega \prod_{f \in F_p} f.
   \]
-  Whereas on the other side of \cref{eq:to_show},
-  \[
-    \exists_p [p]_{w(\neg p)}^{w(p)} [p]_0^1 = \exists_p [p]^{w(p)}_0 = w(p)
-  \]
-  by \cref{prop:basic,def:projection}.
-
   The only remaining case is when $w(p) \ne 1$ and $\{ p \} \not \in \phi_p$.
   Then $\omega = 1$, and
   \[
@@ -459,11 +449,10 @@ for any $Y \subseteq X$.
     \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[\bigwedge_{c \in \phi_p} c\right]_0^1 = \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
                                                                &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 = w(p) + \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^{1-w(p)} \\
                                                                &= \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_{w(p)}^1 = \left[ \neg \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \neg(c \setminus \{ p \}) \right]_1^{w(p)} \\
-                                                               &= \left[ \bigvee_{c \in \phi_p} \neg \bigvee_{l \in c \setminus \{ p \}} l \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l \right]_1^{w(p)}
+                                                               &= \left[ \bigvee_{c \in \phi_p} \neg \bigvee_{l \in c \setminus \{ p \}} l \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l \right]_1^{w(p)}.
   \end{align*}
-   by \cref{prop:basic,def:projection}. By \cref{cond:disjoint}, $\bigwedge_{l
-     \in c \setminus \{ p \}} \neg l$ can be true for at most one $c \in
-   \phi_p$, and so
+   By \cref{cond:disjoint}, $\bigwedge_{l \in c \setminus \{ p \}} \neg l$ can
+   be true for at most one $c \in \phi_p$, and so
    \[
      \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l
      \right]_1^{w(p)} = \prod_{c \in \phi_p} \left[ \bigwedge_{l \in c \setminus
@@ -476,10 +465,20 @@ for any $Y \subseteq X$.
    replaces $[v]_1^p[\neg v]_1^q$ with $[v]_q^p$ (for some $v \in X_I$ and $p, q
    \in \mathbb{R}$), but, of course,
    \[
-     [v]_1^p[\neg v]_1^q = [v]_1^p[v]_q^1 = [v]_q^p
+     [v]_1^p[\neg v]_1^q = [v]_1^p[v]_q^1 = [v]_q^p,
    \]
-   by \cref{prop:basic}.
+   i.e., the answer is unchanged.
 \end{proof}
+
+\section{Experimental Results}
+
+\paragraph{Notes.}
+\begin{itemize}
+\item Apparently, the \textsc{DPMC} paper \cite{DBLP:conf/cp/DudekPV20} already
+  shows that taking the first offered decomposition tree is best.
+\end{itemize}
+
+\section{Conclusions}
 
 \paragraph{Notes.}
 \begin{itemize}
@@ -510,18 +509,14 @@ for any $Y \subseteq X$.
 
 \paragraph{TODO}
 \begin{itemize}
-\item Come up with better names for old/new WMC instances.
 \item Do I need to formally consider extending a pseudo-Boolean function to a
   bigger domain?
-\item Define scalar operations on ADDs.
-\item Define projection of a set of variables.
-\item add parentheses around products
-\item maybe give a name to (2) since it's wrong to call it an equation
 \item check if each condition is actually used. Maybe turn this into a paragraph
   that gives an overview of the proof.
-\item condition 1 is necessary in both cases because we're ignore the weights of
-  indicator variables
+\item condition 1 is necessary in both cases because we're ignoring the weights
+  of indicator variables (explicitly acknowledge this)
 \item maybe do more summations over domains in proofs
+\item add the \texttt{cd05}/\texttt{cd06} correctness theorem
 \end{itemize}
 
 \bibliographystyle{splncs04}
