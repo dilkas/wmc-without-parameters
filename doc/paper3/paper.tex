@@ -12,6 +12,7 @@
 \usepackage{mathtools}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage[capitalise]{cleveref}
+\usepackage{tikz}
 
 \crefname{enumii}{Condition}{Conditions}
 
@@ -102,8 +103,10 @@ for any $Y \subseteq X$.
   $\exists_x fg = \exists_x (fg)$).
 \end{definition}
 
-% NOTE: ...that we will need.
-% NOTE: The proof immediately comes from the definition (of operations).
+NOTE: We list some properties of the operations on pseudo-Boolean functions
+discussed in this section that can be conveniently represented using our syntax.
+The proofs of all these properties follow directly from the definitions.
+
 \begin{proposition}[Basic Properties] \label{prop:basic}
   For any propositional formulas $\phi$ and $\psi$, and $a, b, c, d \in
   \mathbb{R}$,
@@ -128,7 +131,7 @@ for any $Y \subseteq X$.
   \end{itemize}
 \end{itemize}
 
-\paragraph{TODO: Mention}
+\paragraph{Notes.}
 \begin{itemize}
 \item Weights on literals other than the positive literals that correspond to
   variables in $X_P$ are redundant as they either are equal to one or duplicate
@@ -138,8 +141,11 @@ for any $Y \subseteq X$.
 
 \section{Weighted Model Counting}
 
-\begin{definition}[WMC Instance \cite{DBLP:journals/ai/ChaviraD08} (TODO: not
-  exactly though)]
+NOTE: Our definition of WMC is largely based on the standard definition
+\cite{DBLP:journals/ai/ChaviraD08}, but explicitly partitions variables into
+indicator and parameter variables.
+
+\begin{definition}[WMC Instance]
   A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
   the set of indicator variables, $X_P$ is the set of parameter variables (with
   $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula in CNF over
@@ -258,8 +264,7 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   For base case, let $X = \{x\}$. Then
   \[
     (\exists_xf)(\emptyset) = (f|_{x=1} + f|_{x=0})(\emptyset) =
-    f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset) = f(\{x\}) + f(\emptyset) =
-    \sum_{Y \subseteq \{x\}} f(Y).
+    f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset) = \sum_{Y \subseteq \{x\}} f(Y).
   \]
   This easily extends to $|X| > 1$ by the definition of projection on sets of
   variables.
@@ -444,7 +449,7 @@ NOTE: The constant is inspired by the \texttt{bklm16}
       l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p}
     [c]_0^1.
   \]
-  We can rearrange the right-hand-side as
+  We can rearrange the right-hand side as
   \begin{align*}
     \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[\bigwedge_{c \in \phi_p} c\right]_0^1 = \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
                                                                &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 = w(p) + \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^{1-w(p)} \\
@@ -476,7 +481,20 @@ NOTE: The constant is inspired by the \texttt{bklm16}
 \begin{itemize}
 \item Apparently, the \textsc{DPMC} paper \cite{DBLP:conf/cp/DudekPV20} already
   shows that taking the first offered decomposition tree is best.
+\item Processors:
+  \begin{itemize}
+  \item Intel(R) Xeon(R) Gold 6138 CPU @ 2.00GHz
+  \item Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+  \item Intel(R) Xeon(R) CPU E7-4820 v2 @ 2.00GHz
+  \end{itemize}
 \end{itemize}
+
+\begin{figure}[t]
+  \centering
+  \input{cumulative.tex}%
+  \caption{TODO}
+  \label{fig:cumulative}
+\end{figure}
 
 \section{Conclusions}
 
@@ -494,17 +512,6 @@ NOTE: The constant is inspired by the \texttt{bklm16}
     (certain types of) pseudo-Boolean functions.
   \item It's too big and too important to be left for the appendix.
   \end{itemize}
-\item Processors:
-  \begin{itemize}
-  \item Intel(R) Xeon(R) Gold 6138 CPU @ 2.00GHz
-  \item Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-  \item Intel(R) Xeon(R) CPU E7-4820 v2 @ 2.00GHz
-  \end{itemize}
-\item Table captions should be placed above the tables.
-\item Figures should preferably be in EPS format.
-\item the environments 'theorem', 'definition', 'lemma', 'proposition',
-  'corollary', 'remark', and 'example' are defined in the LLNCS documentclass as
-  well.
 \end{itemize}
 
 \paragraph{TODO}
@@ -515,7 +522,6 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   that gives an overview of the proof.
 \item condition 1 is necessary in both cases because we're ignoring the weights
   of indicator variables (explicitly acknowledge this)
-\item maybe do more summations over domains in proofs
 \item add the \texttt{cd05}/\texttt{cd06} correctness theorem
 \end{itemize}
 

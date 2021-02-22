@@ -6,6 +6,7 @@ library(purrr)
 library(tikzDevice)
 library(ggpubr)
 library(tidyr)
+library(RColorBrewer)
 
 # TODO: plot treewidth vs add width
 data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
@@ -48,6 +49,10 @@ data_merged <- subset(data_merged, select = -c(novelty))
 data_sum <- data_merged
 data_sum$time <- data_sum$encoding_time + data_sum$inference_time
 data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
+
+#data_sum2 <- data
+#data_sum2$time <- data_sum2$encoding_time + data_sum2$inference_time
+#data_sum2 <- subset(data_sum2, select = -c(inference_time, encoding_time))
 
 # df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
 #             fun.aggregate = NULL,
@@ -100,6 +105,32 @@ df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
                        answer = NA, time = instance_to_min_time0[df$instance])
 data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
+
+data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsf{DPMC} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "new_bklm16pp"] <- "\\textsf{DPMC} + \\texttt{bklm16++}"
+data_sum$encoding[data_sum$encoding == "new_cd05pp"] <- "\\textsf{DPMC} + \\texttt{cd05++}"
+data_sum$encoding[data_sum$encoding == "new_cd06pp"] <- "\\textsf{DPMC} + \\texttt{cd06++}"
+data_sum$encoding[data_sum$encoding == "new_d02"] <- "\\textsf{DPMC} + \\texttt{d02}"
+data_sum$encoding[data_sum$encoding == "new_d02pp"] <- "\\textsf{DPMC} + \\texttt{d02++}"
+data_sum$encoding[data_sum$encoding == "new_sbk05"] <- "\\textsf{DPMC} + \\texttt{sbk05}"
+data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsf{c2d} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{cd05}"
+data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
+data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
+data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\texttt{sbk05}"
+
+#data_sum2$encoding[data_sum2$encoding == "new_bklm16"] <- "\\textsf{DPMC} + \\texttt{bklm16}"
+#data_sum2$encoding[data_sum2$encoding == "new_bklm16pp"] <- "\\textsf{DPMC} + \\texttt{bklm16}++"
+#data_sum2$encoding[data_sum2$encoding == "new_cd05pp"] <- "\\textsf{DPMC} + \\texttt{cd05}++"
+#data_sum2$encoding[data_sum2$encoding == "new_cd06pp"] <- "\\textsf{DPMC} + \\texttt{cd06}++"
+#data_sum2$encoding[data_sum2$encoding == "new_d02"] <- "\\textsf{DPMC} + \\texttt{d02}"
+#data_sum2$encoding[data_sum2$encoding == "new_d02pp"] <- "\\textsf{DPMC} + \\texttt{d02}++"
+#data_sum2$encoding[data_sum2$encoding == "new_sbk05"] <- "\\textsf{DPMC} + \\texttt{sbk05}"
+#data_sum2$encoding[data_sum2$encoding == "old_bklm16"] <- "\\textsf{c2d} + \\texttt{bklm16}"
+#data_sum2$encoding[data_sum2$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{cd05}"
+#data_sum2$encoding[data_sum2$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
+#data_sum2$encoding[data_sum2$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
+#data_sum2$encoding[data_sum2$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\texttt{sbk05}"
 
 # ============ Numerical investigations ================
 
@@ -216,9 +247,9 @@ scatter_plot(data, "add_width", "inference_time", "ADD width", "time", 2 * TIMEO
 tikz(file = "paper/scatter.tex", width = 6.5, height = 2.5)
 dev.off()
 
-# Cumulative plot
-cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
-                            linetypes, variable, variable_name) {
+#brewer.pal(12, "Paired")
+cumulative_plot <- function(df, column_name, pretty_column_name, variable, variable_name, show.color.legend, show.linetype.legend, position) {
+  column_values <- sort(unique(df$encoding))
   times <- vector(mode = "list", length = length(column_values))
   names(times) <- column_values
   for (value in column_values) {
@@ -235,43 +266,52 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
   }
   cumulative <- as.data.frame(do.call(rbind, as.list(chunks)))
   names(cumulative) <- c("time", column_name, "count")
-  cumulative[[column_name]] <- as.factor(paste("\\texttt{",
-                                               cumulative[[column_name]], "}",
-                                               sep = ""))
+  cumulative$algorithm <- ifelse(grepl("DPMC", cumulative$encoding, fixed = TRUE), "\\textsf{DPMC}", "other")
+  cumulative$encoding <- sub(".*\\+ ", "", cumulative$encoding)
+  cumulative[[column_name]] <- as.factor(cumulative[[column_name]])
+  cumulative$algorithm <- as.factor(cumulative$algorithm)
   cumulative$time <- as.numeric(cumulative$time)
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < 2 * TIMEOUT, ]
-  ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
-    geom_line(aes(linetype = .data[[column_name]])) +
-#    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 10, 1000), labels = c("0.1", "10", "1000")) +
-    scale_x_continuous(trans = log10_trans()) +
+  p <- ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
+    geom_line(aes(linetype = algorithm)) +
+    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000),
+                       labels = c("0.1", "1", "10", "100", "1000")) +
     xlab("Time (s)") +
     ylab("Instances solved") +
-#    scale_colour_brewer(palette = "Dark2") +
-    scale_colour_manual(breaks = map(column_values, function(x)
-      paste("\\texttt{", x, "}", sep = "")), values = c(1, 2, 3, 4, 5, 6, 7,
-                                                        1, 3, 4, 5, 6, 7, 8, 8)) +
-    scale_linetype_manual(breaks = map(column_values, function(x)
-      paste("\\texttt{", x, "}", sep = "")), values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
-    theme_light() +
-    labs(color = pretty_column_name, linetype = pretty_column_name)
+    theme_set(theme_light()) +
+    labs(color = pretty_column_name, linetype = "Algorithm")
+
+  if (show.color.legend) {
+    p <- p + scale_colour_manual(breaks = sort(unique(cumulative$encoding)),
+                        values = c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C",
+                                   "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00",
+                                   "#CAB2D6", "#6A3D9A", "#FFFF99")) +
+      guides(color = guide_legend(ncol = 2)) +
+      theme(legend.position = position)
+  } else {
+    p <- p + scale_colour_manual(breaks = sort(unique(cumulative$encoding)),
+                        values = c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C",
+                                   "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00",
+                                   "#CAB2D6", "#6A3D9A", "#FFFF99"),
+                        guide = show.color.legend)
+  }
+  if (show.linetype.legend) {
+    p <- p + scale_linetype_manual(breaks = sort(unique(cumulative$algorithm)),
+                          values = c(1, 2)) +
+      theme(legend.position = position) +
+      guides(linetype = guide_legend(ncol = 2))
+  } else {
+     p <- p + scale_linetype_manual(breaks = sort(unique(cumulative$algorithm)),
+                          values = c(1, 2), guide = show.linetype.legend)
+  }
+  return(p)
 }
 
-# TODO: 11 lines in one plot is too much. Should I split it into two?
-df2 <- data_sum[startsWith(data_sum$dataset, "2004") & !is.na(data_sum$dataset),]
-df2 <- data_sum[startsWith(data_sum$dataset, "2005") & !is.na(data_sum$dataset),]
-df2 <- data_sum[startsWith(data_sum$dataset, "2006") & !is.na(data_sum$dataset),]
-df2 <- data_sum[startsWith(data_sum$dataset, "Grid") & !is.na(data_sum$dataset),]
-df2 <- data_sum[startsWith(data_sum$dataset, "DQMR") & !is.na(data_sum$dataset),]
-df2 <- data_sum[startsWith(data_sum$dataset, "Plan") & !is.na(data_sum$dataset),]
-df2 <- data_sum
-cumulative_plot(df2, "encoding", "Encoding",
-                sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "time", "Time (s)")
-cumulative_plot(df2, "encoding", "Encoding",
-                sort(unique(df2$encoding)),
-                c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3), "add_width", "ADD Width")
+tikz(file = "../doc/paper3/cumulative.tex", width = 4.8, height = 2.3)
+cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE, TRUE, "right")
+dev.off()
 
 # Stacked bar plots comparing encoding and inference time
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
@@ -307,7 +347,6 @@ sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 0.01)
 sum(!is.na(df$answer_old_cd06) & abs(df$time_old_cd06 - df$time_min) < 0.01)
 # TODO: add some horizontal lines to these plots that show the VBS, cd06, and cw scores
 
-df$diff <- df$time_new_cw - df$time_old_cd06
 df$diff <- df$time_new_bklm16 - df$time_old_cd06
 ggplot(df, aes(treewidth, time_new_bklm16, shape = major.dataset, colour = major.dataset)) +
 #  geom_jitter(width = 0.1, height = 0.1) +
