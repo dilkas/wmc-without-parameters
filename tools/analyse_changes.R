@@ -22,51 +22,77 @@ changes$dataset[grepl("tcc4f", changes$instance, fixed = TRUE)] <- "Other binary
 scatter <- function(data, x_var, y_var) {
   limits <- c(min(data[[x_var]], data[[y_var]], na.rm = TRUE), max(data[[x_var]], data[[y_var]], na.rm = TRUE))
   ggplot(data, aes(.data[[x_var]], .data[[y_var]], col = dataset)) +
-    geom_count() +
+    geom_count(alpha = 0.5) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
     scale_x_continuous(trans = log10_trans(), limits = limits) +
     scale_y_continuous(trans = log10_trans(), limits = limits) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
-    theme_light()
+    theme_light() +
+    theme(legend.position = "right", legend.box = "vertical") +
+    scale_color_brewer(palette = "Dark2") +
+    xlab("\\texttt{bklm16} variables") +
+    ylab("\\texttt{bklm16++} variables") +
+    labs(color = "", size = "")
+#    guides(color = guide_legend(ncol = 2), size = guide_legend(ncol = 2))
 }
 
 # Before/after comparison of the number of variables
 # Note: the same plot for other encodings looks very similar
-scatter(changes[changes$encoding == "bklm16",], "before_variables", "after_variables")
 scatter(changes[changes$encoding == "bklm16",], "before_clauses", "after_clauses")
 
+scatter(changes[changes$encoding == "d02",], "before_variables", "after_variables")
+scatter(changes[changes$encoding == "d02",], "before_clauses", "after_clauses")
+
 # Comparison of encodings after optimisation
-df <- dcast(data = changes, formula = instance + dataset ~ encoding,
+changes.df <- dcast(data = changes, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
             value.var = c("before_variables", "before_clauses", "after_variables", "after_clauses"))
 
-df %>% group_by(df$dataset) %>% tally()
+changes.df %>% group_by(changes.df$dataset) %>% tally()
 
-scatter(df, "after_variables_bklm16", "after_variables_cd06")
-scatter(df, "after_variables_bklm16", "after_variables_cd05")
-scatter(df, "after_variables_bklm16", "after_variables_d02")
-scatter(df, "after_clauses_bklm16", "after_clauses_cd06")
-scatter(df, "after_clauses_bklm16", "after_clauses_cd05")
-scatter(df, "after_clauses_bklm16", "after_clauses_d02")
-scatter(df, "after_variables_bklm16", "before_variables_sbk05")
-scatter(df, "after_clauses_bklm16", "before_clauses_sbk05")
+scatter(changes.df, "after_variables_bklm16", "after_variables_cd06")
+scatter(changes.df, "after_variables_bklm16", "after_variables_cd05")
+scatter(changes.df, "after_variables_bklm16", "after_variables_d02")
+scatter(changes.df, "after_clauses_bklm16", "after_clauses_cd06")
+scatter(changes.df, "after_clauses_bklm16", "after_clauses_cd05")
+scatter(changes.df, "after_clauses_bklm16", "after_clauses_d02")
+scatter(changes.df, "after_variables_bklm16", "before_variables_sbk05")
+scatter(changes.df, "after_clauses_bklm16", "before_clauses_sbk05")
 
-scatter(df, "before_variables_bklm16", "before_variables_cd06")
-scatter(df, "before_variables_bklm16", "before_variables_cd05")
-scatter(df, "before_variables_bklm16", "before_variables_d02")
-scatter(df, "before_clauses_bklm16", "before_clauses_cd06")
-scatter(df, "before_clauses_bklm16", "before_clauses_cd05")
-scatter(df, "before_clauses_bklm16", "before_clauses_d02")
-scatter(df, "before_variables_bklm16", "before_variables_sbk05")
-scatter(df, "before_clauses_bklm16", "before_clauses_sbk05")
+scatter(changes.df, "before_variables_bklm16", "before_variables_cd06")
+scatter(changes.df, "before_variables_bklm16", "before_variables_cd05")
+scatter(changes.df, "before_variables_bklm16", "before_variables_d02")
+scatter(changes.df, "before_clauses_bklm16", "before_clauses_cd06")
+scatter(changes.df, "before_clauses_bklm16", "before_clauses_cd05")
+scatter(changes.df, "before_clauses_bklm16", "before_clauses_d02")
+scatter(changes.df, "before_variables_bklm16", "before_variables_sbk05")
+scatter(changes.df, "before_clauses_bklm16", "before_clauses_sbk05")
 
 # grouped box plots
 df2 <- melt(changes[changes$encoding != "sbk05",], id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_variables", "after_variables"))
-df3 <- melt(changes[changes$encoding != "sbk05",], id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_clauses", "after_clauses"))
+df2$variable <- ifelse(df2$variabl == "before_variables", "before", "after")
+df2$variable <- as.factor(df2$variable)
+df2$variable <- factor(df2$variable, levels = rev(levels(df2$variable)))
+df2$encoding <- paste0("\\texttt{", df2$encoding, "}")
+
+tikz(file = "../doc/paper3/box.tex", width = 4.8, height = 2)
 ggplot(df2, aes(encoding, value, fill = variable)) +
   geom_boxplot(outlier.shape = NA) +
-  scale_y_continuous(limits = quantile(df2$value, c(0, 0.7)))
+  theme_light() +
+  scale_fill_brewer(palette = "Dark2") +
+  xlab("") +
+  ylab("Variables") +
+  labs(fill = "") +
+  coord_cartesian(ylim = quantile(df2$value, c(0, 0.8))) +
+  theme(legend.position = "right")
+dev.off()
+
+tikz(file = "../doc/paper3/variable_scatter.tex", width = 3.2, height = 2.9)
+scatter(changes[changes$encoding == "bklm16",], "before_variables", "after_variables")
+dev.off()
+
+df3 <- melt(changes[changes$encoding != "sbk05",], id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_clauses", "after_clauses"))
 ggplot(df3, aes(encoding, value, fill = variable)) +
   geom_boxplot(outlier.shape = NA) +
   scale_y_continuous(limits = quantile(df2$value, c(0, 0.7)))
