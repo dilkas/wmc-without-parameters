@@ -13,6 +13,7 @@
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage[capitalise]{cleveref}
 \usepackage{tikz}
+\usepackage[binary-units]{siunitx}
 
 \crefname{enumii}{Condition}{Conditions}
 
@@ -50,6 +51,26 @@
 \end{abstract}
 
 \section{Introduction}
+
+\paragraph{Related Work.}
+Many WMC inference algorithms such as
+\textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}}, \textsf{c2d}
+\cite{DBLP:conf/ecai/Darwiche04}, and \textsf{miniC2D}
+\cite{DBLP:conf/ijcai/OztokD15} work by compilation to tractable representations
+such as arithmetic circuits, deterministic, decomposable negation normal form
+\cite{DBLP:journals/jancl/Darwiche01}, and sentential decision diagrams (SDDs)
+\cite{DBLP:conf/ijcai/Darwiche11}. Some attempts have previously been made to
+skip this intermediate stage of representing a Bayesian network as a WMC
+instance and compile directly to a more convenient representation.
+Specifically, direct compilation from Bayesian networks to SDDs
+\cite{DBLP:conf/ecsqaru/ChoiKD13} and from structured Bayesian networks (i.e., a
+generalisation of Bayesian networks) to probabilistic SDDs
+\cite{shen2020modeling} have been considered. To the best of the authors'
+knowledge, neither compilation approach has a publicly available implementation.
+
+% TODO: Now say that our work is similar: it introduces a new representation
+% that is more appropriate for algorithms such as DPMC. Stress that all initial
+% pseudo-Boolean functions have two values.
 
 \section{Pseudo-Boolean Functions}
 
@@ -121,16 +142,6 @@ The proofs of all these properties follow directly from the definitions.
   and $x \in  X$, $(fg)|_{x=i} = f|_{x=i} \cdot g|_{x=i}$ for $i = 0, 1$.
 \end{proposition}
 
-\paragraph{References.}
-\begin{itemize}
-\item Related work without publicly available implementations:
-  \begin{itemize}
-  \item direct compilation to SDDs \cite{DBLP:conf/ecsqaru/ChoiKD13}
-  \item direct compilation to PSDDs, also eliminating parameter variables (a thesis)
-  \item maybe two more papers
-  \end{itemize}
-\end{itemize}
-
 \paragraph{Notes.}
 \begin{itemize}
 \item Weights on literals other than the positive literals that correspond to
@@ -181,6 +192,16 @@ indicator and parameter variables.
 NOTE: The constant is inspired by the \texttt{bklm16}
 \cite{DBLP:conf/ecai/BartKLM16} encoding.
 
+\subsection{Bayesian Network Encodings}
+
+\begin{itemize}
+\item \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}
+\item \texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05}
+\item \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05}
+\item \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06}
+\item \texttt{bklm16} \cite{DBLP:conf/ecai/BartKLM16}
+\end{itemize}
+
 \section{Parameter Variable Elimination}
 
 \paragraph{Notes.}
@@ -203,6 +224,23 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   and thus can be incorporated into an encoding algorithm with no slowdown. In
   fact, if anything, the resulting algorithm would be slightly faster, as it
   would have less data to output.
+\item We do this as a follow-up to Ace compilation because the implementations
+  of the encodings are all closed-source, and we don't want to re-invent (a
+  subpar version of) the wheel.
+\item No obvious way to do this for sbk05 because the roles of indicator and
+  parameter (i.e., `chance') variables overlap.
+\item This just says that $p$ is equivalent to a conjunction.
+\item The first group of conditions applies to \texttt{d02}, while the second
+  group applies to \texttt{bklm16}.
+\item For \texttt{cd05} and \texttt{cd06}, condition $2bi$ should be replaced
+  with $w(\neg p) = 1$.
+\item Benefits of having this proof in the paper:
+  \begin{itemize}
+  \item It puts all encodings on a common ground.
+  \item It illustrates the convenience of our notation for reasoning about
+    (certain types of) pseudo-Boolean functions.
+  \item It's too big and too important to be left for the appendix.
+  \end{itemize}
 \end{itemize}
 
 \begin{algorithm}[t]
@@ -479,52 +517,108 @@ NOTE: The constant is inspired by the \texttt{bklm16}
 
 \paragraph{Notes.}
 \begin{itemize}
-\item Apparently, the \textsc{DPMC} paper \cite{DBLP:conf/cp/DudekPV20} already
-  shows that taking the first offered decomposition tree is best.
-\item Processors:
+\item The experiments were run on a computing cluster with Intel Xeon E5-2630,
+  Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
+  \SI{1000}{\second} timeout separately on both encoding and inference, and a
+  \SI{32}{\gibi\byte} memory limit.\footnote{Each instance was run on the same
+    processor across all algorithms and encodings.}
+\item Along with
+  \textsf{DPMC}\footnote{\url{https://github.com/vardigroup/DPMC}}, in our
+  experiments we also include WMC algorithms used in the papers that introduce
+  each encoding: \textsf{Ace}
+  for \texttt{cd05}, \texttt{cd06}, and \texttt{d02};
+  \textsf{Cachet}\footnote{\url{https://cs.rochester.edu/u/kautz/Cachet/}}
+  \cite{DBLP:conf/sat/SangBBKP04} for \texttt{sbk05}; and
+  \textsf{c2d}\footnote{\url{http://reasoning.cs.ucla.edu/c2d/}}
+  \cite{DBLP:conf/ecai/Darwiche04} with
+  \textsf{query-dnnf}\footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}}
+  for \texttt{bklm16}.
+\item \textsf{DPMC} was run in \emph{greedy mode}. This mode (which was not part
+  of the original paper \cite{DBLP:conf/cp/DudekPV20}) optimises the order in
+  which pseudo-Boolean functions are multiplied by prioritising functions with
+  small representations.
+\item Indeed, the numbers of variables in \texttt{bklm16++} and \texttt{d02++}
+  encodings are equal whenever all variables in a Bayesian network have two
+  values (which applies to most of the benchmark instances). Nonetheless,
+  \texttt{bklm16++} performs much faster than \texttt{d02++}.
+\item \textsf{DPMC} is run with tree decomposition based planning and algebraic
+  decision diagram based execution---the best-performing combination in the
+  original set of experiments \cite{DBLP:conf/cp/DudekPV20}. We use a single
+  iteration of \textsf{htd} \cite{DBLP:conf/cpaior/AbseherMW17} to generate
+  approximately optimal tree decompositions---we found that this configuration
+  is efficient enough to handle huge instances, and yet the width of the
+  returned decomposition is unlikely to differ from optimal by more than one or
+  two.
+\item We also record numbers of variables in each encoding before and after our
+  additional transformation.
+\item Experimental research questions:
   \begin{itemize}
-  \item Intel(R) Xeon(R) Gold 6138 CPU @ 2.00GHz
-  \item Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-  \item Intel(R) Xeon(R) CPU E7-4820 v2 @ 2.00GHz
+  \item Can parameter variable elimination improve inference speed?
+  \item How does DPMC combined with encodings without (and with) parameter
+    variables compare with other WMC algorithms and other encodings?
+  \item Which instances is our approach particularly successful on (compared to
+    other algorithms and encodings and to the same encoding before our
+    transformation)?
+  \item What proportion of variables is typically removed?
+  \item Do some encodings benefit from this transformation more than others?
   \end{itemize}
+\item How many times am I faster than old cd06 and new bklm16? Perhaps add other
+  numbers as well.
+\end{itemize}
+% TODO: define binary = 2 values per variable (or states per node?)
+% reuse this term where I'm referring to two values
+
+For our experiments we use Bayesian networks available with \textsf{Ace} and
+\textsf{Cachet}. We split them into the following groups:
+\begin{itemize}
+\item DQMR and
+\item Grid networks as described by Sang et al. \cite{DBLP:conf/aaai/SangBK05};
+\item Mastermind and
+\item Random Blocks by Chavira et al. \cite{DBLP:journals/ijar/ChaviraDJ06};
+\item other binary Bayesian networks including Plan Recognition
+  \cite{DBLP:conf/aaai/SangBK05}, Friends and Smokers, Students and Professors
+  \cite{DBLP:journals/ijar/ChaviraDJ06}, and \texttt{tcc4f};
+\item non-binary classic Bayesian networks: \texttt{alarm}, \texttt{diabetes},
+  \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
+  \texttt{pathfinder}, \texttt{pigs}, and \texttt{water}.
 \end{itemize}
 
 \begin{figure}
   \centering
   \input{cumulative.tex}%
-  \caption{TODO}
+  \caption{Cumulative numbers of instances solved by each algorithm-encoding
+    pair over time.}
   \label{fig:cumulative}
 \end{figure}
 
 \begin{figure}
   \centering
   \input{scatter.tex}%
-  \caption{TODO}
+  \caption{An instance-by-instance comparison between $\textsf{DPMC} +
+    \texttt{bklm16++}$ (the best combination according to \cref{fig:cumulative})
+  and the second and third best performing combinations: $\textsf{Ace} +
+  \texttt{cd06}$ and $\textsf{DPMC} + \texttt{bklm16}$.}
   \label{fig:scatter}
 \end{figure}
 
 \begin{figure}
   \centering
   \input{box.tex}%
-  \caption{TODO}
+  \caption{Box plots of the numbers of variables in each encoding across all
+    benchmark instances before and after applying \cref{alg:transformation}.}
   \label{fig:box}
-\end{figure}
+\end{figure} % TODO: maybe add sbk05 with just 'before'?
 
 \section{Conclusions}
 
 \paragraph{Notes.}
 \begin{itemize}
-\item This just says that $p$ is equivalent to a conjunction.
-\item The first group of conditions applies to \texttt{d02}, while the second
-  group applies to \texttt{bklm16}.
-\item For \texttt{cd05} and \texttt{cd06}, condition $2bi$ should be replaced
-  with $w(\neg p) = 1$.
-\item Benefits of having this proof in the paper:
+\item Benefits of my approach:
   \begin{itemize}
-  \item It puts all encodings on a common ground.
-  \item It illustrates the convenience of our notation for reasoning about
-    (certain types of) pseudo-Boolean functions.
-  \item It's too big and too important to be left for the appendix.
+  \item smaller primal graph, so easier to perform tree decomposition
+  \item Variable order is less likely to be obstructed by all the unnecessary
+    'parameter' variables.
+  \item There are others, but they're not that important.
   \end{itemize}
 \end{itemize}
 
