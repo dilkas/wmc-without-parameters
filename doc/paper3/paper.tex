@@ -68,9 +68,22 @@ generalisation of Bayesian networks) to probabilistic SDDs
 \cite{shen2020modeling} have been considered. To the best of the authors'
 knowledge, neither compilation approach has a publicly available implementation.
 
-% TODO: Now say that our work is similar: it introduces a new representation
-% that is more appropriate for algorithms such as DPMC. Stress that all initial
-% pseudo-Boolean functions have two values.
+Our work is similar in that it introduces a new representation for computational
+problems that is based on pseudo-Boolean functions---pseudo-Boolean projection
+(PBP). We formally show that every WMC problem instance has a corresponding PBP
+instance. We argue that this new format is more appropriate for WMC solvers
+whose execution is build on pseudo-Boolean function manipulation, i.e.,
+\textsf{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} and \textsf{DPMC}
+\cite{DBLP:conf/cp/DudekPV20}. Finally, we show how most methods of encoding
+probabilistic inference on Bayesian networks to WMC can be adapted to the PBP
+format. This transformation significantly improves inference speed,
+outperforming all other considered algorithm-encoding combinations.
+
+%allowing two encodings that were previously incompatible with
+%\textsf{DPMC} to be compatible.
+
+% TODO: we also show correctness
+% TODO: and new notation!
 
 \section{Pseudo-Boolean Functions}
 
@@ -165,42 +178,58 @@ indicator and parameter variables.
   instance is $\sum_{Y \models \phi} \prod_{Y \models l} w(l)$.
 \end{definition}
 
-\begin{remark}
-  Encodings such as \texttt{cd05} and \texttt{cd06} are \emph{not} WMC
-  encodings. Instead, they encode Bayesian network inference into instances of
-  the \emph{minimum-cardinality} WMC problem, where the answer is defined to be
-  $\sum_{Y \models \phi\text{, }|Y| = k} \prod_{Y \models l}
-  w(l)$, where $k = \min_{Y \models \phi\text{, }Y \ne \emptyset}
-  |Y|$, if $k$ exists, otherwise the answer is zero. This additional
-  condition on model cardinality becomes necessary because these encodings
-  eliminate clauses of the form $p \Rightarrow i$, where $p \in X_P$ is a
-  parameter variable, and $i \in X_I$ is an indicator variable. Nonetheless, our
-  transformation algorithm still works on such encodings, although the
-  experimental results are discouraging because they use approximately twice as
-  many indicator variables. For instance, each binary variable of a Bayesian
-  network is encoded using two indicator variables while one would suffice.
-\end{remark}
-
 \begin{definition}[PBP Instance] \label{def:new_wmc}
-  A \emph{pseudo-Boolean projection} (PBP) instance is a tuple $(F, X, \omega)$,
-  where $X$ is the set of variables, $F$ is a set of pseudo-Boolean functions
-  $2^X \to \mathbb{R}$, and $\omega \in \mathbb{R}$ is the scaling factor. The
-  \emph{answer} of the instance is $\omega \cdot \left(\exists_X\prod_{f \in
-      F}f\right)(\emptyset)$.
+  A PBP instance is a tuple $(F, X, \omega)$, where $X$ is the set of variables,
+  $F$ is a set of pseudo-Boolean functions $2^X \to \mathbb{R}$, and $\omega \in
+  \mathbb{R}$ is the scaling factor.\footnote{We will further restrict $F$ to
+    only contain functions that have exactly two values. While this restriction
+    is not necessary from a computational point of view, such functions can be
+    conveniently represented both in text files and using the syntax proposed in
+    this paper.} The \emph{answer} of the instance is $\omega \cdot
+  \left(\exists_X\prod_{f \in F}f\right)(\emptyset)$.
 \end{definition}
 
-NOTE: The constant is inspired by the \texttt{bklm16}
-\cite{DBLP:conf/ecai/BartKLM16} encoding.
+NOTE: Adding scaling factor $\omega$ to the definition allows us to remove
+clauses that consist entirely of a single parameter variable. The idea of
+extracting some of the structure of the WMC instance into an external
+multiplicative factor originates in one of the Bayesian network encodings
+\cite{DBLP:conf/ecai/BartKLM16}.
 
 \subsection{Bayesian Network Encodings}
 
+\paragraph{TODO}
 \begin{itemize}
-\item \texttt{d02} \cite{DBLP:conf/kr/Darwiche02}
-\item \texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05}
-\item \texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05}
-\item \texttt{cd06} \cite{DBLP:conf/sat/ChaviraD06}
-\item \texttt{bklm16} \cite{DBLP:conf/ecai/BartKLM16}
+\item Define the terminology surrounding BNs: variables, values, directed
+  probabilistic graphical model, DAG, binary = two values per variable.
+\item Reuse this term where I'm referring to two values.
+\item Give a brief description of each encoding.
+\item Talk about the parameter/indicator variable distinction.
 \end{itemize}
+
+WMC is a well-established technique for Bayesian network inference, particularly
+effective on networks where most variables have only a few possible values
+\cite{DBLP:conf/kr/Darwiche02}. Many ways of encoding a Bayesian network into a
+WMC instance have been proposed. We will refer to them based on initials of the
+authors and the year of publication: \texttt{d02}
+\cite{DBLP:conf/kr/Darwiche02}, \texttt{sbk05} \cite{DBLP:conf/aaai/SangBK05},
+\texttt{cd05} \cite{DBLP:conf/ijcai/ChaviraD05}, \texttt{cd06}
+\cite{DBLP:conf/sat/ChaviraD06}, \texttt{bklm16} \cite{DBLP:conf/ecai/BartKLM16}.
+
+\begin{remark}
+  Strictly speaking, encodings such as \texttt{cd05} and \texttt{cd06} are
+  \emph{not} WMC encodings. Instead, they encode Bayesian network inference into
+  instances of the \emph{minimum-cardinality} WMC problem, where the answer is
+  defined to be $\sum_{Y \models \phi\text{, }|Y| = k} \prod_{Y \models l}
+  w(l)$, where $k = \min_{Y \models \phi\text{, }Y \ne \emptyset} |Y|$, if $k$
+  exists, otherwise the answer is zero. This additional condition on model
+  cardinality becomes necessary because these encodings eliminate clauses of the
+  form $p \Rightarrow i$, where $p \in X_P$ is a parameter variable, and $i \in
+  X_I$ is an indicator variable. Nonetheless, our transformation algorithm still
+  works on such encodings, although the experimental results are discouraging
+  because they use approximately twice as many indicator variables. For
+  instance, each binary variable of a Bayesian network is encoded using two
+  indicator variables while one would suffice.
+\end{remark}
 
 \section{Parameter Variable Elimination}
 
@@ -299,7 +328,7 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   \]
 \end{lemma}
 \begin{proof}
-  For base case, let $X = \{x\}$. Then
+  If $X = \{x\}$, then
   \[
     (\exists_xf)(\emptyset) = (f|_{x=1} + f|_{x=0})(\emptyset) =
     f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset) = \sum_{Y \subseteq \{x\}} f(Y).
@@ -318,12 +347,13 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   \end{equation}
   is a PBP instance with the same answer.
 \end{proposition}
-\begin{proof}
-  The answer of \cref{eq:new_wmc} is
-  \begin{align*}
-    \left(\exists_{X_I \cup X_P} \left(\prod_{c \in \phi} [c]_0^1\right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset) &= \sum_{Y \subseteq X_I \cup X_P} \left(\left(\prod_{c \in \phi} [c]_0^1 \right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)(Y) \\
-&= \sum_{Y \subseteq X_I \cup X_P} \underbrace{\left(\prod_{c \in \phi} [c]_0^1\right)}_f(Y) \underbrace{\left(\prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)}\right)}_g(Y)
-  \end{align*}
+\begin{proof} % TODO: equation is not the right word
+  Let $f = \prod_{c \in \phi} [c]_0^1$, and $g = \prod_{x \in X_I \cup X_P}
+  [x]_{w(\neg x)}^{w(x)}$. Then the answer of \cref{eq:new_wmc} is
+  \[
+    (\exists_{X_I \cup X_P} fg)(\emptyset) = \sum_{Y \subseteq X_I \cup X_P}
+    (fg)(Y) = \sum_{Y \subseteq X_I \cup X_P} f(Y)g(Y)
+  \]
   by \cref{lemma:sum}. Note that
   \[
     f(Y) =
@@ -421,11 +451,7 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   \]
   If $w(p) = 1$, then
   \begin{equation} \label{eq:bigsums}
-    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
-    \right]_0^1 = \exists_p \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
-    \right]_0^1 = \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
-    \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n
-      l_i \right]_0^1\right|_{p=0}.
+    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 = \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1\right|_{p=0}.
   \end{equation}
   Since for any input, $\bigwedge_{i=1}^n l_i$ is either true or false, exactly
   one of the two summands in \cref{eq:bigsums} will be equal to one, and the
@@ -450,10 +476,12 @@ NOTE: The constant is inspired by the \texttt{bklm16}
     \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1,
   \]
   and indeed
-  \begin{align*}
-    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 &= \left.\left( [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 \right)\right|_{p=1} + \left.\left([p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 \right)\right|_{p=0} \\
-                                                                                      &= w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[ \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i \right]_1^{w(p)}.
-  \end{align*}
+  \[
+    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
+    \right]_0^1 = w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[
+      \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i
+    \right]_1^{w(p)}.
+  \]
   This finishes the proof of the correctness of the first `foreach' loop under
   \cref{condition:d02}.
 
@@ -487,7 +515,7 @@ NOTE: The constant is inspired by the \texttt{bklm16}
       l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p}
     [c]_0^1.
   \]
-  We can rearrange the right-hand side as
+  We can rearrange the right-hand side as % TODO: make it fit into margins
   \begin{align*}
     \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[\bigwedge_{c \in \phi_p} c\right]_0^1 = \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
                                                                &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 = w(p) + \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^{1-w(p)} \\
@@ -562,11 +590,18 @@ NOTE: The constant is inspired by the \texttt{bklm16}
   \item What proportion of variables is typically removed?
   \item Do some encodings benefit from this transformation more than others?
   \end{itemize}
-\item How many times am I faster than old cd06 and new bklm16? Perhaps add other
-  numbers as well.
+\item TODO: How many times am I faster than old cd06 and new bklm16? Perhaps add
+  other numbers as well.
+\item To perform Bayesian network inference with \textsf{DPMC} (or with any
+  other WMC algorithm not based on compilation such as \textsf{Cachet}), one
+  needs to select a probability to compute
+  \cite{DBLP:conf/cp/DudekPV20,DBLP:conf/sat/SangBBKP04}. If a network comes
+  with an evidence file, we compute the probability of this evidence. Otherwise,
+  let $X$ be the variable last mentioned in the Bayesian network file. If
+  \textsf{true} is one of the values of $X$, then we compute $\Pr(X =
+  \textsf{true})$, otherwise we choose the first-mentioned value of $X$.
 \end{itemize}
-% TODO: define binary = 2 values per variable (or states per node?)
-% reuse this term where I'm referring to two values
+% TODO: describe the results.
 
 For our experiments we use Bayesian networks available with \textsf{Ace} and
 \textsf{Cachet}. We split them into the following groups:
