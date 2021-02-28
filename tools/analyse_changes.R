@@ -7,6 +7,7 @@ library(maditr)
 
 changes <- read.csv("../results/changes.csv", header = FALSE)
 colnames(changes) <- c("instance", "encoding", "before_variables", "before_clauses", "after_variables", "after_clauses")
+changes$after_variables[changes$encoding == "sbk05"] <- NA
 
 changes$dataset <- "Non-binary"
 changes$dataset[grepl("DQMR", changes$instance, fixed = TRUE)] <- "DQMR"
@@ -70,13 +71,13 @@ scatter(changes.df, "before_variables_bklm16", "before_variables_sbk05")
 scatter(changes.df, "before_clauses_bklm16", "before_clauses_sbk05")
 
 # grouped box plots
-df2 <- melt(changes[changes$encoding != "sbk05",], id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_variables", "after_variables"))
+df2 <- melt(changes, id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_variables", "after_variables"))
 df2$variable <- ifelse(df2$variabl == "before_variables", "before", "after")
 df2$variable <- as.factor(df2$variable)
 df2$variable <- factor(df2$variable, levels = rev(levels(df2$variable)))
 df2$encoding <- paste0("\\texttt{", df2$encoding, "}")
 
-tikz(file = "../doc/paper3/box.tex", width = 4.8, height = 2)
+tikz(file = "../doc/paper3/box.tex", width = 2.4, height = 2)
 ggplot(df2, aes(encoding, value, fill = variable)) +
   geom_boxplot(outlier.shape = NA) +
   theme_light() +
@@ -84,8 +85,8 @@ ggplot(df2, aes(encoding, value, fill = variable)) +
   xlab("") +
   ylab("Variables") +
   labs(fill = "") +
-  coord_cartesian(ylim = quantile(df2$value, c(0, 0.8))) +
-  theme(legend.position = "right")
+  coord_cartesian(ylim = quantile(df2$value, c(0, 0.8), na.rm = TRUE)) +
+  theme(legend.position = "bottom", legend.margin=margin(t = -0.8, unit = 'cm'))
 dev.off()
 
 tikz(file = "../doc/paper3/variable_scatter.tex", width = 3.2, height = 2.9)

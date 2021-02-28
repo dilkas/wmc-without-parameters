@@ -135,6 +135,9 @@ data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\tex
 
 # ============ Numerical investigations ================
 
+df$diff <-df$time_new_bklm16pp - df$time_new_bklm16
+summary(df$diff)
+
 # Total time per data set (for job scheduling)
 sum(data$encoding_time[startsWith(data$dataset, "Grid")]) + sum(data$inference_time[startsWith(data$dataset, "Grid")])
 sum(data$encoding_time[startsWith(data$dataset, "DQMR")]) + sum(data$inference_time[startsWith(data$dataset, "DQMR")])
@@ -144,7 +147,9 @@ sum(data$encoding_time[startsWith(data$dataset, "2005")]) + sum(data$inference_t
 sum(data$encoding_time[startsWith(data$dataset, "2006")]) + sum(data$inference_time[startsWith(data$dataset, "2006")])
 
 # The numbers of instances per data set (so I can check if each instance is included)
-df %>% group_by(df$dataset) %>% tally()
+tallies <- df %>% group_by(df$dataset) %>% tally()
+sum(tallies$n)
+df %>% group_by(df$major.dataset) %>% tally()
 
 # Where answers don't match
 interesting <- df[abs(df$answer_old_cd06 - df$answer_new_bklm16) > 0.01,]
@@ -197,13 +202,6 @@ sum(!is.na(df$answer_old_cd05))
 sum(!is.na(df$answer_old_cd06))
 sum(!is.na(df$answer_old_d02))
 sum(!is.na(df$answer_old_sbk05))
-
-# Calculate how many times cw is faster than d02 according to the cumulative plot
-# (not updated)
-max_d02 <- max(cumulative$count[cumulative$encoding == "\\texttt{d02}"])
-interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{cw}"],
-                        y = cumulative$time[cumulative$encoding == "\\texttt{cw}"],
-                        xout = max_d02)$y
 
 # ================ Plots ==========================
 
@@ -282,7 +280,8 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
     ylab("Instances solved") +
     annotation_logticks(sides = "b", colour = "#989898") +
     theme_set(theme_light()) +
-    labs(color = pretty_column_name, linetype = "Algorithm")
+    labs(color = pretty_column_name, linetype = "Algorithm") +
+    geom_hline(yintercept = 1466, linetype = "dotted", color = "black")
 
   if (show.color.legend) {
     p <- p + scale_colour_manual(breaks = sort(unique(cumulative$encoding)),
@@ -307,6 +306,19 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
      p <- p + scale_linetype_manual(breaks = sort(unique(cumulative$algorithm)),
                           values = c(1, 2), guide = show.linetype.legend)
   }
+  # Calculate how many times my best encoding is faster than others
+  max <- max(cumulative$count[cumulative$algorithm == "other" &
+                                  cumulative$encoding == "\\texttt{cd06}"])
+  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
+                          y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
+                          xout = max)$y
+  print(interpolation)
+  max <- max(cumulative$count[cumulative$algorithm == "\\textsf{DPMC}" &
+                                  cumulative$encoding == "\\texttt{bklm16}"])
+  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
+                          y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
+                          xout = max)$y
+  print(interpolation)
   return(p)
 }
 
