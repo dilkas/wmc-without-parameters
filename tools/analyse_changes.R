@@ -106,3 +106,8 @@ df4$encoding[df4$variable == "after_variables"] <- paste(df4$encoding[df4$variab
 df <- data[data$novelty == "new",] %>% left_join(df4, by = c("instance", "encoding"))
 
 ggplot(df, aes(value, inference_time, col = dataset.y, shape = dataset.y)) + geom_point()
+
+# ========== Numerical ==========
+
+median(changes$before_variables[changes$encoding == "bklm16"])
+median(changes$after_variables[changes$encoding == "bklm16"])

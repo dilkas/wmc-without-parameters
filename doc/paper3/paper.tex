@@ -593,7 +593,7 @@ The proofs of all these properties follow directly from the definitions.
    i.e., the answer is unchanged.
 \end{proof}
 
-\section{Experimental Evaluation}
+\section{Experimental Evaluation (mostly done)}
 % TODO: what are the encodings compiled with?
 
 We run a set of experiments, comparing all five original Bayesian network
@@ -620,11 +620,11 @@ for \texttt{bklm16}. We focus on the following questions:
 \item Which instances is our approach particularly successful on (compared to
   other algorithms and encodings and to the same encoding before our
   transformation)?
-\item What proportion of variables is typically removed?
+\item What proportion of variables is typically eliminated?
 \item Do some encodings benefit from this transformation more than others?
 \end{itemize}
 
-\subsection{Setup (mostly done)}
+\subsection{Setup}
 
 \textsf{DPMC} is run with tree decomposition based planning and algebraic
 decision diagram based execution---the best-performing combination in the
@@ -672,31 +672,6 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
   processor across all algorithms and encodings.}
 
 \subsection{Results}
-
-\paragraph{Notes.}
-\begin{itemize}
-\item \Cref{fig:cumulative} shows:
-  \begin{itemize}
-  \item $\textsf{DPMC}+\texttt{bklm16++}$ remains the best-performing
-    combination across all time limits up to \SI{1000}{\second} with $\textsf{Ace} +
-    \texttt{cd06}$ and $\textsf{DPMC}+\texttt{bklm16}$ not far behind;
-  \item $\textsf{DPMC}+\texttt{bklm16++}$ to be 3.35 times faster than
-    $\textsf{DPMC}+\texttt{bklm16}$ and 2.96 times faster than
-    $\textsf{Ace}+\texttt{cd06}$.
-  \end{itemize}
-\item \Cref{tbl:performance} further shows that
-  $\textsf{DPMC}+\texttt{bklm16++}$ solves almost a hundred more instances than
-  any other combination, and is the fastest in \SI{69.1}{\percent} of them.
-\item TODO: now talk about \cref{fig:scatter}.
-\item We also record numbers of variables in each encoding before and after our
-  additional transformation.
-\item TODO: describe \cref{fig:box}.
-\item Indeed, the numbers of variables in \texttt{bklm16++} and \texttt{d02++}
-  encodings are equal for binary Bayesian networks (i.e., most of our data).
-  Nonetheless, \texttt{bklm16++} performs much faster than \texttt{d02++}.
-\end{itemize}
-% TODO: Describe the results. Make sure to answer all of the listed questions.
-% TODO: double check that the numbers in the table make sense.
 
 \begin{figure}
   \centering
@@ -751,6 +726,45 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
     \end{tabular}
   \end{minipage}
 \end{figure}
+
+\Cref{fig:cumulative} shows $\textsf{DPMC}+\texttt{bklm16++}$ to be the
+best-performing combination across all time limits up to \SI{1000}{\second} with
+$\textsf{Ace} + \texttt{cd06}$ and $\textsf{DPMC}+\texttt{bklm16}$ not far
+behind. Overall, $\textsf{DPMC}+\texttt{bklm16++}$ is 3.35 times faster than
+$\textsf{DPMC}+\texttt{bklm16}$ and 2.96 times faster than
+$\textsf{Ace}+\texttt{cd06}$. \Cref{tbl:performance} further shows that
+$\textsf{DPMC}+\texttt{bklm16++}$ solves almost a hundred more instances than
+any other combination, and is the fastest in \SI{69.1}{\percent} of them.
+
+The scatter plots in \cref{fig:scatter} show that how $\textsf{DPMC} +
+\texttt{bklm16++}$ (and perhaps \textsf{DPMC} more generally) compares to
+$\textsf{Ace} + \texttt{cd06}$ depends significantly on the data set: the former
+is a clear winner on DQMR and Grid instances, while the latter performs well on
+Mastermind and Random Blocks. Perhaps because the underlying WMC algorithm
+remains the same, the difference between $\textsf{DPMC} + \texttt{bklm16}$ with
+and without applying \cref{alg:transformation} is quite noisy, i.e, with most
+instances scattered around the line of equality. However, our transformation
+does enable \textsf{DPMC} to solve many instances that were previously beyond
+its reach.
+
+We also record numbers of variables in each encoding before and after applying
+\cref{alg:transformation}. \Cref{fig:box} shows a significant reduction in the
+number of variables. For instance, the median number of variables in instances
+encoded with \texttt{bklm16} was reduced four times: from 1499 to 376. While
+\texttt{bklm16++} results in the overall lowest number of variables, the
+difference between \texttt{bklm16++} and \texttt{d02++} seems small. Indeed, the
+numbers of variables in these two encodings are equal for binary Bayesian
+networks (i.e., most of our data). Nonetheless, \texttt{bklm16++} is still much
+faster than \texttt{d02++} when run with \textsf{DPMC}.
+
+Overall, transforming WMC instances to the PBP format allows us to significantly
+simplify each instance. This transformation is particularly effective on
+\texttt{bklm16}, allowing it to surpass \texttt{cd06} and become the new state
+of the art. While there is a similarly significant reduction in the number of
+variables for \texttt{d02}, the performance of $\textsf{DPMC}+\texttt{d02}$ is
+virtually unaffected. Finally, while our transformation makes it possible to use
+\texttt{cd05} and \texttt{cd06} with \textsf{DPMC}, the two combinations remain
+inefficient.
 
 \section{Conclusions}
 
