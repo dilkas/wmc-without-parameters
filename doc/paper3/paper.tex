@@ -17,6 +17,7 @@
 \usepackage{booktabs}
 \usepackage{capt-of}
 
+\crefname{enumi}{Condition}{Conditions}
 \crefname{enumii}{Condition}{Conditions}
 
 \begin{document}
@@ -97,7 +98,22 @@ outperforming all other considered algorithm-encoding combinations.
 
 \section{Weighted Model Counting}
 
-TODO: Mention that formulas, clauses, and models are all treated as sets.
+\paragraph{TODO}
+\begin{itemize}
+\item Explain two meanings of entailment in the definition of WMC.
+\end{itemize}
+
+Throughout the paper, we use set theoretic notation for many concepts in logic.
+We identify a model with a set of variables that correspond to the positive
+literals in the model (and all other variables are the negative literals of the
+model). A formula in CNF is a set of clauses that are part of an implicit
+conjunction. Similarly, a clause is a set of literals that are part of an
+implicit disjunction. For example, let $\phi = (\neg a \lor b) \land a$ be a
+propositional formula over variables $a$ and $b$. Then an equivalent
+set-theoretic representation of $\phi$ is $\{ \{ \neg a, b \}, \{ a \} \}$. Any
+subset of $\{ a, b \}$ is an interpretation of $\phi$, e.g., $\{ a, b \}$ is a
+model of $\phi$ (written $\{ a, b \} \models \phi$), while $\emptyset$ is an
+interpretation but not a model.
 
 \begin{definition}[WMC]
   A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
@@ -310,7 +326,7 @@ The proofs of all these properties follow directly from the definitions.
   \label{alg:transformation}
   \SetKwFunction{rename}{rename}
   \SetKwProg{Fn}{Function}{:}{}
-  \KwData{WMC instance $(\phi, X_I, X_P, w)$}
+  \KwData{WMC (or minimum-cardinality WMC) instance $(\phi, X_I, X_P, w)$}
   \KwResult{PBP instance $(F, X, \omega)$}
   $F \gets \emptyset$\;
   $\omega \gets 1$\;
@@ -361,7 +377,6 @@ The proofs of all these properties follow directly from the definitions.
   that gives an overview of the proof.
 \item condition 1 is necessary in both cases because we're ignoring the weights
   of indicator variables (explicitly acknowledge this)
-\item add the \texttt{cd05}/\texttt{cd06} correctness theorem
 \end{itemize}
 
 \begin{theorem}[Early Projection
@@ -426,12 +441,13 @@ The proofs of all these properties follow directly from the definitions.
   as required.
 \end{proof}
 
-\begin{theorem}[Correctness] \label{thm:correctness}
+\begin{theorem}[Correctness for WMC] \label{thm:correctness}
   \Cref{alg:transformation}, when given a WMC instance $(\phi, X_I, X_P,
   w)$, returns PBP instance with the same answer, provided the following
   conditions are satisfied:
   \begin{enumerate}
-  \item for all indicator variables $i \in X_I$, $w(i) = w(\neg i) = 1$,
+  \item for all indicator variables $i \in X_I$, $w(i) = w(\neg i) =
+    1$, \label{cond:one}
   \item and either
     \begin{enumerate}
     \item for all parameter variables $p \in X_P$, there is a non-empty family
@@ -447,8 +463,9 @@ The proofs of all these properties follow directly from the definitions.
     \item or for all parameter variables $p \in X_P$, \label{condition:bklm16}
       \begin{enumerate}
       \item $w(p) + w(\neg p) = 1$,
-      \item for any clause $c \in \phi$, $|c \cap X_P| \le 1$,
-      \item there is no clause $c \in \phi$ such that $\neg p \in c$,
+      \item for any clause $c \in \phi$, $|c \cap X_P| \le 1$, \label{cond:2b2}
+      \item there is no clause $c \in \phi$ such that $\neg p \in
+        c$, \label{cond:2b3}
       \item if $\{ p \} \in \phi$, then there is no clause $c \in \phi$ such
         that $c \ne \{ p \}$ and $p \in c$, \label{cond:just_parameter}
         % 'prime implicants are logically disjoint'
@@ -593,7 +610,64 @@ The proofs of all these properties follow directly from the definitions.
    i.e., the answer is unchanged.
 \end{proof}
 
+\begin{theorem}[Correctness for Minimum-Cardinality WMC]
+  Let $(\phi, X_I, X_P, w)$ be a minimum-cardinality WMC instance that satisfies
+  \cref{cond:one,cond:2b2,cond:2b3,cond:just_parameter,cond:disjoint} of
+  \cref{thm:correctness} as well as the following:
+  \begin{enumerate}
+  \item for all parameter variables $p \in X_P$, $w(\neg p) = 1$.
+  \item all models of $\{ c \in \phi \mid c \cap X_P = \emptyset \}$ (as subsets
+    of $X_I$) have the same cardinality;
+  \item $\min_{Z \subseteq X_P} |Z|$ such that $Y \cup Z \models \phi$ is the
+    same for all $Y \models \{ c \in \phi \mid c \cap X_P = \emptyset \}$.
+  \end{enumerate}
+  Then \cref{alg:transformation}, when applied to $(\phi, X_I, X_P, w)$, outputs
+  a PBP instance with the same answer.
+\end{theorem}
+\begin{proof} % TODO: introduce the variables that come from the algorithm
+  We split the proof into two parts. Let
+  \[
+    F = \left\{ [c]_0^1 \mid c \in \phi \text{, } c \cap X_P = \emptyset
+    \right\} \cup \left\{ \left[ \bigwedge_{l \in c \setminus \{ p \}} \neg l
+      \right]_1^{w(p)} \;\middle|\; p \in X_P \text{, } p \in c \in \phi
+      \text{, } c \ne \{ p \} \right\}
+  \]
+  be as returned by \cref{alg:transformation}. In the first part, we show that
+  there is a bijection between minimum-cardinality models of $\phi$ and $Y
+  \subseteq X_I$ such that $\left(\prod_{f \in F} f\right)(Y) \ne 0$ (with the
+  assumption that $w(p) \ne 0$ for all $p \in X_P$).\footnote{The assumption is
+    only there to make the proof more convenient and can be omitted by
+    reformulating the proof in a slightly more cumbersome way.} Let $Y \subseteq
+  X_I$ and $Y' \subseteq X_I \cup X_P$ be related via this bijection. Then in
+  the second part we will show that
+  \[
+    \prod_{Y' \models l} w(l) = \left(\prod_{f \in F} f\right)(Y).
+  \]
+
+  On the one hand, if $Y \subseteq X_I \cup X_P$ is a minimum-cardinality model
+  of $\phi$, then
+  \[
+    \left(\prod_{f \in F}\right)(Y \cap X_I) \ne 0
+  \]
+  under the given assumptions. On the other hand, if $Y \subseteq X_I$ is such
+  that
+  \[
+    \left(\prod_{f \in F}\right)(Y) \ne 0,
+  \]
+  then $Y \models \{ c \in \phi \mid c \cap X_P = \emptyset \}$. Let $Y
+  \subseteq Z \subseteq X_I \cup X_P$ be the smallest superset of $Y$ such that
+  $Z \models \phi$ (it exists by \cref{cond:2b3} of \cref{thm:correctness}). We
+  need to show that $Z$ is minimum cardinality.
+\end{proof} % TODO: first part
+% TODO: make a separate definition for minimum cardinality model and use it in
+% the definition of MCWMC
+% TODO: use the MCWMC abbreviation
+% TODO: my current proof doesn't use omega. Maybe just say that the proof is
+% easily extendable to phi s.t. omega != 1 similarly to the proof of
+% thm:correctness.
+
 \section{Experimental Evaluation (mostly done)}
+% TODO: define cardinality of model
 % TODO: what are the encodings compiled with?
 
 We run a set of experiments, comparing all five original Bayesian network
