@@ -60,7 +60,33 @@
 % here
 % 2) run this through grammarly
 
-\paragraph{Related Work.}
+% NOTE: What is the problem? Why is it interesting and important?
+WMC has emerged as a powerful computational framework for problems in many
+domains, e.g., probabilistic graphical models such as Bayesian networks and
+Markov networks
+\cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05},
+neuro-symbolic artificial intelligence \cite{DBLP:conf/icml/XuZFLB18},
+probabilistic programs \cite{DBLP:journals/pacmpl/HoltzenBM20}, and
+probabilistic logic programs \cite{DBLP:journals/tplp/FierensBRSGTJR15}. It has
+been extended to support continuous variables \cite{DBLP:conf/ijcai/BellePB15},
+infinite domains \cite{DBLP:conf/aaai/Belle17}, first-order logic
+\cite{DBLP:journals/cacm/GogateD16,DBLP:conf/ijcai/BroeckTMDR11}, and arbitrary
+semirings \cite{DBLP:journals/ijar/BelleR20,DBLP:journals/japll/KimmigBR17}.
+
+% NOTE: What's wrong with previous proposed solutions? How does mine differ?
+% TODO: Our work is similar to \cite{DBLP:conf/uai/GogateD10} who suggest using
+% a collection of soft (i.e., with weights) and hard clauses
+% TODO: how different are the semantics?
+% But:
+% 1) we can handle arbitrary formulas and not just clauses
+% 2) we assign two weights, not one
+% 3) the semantics of these weights are completely different, similar to the
+% ones from Markov networks. It is thus difficult to reuse the same formulation
+% for a different WMC algorithm.
+% 4) Since we present a WMC->PBP algorithm, we don't need to invent new
+% encodings for each problem and we can benefit from all the good ideas that
+% went into designing WMC encodings
+
 Many WMC inference algorithms such as
 \textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}}, \textsf{c2d}
 \cite{DBLP:conf/ecai/Darwiche04}, and \textsf{miniC2D}
@@ -76,6 +102,9 @@ generalisation of Bayesian networks) to probabilistic SDDs
 \cite{shen2020modeling} have been considered. To the best of the authors'
 knowledge, neither compilation approach has a publicly available implementation.
 
+% NOTE: What are the key components of my approach and results? Also include any
+% specific limitations. What about your project is new or different from
+% existing solutions?
 Our work is similar in that it introduces a new representation for computational
 problems that is based on pseudo-Boolean functions---pseudo-Boolean projection
 (PBP). We formally show that every WMC problem instance has a corresponding PBP
@@ -90,60 +119,67 @@ outperforming all other considered algorithm-encoding combinations.
 %allowing two encodings that were previously incompatible with
 %\textsf{DPMC} to be compatible.
 
+% NOTE: List of refutable contributions (with forward references to the rest of
+% the paper) What is the outcome of the project?
 \paragraph{Notes.}
 \begin{itemize}
 \item we also show correctness
 \item and introduce a new notation
+\item TODO: briefly mention what a pseudo-Boolean function is
 \end{itemize}
 
 \section{Weighted Model Counting}
 
-% TODO: Explain two meanings of entailment in the definition of WMC.
-
-Throughout the paper, we use set theoretic notation for many concepts in logic.
-A \emph{clause} is a set of literals that are part of an implicit disjunction.
-Similarly, a \emph{formula} in CNF is a set of clauses that are part of an
-implicit conjunction. We identify a \emph{model} with a set of variables that
-correspond to the positive literals in the model (and all other variables are
-the negative literals of the model). We can then define a model's
-\emph{cardinality} as the cardinality of this set. For example, let $\phi =
-(\neg a \lor b) \land a$ be a propositional formula over variables $a$ and $b$.
-Then an equivalent set-theoretic representation of $\phi$ is $\{ \{ \neg a, b
-\}, \{ a \} \}$. Any subset of $\{ a, b \}$ is an interpretation of $\phi$,
-e.g., $\{ a, b \}$ is a model of $\phi$ (written $\{ a, b \} \models \phi$) of
-cardinality two, while $\emptyset$ is an interpretation but not a model.
+We begin with an overview of some notation and terminology. Throughout the
+paper, we use set theoretic notation for many concepts in logic. A \emph{clause}
+is a set of literals that are part of an implicit disjunction. Similarly, a
+\emph{formula} in CNF is a set of clauses that are part of an implicit
+conjunction. We identify a \emph{model} with a set of variables that correspond
+to the positive literals in the model (and all other variables are the negative
+literals of the model). We can then define the \emph{cardinality} of a model as
+the cardinality of this set. For example, let $\phi = (\neg a \lor b) \land a$
+be a propositional formula over variables $a$ and $b$. Then an equivalent
+set-theoretic representation of $\phi$ is $\{ \{ \neg a, b \}, \{ a \} \}$. Any
+subset of $\{ a, b \}$ is an interpretation of $\phi$, e.g., $\{ a, b \}$ is a
+model of $\phi$ (written $\{ a, b \} \models \phi$) of cardinality two, while
+$\emptyset$ is an interpretation but not a model. We can now formally define
+WMC.
 
 \begin{definition}[WMC]
   A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
-  the set of indicator variables, $X_P$ is the set of parameter variables (with
-  $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula in CNF over
-  $X_I \cup X_P$, and $w\colon X_I \cup X_P \cup \{\neg x \mid x \in X_I \cup
-  X_P\} \to \mathbb{R}$ is the weight function. The \emph{answer} of the
-  instance is $\sum_{Y \models \phi} \prod_{Y \models l} w(l)$.
+  the set of \emph{indicator} variables, $X_P$ is the set of \emph{parameter}
+  variables (with $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula
+  in CNF over $X_I \cup X_P$, and $w\colon X_I \cup X_P \cup \{\neg x \mid x \in
+  X_I \cup X_P\} \to \mathbb{R}$ is the weight function. The \emph{answer} of
+  the instance is $\sum_{Y \models \phi} \prod_{Y \models l} w(l)$.
 \end{definition}
 
+That is, the answer to a WMC instance is the sum of the weights of all models of
+$\phi$, where the weight of a model is defined as the product of the weights of
+all (positive and negative) literals in it. Our definition of WMC is largely
+based on the standard definition \cite{DBLP:journals/ai/ChaviraD08}, but
+explicitly partitions variables into indicator and parameter variables. In
+practice, we identify this partition in one of two ways. If an encoding is
+generated by \textsf{Ace}, then variable types are explicitly identified in the
+LMAP file generated alongside the encoding. Otherwise, we define a variable $x$
+to be a parameter variable if $w(x) = w(\neg x) = 1$. Next, we formally define a
+variation of the WMC problem used by some of the Bayesian network encodings
+\cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}.
+
 \begin{definition}
-  Let $\phi$ be a propositional formula over a set of variables $X$. Then $Y
-  \subseteq X$ is a \emph{minimum-cardinality model} of $\phi$ if $Y \models
-  \phi$ and $|Y| \le |Z|$ for all $Z \models \phi$.
+  Let $\phi$ be a formula over a set of variables $X$. Then $Y \subseteq X$ is a
+  \emph{minimum-cardinality model} of $\phi$ if $Y \models \phi$ and $|Y| \le
+  |Z|$ for all $Z \models \phi$.
 \end{definition}
 
 \begin{definition}[Minimum-Cardinality WMC]
-  A \emph{minimum-cardinality WMC} instance has same tuple as a WMC instance,
-  but its answer is defined to be $\sum_{Y \models \phi\text{, }|Y| = k}
-  \prod_{Y \models l} w(l)$ (where $k = \min_{Y \models \phi} |Y|$) if $\phi$ is
-  satisfiable, and zero otherwise.
+  A \emph{minimum-cardinality WMC} instance consists of the same tuple as a WMC
+  instance, but its answer is defined to be $\sum_{Y \models \phi\text{, }|Y| =
+    k} \prod_{Y \models l} w(l)$ (where $k = \min_{Y \models \phi} |Y|$) if
+  $\phi$ is satisfiable, and zero otherwise.
 \end{definition}
 
-Our definition of WMC is largely based on the standard definition
-\cite{DBLP:journals/ai/ChaviraD08}, but explicitly partitions variables into
-indicator and parameter variables. In practice, we identify this partition in
-one of two ways. If an encoding is generated by \textsf{Ace}, then variable
-types are explicitly identified in the LMAP file generated alongside the
-encoding. Otherwise, we define a variable $x$ to be a parameter variable if
-$w(x) = w(\neg x) = 1$.
-
-\subsection{Bayesian Network Encodings (mostly done)}
+\subsection{Bayesian Network Encodings}
 
 A \emph{Bayesian network} is a directed acyclic graph with random variables as
 vertices and edges as conditional dependencies. As is common in related
@@ -199,25 +235,26 @@ encoder\footnote{\url{http://www.cril.univ-artois.fr/kc/bn2cnf.html}}).
 %instance, each binary variable of a Bayesian network is encoded using two
 %indicator variables while one would suffice.
 
-\section{Pseudo-Boolean Functions} % TODO: start here
-% TODO: need more related literature
-% TODO: look at the addmc/background_reading dir
+\section{Pseudo-Boolean Functions}
 
-\paragraph{References.} % extensions and applications
-\begin{itemize}
-\item ADDs \cite{DBLP:journals/fmsd/BaharFGHMPS97}
-\item AADDs \cite{DBLP:conf/ijcai/SannerM05}
-\item CUDD \cite{somenzi1998cudd}
-\item compiling BNs using VE \cite{DBLP:conf/ijcai/ChaviraD07}
-\item FOADDs \cite{DBLP:journals/ai/SannerB09}
-\item stochastic planning \cite{DBLP:conf/uai/HoeySHB99}
-\item XADDs \cite{DBLP:conf/uai/SannerDB11}
-\item another connection between BNs and ADDs \cite{DBLP:conf/icml/ZhaoMP15}
-\item and one more \cite{DBLP:conf/uai/GogateD11}
-\item maybe: \cite{DBLP:conf/aaai/FargierMNS14}
-\end{itemize}
+In this work we propose a more expressive representation for WMC based on
+pseudo-Boolean functions. Pseudo-Boolean functions, most commonly represented as
+algebraic decision diagrams (ADDs) \cite{DBLP:journals/fmsd/BaharFGHMPS97}
+(although a tensor-based approach has also been suggested
+\cite{DBLP:journals/corr/abs-1908-04381,DBLP:conf/cp/DudekPV20}), have seen
+extensive use in value iteration for Markov decision processes
+\cite{DBLP:conf/uai/HoeySHB99}, both exact and approximate Bayesian network
+inference \cite{DBLP:conf/ijcai/ChaviraD07,DBLP:conf/uai/GogateD11}, and
+sum-product network \cite{DBLP:conf/uai/PoonD11} to Bayesian network conversion
+\cite{DBLP:conf/icml/ZhaoMP15}. ADDs have been extended to compactly represent
+additive and multiplicative structure \cite{DBLP:conf/ijcai/SannerM05},
+sentences in first-order logic \cite{DBLP:journals/ai/SannerB09}, and continuous
+variables \cite{DBLP:conf/uai/SannerDB11}, the last of which was also applied to
+weighted model integration, i.e., the WMC extension for continuous variables
+\cite{DBLP:conf/ijcai/BellePB15,DBLP:conf/ijcai/KolbMSBK18}.
 
-\paragraph{Notation.} For any propositional formula $\phi$ over a set of
+Since two-valued pseudo-Boolean functions will be used extensively henceforth,
+we introduce some notation. For any propositional formula $\phi$ over a set of
 variables $X$ and $p, q \in \mathbb{R}$, let $[\phi]^p_q\colon 2^X \to
 \mathbb{R}$ be a pseudo-Boolean function defined as
 \[
@@ -227,7 +264,12 @@ variables $X$ and $p, q \in \mathbb{R}$, let $[\phi]^p_q\colon 2^X \to
     q & \text{otherwise}
   \end{cases}
 \]
-for any $Y \subseteq X$.
+for any $Y \subseteq X$. Next, we define some useful operations on
+pseudo-Boolean functions.
+% TODO: mention where the operations are from
+% TODO: should I consider different domains?
+% TODO: can I say that a domain automatically shrinks (w.r.t. x) if f|x=0 =
+% f|x=1?
 
 \begin{definition}[Operations] \label{def:operations}
   Let $f, g\colon 2^X \to \mathbb{R}$ be pseudo-Boolean functions, $x, y \in X$,
@@ -238,10 +280,9 @@ for any $Y \subseteq X$.
     \coloneqq f(Y) \cdot g(Y).
   \]
   Note that this means that binary operations on pseudo-Boolean functions
-  inherit properties such as associativity and commutativity. By not
-  distinguishing between a real number and a pseudo-Boolean function that always
-  returns that number, we can use the same definitions to define \emph{scalar}
-  operations as
+  inherit properties such as associativity and commutativity. By regarding a
+  real number as a constant pseudo-Boolean function, we can reuse the same
+  definitions to define \emph{scalar} operations as
   \[
     (r+f)(Y) = r+f(Y), \quad \text{and} \quad (r \cdot f)(Y) = r \cdot f(Y).
   \]
@@ -267,9 +308,10 @@ for any $Y \subseteq X$.
   $\exists_x fg = \exists_x (fg)$).
 \end{definition}
 
-Below we list some properties of the operations on pseudo-Boolean functions
-discussed in this section that can be conveniently represented using our syntax.
-The proofs of all these properties follow directly from the definitions.
+Finally, below we list some properties of the operations on pseudo-Boolean
+functions discussed in this section that can be conveniently represented using
+our syntax. The proofs of all these properties follow directly from the
+definitions.
 
 \begin{proposition}[Basic Properties] \label{prop:basic}
   For any propositional formulas $\phi$ and $\psi$, and $a, b, c, d \in
@@ -285,7 +327,7 @@ The proofs of all these properties follow directly from the definitions.
   and $x \in  X$, $(fg)|_{x=i} = f|_{x=i} \cdot g|_{x=i}$ for $i = 0, 1$.
 \end{proposition}
 
-\section{Pseudo-Boolean Projection (mostly done)}
+\section{Pseudo-Boolean Projection}
 
 We introduce a new type of computational problem called \emph{pseudo-Boolean
   projection} based on two-valued pseudo-Boolean functions. While the same
@@ -332,11 +374,10 @@ was inspired by the \texttt{bklm16} encoding.
       $F \gets F \cup \{ [c]^1_0 \}$\; \label{line:foreach1end}
     }
   }
-  \ForEach{indicator variable $v \in X_I$ \label{line:foreach2start}}{
-    \If{$\{[v]_1^p, [\neg v]_1^q\} \subseteq F$ for some $p$ and $q$}{
-      $F \gets F \setminus \{ [v]_1^p, [\neg v]_1^q \} \cup \{ [v]_q^p
-      \}$\; \label{line:foreach2end}
-    }
+  \ForEach{$v \in X_I$ such that $\{[v]_1^p, [\neg v]_1^q\}
+    \subseteq F$ for some $p$ and $q$ \label{line:foreach2start}}{
+    $F \gets F \setminus \{ [v]_1^p, [\neg v]_1^q \} \cup \{ [v]_q^p
+    \}$\; \label{line:foreach2end}
   }
 %  replace every variable $v$ in $F$ with $\rename{$v$}$\;
 %  \Return{$(F, X_I, \omega)$}\;
@@ -405,10 +446,8 @@ to PBP.
 \end{theorem}
 
 \begin{lemma} \label{lemma:sum}
-  For any pseudo-Boolean function $f\colon 2^X \to \mathbb{R}$,
-  \[
-    (\exists_X f)(\emptyset) = \sum_{Y \subseteq X} f(Y).
-  \]
+  For any pseudo-Boolean function $f\colon 2^X \to \mathbb{R}$, we have that
+  $(\exists_X f)(\emptyset) = \sum_{Y \subseteq X} f(Y)$.
 \end{lemma}
 \begin{proof}
   If $X = \{x\}$, then
@@ -449,12 +488,8 @@ to PBP.
     \quad
     g(Y) = \prod_{Y \models l} w(l),
   \]
-  which means that
-  \[
-    \sum_{Y \subseteq X_I \cup X_P} f(Y)g(Y) = \sum_{Y \models \phi} \prod_{Y
-      \models l} w(l)
-  \]
-  as required.
+  which means that $\sum_{Y \subseteq X_I \cup X_P} f(Y)g(Y) = \sum_{Y \models
+    \phi} \prod_{Y \models l} w(l)$ as required.
 \end{proof}
 
 \begin{theorem}[Correctness for WMC] \label{thm:correctness}
@@ -511,21 +546,17 @@ per any parameter variable $p \in X_P$ can `force $p$ to be positive'.
       1\right) \label{eq:new_wmc2}
   \end{equation}
   is a PBP instance with the same answer as the given WMC instance. By
-  \cref{def:new_wmc}, its answer is
-  \begin{equation} \label{eq:answer}
-    \left(\exists_{X_I \cup X_P} \left( \prod_{c \in \phi} [c]_0^1 \right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg x)}^{w(x)} \right)(\emptyset)
-  \end{equation}
-  Since both \cref{cond:d02,cond:bklm16} ensure that each clause in
-  $\phi$ has at most one parameter variable, we can partition $\phi$ into
-  $\phi_* \coloneqq \{c \in \phi \mid \mathtt{Vars}(c) \cap X_P = \emptyset \}$
-  and $\phi_p \coloneqq \{ c \in \phi \mid \mathtt{Vars}(c) \cap X_P = \{ p \}
-  \}$ for all $p \in X_P$. We can then use \cref{thm:early} to reorder
-  \eqref{eq:answer} into
-  \[
-    \left(\exists_{X_I} \left( \prod_{x \in X_I} [x]_{w(\neg x)}^{w(x)} \right)
-      \left( \prod_{c \in \phi_*} [c]_0^1 \right) \prod_{p \in X_P} \exists_p
-      [p]_{w(\neg p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 \right)(\emptyset).
-  \]
+  \cref{def:new_wmc}, its answer is $\left(\exists_{X_I \cup X_P} \left(\prod_{c
+        \in \phi} [c]_0^1 \right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg
+      x)}^{w(x)} \right)(\emptyset)$. Since both \cref{cond:d02,cond:bklm16}
+  ensure that each clause in $\phi$ has at most one parameter variable, we can
+  partition $\phi$ into $\phi_* \coloneqq \{c \in \phi \mid \mathtt{Vars}(c)
+  \cap X_P = \emptyset \}$ and $\phi_p \coloneqq \{ c \in \phi \mid
+  \mathtt{Vars}(c) \cap X_P = \{ p \} \}$ for all $p \in X_P$. We can then use
+  \cref{thm:early} to reorder the answer into $\left(\exists_{X_I} \left(
+      \prod_{x \in X_I} [x]_{w(\neg x)}^{w(x)} \right) \left( \prod_{c \in
+        \phi_*} [c]_0^1 \right) \prod_{p \in X_P} \exists_p [p]_{w(\neg
+      p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 \right)(\emptyset)$.
 
   Let us first consider how the unfinished WMC instance $(F, X_I, \omega)$ after
   the loop on \crefrange{line:foreach1start}{line:foreach1end} differs from
@@ -566,12 +597,9 @@ per any parameter variable $p \in X_P$ can `force $p$ to be positive'.
   \[
     F_p = \left\{ \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} \right\},
   \]
-  and $\omega = 1$, and so we want to show that
-  \[
-    \left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} = \exists_p [p]_1^{w(p)}
-    \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1,
-  \]
-  and indeed
+  and $\omega = 1$, and so we want to show that $\left[ \bigwedge_{i = 1}^n l_i
+  \right]_1^{w(p)} = \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow
+    \bigwedge_{i=1}^n l_i \right]_0^1$, and indeed
   \[
     \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
     \right]_0^1 = w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[
@@ -600,12 +628,9 @@ per any parameter variable $p \in X_P$ can `force $p$ to be positive'.
     \omega \prod_{f \in F_p} f.
   \]
   The only remaining case is when $w(p) \ne 1$ and $\{ p \} \not \in \phi_p$.
-  Then $\omega = 1$, and
-  \[
-    F_p = \left\{ \left[\bigwedge_{l \in c \setminus \{ p \}} \neg
-        l\right]_1^{w(p)} \;\middle|\; c \in \phi_p \right\},
-  \]
-  so need to show that
+  Then $\omega = 1$, and $F_p = \left\{ \left[\bigwedge_{l \in c \setminus \{ p
+        \}} \neg l\right]_1^{w(p)} \;\middle|\; c \in \phi_p \right\}$, so we
+  need to show that
   \[
     \prod_{c \in \phi_p} \left[\bigwedge_{l \in c \setminus \{ p \}} \neg
       l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p}
@@ -630,11 +655,8 @@ per any parameter variable $p \in X_P$ can `force $p$ to be positive'.
    \cref{cond:d02} and \cref{cond:bklm16}. Finally, the loop on
    \crefrange{line:foreach2start}{line:foreach2end} of \cref{alg:transformation}
    replaces $[v]_1^p[\neg v]_1^q$ with $[v]_q^p$ (for some $v \in X_I$ and $p, q
-   \in \mathbb{R}$), but, of course,
-   \[
-     [v]_1^p[\neg v]_1^q = [v]_1^p[v]_q^1 = [v]_q^p,
-   \]
-   i.e., the answer is unchanged.
+   \in \mathbb{R}$), but, of course, $[v]_1^p[\neg v]_1^q = [v]_1^p[v]_q^1 =
+   [v]_q^p$, i.e., the answer is unchanged.
 \end{proof}
 
 \begin{theorem}[Minimum-Cardinality Correctness] \label{thm:mccorrectness}
@@ -692,23 +714,17 @@ slightly less explicit and assumes that $\omega = 1$.
   \end{equation}
 
   On the one hand, if $Z \subseteq X_I \cup X_P$ is a minimum-cardinality model
-  of $\phi$, then
-  \[
-    \left(\prod_{f \in F}\right)(Z \cap X_I) \ne 0
-  \]
-  under the given assumptions. On the other hand, if $Y \subseteq X_I$ is such
-  that
-  \[
-    \left(\prod_{f \in F}\right)(Y) \ne 0,
-  \]
-  then $Y \models \{ c \in \phi \mid c \cap X_P = \emptyset \}$. Let $Y
-  \subseteq Z \subseteq X_I \cup X_P$ be the smallest superset of $Y$ such that
-  $Z \models \phi$ (it exists by \cref{cond:2b3} of \cref{thm:correctness}). We
-  need to show that $Z$ has minimum cardinality. Let $Y'$ and $Z'$ be defined
-  equivalently to $Y$ and $Z$. We will show that $|Z| = |Z'|$. Note that $|Y| =
-  |Y'|$ by \cref{cond:22}, and $|Z \setminus Y| = |Z' \setminus Y'|$ by
-  \cref{cond:23}. Combining that with the general property that $|Z| = |Y| + |Z
-  \setminus Y|$ finishes the first part of the proof.
+  of $\phi$, then $\left(\prod_{f \in F}\right)(Z \cap X_I) \ne 0$ under the
+  given assumptions. On the other hand, if $Y \subseteq X_I$ is such that
+  $\left(\prod_{f \in F}\right)(Y) \ne 0$, then $Y \models \{ c \in \phi \mid c
+  \cap X_P = \emptyset \}$. Let $Y \subseteq Z \subseteq X_I \cup X_P$ be the
+  smallest superset of $Y$ such that $Z \models \phi$ (it exists by
+  \cref{cond:2b3} of \cref{thm:correctness}). We need to show that $Z$ has
+  minimum cardinality. Let $Y'$ and $Z'$ be defined equivalently to $Y$ and $Z$.
+  We will show that $|Z| = |Z'|$. Note that $|Y| = |Y'|$ by \cref{cond:22}, and
+  $|Z \setminus Y| = |Z' \setminus Y'|$ by \cref{cond:23}. Combining that with
+  the general property that $|Z| = |Y| + |Z \setminus Y|$ finishes the first
+  part of the proof.
 
   For the second part, let us consider the multiplicative influence of a single
   parameter variable $p \in X_P$ on \cref{eq:weights}. If the left-hand side is
@@ -719,7 +735,7 @@ slightly less explicit and assumes that $\omega = 1$.
   \cref{thm:correctness}). This argument works in the other direction as well.
 \end{proof}
 
-\section{Experimental Evaluation (mostly done)}
+\section{Experimental Evaluation}
 % TODO: what are the encodings compiled with?
 
 We run a set of experiments, comparing all five original Bayesian network
@@ -752,17 +768,16 @@ for \texttt{bklm16}. We focus on the following questions:
 
 \subsection{Setup}
 
-\textsf{DPMC} is run with tree decomposition based planning and algebraic
-decision diagram based execution---the best-performing combination in the
-original set of experiments \cite{DBLP:conf/cp/DudekPV20}. We use a single
-iteration of \textsf{htd} \cite{DBLP:conf/cpaior/AbseherMW17} to generate
-approximately optimal tree decompositions---we found that this configuration
-is efficient enough to handle huge instances, and yet the width of the
-returned decomposition is unlikely to differ from optimal by more than one or
-two. We also enabled \textsf{DPMC}'s greedy mode. This mode (which was not part
-of the original paper \cite{DBLP:conf/cp/DudekPV20}) optimises the order in
-which pseudo-Boolean functions are multiplied by prioritising functions with
-small representations.
+\textsf{DPMC} is run with tree decomposition based planning and ADD based
+execution---the best-performing combination in the original set of experiments
+\cite{DBLP:conf/cp/DudekPV20}. We use a single iteration of \textsf{htd}
+\cite{DBLP:conf/cpaior/AbseherMW17} to generate approximately optimal tree
+decompositions---we found that this configuration is efficient enough to handle
+huge instances, and yet the width of the returned decomposition is unlikely to
+differ from optimal by more than one or two. We also enabled \textsf{DPMC}'s
+greedy mode. This mode (which was not part of the original paper
+\cite{DBLP:conf/cp/DudekPV20}) optimises the order in which pseudo-Boolean
+functions are multiplied by prioritising functions with small representations.
 
 For experimental data, we use Bayesian networks available with \textsf{Ace} and
 \textsf{Cachet}. We split them into the following groups:
