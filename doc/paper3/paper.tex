@@ -46,7 +46,7 @@
 
 \maketitle              % typeset the header of the contribution
 
-\begin{abstract}
+\begin{abstract} % TODO: write
   The abstract should briefly summarize the contents of the paper in
   150--250 words.
 
@@ -54,16 +54,18 @@
 \end{abstract}
 
 \section{Introduction}
-
 % TODO for later:
 % 1) read through v2 of the paper and check if I forgot to mention something
 % here
 % 2) run this through grammarly
 
 % NOTE: What is the problem? Why is it interesting and important?
-WMC has emerged as a powerful computational framework for problems in many
-domains, e.g., probabilistic graphical models such as Bayesian networks and
-Markov networks
+Weighted model counting (WMC), i.e., a generalisation of propositional model
+counting that assigns weights to literals and computes the total weight of all
+models of a propositional formula \cite{DBLP:journals/ai/ChaviraD08}, has
+emerged as a powerful computational framework for problems in many domains,
+e.g., probabilistic graphical models such as Bayesian networks and Markov
+networks
 \cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05},
 neuro-symbolic artificial intelligence \cite{DBLP:conf/icml/XuZFLB18},
 probabilistic programs \cite{DBLP:journals/pacmpl/HoltzenBM20}, and
@@ -72,61 +74,77 @@ been extended to support continuous variables \cite{DBLP:conf/ijcai/BellePB15},
 infinite domains \cite{DBLP:conf/aaai/Belle17}, first-order logic
 \cite{DBLP:journals/cacm/GogateD16,DBLP:conf/ijcai/BroeckTMDR11}, and arbitrary
 semirings \cite{DBLP:journals/ijar/BelleR20,DBLP:journals/japll/KimmigBR17}.
+However, as the definition of WMC puts weights on literals, additional variables
+often need to be added for the sole purpose of holding a weight
+\cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05}.
+As the parameterised complexity of model counting (and, by extension, WMC)
+depends on the number of variables
+\cite{DBLP:conf/focs/BacchusDP03,DBLP:journals/jda/SamerS10}, this can make WMC
+unnecessarily slow and could be detrimental to WMC algorithms such as
+\textsf{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} that depend on variable ordering
+heuristics.
 
 % NOTE: What's wrong with previous proposed solutions? How does mine differ?
-% TODO: Our work is similar to \cite{DBLP:conf/uai/GogateD10} who suggest using
-% a collection of soft (i.e., with weights) and hard clauses
-% TODO: how different are the semantics?
-% But:
-% 1) we can handle arbitrary formulas and not just clauses
-% 2) we assign two weights, not one
-% 3) the semantics of these weights are completely different, similar to the
-% ones from Markov networks. It is thus difficult to reuse the same formulation
-% for a different WMC algorithm.
-% 4) Since we present a WMC->PBP algorithm, we don't need to invent new
-% encodings for each problem and we can benefit from all the good ideas that
-% went into designing WMC encodings
-
-Many WMC inference algorithms such as
+One approach to this problem considers weighted clauses and probabilistic
+semantics based on Markov networks \cite{DBLP:conf/uai/GogateD10}. However, with
+a new representation comes the need to invent new encodings and inference
+algorithms. Our work is similar in that it introduces a new representation for
+computational problems but is able to reuse recent WMC algorithms based on
+pseudo-Boolean function manipulation, namely, \textsf{ADDMC}
+\cite{DBLP:conf/aaai/DudekPV20} and \textsf{DPMC} \cite{DBLP:conf/cp/DudekPV20}.
+Furthermore, we identify necessary conditions for transforming a WMC instance
+into the new format. As many WMC inference algorithms such as
 \textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}}, \textsf{c2d}
 \cite{DBLP:conf/ecai/Darwiche04}, and \textsf{miniC2D}
 \cite{DBLP:conf/ijcai/OztokD15} work by compilation to tractable representations
 such as arithmetic circuits, deterministic, decomposable negation normal form
 \cite{DBLP:journals/jancl/Darwiche01}, and sentential decision diagrams (SDDs)
-\cite{DBLP:conf/ijcai/Darwiche11}. Some attempts have previously been made to
-skip this intermediate stage of representing a Bayesian network as a WMC
-instance and compile directly to a more convenient representation.
-Specifically, direct compilation from Bayesian networks to SDDs
-\cite{DBLP:conf/ecsqaru/ChoiKD13} and from structured Bayesian networks (i.e., a
-generalisation of Bayesian networks) to probabilistic SDDs
-\cite{shen2020modeling} have been considered. To the best of the authors'
-knowledge, neither compilation approach has a publicly available implementation.
+\cite{DBLP:conf/ijcai/Darwiche11}, another way to avoid parameter variables
+could be via direct compilation to a more convenient representation. However,
+while direct compilation of Bayesian networks to SDDs has been investigated
+\cite{DBLP:conf/ecsqaru/ChoiKD13}, SDDs are not expressive enough to avoid the
+issue.
 
 % NOTE: What are the key components of my approach and results? Also include any
 % specific limitations. What about your project is new or different from
-% existing solutions?
-Our work is similar in that it introduces a new representation for computational
-problems that is based on pseudo-Boolean functions---pseudo-Boolean projection
-(PBP). We formally show that every WMC problem instance has a corresponding PBP
-instance. We argue that this new format is more appropriate for WMC solvers
-whose execution is build on pseudo-Boolean function manipulation, i.e.,
-\textsf{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} and \textsf{DPMC}
-\cite{DBLP:conf/cp/DudekPV20}. Finally, we show how most methods of encoding
-probabilistic inference on Bayesian networks to WMC can be adapted to the PBP
-format. This transformation significantly improves inference speed,
-outperforming all other considered algorithm-encoding combinations.
+% existing solutions? List of refutable contributions (with forward references
+% to the rest of the paper) What is the outcome of the project?
+In this work, we introduce a way to transform WMC problems to a new format based
+on pseudo-Boolean functions---\emph{pseudo-Boolean projection} (PBP). We
+formally show that every WMC problem instance has a corresponding PBP instance
+and identify conditions under which this transformation can remove parameter
+variables. Four out of the five known WMC encodings for Bayesian networks
+\cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05}
+can indeed be simplified in this manner. This transformation enables two
+encodings that were previously incompatible with most WMC algorithms (due to
+using a different definition of WMC
+\cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be run with
+\textsf{ADDMC} and \textsf{DPMC} and results in a significant performance boost
+for one other encoding, allowing it to surpass the current state of the art.
+Finally, our theoretical contributions result in a convenient algebraic way of
+reasoning about two-valued pseudo-Boolean functions and position WMC encodings
+on a common ground, identifying their key properties and assumptions.
 
-%allowing two encodings that were previously incompatible with
-%\textsf{DPMC} to be compatible.
+%To the best of the authors' knowledge, none of these compilation/inference
+%techniques have a publicly available implementation.
 
-% NOTE: List of refutable contributions (with forward references to the rest of
-% the paper) What is the outcome of the project?
-\paragraph{Notes.}
-\begin{itemize}
-\item we also show correctness
-\item and introduce a new notation
-\item TODO: briefly mention what a pseudo-Boolean function is
-\end{itemize}
+% Specifically, direct compilation
+% from Bayesian networks to SDDs \cite{DBLP:conf/ecsqaru/ChoiKD13} and from
+% structured Bayesian networks (i.e., a generalisation of Bayesian networks) to
+% probabilistic SDDs \cite{shen2020modeling} have been considered.
+
+% * SDD compilation still has parameter variables
+% 1) However, no conversion algorithms from either WMC or probabilistic models
+% are provided.
+% Since we present a WMC to PBP algorithm, we don't need to invent new
+% encodings for each problem and we can benefit from all the good ideas that
+% went into designing WMC encodings
+% 3) Instead of combining techniques from older WMC algorithms like they did, we
+% use a much more recent WMC solver that is shown to...
+% 3) We benefit from a decade of research in WMC inference and, specifically, 
+% 4) We are not restricted to clauses and probabilistic semantics
+% 5) We identify conditions and describe an algorithm for transforming any WMC
+% instance into PBP
 
 \section{Weighted Model Counting}
 
@@ -236,6 +254,9 @@ encoder\footnote{\url{http://www.cril.univ-artois.fr/kc/bn2cnf.html}}).
 %indicator variables while one would suffice.
 
 \section{Pseudo-Boolean Functions}
+
+% TODO: briefly mention what a pseudo-Boolean function is
+% TODO: mention that $2^x$ denotes the powerset of $X$.
 
 In this work we propose a more expressive representation for WMC based on
 pseudo-Boolean functions. Pseudo-Boolean functions, most commonly represented as
@@ -685,12 +706,9 @@ parameter variables needed to turn an indicator-only model into a full model is
 the same for all indicator-only models. As some ideas duplicate between the
 proofs of \cref{thm:correctness,thm:mccorrectness}, the following proof is
 slightly less explicit and assumes that $\omega = 1$.
-
 % We assume that $\omega = 1$ (i.e., $\{ p \} \not\in \phi$ for all parameter
 % variables $p \in X_P$) as the proof can be easily extended to handle $\omega
 % \neq 1$ similarly to the proof of \cref{thm:correctness}. 
-
-% TODO: check if each condition is actually used
 
 \begin{proof}
   Let $(F, X_I, \omega)$ be the tuple returned by \cref{alg:transformation} and
@@ -906,30 +924,34 @@ variables for \texttt{d02}, the performance of $\textsf{DPMC}+\texttt{d02}$ is
 virtually unaffected. Finally, while our transformation makes it possible to use
 \texttt{cd05} and \texttt{cd06} with \textsf{DPMC}, the two combinations remain
 inefficient.
+% TODO: mention (somewhere) that we can't compare to Gogate's work and direct
+% compilation (take the text from the introduction)
 
-\section{Conclusions}
+\section{Conclusion} % So what?
 
-\paragraph{Notes.}
-\begin{itemize}
-\item Benefits of my approach:
-  \begin{itemize}
-  \item smaller primal graph, so easier to perform tree decomposition
-  \item Variable order is less likely to be obstructed by all the unnecessary
-    'parameter' variables.
-  \item There are others, but they're not that important.
-  \end{itemize}
-\item Future work: do other WMC encodings also have this variable partition
-  property?
-\item Do I need to formally consider extending a pseudo-Boolean function to a
-  bigger domain?
-\item Benefits of having this proof in the paper:
-  \begin{itemize}
-  \item It puts all encodings on a common ground.
-  \item It illustrates the convenience of our notation for reasoning about
-    (certain types of) pseudo-Boolean functions.
-  \item It's too big and too important to be left for the appendix.
-  \end{itemize}
-\end{itemize}
+In this paper, we showed how the number of variables in a WMC instance can be
+significantly reduced by transforming it into a representation based on
+two-valued pseudo-Boolean functions. In some cases, this led to significant
+improvements in inference speed, allowing $\textsf{DPMC} + \texttt{bklm16++}$ to
+overtake $\textsf{Ace}+\texttt{cd06}$ as the new state of the art WMC technique
+for Bayesian network inference. Moreover, we identified key properties of
+Bayesian network encodings that allow for parameter variable removal. However,
+these properties were rather different for each encoding, and so an interesting
+question for future work is whether they can be unified into a more abstract
+and coherent list of conditions.
+
+Bayesian network inference was chosen as the example application of WMC because
+it is the first and the most studied one
+\cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05}.
+While the distinction between indicator and parameter variables is often not
+explicitly described in other WMC encodings
+\cite{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/pacmpl/HoltzenBM20,DBLP:conf/icml/XuZFLB18},
+perhaps in some cases variables could still be partitioned in this way, allowing
+for not just faster inference with \textsf{DPMC} or \textsf{ADDMC} but also for
+well-established WMC encoding and inference techniques (such as in the
+\texttt{cd05} and \texttt{cd06} papers
+\cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be transferred to
+other application domains.
 
 \bibliographystyle{splncs04}
 \bibliography{paper}
