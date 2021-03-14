@@ -272,16 +272,16 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
   cumulative$time <- as.numeric(cumulative$time)
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < 2 * TIMEOUT, ]
-  p <- ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
+  p <- ggplot(cumulative, aes(x = count, y = time, color = .data[[column_name]])) +
     geom_line(aes(linetype = algorithm)) +
-    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000),
+    scale_y_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000),
                        labels = c("0.1", "1", "10", "100", "1000")) +
-    xlab("Time (s)") +
-    ylab("Instances solved") +
-    annotation_logticks(sides = "b", colour = "#989898") +
+    ylab("Time (s)") +
+    xlab("Instances solved") +
+    annotation_logticks(sides = "l", colour = "#989898") +
     theme_set(theme_light()) +
     labs(color = pretty_column_name, linetype = "Algorithm") +
-    geom_hline(yintercept = 1466, linetype = "dotted", color = "black")
+    geom_vline(xintercept = 1466, linetype = "dotted", color = "black")
 
   if (show.color.legend) {
     p <- p + scale_colour_manual(breaks = sort(unique(cumulative$encoding)),

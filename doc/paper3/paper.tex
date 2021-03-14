@@ -65,7 +65,7 @@
   competitive with the more traditional WMC algorithms based on knowledge
   compilation and backtracking search. We present an algorithm that transforms
   WMC instances into a format based on pseudo-Boolean functions while
-  eliminating around \SI{57}{\percent} of variables on average across various
+  eliminating around \SI{43}{\percent} of variables on average across various
   Bayesian network encodings. Moreover, we identify sufficient conditions for
   such a variable removal to be possible. Our experiments show significant
   improvement in WMC-based Bayesian network inference, outperforming the current
@@ -106,23 +106,25 @@ heuristics.
 One approach to this problem considers weighted clauses and probabilistic
 semantics based on Markov networks \cite{DBLP:conf/uai/GogateD10}. However, with
 a new representation comes the need to invent new encodings and inference
-algorithms. Our work is similar in that it introduces a new representation for
-computational problems but can reuse recent WMC algorithms based on
-pseudo-Boolean function manipulation, namely, \textsf{ADDMC}
+algorithms. Our work is similar in spirit in that it introduces a new
+representation for computational problems but can reuse recent WMC algorithms
+based on pseudo-Boolean function manipulation, namely, \textsf{ADDMC}
 \cite{DBLP:conf/aaai/DudekPV20} and \textsf{DPMC} \cite{DBLP:conf/cp/DudekPV20}.
 Furthermore, we identify sufficient conditions for transforming a WMC instance
 into our new format. As many WMC inference algorithms such as
-\textsf{Ace}\footnote{\url{http://reasoning.cs.ucla.edu/ace/}}, \textsf{c2d}
+\textsf{Ace}, \textsf{c2d}
 \cite{DBLP:conf/ecai/Darwiche04}, and \textsf{miniC2D}
 \cite{DBLP:conf/ijcai/OztokD15} work by compilation to tractable representations
 such as arithmetic circuits, deterministic, decomposable negation normal form
 \cite{DBLP:journals/jancl/Darwiche01}, and sentential decision diagrams (SDDs)
 \cite{DBLP:conf/ijcai/Darwiche11}, another way to avoid parameter variables
-could be via direct compilation to a more convenient representation. However,
-while direct compilation of Bayesian networks to SDDs has been investigated
-\cite{DBLP:conf/ecsqaru/ChoiKD13}, SDDs are not expressive enough to avoid the
-issue. Furthermore, to the best of the authors' knowledge, neither
-compilation/inference technique has a publicly available implementation.
+could be via direct compilation to a more convenient representation. Direct
+compilation of Bayesian networks to SDDs has been investigated
+\cite{DBLP:conf/ecsqaru/ChoiKD13}. However, SDDs only support weights on
+literals, and so are not expressive enough to avoid the issue. To the best of
+the authors' knowledge, neither approach
+\cite{DBLP:conf/ecsqaru/ChoiKD13,DBLP:conf/uai/GogateD10} has a publicly
+available implementation.
 
 % NOTE: What are the key components of my approach and results? Also include any
 % specific limitations. What about your project is new or different from
@@ -134,15 +136,16 @@ formally show that every WMC problem instance has a corresponding PBP instance
 and identify conditions under which this transformation can remove parameter
 variables. Four out of the five known WMC encodings for Bayesian networks
 \cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05}
-can indeed be simplified in this manner. This transformation enables two
-encodings that were previously incompatible with most WMC algorithms (due to
-using a different definition of WMC
-\cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be run with
+can indeed be simplified in this manner. We are able to eliminate
+\SI{43}{\percent} of variables on average and up to \SI{99}{\percent} on some
+instances. This transformation enables two encodings that were previously
+incompatible with most WMC algorithms (due to using a different definition of
+WMC \cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be run with
 \textsf{ADDMC} and \textsf{DPMC} and results in a significant performance boost
-for one other encoding, allowing it to surpass the current state of the art.
-Finally, our theoretical contributions result in a convenient algebraic way of
-reasoning about two-valued pseudo-Boolean functions and position WMC encodings
-on common ground, identifying their key properties and assumptions.
+for one other encoding, making it about three times faster than the state of the
+art. Finally, our theoretical contributions result in a convenient algebraic way
+of reasoning about two-valued pseudo-Boolean functions and position WMC
+encodings on common ground, identifying their key properties and assumptions.
 
 % Specifically, direct compilation
 % from Bayesian networks to SDDs \cite{DBLP:conf/ecsqaru/ChoiKD13} and from
@@ -181,10 +184,11 @@ WMC.
 
 \begin{definition}[WMC]
   A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
-  the set of \emph{indicator} variables, $X_P$ is the set of \emph{parameter}
-  variables (with $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula
+  the set of \emph{indicator variables}, $X_P$ is the set of \emph{parameter
+  variables} (with $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula
   in CNF over $X_I \cup X_P$, and $w\colon X_I \cup X_P \cup \{\neg x \mid x \in
-  X_I \cup X_P\} \to \mathbb{R}$ is the weight function. Its \emph{answer} is
+  X_I \cup X_P\} \to \mathbb{R}$ is a \emph{weight function} such that $w(x) =
+  w(\neg x) = 1$ for all $x \in X_I$. The \emph{answer} of the instance is
   $\sum_{Y \models \phi} \prod_{Y \models l} w(l)$.
 \end{definition}
 
@@ -194,10 +198,14 @@ all (positive and negative) literals in it. Our definition of WMC is largely
 based on the standard definition \cite{DBLP:journals/ai/ChaviraD08}, but
 explicitly partitions variables into indicator and parameter variables. In
 practice, we identify this partition in one of two ways. If an encoding is
-generated by \textsf{Ace}, then variable types are explicitly identified in the
-LMAP file generated alongside the encoding. Otherwise, we define a variable $x$
-to be a parameter variable if $w(x) = w(\neg x) = 1$. Next, we formally define a
-variation of the WMC problem used by some of the Bayesian network encodings
+generated by \textsf{Ace}\footnote{\textsf{Ace}
+  \cite{DBLP:journals/ai/ChaviraD08} implements most of the Bayesian network
+  encodings and can also be used for compilation (and thus inference). It is
+  available at \url{http://reasoning.cs.ucla.edu/ace/}.}, then variable types
+are explicitly identified in a file generated alongside the encoding. Otherwise,
+we take $X_I$ to be the set of all variables $x$ such that $w(x) = w(\neg x) =
+1$. Next, we formally define a variation of the WMC problem used by some of the
+Bayesian network encodings
 \cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}.
 
 \begin{definition}
@@ -213,7 +221,16 @@ variation of the WMC problem used by some of the Bayesian network encodings
   $\phi$ is satisfiable, and zero otherwise.
 \end{definition}
 
-\subsection{Bayesian Network Encodings}
+\begin{example}
+  Let $\phi = (x \lor y) \land (\neg x \lor \neg y) \land (\neg x \lor p) \land
+  (\neg y \lor q) \land x$, $X_I = \{ x, y \}$, $X_P = \{ p, q \}$, $w(p) =
+  0.2$, $w(q) = 0.8$, and $w(\neg p) = w(\neg q) = 1$. Then $\phi$ has two
+  models: $\{x, p\}$ and $\{ x, p, q \}$ with weights $0.2$ and $0.2 \times 0.8
+  = 0.16$, respectively. The WMC answer is then $0.2 + 0.16 = 0.36$, and the
+  minimum-cardinality WMC answer is $0.2$.
+\end{example}
+
+\subsection{Bayesian Network Encodings} \label{sec:encodings}
 
 A \emph{Bayesian network} is a directed acyclic graph with random variables as
 vertices and edges as conditional dependencies. As is common in related
@@ -259,6 +276,16 @@ seven mutually independent binary variables, 0.1 and 0.9 probabilities each, is
 already big enough for the scaling factor to be exactly equal to zero (as
 produced by the \texttt{bklm16}
 encoder\footnote{\url{http://www.cril.univ-artois.fr/kc/bn2cnf.html}}).
+% TODO (on encodings and clauses): I realise the paper is already long but it
+% might be useful to have a quick example
+% TODO: If I am reading this correctly you are making a stark statement about
+% the inefficacy. It might be good to rephrase this differently. You might want
+% to say that there are many corner cases where there are no improvements. 
+% TODO: Is there a reference for this example? If yes provide one. If no, maybe
+% you could provide a link to the output, or alternatively, you could say
+% something like the reader is free to check that such an example produces no
+% improvements
+% TODO: is this example the same as the previous one?
 
 %This additional condition on model
 %cardinality becomes necessary because these encodings eliminate clauses of the
@@ -378,14 +405,15 @@ files and using the syntax proposed in this paper.
 \begin{definition}[PBP Instance] \label{def:new_wmc}
   A PBP instance is a tuple $(F, X, \omega)$, where $X$ is the set of variables,
   $F$ is a set of two-valued pseudo-Boolean functions $2^X \to \mathbb{R}$, and
-  $\omega \in \mathbb{R}$ is the scaling factor. Its \emph{answer} is $\omega
-  \cdot \left(\exists_X\prod_{f \in F}f\right)(\emptyset)$.
+  $\omega \in \mathbb{R}$ is the scaling factor.\footnote{
+    Adding scaling factor $\omega$ to the definition allows us to remove clauses
+    that consist entirely of a single parameter variable. The idea of extracting
+    some of the structure of the WMC instance into an external multiplicative factor
+    was loosely inspired by the \texttt{bklm16} encoding, where it is used
+    to subsume the most commonly occurring probability of each CPT
+    \cite{DBLP:conf/ecai/BartKLM16}.} Its \emph{answer} is $\omega \cdot
+  \left(\exists_X\prod_{f \in F}f\right)(\emptyset)$.
 \end{definition}
-
-Adding scaling factor $\omega$ to the definition allows us to remove clauses
-that consist entirely of a single parameter variable. The idea of extracting
-some of the structure of the WMC instance into an external multiplicative factor
-was inspired by the \texttt{bklm16} encoding.
 
 \subsection{From WMC to PBP}
 
@@ -429,8 +457,12 @@ was inspired by the \texttt{bklm16} encoding.
 
 In this section, we describe an algorithm for transforming WMC instances to the
 PBP format while removing all parameter variables. The algorithm works on four
-out of the five Bayesian network encodings. There is no obvious way to adjust it
-to work with \texttt{sbk05} because the roles of indicator and parameter (i.e.,
+out of the five Bayesian network encodings: \texttt{bklm16}
+\cite{DBLP:conf/ecai/BartKLM16}, \texttt{cd05}
+\cite{DBLP:conf/ijcai/ChaviraD05}, \texttt{cd06}
+\cite{DBLP:conf/sat/ChaviraD06}, and \texttt{d02}
+\cite{DBLP:conf/kr/Darwiche02}. There is no obvious way to adjust it to work
+with \texttt{sbk05} because the roles of indicator and parameter (i.e.,
 `chance') variables overlap \cite{DBLP:conf/aaai/SangBK05}. The algorithm is
 based on several observations that will be made more precise in
 \cref{sec:proof}. First, all weights except for $\{w(p) \mid p \in X_P\}$ are
@@ -507,6 +539,18 @@ to PBP.
   \end{equation}
   is a PBP instance with the same answer.
 \end{proposition}
+% TODO: It’s a bit strange to say same answer, when you don’t precisely refer to
+% this anywhere. One option is to say the above is the WMC instance and let
+% Delta be the weighted model count. Then the new encoding Has a weighted model
+% count of delta as well. Or something like that.
+% But looking at the text below, I see that you use this phrasing everywhere,
+% and I admit my formulation is awkward. So maybe the best compromise here is
+% just simply add a footnote explaining what exactly you mean when you say same
+% answer
+% TODO: If it is the case that you cannot include the proofs in line, and indeed
+% it might be better for readability to have an appendix with all the proofs, it
+% might make sense to provide the type of argument you are using in the proofs
+% so that readers know what to expect when they look into it
 \begin{proof}
   Let $f = \prod_{c \in \phi} [c]_0^1$, and $g = \prod_{x \in X_I \cup X_P}
   [x]_{w(\neg x)}^{w(x)}$. Then the WMC answer is
@@ -533,49 +577,41 @@ to PBP.
 
 \begin{theorem}[Correctness for WMC] \label{thm:correctness}
   \Cref{alg:transformation}, when given a WMC instance $(\phi, X_I, X_P,
-  w)$, returns PBP instance with the same answer, provided the following
-  conditions are satisfied:
+  w)$, returns a PBP instance with the same answer, provided \emph{either} of
+  the two conditions is satisfied:
   \begin{enumerate}
-  \item for all indicator variables $i \in X_I$, $w(i) = w(\neg i) =
-    1$, \label{cond:one}
-  \item and either
+  \item for all $p \in X_P$, there is a non-empty family of literals
+    $(l_i)_{i=1}^n$ such that \label{cond:d02}
     \begin{enumerate}
-    \item for all parameter variables $p \in X_P$, there is a non-empty family
-      of literals $(l_i)_{i=1}^n$ such that \label{cond:d02}
-      \begin{enumerate}
-      \item $w(\neg p) = 1$,
-      \item $l_i \in X_I$ or $\neg l_i \in X_I$ for all $i = 1, \dots, n$,
-        \label{condition:equivalence1}
-      \item and $\{ c \in \phi \mid p \in c \text{ or } \neg p \in c \} =
-        \left\{p \lor \bigvee_{i=1}^n \neg l_i \right\} \cup \{ l_i \lor \neg p
-        \mid i = 1, \dots, n \}$; \label{condition:equivalence2}
-      \end{enumerate}
-    \item or for all parameter variables $p \in X_P$, \label{cond:bklm16}
-      \begin{enumerate}
-      \item $w(p) + w(\neg p) = 1$,
-      \item for any clause $c \in \phi$, $|c \cap X_P| \le 1$, \label{cond:2b2}
-      \item there is no clause $c \in \phi$ such that $\neg p \in
-        c$, \label{cond:2b3}
-      \item if $\{ p \} \in \phi$, then there is no clause $c \in \phi$ such
-        that $c \ne \{ p \}$ and $p \in c$, \label{cond:just_parameter}
-        % 'prime implicants are logically disjoint'
-      \item and for any $c, d \in \phi$ such that $c \ne d$, $p \in c$ and $p
-        \in d$, $\bigwedge_{l \in c \setminus \{ p \}} \neg l \land \bigwedge_{l
-          \in d \setminus \{ p \}} \neg l$ is false. \label{cond:disjoint}
-      \end{enumerate}
+    \item $w(\neg p) = 1$,
+    \item $l_i \in X_I$ or $\neg l_i \in X_I$ for all $i = 1, \dots, n$,
+      \label{condition:equivalence1}
+    \item and $\{ c \in \phi \mid p \in c \text{ or } \neg p \in c \} =
+      \left\{p \lor \bigvee_{i=1}^n \neg l_i \right\} \cup \{ l_i \lor \neg p
+      \mid i = 1, \dots, n \}$; \label{condition:equivalence2}
+    \end{enumerate}
+  \item or for all $p \in X_P$, \label{cond:bklm16}
+    \begin{enumerate}
+    \item $w(p) + w(\neg p) = 1$,
+    \item for any clause $c \in \phi$, $|c \cap X_P| \le 1$, \label{cond:2b2}
+    \item there is no clause $c \in \phi$ such that $\neg p \in
+      c$, \label{cond:2b3}
+    \item if $\{ p \} \in \phi$, then there is no clause $c \in \phi$ such
+      that $c \ne \{ p \}$ and $p \in c$, \label{cond:just_parameter}
+    \item and for any $c, d \in \phi$ such that $c \ne d$, $p \in c$ and $p
+      \in d$, $\bigwedge_{l \in c \setminus \{ p \}} \neg l \land \bigwedge_{l
+        \in d \setminus \{ p \}} \neg l$ is false. \label{cond:disjoint}
     \end{enumerate}
   \end{enumerate}
 \end{theorem}
 
-\Cref{cond:one} applies to all four WMC encodings under consideration and
-ensures that only parameter variables carry nontrivial weights. \Cref{cond:d02}
-(for \texttt{d02}) simply states that each parameter variable is equivalent to a
-conjunction of indicator literals. \Cref{cond:bklm16} is for encodings that have
-implications rather than equivalences associated with parameter variables
-(which, in this case, is \texttt{bklm16}). It ensures that each clause has at
-most one positive parameter literal and no negative ones, and that at most one
-implication clause per any parameter variable $p \in X_P$ can `force $p$ to be
-positive'.
+\Cref{cond:d02} (for \texttt{d02}) simply states that each parameter variable is
+equivalent to a conjunction of indicator literals. \Cref{cond:bklm16} is for
+encodings that have implications rather than equivalences associated with
+parameter variables (which, in this case, is \texttt{bklm16}). It ensures that
+each clause has at most one positive parameter literal and no negative ones, and
+that at most one implication clause per any parameter variable $p \in X_P$ can
+`force $p$ to be positive'.
 
 \begin{proof}
   By \cref{prop:equivalence},
@@ -608,12 +644,9 @@ positive'.
   \end{equation}
   Note that under \cref{cond:d02}, $\bigwedge_{c \in \phi_p} c \equiv p
   \Leftrightarrow \bigwedge_{i=1}^n l_i$ for some family of indicator variable
-  literals $(l_i)_{i=1}^n$. Thus,
-  \[
-    \exists_p [p]_{w(\neg p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 = \exists_p
-    [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1.
-  \]
-  If $w(p) = 1$, then
+  literals $(l_i)_{i=1}^n$. Thus, $\exists_p [p]_{w(\neg p)}^{w(p)} \prod_{c \in
+    \phi_p} [c]_0^1 = \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow
+    \bigwedge_{i=1}^n l_i \right]_0^1$. If $w(p) = 1$, then
   \begin{equation} \label{eq:bigsums}
     \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1 = \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1\right|_{p=0}.
   \end{equation}
@@ -700,7 +733,7 @@ positive'.
 
 \begin{theorem}[Minimum-Cardinality Correctness] \label{thm:mccorrectness}
   Let $(\phi, X_I, X_P, w)$ be a minimum-cardinality WMC instance that satisfies
-  \cref{cond:one,cond:2b2,cond:2b3,cond:just_parameter,cond:disjoint} of
+  \cref{cond:2b2,cond:2b3,cond:just_parameter,cond:disjoint} of
   \cref{thm:correctness} as well as the following:
   \begin{enumerate}
   \item for all parameter variables $p \in X_P$, $w(\neg p) = 1$.
@@ -744,7 +777,7 @@ slightly less explicit and assumes that $\omega = 1$.
     make the proof more convenient and can be omitted by reformulating the proof
     in a slightly more cumbersome way.} Let $Y \subseteq X_I$ and $Z \subseteq
   X_I \cup X_P$ be related via this bijection. Then in the second part we will
-  show that
+  show that % TODO: footnote: explain how
   \begin{equation} \label{eq:weights}
     \prod_{Z \models l} w(l) = \left(\prod_{f \in F} f\right)(Y).
   \end{equation}
@@ -854,8 +887,8 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
 \begin{figure}
   \centering
   \input{cumulative.tex}%
-  \caption{Cumulative numbers of instances solved by each algorithm-encoding
-    pair over time. The dotted line denotes the total number of instances used.}
+  \caption{Cactus plot of all algorithm-encoding pairs. The dotted line
+    denotes the total number of instances used.}
   \label{fig:cumulative}
 \end{figure}
 
@@ -969,6 +1002,9 @@ well-established WMC encoding and inference techniques (such as in the
 \texttt{cd05} and \texttt{cd06} papers
 \cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be transferred to
 other application domains.
+
+% TODO: consider moving (some) proofs to the appendix or at least making a clear
+% argument why they should be in the text.
 
 \bibliographystyle{splncs04}
 \bibliography{paper}
