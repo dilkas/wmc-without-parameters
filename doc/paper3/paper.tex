@@ -16,6 +16,7 @@
 \usepackage[binary-units]{siunitx}
 \usepackage{booktabs}
 \usepackage{capt-of}
+\usepackage[inline]{enumitem}
 
 \crefname{enumi}{Condition}{Conditions}
 \crefname{enumii}{Condition}{Conditions}
@@ -182,7 +183,7 @@ model of $\phi$ (written $\{ a, b \} \models \phi$) of cardinality two, while
 $\emptyset$ is an interpretation but not a model. We can now formally define
 WMC.
 
-\begin{definition}[WMC]
+\begin{definition}[WMC] \label{def:wmc}
   A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
   the set of \emph{indicator variables}, $X_P$ is the set of \emph{parameter
   variables} (with $X_I \cap X_P = \emptyset$), $\phi$ is a propositional formula
@@ -214,14 +215,14 @@ Bayesian network encodings
   |Z|$ for all $Z \models \phi$.
 \end{definition}
 
-\begin{definition}[Minimum-Cardinality WMC]
+\begin{definition}[Minimum-Cardinality WMC] \label{def:mcwmc}
   A \emph{minimum-cardinality WMC} instance consists of the same tuple as a WMC
-  instance, but its answer is defined to be $\sum_{Y \models \phi\text{, }|Y| =
-    k} \prod_{Y \models l} w(l)$ (where $k = \min_{Y \models \phi} |Y|$) if
-  $\phi$ is satisfiable, and zero otherwise.
+  instance, but its \emph{answer} is defined to be $\sum_{Y \models \phi\text{,
+    }|Y| = k} \prod_{Y \models l} w(l)$ (where $k = \min_{Y \models \phi} |Y|$)
+  if $\phi$ is satisfiable, and zero otherwise.
 \end{definition}
 
-\begin{example}
+\begin{example} \label{example:1}
   Let $\phi = (x \lor y) \land (\neg x \lor \neg y) \land (\neg x \lor p) \land
   (\neg y \lor q) \land x$, $X_I = \{ x, y \}$, $X_P = \{ p, q \}$, $w(p) =
   0.2$, $w(q) = 0.8$, and $w(\neg p) = w(\neg q) = 1$. Then $\phi$ has two
@@ -261,7 +262,8 @@ minimum-cardinality WMC because that allows the encoding to have fewer variables
 and clauses. In particular, they propose a way to use the same parameter
 variable to represent all probabilities in a CPT that are equal and keep only
 clauses that `imply' parameter variables (i.e., omit clauses where a parameter
-variable implies indicator variables). In their next encoding, \texttt{cd06}
+variable implies indicator variables).\footnote{\Cref{example:2} demonstrates
+  what we mean by implication clauses.} In their next encoding, \texttt{cd06}
 \cite{DBLP:conf/sat/ChaviraD06}, the same authors optimise the aforementioned
 implication clauses, choosing the smallest sufficient selection of indicator
 variables. A decade later, Bart et al. present \texttt{bklm16}
@@ -271,21 +273,30 @@ variable from a linear to a logarithmic amount. Second, they introduce a scaling
 factor that can `absorb' one probability per Bayesian network variable. However,
 for this work, we choose to disable the latter improvement since this scaling
 factor is often small enough to be indistinguishable from zero without the use
-of arbitrary precision arithmetic. Indeed, even a small Bayesian network with
-seven mutually independent binary variables, 0.1 and 0.9 probabilities each, is
-already big enough for the scaling factor to be exactly equal to zero (as
-produced by the \texttt{bklm16}
-encoder\footnote{\url{http://www.cril.univ-artois.fr/kc/bn2cnf.html}}).
-% TODO (on encodings and clauses): I realise the paper is already long but it
-% might be useful to have a quick example
-% TODO: If I am reading this correctly you are making a stark statement about
-% the inefficacy. It might be good to rephrase this differently. You might want
-% to say that there are many corner cases where there are no improvements. 
-% TODO: Is there a reference for this example? If yes provide one. If no, maybe
-% you could provide a link to the output, or alternatively, you could say
-% something like the reader is free to check that such an example produces no
-% improvements
-% TODO: is this example the same as the previous one?
+of arbitrary precision arithmetic, making it completely unusable on realistic
+instances. Indeed, the reader is free to check that even a small Bayesian
+network with seven mutually independent binary variables, 0.1 and 0.9
+probabilities each, is already big enough for the scaling factor to be exactly
+equal to zero (as produced by the \texttt{bklm16}
+encoder\footnote{\url{http://www.cril.univ-artois.fr/kc/bn2cnf.html}}). We
+suspect that this issue was not identified during the original set of
+experiments because they never looked at numerical answers.
+
+\begin{example} \label{example:2}
+  Let $\mathcal{B}$ be a Bayesian network with one variable $X$ which has two
+  values $x_1$ and $x_2$ with probabilities $\Pr(X = x_1) = 0.2$ and $\Pr(X =
+  x_2) = 0.8$. Let $x, y$ be indicator variables, and $p, q$ be parameter
+  variables. Then \cref{example:1} is both the \texttt{cd05} and the
+  \texttt{cd06} encoding of $\mathcal{B}$. The \texttt{bklm16} encoding is $(x
+  \Rightarrow p) \land (\neg x \Rightarrow q) \land x$ with $w(p) = w(\neg q) =
+  0.2$, and $w(\neg p) = w(q) = 0.8$. And the \texttt{d02} encoding is $(\neg x
+  \Rightarrow p) \land (p \Rightarrow \neg x) \land (x \Rightarrow q) \land (q
+  \Rightarrow x) \land \neg x$ with $w(p) = 0.2$, $w(q) = 0.8$, and $w(\neg p) =
+  w(\neg q) = 1$. Note how all other encodings have fewer clauses than
+  \texttt{d02}. While \texttt{cd05} and \texttt{cd06} require
+  minimum-cardinality WMC to make this work, \texttt{bklm16} achieves the same
+  thing by adjusting weights.
+\end{example}
 
 %This additional condition on model
 %cardinality becomes necessary because these encodings eliminate clauses of the
@@ -402,7 +413,7 @@ functions are particularly convenient because \textsf{DPMC} can be easily
 adapted to use them as input, and they are easily representable in both text
 files and using the syntax proposed in this paper.
 
-\begin{definition}[PBP Instance] \label{def:new_wmc}
+\begin{definition}[PBP Instance] \label{def:pbp}
   A PBP instance is a tuple $(F, X, \omega)$, where $X$ is the set of variables,
   $F$ is a set of two-valued pseudo-Boolean functions $2^X \to \mathbb{R}$, and
   $\omega \in \mathbb{R}$ is the scaling factor.\footnote{
@@ -537,9 +548,9 @@ to PBP.
         x)}^{w(x)} \;\middle|\; x \in X_I \cup X_P\right\}, X_I \cup X_P,
     1\right) \label{eq:new_wmc}
   \end{equation}
-  is a PBP instance with the same answer.
+  is a PBP instance with the same answer (as defined in \cref{def:wmc,def:pbp}).
 \end{proposition}
-% TODO: It’s a bit strange to say same answer, when you don’t precisely refer to
+% It’s a bit strange to say same answer, when you don’t precisely refer to
 % this anywhere. One option is to say the above is the WMC instance and let
 % Delta be the weighted model count. Then the new encoding Has a weighted model
 % count of delta as well. Or something like that.
@@ -547,10 +558,6 @@ to PBP.
 % and I admit my formulation is awkward. So maybe the best compromise here is
 % just simply add a footnote explaining what exactly you mean when you say same
 % answer
-% TODO: If it is the case that you cannot include the proofs in line, and indeed
-% it might be better for readability to have an appendix with all the proofs, it
-% might make sense to provide the type of argument you are using in the proofs
-% so that readers know what to expect when they look into it
 \begin{proof}
   Let $f = \prod_{c \in \phi} [c]_0^1$, and $g = \prod_{x \in X_I \cup X_P}
   [x]_{w(\neg x)}^{w(x)}$. Then the WMC answer is
@@ -577,8 +584,9 @@ to PBP.
 
 \begin{theorem}[Correctness for WMC] \label{thm:correctness}
   \Cref{alg:transformation}, when given a WMC instance $(\phi, X_I, X_P,
-  w)$, returns a PBP instance with the same answer, provided \emph{either} of
-  the two conditions is satisfied:
+  w)$, returns a PBP instance with the same answer (as defined in
+  \cref{def:wmc,def:pbp}), provided \emph{either} of the two conditions is
+  satisfied:
   \begin{enumerate}
   \item for all $p \in X_P$, there is a non-empty family of literals
     $(l_i)_{i=1}^n$ such that \label{cond:d02}
@@ -621,7 +629,7 @@ that at most one implication clause per any parameter variable $p \in X_P$ can
       1\right) \label{eq:new_wmc2}
   \end{equation}
   is a PBP instance with the same answer as the given WMC instance. By
-  \cref{def:new_wmc}, its answer is $\left(\exists_{X_I \cup X_P} \left(\prod_{c
+  \cref{def:pbp}, its answer is $\left(\exists_{X_I \cup X_P} \left(\prod_{c
         \in \phi} [c]_0^1 \right) \prod_{x \in X_I \cup X_P} [x]_{w(\neg
       x)}^{w(x)} \right)(\emptyset)$. Since both \cref{cond:d02,cond:bklm16}
   ensure that each clause in $\phi$ has at most one parameter variable, we can
@@ -697,13 +705,9 @@ that at most one implication clause per any parameter variable $p \in X_P$ can
   The only remaining case is when $w(p) \ne 1$ and $\{ p \} \not \in \phi_p$.
   Then $\omega = 1$, and $F_p = \left\{ \left[\bigwedge_{l \in c \setminus \{ p
         \}} \neg l\right]_1^{w(p)} \;\middle|\; c \in \phi_p \right\}$, so we
-  need to show that
-  \[
-    \prod_{c \in \phi_p} \left[\bigwedge_{l \in c \setminus \{ p \}} \neg
-      l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p}
-    [c]_0^1.
-  \]
-  We can rearrange the right-hand side as
+  need to show that $\prod_{c \in \phi_p} \left[\bigwedge_{l \in c \setminus \{
+      p \}} \neg l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in
+    \phi_p} [c]_0^1$. We can rearrange the right-hand side as
   % \begin{align*}
   %   \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[\bigwedge_{c \in \phi_p} c\right]_0^1 = \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
   %                                                              &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 = w(p) + \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^{1-w(p)} \\
@@ -716,15 +720,12 @@ that at most one implication clause per any parameter variable $p \in X_P$ can
                                                                &= \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_{w(p)}^1 = \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l \right]_1^{w(p)}.
   \end{align*}
    By \cref{cond:disjoint}, $\bigwedge_{l \in c \setminus \{ p \}} \neg l$ can
-   be true for at most one $c \in \phi_p$, and so
-   \[
-     \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l
-     \right]_1^{w(p)} = \prod_{c \in \phi_p} \left[ \bigwedge_{l \in c \setminus
-         \{ p \}} \neg l \right]_1^{w(p)}
-   \]
-   which is exactly what we needed to show. This ends the proof that the
-   first loop of \cref{alg:transformation} preserves the answer under both
-   \cref{cond:d02} and \cref{cond:bklm16}. Finally, the loop on
+   be true for at most one $c \in \phi_p$, and so $\left[ \bigvee_{c \in \phi_p}
+     \bigwedge_{l \in c \setminus \{ p \}} \neg l \right]_1^{w(p)} = \prod_{c
+     \in \phi_p} \left[ \bigwedge_{l \in c \setminus \{ p \}} \neg l
+   \right]_1^{w(p)}$ which is exactly what we needed to show. This ends the
+   proof that the first loop of \cref{alg:transformation} preserves the answer
+   under both \cref{cond:d02} and \cref{cond:bklm16}. Finally, the loop on
    \crefrange{line:foreach2start}{line:foreach2end} of \cref{alg:transformation}
    replaces $[v]_1^p[\neg v]_1^q$ with $[v]_q^p$ (for some $v \in X_I$ and $p, q
    \in \mathbb{R}$), but, of course, $[v]_1^p[\neg v]_1^q = [v]_1^p[v]_q^1 =
@@ -744,7 +745,7 @@ that at most one implication clause per any parameter variable $p \in X_P$ can
     \}$. \label{cond:23}
   \end{enumerate}
   Then \cref{alg:transformation}, when applied to $(\phi, X_I, X_P, w)$, outputs
-  a PBP instance with the same answer.
+  a PBP instance with the same answer (as defined in \cref{def:mcwmc,def:pbp}).
 \end{theorem}
 
 In this case, we have to add some assumptions about the cardinality of models.
@@ -763,21 +764,16 @@ slightly less explicit and assumes that $\omega = 1$.
 
 \begin{proof}
   Let $(F, X_I, \omega)$ be the tuple returned by \cref{alg:transformation} and
-  note that
-  \[
-    F = \left\{ [c]_0^1 \mid c \in \phi \text{, } c \cap X_P = \emptyset
-    \right\} \cup \left\{ \left[ \bigwedge_{l \in c \setminus \{ p \}} \neg l
-      \right]_1^{w(p)} \;\middle|\; p \in X_P \text{, } p \in c \in \phi
-      \text{, } c \ne \{ p \} \right\}.
-  \]
-  We split the proof into two parts. In the first part, we show that there is a
-  bijection between minimum-cardinality models of $\phi$ and $Y \subseteq X_I$
-  such that $\left(\prod_{f \in F} f\right)(Y) \ne 0$ (with the assumption that
-  $w(p) \ne 0$ for all $p \in X_P$).\footnote{The assumption is only there to
-    make the proof more convenient and can be omitted by reformulating the proof
-    in a slightly more cumbersome way.} Let $Y \subseteq X_I$ and $Z \subseteq
-  X_I \cup X_P$ be related via this bijection. Then in the second part we will
-  show that % TODO: footnote: explain how
+  note that $F = \left\{ [c]_0^1 \mid c \in \phi \text{, } c \cap X_P =
+    \emptyset \right\} \cup \left\{ \left[ \bigwedge_{l \in c \setminus \{ p \}}
+      \neg l \right]_1^{w(p)} \;\middle|\; p \in X_P \text{, } p \in c \in \phi
+    \text{, } c \ne \{ p \} \right\}$. We split the proof into two parts. In the
+  first part, we show that there is a bijection between minimum-cardinality
+  models of $\phi$ and $Y \subseteq X_I$ such that $\left(\prod_{f \in F}
+    f\right)(Y) \ne 0$.\footnote{For convenience and without loss of generality
+    we assume that $w(p) \ne 0$ for all $p \in X_P$.} Let $Y \subseteq X_I$ and
+  $Z \subseteq X_I \cup X_P$ be related via this bijection. Then in the second
+  part we will show that
   \begin{equation} \label{eq:weights}
     \prod_{Z \models l} w(l) = \left(\prod_{f \in F} f\right)(Y).
   \end{equation}
@@ -851,7 +847,7 @@ functions are multiplied by prioritising functions with small representations.
 
 For experimental data, we use Bayesian networks available with \textsf{Ace} and
 \textsf{Cachet}. We split them into the following groups:
-\begin{itemize}
+\begin{itemize*}
 \item DQMR (390 instances) and
 \item Grid networks (450 instances) as described by Sang et al.
   \cite{DBLP:conf/aaai/SangBK05};
@@ -865,7 +861,7 @@ For experimental data, we use Bayesian networks available with \textsf{Ace} and
   \texttt{diabetes}, \texttt{hailfinder}, \texttt{mildew},
   \texttt{munin1}--\texttt{4}, \texttt{pathfinder}, \texttt{pigs}, and
   \texttt{water}.
-\end{itemize}
+\end{itemize*}
 
 To perform Bayesian network inference with \textsf{DPMC} (or with any
 other WMC algorithm not based on compilation such as \textsf{Cachet}), one
@@ -1005,6 +1001,10 @@ other application domains.
 
 % TODO: consider moving (some) proofs to the appendix or at least making a clear
 % argument why they should be in the text.
+% If it is the case that you cannot include the proofs in line, and indeed
+% it might be better for readability to have an appendix with all the proofs, it
+% might make sense to provide the type of argument you are using in the proofs
+% so that readers know what to expect when they look into it
 
 \bibliographystyle{splncs04}
 \bibliography{paper}
