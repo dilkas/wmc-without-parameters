@@ -112,6 +112,9 @@ ggplot(df, aes(value, inference_time, col = dataset.y, shape = dataset.y)) + geo
 median(changes$before_variables[changes$encoding == "bklm16"])
 median(changes$after_variables[changes$encoding == "bklm16"])
 
+summary(changes$before_variables)
+summary(changes$before_clauses)
+
 summary(changes$after_variables[changes$encoding == "bklm16"] / changes$before_variables[changes$encoding == "bklm16"])
 summary(1 - changes$after_variables[changes$encoding != "sbk05"] / changes$before_variables[changes$encoding != "sbk05"])
 hist(changes$after_variables[changes$encoding != "sbk05"] / changes$before_variables[changes$encoding != "sbk05"])

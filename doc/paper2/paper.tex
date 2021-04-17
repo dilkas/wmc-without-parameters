@@ -218,6 +218,7 @@ necessarily faster.
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
 
+% TODO: The notation for a->b and b->a is backwards.
 \begin{table*}
   \caption{Notation for a logic with two atoms. The elements in both columns are
     listed in the same order.}
@@ -419,6 +420,8 @@ practice.\footnote{The proofs of this and other theoretical results can be found
 \end{restatable}
 
 \section{Encoding Bayesian Networks Using Conditional Weights} \label{sec:bns}
+% TODO: Perhaps make explicit that the additional clauses added for multi-valued
+% variables are mutual exclusivity constraints, by name dropping this.
 
 \begin{figure*}
   \centering
@@ -903,6 +906,11 @@ our asymptotic bounds.
 \section{Conclusions and Future Work}
 % TODO: maybe: emphasise that BN encodings have never been compared w.r.t. time
 % before
+% TODO: the claim about this being applicable to other algorithms is a bit too
+% optimistic (especially for the abstract)
+% TODO: mention the Chavira & Darwiche "Compiling Bayesian Networks Using
+% Variable Elimination" paper
+% TODO: also mention the Gogate UAI 2010 paper
 
 WMC was originally motivated by an appeal to the success of \SAT{} solvers in
 efficiently tackling an $\NP{}$-complete problem

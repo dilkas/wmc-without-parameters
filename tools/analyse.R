@@ -50,26 +50,22 @@ data_sum <- data_merged
 data_sum$time <- data_sum$encoding_time + data_sum$inference_time
 data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 
-#data_sum2 <- data
-#data_sum2$time <- data_sum2$encoding_time + data_sum2$inference_time
-#data_sum2 <- subset(data_sum2, select = -c(inference_time, encoding_time))
-
-# df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
-#             fun.aggregate = NULL,
-#             value.var = c("answer", "time", "add_width"))
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
-            value.var = c("answer", "time"))
+            value.var = c("answer", "time", "add_width", "treewidth"))
+#df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
+#            fun.aggregate = NULL,
+#            value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
 time_columns0 <- time_columns[!grepl('pp$', time_columns)]
 for (column in time_columns) {
   df[is.na(df[[column]]), column] <- 2 * TIMEOUT
 }
 
-#df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
-#                      function(x) max(x, na.rm = TRUE))
-#df <- df %>% select(!starts_with("treewidth_"))
-#df$treewidth <- df$treewidth - 1
+df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
+                      function(x) max(x, na.rm = TRUE))
+df <- df %>% select(!starts_with("treewidth_"))
+df$treewidth <- df$treewidth - 1
 #df$zero_proportion <- apply(df %>% select(starts_with("zero_")), 1,
 #                      function(x) max(x, na.rm = TRUE))
 #df <- df %>% select(!starts_with("zero_proportion_"))
@@ -348,7 +344,7 @@ ggplot(data_melted, aes(encoding, time, fill = variable)) +
   ylab("Time (s)") +
   labs(fill = "")
 
-# Plots that show how the combination of cw and cd06 would do (not including tree decomposition time)
+# Plots that show how the combination of bklm16 and cd06 would do (not including tree decomposition time)
 fusion <- data.frame(treewidth = unique(data$treewidth))
 fusion$tops <- apply(fusion, 1, function(x) nrow(df[ifelse(df$treewidth <= x, abs(df$time_new_bklm16 - df$time_min) < 0.01, abs(df$time_old_cd06 - df$time_min) < 0.01),]))
 fusion$time <- apply(fusion, 1, function(x) sum(df$time_new_bklm16[df$treewidth <= x[1]]) + sum(df$time_old_cd06[df$treewidth > x[1]]))
