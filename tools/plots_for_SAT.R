@@ -8,26 +8,18 @@ library(ggpubr)
 library(tidyr)
 library(RColorBrewer)
 
-# TODO: plot treewidth vs add width
 data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
 
-# TODO: remove (just for testing)
-data <- data[data$dataset != "2004-PGM",]
-data$encoding_time[grepl("pp$", data$encoding)] <- 0
-data <- data[is.na(data$answer) | data$answer < 1e-10,]
-data <- data[is.na(data$answer) | data$answer > 1e-3 & data$answer < 1,]
-data$encoding_time <- 0
-
-# TODO: how many times does each encoding produce the wrong answer?
-temp <- data %>% left_join(data[data$encoding == "cd06" &
-                                   data$novelty == "old",
-                                 c("instance", "answer")], by = "instance") %>%
-  left_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
-temp$answer.y <- ifelse(is.na(temp$answer.y), temp$answer, temp$answer.y)
-removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y) > 0.01),]
-temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
-data <- subset(temp, select = -c(answer.y, answer))
-names(data)[names(data) == 'answer.x'] <- 'answer'
+# how many times does each encoding produce the wrong answer?
+# temp <- data %>% left_join(data[data$encoding == "cd06" &
+#                                    data$novelty == "old",
+#                                  c("instance", "answer")], by = "instance") %>%
+#   left_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
+# temp$answer.y <- ifelse(is.na(temp$answer.y), temp$answer, temp$answer.y)
+# removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y) > 0.01),]
+# temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
+# data <- subset(temp, select = -c(answer.y, answer))
+# names(data)[names(data) == 'answer.x'] <- 'answer'
 
 TIMEOUT <- 1000
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
@@ -53,25 +45,16 @@ data_sum <- subset(data_sum, select = -c(inference_time, encoding_time))
 df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = NULL,
             value.var = c("answer", "time", "add_width", "treewidth"))
-#df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
-#            fun.aggregate = NULL,
-#            value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
 time_columns0 <- time_columns[!grepl('pp$', time_columns)]
 for (column in time_columns) {
   df[is.na(df[[column]]), column] <- 2 * TIMEOUT
 }
 
-df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
-                      function(x) max(x, na.rm = TRUE))
-df <- df %>% select(!starts_with("treewidth_"))
-df$treewidth <- df$treewidth - 1
-#df$zero_proportion <- apply(df %>% select(starts_with("zero_")), 1,
-#                      function(x) max(x, na.rm = TRUE))
-#df <- df %>% select(!starts_with("zero_proportion_"))
-#df$count <- apply(df %>% select(starts_with("count_")), 1,
-#                      function(x) max(x, na.rm = TRUE))
-#df <- df %>% select(!starts_with("count_"))
+# df$treewidth <- apply(df %>% select(starts_with("treewidth")), 1,
+#                       function(x) max(x, na.rm = TRUE))
+# df <- df %>% select(!starts_with("treewidth_"))
+# df$treewidth <- df$treewidth - 1
 
 df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
 df$time_min0 <- as.numeric(apply(df, 1, function (row) min(row[time_columns0])))
@@ -91,16 +74,10 @@ names(instance_to_min_time) <- df$instance
 instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
 # df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
-#                       answer = NA, time = instance_to_min_time[df$instance],
-#                       add_width= max(data$add_width), treewidth = max(data$treewidth))
+#                       answer = NA, time = instance_to_min_time[df$instance])
 # df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
-#                        answer = NA, time = instance_to_min_time0[df$instance],
-#                        add_width = max(data$add_width), treewidth = max(data$treewidth))
-df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
-                      answer = NA, time = instance_to_min_time[df$instance])
-df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
-                       answer = NA, time = instance_to_min_time0[df$instance])
-data_sum <- rbind(data_sum, df.temp, df.temp2)
+#                        answer = NA, time = instance_to_min_time0[df$instance])
+# data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
 data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsf{DPMC} + \\texttt{bklm16}"
@@ -115,19 +92,6 @@ data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{
 data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
 data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
 data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\texttt{sbk05}"
-
-#data_sum2$encoding[data_sum2$encoding == "new_bklm16"] <- "\\textsf{DPMC} + \\texttt{bklm16}"
-#data_sum2$encoding[data_sum2$encoding == "new_bklm16pp"] <- "\\textsf{DPMC} + \\texttt{bklm16}++"
-#data_sum2$encoding[data_sum2$encoding == "new_cd05pp"] <- "\\textsf{DPMC} + \\texttt{cd05}++"
-#data_sum2$encoding[data_sum2$encoding == "new_cd06pp"] <- "\\textsf{DPMC} + \\texttt{cd06}++"
-#data_sum2$encoding[data_sum2$encoding == "new_d02"] <- "\\textsf{DPMC} + \\texttt{d02}"
-#data_sum2$encoding[data_sum2$encoding == "new_d02pp"] <- "\\textsf{DPMC} + \\texttt{d02}++"
-#data_sum2$encoding[data_sum2$encoding == "new_sbk05"] <- "\\textsf{DPMC} + \\texttt{sbk05}"
-#data_sum2$encoding[data_sum2$encoding == "old_bklm16"] <- "\\textsf{c2d} + \\texttt{bklm16}"
-#data_sum2$encoding[data_sum2$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{cd05}"
-#data_sum2$encoding[data_sum2$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
-#data_sum2$encoding[data_sum2$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
-#data_sum2$encoding[data_sum2$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\texttt{sbk05}"
 
 # ============ Numerical investigations ================
 
@@ -230,7 +194,7 @@ p1 <- scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\
                    "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 p2 <- scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)",
                    "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
-tikz(file = "../doc/paper3/scatter.tex", width = 4.8, height = 2.9)
+tikz(file = "../doc/paper3/scatter.tex", width = 4.8, height = 2.9, standAlone = TRUE)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()
 
@@ -318,7 +282,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
   return(p)
 }
 
-tikz(file = "../doc/paper3/cumulative.tex", width = 4.8, height = 2.3)
+tikz(file = "../doc/paper3/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
 cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE, TRUE, "right")
 dev.off()
 
@@ -354,11 +318,9 @@ ggplot(data = fusion, aes(x = treewidth, y = time)) + geom_line() + scale_x_cont
 sum(!is.na(df$time_min))
 sum(!is.na(df$answer_new_cw) & abs(df$time_new_cw - df$time_min) < 0.01)
 sum(!is.na(df$answer_old_cd06) & abs(df$time_old_cd06 - df$time_min) < 0.01)
-# TODO: add some horizontal lines to these plots that show the VBS, cd06, and cw scores
 
 df$diff <- df$time_new_bklm16 - df$time_old_cd06
 ggplot(df, aes(treewidth, time_new_bklm16, shape = major.dataset, colour = major.dataset)) +
-#  geom_jitter(width = 0.1, height = 0.1) +
   geom_point() +
   scale_x_continuous(trans = log10_trans()) +
   scale_y_continuous(trans = log10_trans())
@@ -378,3 +340,8 @@ ggplot(df, aes(add_width_new_bklm16, add_width_new_d02, color = major.dataset)) 
 df$diff <- df$add_width_new_d02 - df$add_width_new_d02pp
 ggplot(df, aes(diff)) + geom_density()
 ggplot(df, aes(diff)) + geom_boxplot()
+
+# Difference in treewidth
+df$diff <- df$add_width_new_bklm16 - df$add_width_new_bklm16pp
+df$diff <- df$add_width_new_d02 - df$add_width_new_d02pp
+plot(df$diff)

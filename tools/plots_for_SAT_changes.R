@@ -1,9 +1,7 @@
 library(ggplot2)
 library(scales)
 library(maditr)
-
-# Note: I'm including sbk05 in changes.csv just in case. At least the way it's currently implemented, my method is unsuitable for sbk05.
-# TODO: mention some percentages of how many variables were removed (the high points should sound impressive)
+library(tikzDevice)
 
 changes <- read.csv("../results/changes.csv", header = FALSE)
 colnames(changes) <- c("instance", "encoding", "before_variables", "before_clauses", "after_variables", "after_clauses")
@@ -77,7 +75,7 @@ df2$variable <- as.factor(df2$variable)
 df2$variable <- factor(df2$variable, levels = rev(levels(df2$variable)))
 df2$encoding <- paste0("\\texttt{", df2$encoding, "}")
 
-tikz(file = "../doc/paper3/box.tex", width = 2.4, height = 2)
+tikz(file = "../doc/paper3/box.tex", width = 2.4, height = 2, standAlone = TRUE)
 ggplot(df2, aes(encoding, value, fill = variable)) +
   geom_boxplot(outlier.shape = NA) +
   theme_light() +

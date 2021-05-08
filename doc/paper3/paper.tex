@@ -1,13 +1,6 @@
 \documentclass[runningheads]{llncs}
 
 \usepackage{graphicx}
-% Used for displaying a sample figure. If possible, figure files should
-% be included in EPS format.
-%
-% If you use the hyperref package, please uncomment the following line
-% to display URLs in blue roman font according to Springer's eBook style:
-% \renewcommand\UrlFont{\color{blue}\rmfamily}
-
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
@@ -23,33 +16,22 @@
 
 \begin{document}
 
-%\title{Contribution Title\thanks{Supported by organization x.}}
-\title{Weighted Model Counting Without Parameter Variables}
+% TODO: Check author % instructions in the lncs/ directory.
+% TODO: Make sure that the paper fits into 15 pages.
 
-%\titlerunning{Abbreviated paper title}
-% If the paper title is too long for the running head, you can set
-% an abbreviated paper title here
+\title{Weighted Model Counting Without Parameter Variables}
 
 \author{Paulius Dilkas\inst{1} \and
 Vaishak Belle\inst{1,2}}
+% TODO: maybe add an envelope or two?
 
 \authorrunning{P. Dilkas and V. Belle}
-% First names are abbreviated in the running head.
-% If there are more than two authors, 'et al.' is used.
 
 \institute{University of Edinburgh, Edinburgh, UK \\
   \email{p.dilkas@sms.ed.ac.uk, vaishak@ed.ac.uk} \and Alan Turing Institute, London, UK}
 
-\maketitle              % typeset the header of the contribution
+\maketitle
 
-% The abstract should briefly summarize the contents of the paper in
-% 150--250 words.
-% 1. Introduction. In one sentence, what’s the topic?
-% 2. State the problem you tackle.
-% 3. Summarize (in one sentence) why nobody else has adequately answered the research question yet.
-% 4. Explain, in one sentence, how you tackled the research question.
-% 5. In one sentence, how did you go about doing the research that follows from your big idea.
-% 6. As a single sentence, what’s the key impact of your research?
 \begin{abstract}
   Weighted model counting (WMC) is a powerful computational technique for a
   variety of problems, especially commonly used for probabilistic inference.
@@ -68,12 +50,11 @@ Vaishak Belle\inst{1,2}}
   state of the art.
 
   \keywords{Weighted model counting \and Probabilistic inference \and Bayesian
-    networks.}
+    networks}
 \end{abstract}
 
 \section{Introduction}
 
-% NOTE: What is the problem? Why is it interesting and important?
 Weighted model counting (WMC), i.e., a generalisation of propositional model
 counting that assigns weights to literals and computes the total weight of all
 models of a propositional formula \cite{DBLP:journals/ai/ChaviraD08}, has
@@ -97,8 +78,30 @@ depends on the number of variables
 unnecessarily slow and could be detrimental to WMC algorithms such as
 \textsf{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} that depend on variable ordering
 heuristics.
+% TODO: While the complexity results in the cited papers [2, 32] have various
+% widths as the dominant (i.e., exponential) part of the formula, the number of
+% variables is featured as well, e.g., as $n$ in [2]. We did not notice a
+% significant difference in treewidth before and after performing our
+% transformation (we can include details about this in the final version of the
+% paper). The observed performance improvement is more likely related to the
+% variable ordering heuristic used by ADDs.
+% One important aspect that is not analyzed is how the technique affects the
+% treewidth of the instance.
+% This is important because DPMC makes use of tree decompositions of low width.
+% In particular, from a theoretical standpoint the questions are whether the
+% given reduction can increase or decrease the treewidth, and if yes, are there
+% any bounds to it.
+% (to me it seems that the reduction can decrease treewidth but cannot increase
+% it)
+% From practical standpoint the question is how the widths of the tree
+% decompositions used by DPMC+bklm16 and DPMC+bklm16++ compare.
+% Do you have any data on this?
+% Also related to treewidth, the sentence "As the parameterised complexity of
+% model counting (and, by extension, WMC) depends on the number of variables [2,
+% 32], ..." sounds very weird because the cited papers consider the complexity
+% parameterized by treewidth.
+% Should "number of variables" be replaced by "treewidth"?
 
-% NOTE: What's wrong with previous proposed solutions? How does mine differ?
 One approach to this problem considers weighted clauses and probabilistic
 semantics based on Markov networks \cite{DBLP:conf/uai/GogateD10}. However, with
 a new representation comes the need to invent new encodings and inference
@@ -122,10 +125,12 @@ the authors' knowledge, neither approach
 \cite{DBLP:conf/ecsqaru/ChoiKD13,DBLP:conf/uai/GogateD10} has a publicly
 available implementation.
 
-% NOTE: What are the key components of my approach and results? Also include any
-% specific limitations. What about your project is new or different from
-% existing solutions? List of refutable contributions (with forward references
-% to the rest of the paper) What is the outcome of the project?
+% TODO: We chose to transform existing encodings instead of creating a new one
+% because encodings such as cd05, cd06, and bklm16 do a good job at reducing
+% each CPT to a minimal logical representation by using techniques such as prime
+% implicants and limited forms of resolution. We wanted to reuse and build on
+% these ideas.
+
 In this work, we introduce a way to transform WMC problems into a new format
 based on pseudo-Boolean functions---\emph{pseudo-Boolean projection} (PBP). We
 formally show that every WMC problem instance has a corresponding PBP instance
@@ -290,7 +295,9 @@ experiments because they never looked at numerical answers.
   w(\neg q) = 1$. Note how all other encodings have fewer clauses than
   \texttt{d02}. While \texttt{cd05} and \texttt{cd06} require
   minimum-cardinality WMC to make this work, \texttt{bklm16} achieves the same
-  thing by adjusting weights.
+  thing by adjusting weights.\footnote{Note that since \texttt{cd05} and
+    \texttt{cd06} are minimum-cardinality WMC encodings, they are not supported
+    by most WMC algorithms.}
 \end{example}
 
 %This additional condition on model
@@ -423,6 +430,13 @@ files and using the syntax proposed in this paper.
 
 \subsection{From WMC to PBP}
 
+% TODO: Examples can be added for illustration of the transformation algorithm.
+% TODO:  We will update the camera-ready version of the paper with a complete
+% description of how the input format was adjusted to support a new type of
+% problem instance. In short, we replace the weight lines of the form 'w
+% <variable> <positive weight>' with 'w <conjunction of literals> <positive
+% weight> <negative weight>'. The input format is restricted to conjunctions for
+% simplicity, but, of course, the algorithm can accept arbitrary formulas.
 \begin{algorithm}[t]
   \caption{WMC to PBP transformation}
   \label{alg:transformation}
@@ -432,8 +446,6 @@ files and using the syntax proposed in this paper.
   \KwResult{PBP instance $(F, X_I, \omega)$}
   $F \gets \emptyset$\;
   $\omega \gets 1$\;
-%  let $d\colon X_P \to \mathbb{N}$ be defined as $p \mapsto |\{ o \in X_P \mid o
-%  \le p \}|$\;
   \ForEach{clause $c \in \phi$\label{line:foreach1start}}{
     \uIf{$c \cap X_P = \{ p \}$ for some $p$ \textnormal{\textbf{and}} $w(p) \ne
       1$}{
@@ -452,13 +464,6 @@ files and using the syntax proposed in this paper.
     $F \gets F \setminus \{ [v]_1^p, [\neg v]_1^q \} \cup \{ [v]_q^p
     \}$\; \label{line:foreach2end}
   }
-%  replace every variable $v$ in $F$ with $\rename{$v$}$\;
-%  \Return{$(F, X_I, \omega)$}\;
-%  \Fn{\rename{$v$}}{
-%    $S \gets \{u \in X_P \mid u \le v\}$\;
-%    \lIf{$S = \emptyset$}{\Return{$v$}}
-%    \Return{$v - d(\max S)$}\;
-%  }
 \end{algorithm}
 
 In this section, we describe an algorithm for transforming WMC instances to the
@@ -506,14 +511,14 @@ functions will be generated one after the other).
 
 \subsection{Correctness Proofs} \label{sec:proof}
 
-In this section, we outline key properties that a (WMC or minimum-cardinality
+In this section, we outline key conditions that a (WMC or minimum-cardinality
 WMC) encoding has to satisfy for \cref{alg:transformation} to output an
 equivalent PBP instance. We divide the correctness proof into two theorems:
 \cref{thm:correctness} for WMC encodings (i.e., \texttt{bklm16} and
 \texttt{d02}) and \cref{thm:mccorrectness} for minimum-cardinality WMC encodings
 (i.e., \texttt{cd05} and \texttt{cd06}). We begin by listing some properties of
-pseudo-Boolean functions and establishing a canonical transformation from WMC
-to PBP.
+pseudo-Boolean functions and establishing a canonical transformation from WMC to
+PBP.
 
 \begin{theorem}[Early Projection
   \cite{DBLP:conf/aaai/DudekPV20,DBLP:conf/cp/DudekPV20}] \label{thm:early}
@@ -545,14 +550,7 @@ to PBP.
   \end{equation}
   is a PBP instance with the same answer (as defined in \cref{def:wmc,def:pbp}).
 \end{proposition}
-% It’s a bit strange to say same answer, when you don’t precisely refer to
-% this anywhere. One option is to say the above is the WMC instance and let
-% Delta be the weighted model count. Then the new encoding Has a weighted model
-% count of delta as well. Or something like that.
-% But looking at the text below, I see that you use this phrasing everywhere,
-% and I admit my formulation is awkward. So maybe the best compromise here is
-% just simply add a footnote explaining what exactly you mean when you say same
-% answer
+
 \begin{proof}
   Let $f = \prod_{c \in \phi} [c]_0^1$, and $g = \prod_{x \in X_I \cup X_P}
   [x]_{w(\neg x)}^{w(x)}$. Then the WMC answer is
@@ -703,12 +701,6 @@ that at most one implication clause per any parameter variable $p \in X_P$ can
   need to show that $\prod_{c \in \phi_p} \left[\bigwedge_{l \in c \setminus \{
       p \}} \neg l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in
     \phi_p} [c]_0^1$. We can rearrange the right-hand side as
-  % \begin{align*}
-  %   \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[\bigwedge_{c \in \phi_p} c\right]_0^1 = \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
-  %                                                              &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 = w(p) + \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^{1-w(p)} \\
-  %                                                              &= \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_{w(p)}^1 = \left[ \neg \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \neg(c \setminus \{ p \}) \right]_1^{w(p)} \\
-  %                                                              &= \left[ \bigvee_{c \in \phi_p} \neg \bigvee_{l \in c \setminus \{ p \}} l \right]_1^{w(p)} = \left[ \bigvee_{c \in \phi_p} \bigwedge_{l \in c \setminus \{ p \}} \neg l \right]_1^{w(p)}.
-  % \end{align*}
   \begin{align*}
     \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
                                                                &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
@@ -753,9 +745,6 @@ parameter variables needed to turn an indicator-only model into a full model is
 the same for all indicator-only models. As some ideas duplicate between the
 proofs of \cref{thm:correctness,thm:mccorrectness}, the following proof is
 slightly less explicit and assumes that $\omega = 1$.
-% We assume that $\omega = 1$ (i.e., $\{ p \} \not\in \phi$ for all parameter
-% variables $p \in X_P$) as the proof can be easily extended to handle $\omega
-% \neq 1$ similarly to the proof of \cref{thm:correctness}. 
 
 \begin{proof}
   Let $(F, X_I, \omega)$ be the tuple returned by \cref{alg:transformation} and
@@ -798,7 +787,7 @@ slightly less explicit and assumes that $\omega = 1$.
 \section{Experimental Evaluation}
 
 We run a set of experiments, comparing all five original Bayesian network
-encodings (\texttt{bklm16}, \texttt{cd05}, \texttt{cd06}, \texttt{d02}
+encodings (\texttt{bklm16}, \texttt{cd05}, \texttt{cd06}, \texttt{d02},
 \texttt{sbk05}) as well as the first four with \cref{alg:transformation} applied
 afterwards.\footnote{Recall that \texttt{cd05} and \texttt{cd06} are
   incompatible with \textsf{DPMC}.} For each encoding \texttt{e}, we write
@@ -877,7 +866,7 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
 
 \begin{figure}
   \centering
-  \input{cumulative.tex}%
+  \includegraphics{cumulative}
   \caption{Cactus plot of all algorithm-encoding pairs. The dotted line
     denotes the total number of instances used.}
   \label{fig:cumulative}
@@ -885,7 +874,7 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
 
 \begin{figure}
   \centering
-  \input{scatter.tex}%
+  \includegraphics{scatter}
   \caption{An instance-by-instance comparison between $\textsf{DPMC} +
     \texttt{bklm16++}$ (the best combination according to \cref{fig:cumulative})
   and the second and third best-performing combinations: $\textsf{Ace} +
@@ -897,7 +886,7 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
   \centering
   \begin{minipage}{0.49\textwidth}
     \centering
-    \input{box.tex}%
+    \includegraphics{box}
     \caption{Box plots of the numbers of variables in each encoding across all
       benchmark instances before and after applying \cref{alg:transformation}.
       Outliers and the top parts of some whiskers are
@@ -968,7 +957,7 @@ virtually unaffected. Finally, while our transformation makes it possible to use
 \texttt{cd05} and \texttt{cd06} with \textsf{DPMC}, the two combinations remain
 inefficient.
 
-\section{Conclusion} % So what?
+\section{Conclusion}
 
 In this paper, we showed how the number of variables in a WMC instance can be
 significantly reduced by transforming it into a representation based on
@@ -994,12 +983,13 @@ well-established WMC encoding and inference techniques (such as in the
 \cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be transferred to
 other application domains.
 
-% TODO: consider moving (some) proofs to the appendix or at least making a clear
-% argument why they should be in the text.
-% If it is the case that you cannot include the proofs in line, and indeed
-% it might be better for readability to have an appendix with all the proofs, it
-% might make sense to provide the type of argument you are using in the proofs
-% so that readers know what to expect when they look into it
+\paragraph{Acknowledgments.}
+The first author was supported by the EPSRC Centre for Doctoral Training in
+Robotics and Autonomous Systems, funded by the UK Engineering and Physical
+Sciences Research Council (grant EP/L016834/1). This work has made use of the
+resources provided by the Edinburgh Compute and Data Facility (ECDF)
+(\url{http://www.ecdf.ed.ac.uk/}).
+% TODO: should I add something for him as well?
 
 \bibliographystyle{splncs04}
 \bibliography{paper}
