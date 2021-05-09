@@ -10,20 +10,17 @@
 \usepackage{booktabs}
 \usepackage{capt-of}
 \usepackage[inline]{enumitem}
+\usepackage[misc,geometry]{ifsym}
 
 \crefname{enumi}{Condition}{Conditions}
 \crefname{enumii}{Condition}{Conditions}
 
 \begin{document}
 
-% TODO: Check author % instructions in the lncs/ directory.
-% TODO: Make sure that the paper fits into 15 pages.
-
 \title{Weighted Model Counting Without Parameter Variables}
 
-\author{Paulius Dilkas\inst{1} \and
+\author{Paulius Dilkas\inst{1}$^{(\textrm{\Letter})}$ \and
 Vaishak Belle\inst{1,2}}
-% TODO: maybe add an envelope or two?
 
 \authorrunning{P. Dilkas and V. Belle}
 
@@ -72,35 +69,14 @@ semirings \cite{DBLP:journals/ijar/BelleR20,DBLP:journals/japll/KimmigBR17}.
 However, as the definition of WMC puts weights on literals, additional variables
 often need to be added for the sole purpose of holding a weight
 \cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06,DBLP:conf/kr/Darwiche02,DBLP:conf/aaai/SangBK05}.
-As the parameterised complexity of model counting (and, by extension, WMC)
-depends on the number of variables
-\cite{DBLP:conf/focs/BacchusDP03,DBLP:journals/jda/SamerS10}, this can make WMC
-unnecessarily slow and could be detrimental to WMC algorithms such as
-\textsf{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} that depend on variable ordering
-heuristics.
-% TODO: While the complexity results in the cited papers [2, 32] have various
-% widths as the dominant (i.e., exponential) part of the formula, the number of
-% variables is featured as well, e.g., as $n$ in [2]. We did not notice a
-% significant difference in treewidth before and after performing our
-% transformation (we can include details about this in the final version of the
-% paper). The observed performance improvement is more likely related to the
-% variable ordering heuristic used by ADDs.
-% One important aspect that is not analyzed is how the technique affects the
-% treewidth of the instance.
-% This is important because DPMC makes use of tree decompositions of low width.
-% In particular, from a theoretical standpoint the questions are whether the
-% given reduction can increase or decrease the treewidth, and if yes, are there
-% any bounds to it.
-% (to me it seems that the reduction can decrease treewidth but cannot increase
-% it)
-% From practical standpoint the question is how the widths of the tree
-% decompositions used by DPMC+bklm16 and DPMC+bklm16++ compare.
-% Do you have any data on this?
-% Also related to treewidth, the sentence "As the parameterised complexity of
-% model counting (and, by extension, WMC) depends on the number of variables [2,
-% 32], ..." sounds very weird because the cited papers consider the complexity
-% parameterized by treewidth.
-% Should "number of variables" be replaced by "treewidth"?
+This can be particularly detrimental to WMC algorithms that rely on variable
+ordering heuristics.
+% As the parameterised complexity of model counting (and, by extension, WMC)
+% depends on the number of variables
+% \cite{DBLP:conf/focs/BacchusDP03,DBLP:journals/jda/SamerS10}, this can make WMC
+% unnecessarily slow and could be detrimental to WMC algorithms such as
+% \textsf{ADDMC} \cite{DBLP:conf/aaai/DudekPV20} that depend on variable ordering
+% heuristics.
 
 One approach to this problem considers weighted clauses and probabilistic
 semantics based on Markov networks \cite{DBLP:conf/uai/GogateD10}. However, with
@@ -124,12 +100,6 @@ literals, and so are not expressive enough to avoid the issue. To the best of
 the authors' knowledge, neither approach
 \cite{DBLP:conf/ecsqaru/ChoiKD13,DBLP:conf/uai/GogateD10} has a publicly
 available implementation.
-
-% TODO: We chose to transform existing encodings instead of creating a new one
-% because encodings such as cd05, cd06, and bklm16 do a good job at reducing
-% each CPT to a minimal logical representation by using techniques such as prime
-% implicants and limited forms of resolution. We wanted to reuse and build on
-% these ideas.
 
 In this work, we introduce a way to transform WMC problems into a new format
 based on pseudo-Boolean functions---\emph{pseudo-Boolean projection} (PBP). We
@@ -280,7 +250,7 @@ probabilities each, is already big enough for the scaling factor to be exactly
 equal to zero (as produced by the \texttt{bklm16}
 encoder\footnote{\url{http://www.cril.univ-artois.fr/kc/bn2cnf.html}}). We
 suspect that this issue was not identified during the original set of
-experiments because they never looked at numerical answers.
+experiments because the authors never looked at numerical answers.
 
 \begin{example} \label{example:2}
   Let $\mathcal{B}$ be a Bayesian network with one variable $X$ which has two
@@ -412,8 +382,11 @@ We introduce a new type of computational problem called \emph{pseudo-Boolean
   projection} based on two-valued pseudo-Boolean functions. While the same
 computational framework can handle any pseudo-Boolean functions, two-valued
 functions are particularly convenient because \textsf{DPMC} can be easily
-adapted to use them as input, and they are easily representable in both text
-files and using the syntax proposed in this paper.
+adapted to use them as input. Since we will only encounter functions of
+the form $[\phi]^a_b$, where $\phi$ is a conjunction of literals, we can
+represent it in text as \texttt{w $\langle\phi\rangle$ a b} where
+$\langle\phi\rangle$ is a representation of $\phi$ analogous to the
+representation of a clause in the DIMACS CNF format.
 
 \begin{definition}[PBP Instance] \label{def:pbp}
   A PBP instance is a tuple $(F, X, \omega)$, where $X$ is the set of variables,
@@ -430,13 +403,6 @@ files and using the syntax proposed in this paper.
 
 \subsection{From WMC to PBP}
 
-% TODO: Examples can be added for illustration of the transformation algorithm.
-% TODO:  We will update the camera-ready version of the paper with a complete
-% description of how the input format was adjusted to support a new type of
-% problem instance. In short, we replace the weight lines of the form 'w
-% <variable> <positive weight>' with 'w <conjunction of literals> <positive
-% weight> <negative weight>'. The input format is restricted to conjunctions for
-% simplicity, but, of course, the algorithm can accept arbitrary formulas.
 \begin{algorithm}[t]
   \caption{WMC to PBP transformation}
   \label{alg:transformation}
@@ -467,15 +433,20 @@ files and using the syntax proposed in this paper.
 \end{algorithm}
 
 In this section, we describe an algorithm for transforming WMC instances to the
-PBP format while removing all parameter variables. The algorithm works on four
-out of the five Bayesian network encodings: \texttt{bklm16}
-\cite{DBLP:conf/ecai/BartKLM16}, \texttt{cd05}
+PBP format while removing all parameter variables. We chose to transform
+existing encodings instead of creating a new one to reuse already-existing
+techniques for encoding each CPT to its minimal logical representation such as
+prime implicants and limited forms of resolution
+\cite{DBLP:conf/ecai/BartKLM16,DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}.
+The transformation algorithm works on four out of the five Bayesian network
+encodings: \texttt{bklm16} \cite{DBLP:conf/ecai/BartKLM16}, \texttt{cd05}
 \cite{DBLP:conf/ijcai/ChaviraD05}, \texttt{cd06}
 \cite{DBLP:conf/sat/ChaviraD06}, and \texttt{d02}
 \cite{DBLP:conf/kr/Darwiche02}. There is no obvious way to adjust it to work
-with \texttt{sbk05} because the roles of indicator and parameter (i.e.,
-`chance') variables overlap \cite{DBLP:conf/aaai/SangBK05}. The algorithm is
-based on several observations that will be made more precise in
+with \texttt{sbk05} because the roles of indicator and parameter variables
+overlap \cite{DBLP:conf/aaai/SangBK05}.
+
+The algorithm is based on several observations that will be made more precise in
 \cref{sec:proof}. First, all weights except for $\{w(p) \mid p \in X_P\}$ are
 redundant as they either duplicate an already-defined weight or are equal to
 one. Second, each clause has at most one parameter variable. Third, if the
@@ -489,11 +460,11 @@ efficiently incorporated into a WMC encoding algorithm with no slowdown.
 The algorithm is listed as \cref{alg:transformation}. The main part of the
 algorithms is the first loop that iterates over clauses. If a clause consists of
 a single parameter variable, we incorporate it into $\omega$. If a clause is
-of the form $\alpha \Rightarrow p$, where $p \in X_P$ and $\alpha$ is a
+of the form $\alpha \Rightarrow p$, where $p \in X_P$, and $\alpha$ is a
 conjunction of literals over $X_I$, we transform it into a pseudo-Boolean
-function $[\alpha]_1^{w(p)}$. If a clause (say, $c \in \phi$) has no parameter
+function $[\alpha]_1^{w(p)}$. If a clause $c \in \phi$ has no parameter
 variables, we reformulate it into a pseudo-Boolean function $[c]_0^1$. Finally,
-if a clause has negative parameter literals, we skip it.
+clauses with negative parameter literals are omitted.
 
 As all `weighted' pseudo-Boolean functions produced by the first loop are of the
 form $[\alpha]_1^p$ (for some $p \in \mathbb{R}$ and formula $\alpha$), the
@@ -553,13 +524,10 @@ PBP.
 
 \begin{proof}
   Let $f = \prod_{c \in \phi} [c]_0^1$, and $g = \prod_{x \in X_I \cup X_P}
-  [x]_{w(\neg x)}^{w(x)}$. Then the WMC answer is
-  \eqref{eq:new_wmc} is
-  \[
-    (\exists_{X_I \cup X_P} fg)(\emptyset) = \sum_{Y \subseteq X_I \cup X_P}
-    (fg)(Y) = \sum_{Y \subseteq X_I \cup X_P} f(Y)g(Y)
-  \]
-  by \cref{lemma:sum}. Note that
+  [x]_{w(\neg x)}^{w(x)}$. Then the WMC answer of \eqref{eq:new_wmc} is
+  $(\exists_{X_I \cup X_P} fg)(\emptyset) = \sum_{Y \subseteq X_I \cup X_P}
+  (fg)(Y) = \sum_{Y \subseteq X_I \cup X_P} f(Y)g(Y)$ by \cref{lemma:sum}. Note
+  that
   \[
     f(Y) =
     \begin{cases}
@@ -653,54 +621,42 @@ that at most one implication clause per any parameter variable $p \in X_P$ can
   \end{equation}
   Since for any input, $\bigwedge_{i=1}^n l_i$ is either true or false, exactly
   one of the two summands in \cref{eq:bigsums} will be equal to one, and the
-  other will be equal to zero, and so
-  \[
-    \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
-      \right]_0^1\right|_{p=1} + \left.\left[ p \Leftrightarrow \bigwedge_{i=1}^n
-        l_i \right]_0^1\right|_{p=0} = 1,
-  \]
-  where $1$ is a pseudo-Boolean function that always returns one. On the other
-  side of \cref{eq:to_show}, since $F_p = \emptyset$, and $\omega$ is unchanged,
-  we get $\omega\prod_{f \in F_p} f = 1$, and so \cref{eq:to_show} is satisfied
-  under \cref{cond:d02} when $w(p) = 1$.
+  other will be equal to zero, and so $\left.\left[ p \Leftrightarrow
+      \bigwedge_{i=1}^n l_i \right]_0^1\right|_{p=1} + \left.\left[ p
+      \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1\right|_{p=0} = 1$, where
+  $1$ is a pseudo-Boolean function that always returns one. On the other side of
+  \cref{eq:to_show}, since $F_p = \emptyset$, and $\omega$ is unchanged, we get
+  $\omega\prod_{f \in F_p} f = 1$, and so \cref{eq:to_show} is satisfied under
+  \cref{cond:d02} when $w(p) = 1$.
 
   If $w(p) \ne 1$, then $F_p = \left\{ \left[ \bigwedge_{i = 1}^n l_i
     \right]_1^{w(p)} \right\}$, and $\omega = 1$, and so we want to show that
   $\left[ \bigwedge_{i = 1}^n l_i \right]_1^{w(p)} = \exists_p [p]_1^{w(p)}
-  \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1$, and indeed
-  \[
-    \exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
-    \right]_0^1 = w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[
-      \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i
-    \right]_1^{w(p)}.
-  \]
-  This finishes the proof of the correctness of the first loop under
-  \cref{cond:d02}.
+  \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i \right]_0^1$. Indeed,
+  $\exists_p [p]_1^{w(p)} \left[ p \Leftrightarrow \bigwedge_{i=1}^n l_i
+  \right]_0^1 = w(p) \cdot \left[ \bigwedge_{i=1}^n l_i \right]_0^1 + \left[
+    \bigwedge_{i=1}^n l_i \right]_1^0 = \left[ \bigwedge_{i=1}^n l_i
+  \right]_1^{w(p)}$. This finishes the proof of the correctness of the first
+  loop under \cref{cond:d02}.
 
   Now let us assume \cref{cond:bklm16}. We still want to prove
   \cref{eq:to_show}. If $w(p) = 1$, then $F_p = \emptyset$, and $\omega = 1$,
   and so the left-hand side of \cref{eq:to_show} is equal to one. Then the
-  right-hand side is
-  \[
-    \exists_p [p]_0^1 \prod_{c \in \phi_p} [c]_0^1 = \exists_p \left[ p \land
-      \bigwedge_{c \in \phi_p} c \right]_0^1 = \exists_p [p]_0^1 = 0 + 1 = 1
-  \]
-  since $p \in c$ for every clause $c \in \phi_p$.
+  right-hand side is $\exists_p [p]_0^1 \prod_{c \in \phi_p} [c]_0^1 = \exists_p
+  \left[ p \land \bigwedge_{c \in \phi_p} c \right]_0^1 = \exists_p [p]_0^1 = 0
+  + 1 = 1$ since $p \in c$ for every clause $c \in \phi_p$.
 
   If $w(p) \ne 1$, and $\{ p \} \in \phi_p$, then, by
   \cref{cond:just_parameter}, $\phi_p = \{ \{ p \} \}$, and
-  \cref{alg:transformation} produces $F_p = \emptyset$ and $\omega = w(p)$, and
-  so
-  \[
-    \exists_p [p]_{w(\neg p)}^{w(p)} [p]_0^1 = \exists_p [p]^{w(p)}_0 = w(p) =
-    \omega \prod_{f \in F_p} f.
-  \]
-  The only remaining case is when $w(p) \ne 1$ and $\{ p \} \not \in \phi_p$.
-  Then $\omega = 1$, and $F_p = \left\{ \left[\bigwedge_{l \in c \setminus \{ p
-        \}} \neg l\right]_1^{w(p)} \;\middle|\; c \in \phi_p \right\}$, so we
-  need to show that $\prod_{c \in \phi_p} \left[\bigwedge_{l \in c \setminus \{
-      p \}} \neg l\right]_1^{w(p)} = \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in
-    \phi_p} [c]_0^1$. We can rearrange the right-hand side as
+  \cref{alg:transformation} produces $F_p = \emptyset$, and $\omega = w(p)$, and
+  so $\exists_p [p]_{w(\neg p)}^{w(p)} [p]_0^1 = \exists_p [p]^{w(p)}_0 = w(p) =
+  \omega \prod_{f \in F_p} f$. The only remaining case is when $w(p) \ne 1$ and
+  $\{ p \} \not \in \phi_p$. Then $\omega = 1$, and $F_p = \left\{
+    \left[\bigwedge_{l \in c \setminus \{ p \}} \neg l\right]_1^{w(p)}
+    \;\middle|\; c \in \phi_p \right\}$, so we need to show that $\prod_{c \in
+    \phi_p} \left[\bigwedge_{l \in c \setminus \{p \}} \neg l\right]_1^{w(p)} =
+  \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1$. We can rearrange
+  the right-hand side as
   \begin{align*}
     \exists_p [p]_{1-w(p)}^{w(p)} \prod_{c \in \phi_p} [c]_0^1 &= \exists_p [p]_{1-w(p)}^{w(p)} \left[ p \lor \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
                                                                &= w(p) + (1-w(p)) \left[ \bigwedge_{c \in \phi_p} c \setminus \{ p \} \right]_0^1 \\
@@ -866,7 +822,7 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
 
 \begin{figure}
   \centering
-  \includegraphics{cumulative}
+  \includegraphics[width=\textwidth]{cumulative}
   \caption{Cactus plot of all algorithm-encoding pairs. The dotted line
     denotes the total number of instances used.}
   \label{fig:cumulative}
@@ -874,7 +830,7 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
 
 \begin{figure}
   \centering
-  \includegraphics{scatter}
+  \includegraphics[width=\textwidth]{scatter}
   \caption{An instance-by-instance comparison between $\textsf{DPMC} +
     \texttt{bklm16++}$ (the best combination according to \cref{fig:cumulative})
   and the second and third best-performing combinations: $\textsf{Ace} +
@@ -886,7 +842,7 @@ Intel Xeon E7-4820, and Intel Xeon Gold 6138 processors with a
   \centering
   \begin{minipage}{0.49\textwidth}
     \centering
-    \includegraphics{box}
+    \includegraphics[width=\textwidth]{box}
     \caption{Box plots of the numbers of variables in each encoding across all
       benchmark instances before and after applying \cref{alg:transformation}.
       Outliers and the top parts of some whiskers are
@@ -953,9 +909,13 @@ simplify each instance. This transformation is particularly effective on
 \texttt{bklm16}, allowing it to surpass \texttt{cd06} and become the new state
 of the art. While there is a similarly significant reduction in the number of
 variables for \texttt{d02}, the performance of $\textsf{DPMC}+\texttt{d02}$ is
-virtually unaffected. Finally, while our transformation makes it possible to use
-\texttt{cd05} and \texttt{cd06} with \textsf{DPMC}, the two combinations remain
-inefficient.
+virtually unaffected. It is also worth noting that there was no observable
+difference in the width of the project-join tree used by DPMC
+\cite{DBLP:conf/cp/DudekPV20} before and after applying
+\cref{alg:transformation}---the observed performance improvement is more likely
+related to the variable ordering heuristic used by ADDs. Finally, while our
+transformation makes it possible to use \texttt{cd05} and \texttt{cd06} with
+\textsf{DPMC}, the two combinations remain inefficient.
 
 \section{Conclusion}
 
@@ -983,13 +943,13 @@ well-established WMC encoding and inference techniques (such as in the
 \cite{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}) to be transferred to
 other application domains.
 
-\paragraph{Acknowledgments.}
+\subsubsection{Acknowledgments.}
 The first author was supported by the EPSRC Centre for Doctoral Training in
 Robotics and Autonomous Systems, funded by the UK Engineering and Physical
-Sciences Research Council (grant EP/L016834/1). This work has made use of the
+Sciences Research Council (grant EP/L016834/1). The second author was supported
+by a Royal Society University Research Fellowship. This work has made use of the
 resources provided by the Edinburgh Compute and Data Facility (ECDF)
 (\url{http://www.ecdf.ed.ac.uk/}).
-% TODO: should I add something for him as well?
 
 \bibliographystyle{splncs04}
 \bibliography{paper}
