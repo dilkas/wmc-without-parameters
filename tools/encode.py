@@ -28,10 +28,6 @@ ACE_LEGACY = {
 BN2CNF = ['deps/bn2cnf_linux', '-e', 'LOG', '-s', 'prime']
 C2D = ['deps/ace/c2d_linux']
 CNF4DPMC = ['tools/cnf4dpmc/cnf4dpmc', '-f']
-PMC = [
-    'deps/pmc_linux', '-vivification', '-eliminateLit', '-litImplied',
-    '-iterate=10'
-]
 
 Goal = collections.namedtuple('Goal', ['variable', 'value', 'value_index'])
 
@@ -89,12 +85,7 @@ class LiteralDict:
 def exactly_one_constraint(literals, encoding):
     """Given a list of literals and encoding information, returns a list of
     lines that implement the 'exactly one' constraint on the list of literals
-    (that can then be inserted into a CNF or a PB file)."""
-    if encoding == 'cw_pb':
-        return [
-            ' '.join('+1 x{}'.format(literal)
-                     for literal in literals) + ' = 1;'
-        ]
+    (that can then be inserted into a CNF file)."""
     return ['{} 0'.format(' '.join(literals))] + [
         '-{} -{} 0'.format(literals[i], literals[j])
         for i in range(len(literals)) for j in range(i + 1, len(literals))
@@ -102,7 +93,7 @@ def exactly_one_constraint(literals, encoding):
 
 
 def bn2cnf(bn, literal_dict, encoding):
-    """Transforms a Bayesian network to a list of constraints/clauses. The
+    """Transforms a Bayesian network to a list of clauses. The
     return value is divided into two parts: regular clauses and weights.
     NOTE: This function has nothing to do with the external program with the
     same name."""
@@ -191,10 +182,7 @@ def bn2uai(bn):
 
 def encode_single_literal(literal, encoding):
     """Returns a string that encodes the given literal as a clause."""
-    if encoding != 'cw_pb':
-        return '{} 0'.format(literal)
-    return ('1 x{} = 0;'.format(literal[1:])
-            if literal.startswith('-') else '1 x{} = 1;'.format(literal))
+    return '{} 0'.format(literal)
 
 
 def new_evidence_file(network_filename, variable, value):
@@ -345,34 +333,15 @@ def run_legacy_ace(args, goal):
         ], args.memory)
 
 
-# ==================== Final output functions ====================
+# ==================== Final output function ====================
 
 
 def write_cnf_file(args, num_variables, clauses, weights):
-    """If there is a command-line flag for preprocessing, the function writes
-    the CNF file without weights, runs pmc, and writes its output together with
-    weights back to the file. Otherwise, it immediately writes the full WMC
-    instance to a file."""
+    """Write the full WMC instance to a file"""
     header = 'p cnf {} {}'.format(num_variables, len(clauses))
     filename = args.network + '.cnf'
-    if args.preprocess:
-        with open(filename, 'w') as cnf_file:
-            cnf_file.write('\n'.join([header] + clauses) + '\n')
-        output = run(PMC + [filename], args.memory)
-        with open(filename, 'w') as cnf_file:
-            cnf_file.write(output + '\n'.join(weights) + '\n')
-    else:
-        with open(filename, 'w') as cnf_file:
-            cnf_file.write('\n'.join([header] + clauses + weights) + '\n')
-
-
-def write_pb_file(args, num_variables, constraints, weights):
-    """Combines constraints with weights, adds a header, and writes everything
-    to a file."""
-    header = '* #variable= {} #constraint= {}\n*'.format(
-        num_variables, len(constraints))
-    with open(args.network + '.pb', 'w') as pb_file:
-        pb_file.write('\n'.join([header] + constraints + weights) + '\n')
+    with open(filename, 'w') as cnf_file:
+        cnf_file.write('\n'.join([header] + clauses + weights) + '\n')
 
 
 # ==================== Main encoding functions ====================
@@ -456,7 +425,7 @@ def bn2cnf_encoder(args):
 
 def my_encoder(args):
     """This function is responsible for the entire encoding process for the cw
-    encoding (both CNF and PB versions)."""
+    encoding"""
     bn = common.BayesianNetwork(args.network)
     literal_dict = LiteralDict(bn)
     clauses, weight_clauses = bn2cnf(bn, literal_dict, args.encoding)
@@ -472,10 +441,7 @@ def my_encoder(args):
         literal = literal_dict.get_literal(*bn.goal())
         clauses.append(encode_single_literal(literal, args.encoding))
 
-    if args.encoding == 'cw_pb':
-        write_pb_file(args, len(literal_dict), clauses, weight_clauses)
-    else:
-        write_cnf_file(args, len(literal_dict), clauses, weight_clauses)
+    write_cnf_file(args, len(literal_dict), clauses, weight_clauses)
 
 
 def moralisation_encoder(args):
@@ -522,7 +488,7 @@ def main():
         'weighted model counting (WMC)')
     parser.add_argument('encoding',
                         choices=[
-                            'bklm16', 'cd05', 'cd06', 'cw', 'cw_pb', 'd02',
+                            'bklm16', 'cd05', 'cd06', 'cw', 'd02',
                             'sbk05', 'moralisation', 'stats'
                         ],
                         help='choose a WMC encoding')
@@ -544,10 +510,6 @@ def main():
         dest='memory',
         help='the maximum amount of virtual memory available to underlying ' +
         'encoders (in GiB)')
-    parser.add_argument('-p',
-                        dest='preprocess',
-                        action='store_true',
-                        help='run a preprocessor (PMC) on the CNF file')
     args = parser.parse_args()
 
     if args.encoding == 'moralisation':

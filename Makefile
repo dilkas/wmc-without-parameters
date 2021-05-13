@@ -28,10 +28,10 @@ DIRECTORIES := Grid/Ratio_50 Grid/Ratio_75 Grid/Ratio_90 DQMR/qmr-100 DQMR/qmr-5
 #all: $(addsuffix /WITHOUT_EVIDENCE,$(wildcard data/Grid/*/*.dne))
 
 # all: $(addsuffix /TREEWIDTH,$(wildcard data/2005-ijcai/*.net))
-all: $(addsuffix /TREEWIDTH,$(wildcard data/2006-ijar/*.net))
+# all: $(addsuffix /TREEWIDTH,$(wildcard data/2006-ijar/*.net))
 # all: $(addsuffix /TREEWIDTH,$(wildcard data/2004-pgm/*.net))
-all: $(addsuffix /TREEWIDTH,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
-all: $(addsuffix /TREEWIDTH,$(wildcard data/Plan_Recognition/with_evidence/*.dne))
+# all: $(addsuffix /TREEWIDTH,$(wildcard data/Plan_Recognition/without_evidence/*.dne))
+# all: $(addsuffix /TREEWIDTH,$(wildcard data/Plan_Recognition/with_evidence/*.dne))
 # all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-100/*.dne))
 # all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-50/*.dne))
 # all: $(addsuffix /TREEWIDTH,$(wildcard data/DQMR/qmr-60/*.dne))

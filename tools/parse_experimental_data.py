@@ -3,8 +3,6 @@ import glob
 import os
 import re
 
-TIMEOUT = 1000
-
 directories = [
     ('Grid/Ratio_50/', 'Grid-50'),
     ('Grid/Ratio_75/', 'Grid-75'),

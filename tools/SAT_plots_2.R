@@ -97,7 +97,7 @@ ggplot(df3, aes(encoding, value, fill = variable)) +
   scale_y_continuous(limits = quantile(df2$value, c(0, 0.7)))
 
 # number of variables vs. inference time: useless (at least so far)
-# NOTE: data comes from analyse.R
+# NOTE: data comes from SAT_plots.R
 data$instance <- sub("results/", "", data$instance)
 df4 <- melt(changes, id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_variables", "after_variables"))
 df4$encoding[df4$variable == "after_variables"] <- paste(df4$encoding[df4$variable == "after_variables"], "pp", sep = "")

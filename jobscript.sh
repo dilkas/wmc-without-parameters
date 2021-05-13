@@ -1,5 +1,5 @@
 #!/bin/sh
-#$ -N cwmc
+#$ -N wmc
 #$ -cwd
 #$ -pe sharedmem 16
 #$ -l h_rt=70:00:00

@@ -86,18 +86,16 @@ representation for computational problems but can reuse recent WMC algorithms
 based on pseudo-Boolean function manipulation, namely, \textsf{ADDMC}
 \cite{DBLP:conf/aaai/DudekPV20} and \textsf{DPMC} \cite{DBLP:conf/cp/DudekPV20}.
 Furthermore, we identify sufficient conditions for transforming a WMC instance
-into our new format. As many WMC inference algorithms such as
-\textsf{Ace}, \textsf{c2d}
-\cite{DBLP:conf/ecai/Darwiche04}, and \textsf{miniC2D}
-\cite{DBLP:conf/ijcai/OztokD15} work by compilation to tractable representations
-such as arithmetic circuits, deterministic, decomposable negation normal form
-\cite{DBLP:journals/jancl/Darwiche01}, and sentential decision diagrams (SDDs)
-\cite{DBLP:conf/ijcai/Darwiche11}, another way to avoid parameter variables
-could be via direct compilation to a more convenient representation. Direct
-compilation of Bayesian networks to SDDs has been investigated
-\cite{DBLP:conf/ecsqaru/ChoiKD13}. However, SDDs only support weights on
-literals, and so are not expressive enough to avoid the issue. To the best of
-the authors' knowledge, neither approach
+into our new format. As many WMC inference algorithms
+\cite{DBLP:conf/ecai/Darwiche04,DBLP:conf/ijcai/OztokD15} work by compilation to
+tractable representations such as arithmetic circuits, deterministic,
+decomposable negation normal form \cite{DBLP:journals/jancl/Darwiche01}, and
+sentential decision diagrams (SDDs) \cite{DBLP:conf/ijcai/Darwiche11}, another
+way to avoid parameter variables could be via direct compilation to a more
+convenient representation. Direct compilation of Bayesian networks to SDDs has
+been investigated \cite{DBLP:conf/ecsqaru/ChoiKD13}. However, SDDs only support
+weights on literals, and so are not expressive enough to avoid the issue. To the
+best of the authors' knowledge, neither approach
 \cite{DBLP:conf/ecsqaru/ChoiKD13,DBLP:conf/uai/GogateD10} has a publicly
 available implementation.
 
@@ -138,20 +136,22 @@ encodings on common ground, identifying their key properties and assumptions.
 
 \section{Weighted Model Counting}
 
-We begin with an overview of some notation and terminology. Throughout the
-paper, we use set-theoretic notation for many concepts in logic. A \emph{clause}
-is a set of literals that are part of an implicit disjunction. Similarly, a
-\emph{formula} in CNF is a set of clauses that are part of an implicit
-conjunction. We identify a \emph{model} with a set of variables that correspond
-to the positive literals in the model (and all other variables are the negative
-literals of the model). We can then define the \emph{cardinality} of a model as
-the cardinality of this set. For example, let $\phi = (\neg a \lor b) \land a$
-be a propositional formula over variables $a$ and $b$. Then an equivalent
-set-theoretic representation of $\phi$ is $\{ \{ \neg a, b \}, \{ a \} \}$. Any
-subset of $\{ a, b \}$ is an interpretation of $\phi$, e.g., $\{ a, b \}$ is a
-model of $\phi$ (written $\{ a, b \} \models \phi$) of cardinality two, while
-$\emptyset$ is an interpretation but not a model. We can now formally define
-WMC.
+We begin with an overview of some notation and terminology. We use $\land$,
+$\lor$, $\neg$, $\Rightarrow$, and $\Leftrightarrow$ to denote conjunction,
+disjunction, negation, material implication, and material biconditional,
+respectively. Throughout the paper, we use set-theoretic notation for many
+concepts in logic. A \emph{clause} is a set of literals that are part of an
+implicit disjunction. Similarly, a \emph{formula} in CNF is a set of clauses
+that are part of an implicit conjunction. We identify a \emph{model} with a set
+of variables that correspond to the positive literals in the model (and all
+other variables are the negative literals of the model). We can then define the
+\emph{cardinality} of a model as the cardinality of this set. For example, let
+$\phi = (\neg a \lor b) \land a$ be a propositional formula over variables $a$
+and $b$. Then an equivalent set-theoretic representation of $\phi$ is $\{ \{
+\neg a, b \}, \{ a \} \}$. Any subset of $\{ a, b \}$ is an interpretation of
+$\phi$, e.g., $\{ a, b \}$ is a model of $\phi$ (written $\{ a, b \} \models
+\phi$) of cardinality two, while $\emptyset$ is an interpretation but not a
+model. We can now formally define WMC.
 
 \begin{definition}[WMC] \label{def:wmc}
   A \emph{WMC instance} is a tuple $(\phi, X_I, X_P, w)$, where $X_I$ is
@@ -902,9 +902,9 @@ networks (i.e., most of our data). Nonetheless, \texttt{bklm16++} is still much
 faster than \texttt{d02++} when run with \textsf{DPMC}.
 
 It is also worth noting that there was no observable difference in the width of
-the project-join tree used by DPMC \cite{DBLP:conf/cp/DudekPV20} (which is
-equivalent to the treewidth of the primal/Gaifman graph of the input formula)
-before and after applying \cref{alg:transformation}---the observed performance
+the project-join tree used by DPMC (which is equivalent to the treewidth of the
+primal/Gaifman graph of the input formula \cite{DBLP:conf/cp/DudekPV20}) before
+and after applying \cref{alg:transformation}---the observed performance
 improvement is more likely related to the variable ordering heuristic used by
 ADDs.\footnote{The data on this (along with the implementation of
   \cref{alg:transformation}) is available at
