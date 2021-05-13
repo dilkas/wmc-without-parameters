@@ -503,13 +503,10 @@ PBP.
   $(\exists_X f)(\emptyset) = \sum_{Y \subseteq X} f(Y)$.
 \end{lemma}
 \begin{proof}
-  If $X = \{x\}$, then
-  \[
-    (\exists_xf)(\emptyset) = (f|_{x=1} + f|_{x=0})(\emptyset) =
-    f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset) = \sum_{Y \subseteq \{x\}} f(Y).
-  \]
-  This easily extends to $|X| > 1$ by the definition of projection on sets of
-  variables.
+  If $X = \{x\}$, then $(\exists_xf)(\emptyset) = (f|_{x=1} +
+  f|_{x=0})(\emptyset) = f|_{x=1}(\emptyset) + f|_{x=0}(\emptyset) = \sum_{Y
+    \subseteq \{x\}} f(Y)$. This easily extends to $|X| > 1$ by the definition
+  of projection on sets of variables.
 \end{proof}
 
 \begin{proposition} \label{prop:equivalence}
@@ -782,8 +779,8 @@ decompositions---we found that this configuration is efficient enough to handle
 huge instances, and yet the width of the returned decomposition is unlikely to
 differ from optimal by more than one or two. We also enabled \textsf{DPMC}'s
 greedy mode. This mode (which was not part of the original paper
-\cite{DBLP:conf/cp/DudekPV20}) optimises the order in which pseudo-Boolean
-functions are multiplied by prioritising functions with small representations.
+\cite{DBLP:conf/cp/DudekPV20}) optimises the order in which ADDs are multiplied
+by prioritising those with small representations.
 
 For experimental data, we use Bayesian networks available with \textsf{Ace} and
 \textsf{Cachet}. We split them into the following groups:
@@ -904,16 +901,21 @@ numbers of variables in these two encodings are equal for binary Bayesian
 networks (i.e., most of our data). Nonetheless, \texttt{bklm16++} is still much
 faster than \texttt{d02++} when run with \textsf{DPMC}.
 
+It is also worth noting that there was no observable difference in the width of
+the project-join tree used by DPMC \cite{DBLP:conf/cp/DudekPV20} (which is
+equivalent to the treewidth of the primal/Gaifman graph of the input formula)
+before and after applying \cref{alg:transformation}---the observed performance
+improvement is more likely related to the variable ordering heuristic used by
+ADDs.\footnote{The data on this (along with the implementation of
+  \cref{alg:transformation}) is available at
+  \url{https://github.com/dilkas/wmc-without-parameters}.}
+
 Overall, transforming WMC instances to the PBP format allows us to significantly
 simplify each instance. This transformation is particularly effective on
 \texttt{bklm16}, allowing it to surpass \texttt{cd06} and become the new state
 of the art. While there is a similarly significant reduction in the number of
 variables for \texttt{d02}, the performance of $\textsf{DPMC}+\texttt{d02}$ is
-virtually unaffected. It is also worth noting that there was no observable
-difference in the width of the project-join tree used by DPMC
-\cite{DBLP:conf/cp/DudekPV20} before and after applying
-\cref{alg:transformation}---the observed performance improvement is more likely
-related to the variable ordering heuristic used by ADDs. Finally, while our
+virtually unaffected. Finally, while our
 transformation makes it possible to use \texttt{cd05} and \texttt{cd06} with
 \textsf{DPMC}, the two combinations remain inefficient.
 
@@ -944,11 +946,12 @@ well-established WMC encoding and inference techniques (such as in the
 other application domains.
 
 \subsubsection{Acknowledgments.}
-The first author was supported by the EPSRC Centre for Doctoral Training in
-Robotics and Autonomous Systems, funded by the UK Engineering and Physical
-Sciences Research Council (grant EP/L016834/1). The second author was supported
-by a Royal Society University Research Fellowship. This work has made use of the
-resources provided by the Edinburgh Compute and Data Facility (ECDF)
+We thank the anonymous reviewers for their helpful comments. The first author
+was supported by the EPSRC Centre for Doctoral Training in Robotics and
+Autonomous Systems, funded by the UK Engineering and Physical Sciences Research
+Council (grant EP/L016834/1). The second author was supported by a Royal Society
+University Research Fellowship. This work has made use of the resources provided
+by the Edinburgh Compute and Data Facility (ECDF)
 (\url{http://www.ecdf.ed.ac.uk/}).
 
 \bibliographystyle{splncs04}

@@ -8,18 +8,8 @@ library(ggpubr)
 library(tidyr)
 library(RColorBrewer)
 
+# ==================== PREPROCESSING ====================
 data <- read.csv("../results/results.csv", header = TRUE, sep = ",")
-
-# how many times does each encoding produce the wrong answer?
-# temp <- data %>% left_join(data[data$encoding == "cd06" &
-#                                    data$novelty == "old",
-#                                  c("instance", "answer")], by = "instance") %>%
-#   left_join(data[data$encoding == "cw" & data$novelty == "new", c("instance", "answer")], by = "instance")
-# temp$answer.y <- ifelse(is.na(temp$answer.y), temp$answer, temp$answer.y)
-# removed <- temp[which(!is.na(temp$answer.y) & abs(temp$answer.x - temp$answer.y) > 0.01),]
-# temp <- temp[which(is.na(temp$answer.y) | abs(temp$answer.x - temp$answer.y) < 0.01),]
-# data <- subset(temp, select = -c(answer.y, answer))
-# names(data)[names(data) == 'answer.x'] <- 'answer'
 
 TIMEOUT <- 1000
 data$inference_time[is.na(data$inference_time)] <- TIMEOUT
@@ -73,11 +63,6 @@ instance_to_min_time <- df$time_min
 names(instance_to_min_time) <- df$instance
 instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
-# df.temp <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS",
-#                       answer = NA, time = instance_to_min_time[df$instance])
-# df.temp2 <- data.frame(instance = df$instance, dataset = NA, encoding = "VBS*",
-#                        answer = NA, time = instance_to_min_time0[df$instance])
-# data_sum <- rbind(data_sum, df.temp, df.temp2)
 rownames(data_sum) <- c()
 
 data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsf{DPMC} + \\texttt{bklm16}"
@@ -187,7 +172,6 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     theme_light() +
     labs(shape = "", colour = "") +
     scale_color_brewer(palette = "Dark2")
-#    scale_color_distiller("Treewidth", trans = "log") + # TODO: add breaks
 }
 
 p1 <- scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\texttt{cd06} time (s)",
@@ -344,4 +328,5 @@ ggplot(df, aes(diff)) + geom_boxplot()
 # Difference in treewidth
 df$diff <- df$add_width_new_bklm16 - df$add_width_new_bklm16pp
 df$diff <- df$add_width_new_d02 - df$add_width_new_d02pp
-plot(df$diff)
+ggplot(df, aes(x = diff)) +
+  geom_density()
