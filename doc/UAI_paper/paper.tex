@@ -1,25 +1,9 @@
-\documentclass{uai2021} % for initial submission
-% \documentclass[accepted]{uai2021} % after acceptance, for a revised
-                                    % version; also before submission to
-                                    % see how the non-anonymous paper
-                                    % would look like
-%% There is a class option to choose the math font
-% \documentclass[mathfont=cm]{uai2021} % Computer Modern math instead of
-                                       % ptmx, like default for UAI ≤2020
-% \documentclass[mathfont=newtx]{uai2021} % newtx fonts (improves upon
-                                          % ptmx; less tested, no support)
-% NOTE: Only keep *one* line above as appropriate, as it will be replaced
-%       automatically for papers to be published. Do not make any other
-%       change above this note for an accepted version.
+\documentclass[accepted]{uai2021}
 
-%% Choose your variant of English; be consistent
-% \usepackage[american]{babel}
 \usepackage[british]{babel}
-
-%% Some suggested packages, as needed:
 \usepackage{natbib} % has a nice set of citation styles and commands
-    \bibliographystyle{plainnat}
-    \renewcommand{\bibsection}{\subsubsection*{References}}
+\bibliographystyle{plainnat}
+\renewcommand{\bibsection}{\subsubsection*{References}}
 \usepackage{mathtools} % amsmath with fixes and additions
 \usepackage[binary-units]{siunitx} % for proper typesetting of numbers and units
 \usepackage{booktabs} % commands to create good-looking tables
@@ -31,7 +15,6 @@
 \usepackage{multirow}
 \usepackage{amsfonts}
 \usepackage{amsthm}
-\usepackage{thm-restate}
 \usepackage{subcaption}
 \usepackage[ruled,vlined]{algorithm2e}
 
@@ -52,6 +35,10 @@
 \makeatother
 
 \title{Weighted Model Counting with Conditional Weights for Bayesian Networks}
+% TODO: maybe I should rotate the cumulative plot
+
+% TODO: read 'Preparing the submission materials' (code: dilkas_167)
+% TODO: update the abstract during submission
 
 % The standard author block has changed for UAI 2021 to provide
 % more space for long author lists and allow for complex affiliations
@@ -59,27 +46,19 @@
 % All author information is authomatically removed by the class for the
 % anonymous submission version of your paper, so you can already add your
 % information below.
-%
-% Add authors in order of decreasing contribution
-\author[1]{\href{mailto:Harry Q. Bovik <harryq@example.edu>?Subject=Your UAI 2021 paper}{Harry~Q.~Bovik}{}} % Lead author
-\author[2]{Coauthor~One}
-\author[1,2]{Coauthor~Two}
-\author[3]{Further~Coauthor}
-\author[1]{Further~Coauthor}
-\author[3]{Further~Coauthor}
-\author[3,1]{Further~Coauthor}
-% Add affiliations after the authors
+
+\author[1]{\href{mailto:Paulius Dilkas <p.dilkas@sms.ed.ac.uk>?Subject=Your UAI
+    2021 paper}{Paulius~Dilkas}{}}
+\author[1,2]{Vaishak~Belle}
 \affil[1]{%
-    Computer Science Dept.\\
-    Cranberry University\\
-    Pittsburgh, Pennsylvania, USA
+    School of Informatics\\
+    University of Edinburgh\\
+    Edinburgh, UK
 }
 \affil[2]{%
-    Affiliation\\
-    Address\\
-    …
+    Alan Turing Institute\\
+    London, UK
 }
-\affil[3]{…}
 
 \begin{document}
 \maketitle
@@ -99,12 +78,10 @@
   of extra literals, we develop a new WMC encoding for Bayesian networks and
   adapt a state-of-the-art WMC algorithm \textsf{ADDMC} to the new format. Our
   experiments show that the new encoding significantly improves the performance
-  of the algorithm on most benchmark instances. Furthermore, the same idea can
-  be adapted to other WMC algorithms and other problem domains.
+  of the algorithm on most benchmark instances.
 \end{abstract}
 
 \section{Introduction}
-% TODO: keep mentioning citations along with algorithm and encoding names
 
 Weighted model counting (WMC), i.e., an extension of model counting ($\#\SAT{}$)
 that assigns a weight to every model \citep{DBLP:conf/aaai/SangBK05}, has
@@ -215,10 +192,12 @@ findings outlined in this section while also showing that the performance of
 each encoding depends on the WMC algorithm in use, and smaller encodings are not
 necessarily faster.
 
+% TODO: must reference the SAT paper and explain the differences
+% \cite{my_sat_paper}
+
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
 
-% TODO: The notation for a->b and b->a is backwards.
 \begin{table*}
   \caption{Notation for a logic with two atoms. The elements in both columns are
     listed in the same order.}
@@ -231,8 +210,8 @@ necessarily faster.
     Atoms (elements of $U$) & $a, b$ & $a, b$ \\
     \rowcolor{gray!10} Models (elements of $2^U$) & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ & $\emptyset, \{a\}, \{b\}, \{a, b\}$ \\
     & $\top$ & $\{ \emptyset, \{a\}, \{b\}, \{a, b\} \}$ \\
-    & $\neg a \lor \neg b, a \to b$ & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{a\}, \{a, b\} \}$ \\
-    & $b \to a, a \lor b$ & $\{ \emptyset, \{b\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ \\
+    & $\neg a \lor \neg b, a \to b$ & $\{ \emptyset, \{a\}, \{b\} \}, \{ \emptyset, \{b\}, \{a, b\} \}$ \\
+    & $b \to a, a \lor b$ & $\{ \emptyset, \{a\}, \{a, b\} \}, \{ \{a\}, \{b\}, \{a, b\} \}$ \\
     & $\neg b, \neg a, a \leftrightarrow b$ & $\{\emptyset, \{a\}\}, \{\emptyset, \{b\}\}, \{\emptyset, \{a, b\}\}$ \\
     & $(a \land \neg b) \lor (b \land \neg a), a, b$ & $\{\{a\}, \{b\}\}, \{\{a\}, \{a, b\}\}, \{\{b\}, \{a, b\}\}$ \\
     & $\neg a \land \neg b, a \land \neg b, \neg a \land b, a \land b$ & $\{\emptyset\}, \{\{a\}\}, \{\{b\}\}, \{\{a, b\}\}$ \\
@@ -262,8 +241,6 @@ $2^{2^U}$, except for (Boolean) atoms in $2^{2^U}$ that are denoted as $\{x\}$
 for some model $x \in 2^U$.
 
 \subsection{Functions on Boolean Algebras}
-% TODO: maybe: it would be easier to talk about pseudo-Boolean functions
-% instead, but maybe it's not necessary.
 
 We also consider the space of all functions from any Boolean algebra to
 $\mathbb{R}_{\ge 0}$ together with some operations on those functions. They will
@@ -323,9 +300,9 @@ a weight function $\nu\colon 2^U \to \mathbb{R}_{\ge 0}$ \emph{induces} a
 measure $\mu_\nu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ if $\mu_\nu(x) =
 \sum_{\{u\} \le x} \nu(u)$.
 
-\begin{restatable}{theorem}{measure} \label{prop:measure}
+\begin{theorem} \label{prop:measure}
   The function $\mu_\nu$ is a measure.
-\end{restatable}
+\end{theorem}
 
 Finally, a measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$ is
 \emph{factorable} if there exists a factored weight function $\nu\colon 2^U \to
@@ -410,18 +387,16 @@ encode them into instances of WMC is by adding more literals
 perspective on WMC to show that this is always possible, however, as ensuing
 sections will demonstrate, it can make the inference task much harder in
 practice.\footnote{The proofs of this and other theoretical results can be found
-  in the appendix.}
+  in the supplementary material.}
 
-\begin{restatable}{theorem}{extendable}
+\begin{theorem}
   For any set $U$ and measure $\mu\colon 2^{2^U} \to \mathbb{R}_{\ge 0}$, there
   exists a set $V \supseteq U$, a factorable measure $\mu'\colon 2^{2^V} \to
   \mathbb{R}_{\ge 0}$, and a formula $f \in 2^{2^V}$ such that $\mu(x) = \mu'(x
   \land f)$ for all formulas $x \in 2^{2^U}$.
-\end{restatable}
+\end{theorem}
 
 \section{Encoding Bayesian Networks Using Conditional Weights} \label{sec:bns}
-% TODO: Perhaps make explicit that the additional clauses added for multi-valued
-% variables are mutual exclusivity constraints, by name dropping this.
 
 \begin{figure*}
   \centering
@@ -564,8 +539,11 @@ a)$, or something else entirely, e.g., $\Pr(a \land b)$, $\Pr(a \lor b)$, etc.
 For a binary random variable $X$, $\mathrm{CPT}_X$ is simply a sum of smaller
 functions, one for each row of the CPT. If $X$ has more than two values, we also
 multiply $\mathrm{CPT}_X$ by `clause' functions that restrict the value of
-$\phi(T)$ to zero whenever $|\mathcal{E}(X) \cap T| \ne 1$. For the Bayesian
-network in \cref{fig:example_bn}, we get:
+$\phi(T)$ to zero whenever $|\mathcal{E}(X) \cap T| \ne 1$, i.e., we add mutual
+exclusivity constraints that ensure that each random variable is associated with
+exactly one value. Note that \citet{DBLP:conf/ijcai/ChaviraD07} use the same ADD
+representation of CPTs for their compilation algorithm based on variable
+elimination. For the example Bayesian network in \cref{fig:example_bn}, we get:
 \begin{align*}
   \mathrm{CPT_F} &= 0.6[\lambda_{F=1}] \cdot [\lambda_{W=1}] + 0.4[\lambda_{F=0}] \cdot [\lambda_{W=1}] \\
                  &+ 0.1[\lambda_{F=1}] \cdot [\lambda_{W=0}] + 0.9[\lambda_{F=0}] \cdot [\lambda_{W=0}], \\
@@ -590,7 +568,7 @@ $\phi$.\footnote{Note that it can just as well compute \emph{any} probability
 right answer when given a valid encoding of variable-value assignments relevant
 to the CPT.
 
-\begin{restatable}{lemma}{cptlemma} \label{lemma:cpt}
+\begin{lemma} \label{lemma:cpt}
   Let $X \in \mathcal{V}$ be a random variable with parents $\mathrm{pa}(X) = \{ Y_1,
   \dots, Y_n \}$. Then $\mathrm{CPT}_X\colon 2^{\mathcal{E}^*(X)} \to
   \mathbb{R}_{\ge 0}$ is such that for any $x \in \im X$ and $(y_1, \dots, y_n)
@@ -600,13 +578,13 @@ to the CPT.
   \]
   where $T = \{ \lambda_{X=x} \} \cup \{ \lambda_{Y_i=y_i} \mid i = 1, \dots, n
   \}$.
-\end{restatable}
+\end{lemma}
 
 Now, \cref{lemma:full_distribution} shows that $\phi$ represents the full
 probability distribution of the Bayesian network, i.e., it gives the right
 probabilities for the right inputs and zero otherwise. 
 
-\begin{restatable}{lemma}{fulldistribution} \label{lemma:full_distribution}
+\begin{lemma} \label{lemma:full_distribution}
   Let $\mathcal{V} = \{X_1, \dots, X_n\}$. Then
   \[
     \phi(T) =
@@ -620,18 +598,18 @@ probabilities for the right inputs and zero otherwise.
     \end{cases}
   \]
   for all $T \in 2^U$.
-\end{restatable}
+\end{lemma}
 
 We end with \cref{thm:correctness} that shows how $\phi$ can be combined with an
-encoding of a single variable-value assignment so that \textsf{ADDMC} would
-compute its marginal probability.
+encoding of a single variable-value assignment so that \textsf{ADDMC}
+\citep{DBLP:conf/aaai/DudekPV20} would compute its marginal probability.
 
-\begin{restatable}{theorem}{correctness} \label{thm:correctness}
+\begin{theorem} \label{thm:correctness}
   For any $X \in \mathcal{V}$ and $x \in \im X$,
   \[
     (\exists_U(\phi \cdot [\lambda_{X=x}]))(\emptyset) = \Pr(X = x).
   \]
-\end{restatable}
+\end{theorem}
 
 \subsection{Textual Representation} \label{sec:textual_representation}
 
@@ -763,21 +741,11 @@ correct for this, we multiply the final answer by two for every $u \in U
   \label{fig:scatter}
 \end{figure*}
 
-%\begin{figure*}[t] % TODO: maybe not: describe this in the text
-%  \centering
-%  \input{melt.tex}%
-%  \caption{Average encoding and inference time of each encoding with their
-%    original WMC algorithm (on the left) and with \textsf{ADDMC} (on the right)
-%    on \emph{solved} instances. The error bars denote \SI{10}{\percent} of
-%    standard deviation.}
-%  \label{fig:melted}
-%\end{figure*}
-
 We compare the six WMC encodings for Bayesian networks when run with both
-\textsf{ADDMC} and the WMC algorithms used in the original papers.\footnote{Both
-  \texttt{cd05} and \texttt{cd06} cannot be run with most WMC algorithms
-  including \textsf{ADDMC} because these encodings allow for additional models
-  that the WMC algorithm is supposed to ignore
+\textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} and the WMC algorithms used in
+the original papers.\footnote{Both \texttt{cd05} and \texttt{cd06} cannot be run
+  with most WMC algorithms including \textsf{ADDMC} because these encodings
+  allow for additional models that the WMC algorithm is supposed to ignore
   \citep{DBLP:conf/ijcai/ChaviraD05,DBLP:conf/sat/ChaviraD06}.} We compare the
 encodings with respect to the total time it takes to encode a Bayesian network,
 compile it or run a WMC algorithm on it, and extract the (numerical) answer.
@@ -789,34 +757,40 @@ memory limits. The experiments were run on a computing cluster with Intel Xeon
 Gold 6138 and Intel Xeon E5-2630 processors\footnote{Each instance is run on the
   same processor for all encodings.} running Scientific~Linux~7 with a
 \SI{32}{\gibi\byte} memory limit and a \SI{1000}{\second} timeout on both
-encoding and inference. For inference, we use \textsf{Ace} for \texttt{cd05},
-\texttt{cd06}, and \texttt{d02};
+encoding and inference. For inference, we use \textsf{Ace} for \texttt{cd05}
+\citep{DBLP:conf/ijcai/ChaviraD05}, \texttt{cd06}
+\citep{DBLP:conf/sat/ChaviraD06}, and \texttt{d02}
+\citep{DBLP:conf/kr/Darwiche02};
 \textsf{Cachet}\footnote{\url{https://cs.rochester.edu/u/kautz/Cachet/}}
-\citep{DBLP:conf/sat/SangBBKP04} for \texttt{sbk05}; and \textsf{c2d}
+\citep{DBLP:conf/sat/SangBBKP04} for \texttt{sbk05}
+\citep{DBLP:conf/aaai/SangBK05}; and \textsf{c2d}
 \citep{DBLP:conf/ecai/Darwiche04} for compilation and \textsf{query-dnnf}
 \footnote{\url{http://www.cril.univ-artois.fr/kc/d-DNNF-reasoner.html}} for
-answer computation for \texttt{bklm16}. For encoding, we use \textsf{bn2cnf}
+answer computation for \texttt{bklm16} \citep{DBLP:conf/ecai/BartKLM16}. For
+encoding, we use \textsf{bn2cnf}
 \footnote{\url{http://www.cril.univ-artois.fr/KC/bn2cnf.html}} for
 \texttt{bklm16}, and \textsf{Ace} for all other encodings (except for
 \texttt{cw}, which is implemented in Python).
 
-\textsf{Ace} was not used to encode evidence, as
-preliminary experiments revealed that the evidence-encoding implementation
-contains bugs that can lead to incorrect answers or a Java exception being
-thrown on some instances of the data set (and the source code is not publicly
-available). Instead, we simply list all the evidence as additional clauses in
-the encoding. Furthermore, to ensure that \texttt{bklm16} (whether run with
-\textsf{ADDMC} or \textsf{c2d}) returns correct answers on most instances, we
+\textsf{Ace} was not used to encode evidence, as preliminary experiments
+revealed that the evidence-encoding implementation contains bugs that can lead
+to incorrect answers or a Java exception being thrown on some instances of the
+data set (and the source code is not publicly available). Instead, we simply
+list all the evidence as additional clauses in the encoding. Furthermore, to
+ensure that \texttt{bklm16} \citep{DBLP:conf/ecai/BartKLM16} (whether run with
+\textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} or \textsf{c2d}
+\citep{DBLP:conf/ecai/Darwiche04}) returns correct answers on most instances, we
 had to disable one of the improvements that \texttt{bklm16} brings over
-\texttt{cd06}, namely, the construction of a scaling factor that `absorbs' one
-probability from each CDT \citep{DBLP:conf/ecai/BartKLM16}. For realistic
-benchmark instances, this scaling factor can easily be below $10^{-30}$, and
-thus would require arbitrary-precision floating-point arithmetic to be usable.
-Even a toy Bayesian network with seven binary independent variables with
-probabilities $0.1$ and $0.9$ is enough for \textsf{bn2cnf} to output precisely
-zero as the scaling factor. We note that this issue likely remained unnoticed
-because \citet{DBLP:conf/ecai/BartKLM16} did not attempt to compute numerical
-answers in their experiments.
+\texttt{cd06} \citep{DBLP:conf/sat/ChaviraD06}, namely, the construction of a
+scaling factor that `absorbs' one probability from each CDT
+\citep{DBLP:conf/ecai/BartKLM16}. For realistic benchmark instances, this
+scaling factor can easily be below $10^{-30}$, and thus would require
+arbitrary-precision floating-point arithmetic to be usable. Even a toy Bayesian
+network with seven binary independent variables with probabilities $0.1$ and
+$0.9$ is enough for \textsf{bn2cnf} to output precisely zero as the scaling
+factor. We note that this issue likely remained unnoticed because
+\citet{DBLP:conf/ecai/BartKLM16} did not attempt to compute numerical answers in
+their experiments.
 
 For each Bayesian network, we need to choose a probability to compute. Whenever
 a Bayesian network comes with an evidence file, we compute the probability of
@@ -825,8 +799,8 @@ network. If $\mathsf{true} \in \im X$, then we compute the marginal probability
 of $X = \mathsf{true}$. Otherwise, we pick the value of $X$ which is listed
 first and calculate its marginal probability.
 
-For experimental data, we use the Bayesian networks
-available with \textsf{Ace} and \textsf{Cachet}, most of which happen to be
+For experimental data, we use the Bayesian networks available with \textsf{Ace}
+and \textsf{Cachet} \citep{DBLP:conf/sat/SangBBKP04}, most of which happen to be
 binary. We classify them into the following seven categories:
 \begin{itemize*}
 \item DQMR and
@@ -840,33 +814,28 @@ binary. We classify them into the following seven categories:
   \texttt{hailfinder}, \texttt{mildew}, \texttt{munin1}--\texttt{4},
   \texttt{pathfinder}, \texttt{pigs}, \texttt{water}).
 \end{itemize*}
-We run \textsf{ADDMC} with each of the five encodings once on each Bayesian
-network. % TODO: this should be updated
 
-%Specifically, \texttt{cw} solves the same number of
-%instances in \SI{8.144}{\second} as \texttt{d02} does in \SI{1000}{\second},
-%which is the second-best encoding in our experiments.
-
-\Cref{fig:cumulative} shows that \texttt{cd05} and
-\texttt{cd06} (when run with \textsf{Ace}) are in the lead, while \textsf{ADDMC}
-significantly underperforms when combined with any of the previous encodings.
-Our encoding \texttt{cw} significantly improves the performance of
-\textsf{ADDMC}, making $\textsf{ADDMC}+\texttt{cw}$ comparable to
-$\textsf{Ace}+\texttt{d02}$, $\textsf{c2d}+\texttt{bklm16}$, and
-$\textsf{Cachet}+\texttt{sbk05}$. Furthermore,
-\cref{tbl:tallies} shows that, while $\textsf{Ace}+\texttt{cd06}$ managed to
-solve the most instances, $\textsf{ADDMC}+\texttt{cw}$ was the best-performing
-algorithm-encoding combination on the largest number of instances. The scatter
-plot on the left-hand side of \cref{fig:scatter} add to this by showing that
-\texttt{cw} is particularly promising on Grid networks and tackles all DQMR
-instances in less than a second. The scatter plot on the right-hand side of
-\cref{fig:scatter} shows that \texttt{cw} is better than \texttt{sbk05} (i.e.,
-the second-best encoding for \textsf{ADDMC}) on the majority of
-instances. Seeing how, e.g., DQMR instances are trivial for
-$\textsf{ADDMC}+\texttt{cw}$ but hard for $\textsf{Ace}+\texttt{cd06}$, and
-vice versa for Mastermind instances, we conclude that the best-performing
-algorithm-encoding combination depends significantly on (as-of-yet unknown)
-properties of the Bayesian networks.
+\Cref{fig:cumulative} shows that \texttt{cd05}
+\citep{DBLP:conf/ijcai/ChaviraD05} and \texttt{cd06}
+\citep{DBLP:conf/sat/ChaviraD06} (when run with \textsf{Ace}) are in the lead,
+while \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} significantly
+underperforms when combined with any of the previous encodings. Our encoding
+\texttt{cw} significantly improves the performance of \textsf{ADDMC}, making
+$\textsf{ADDMC}+\texttt{cw}$ comparable to $\textsf{Ace}+\texttt{d02}$,
+$\textsf{c2d}+\texttt{bklm16}$, and $\textsf{Cachet}+\texttt{sbk05}$.
+Furthermore, \cref{tbl:tallies} shows that, while $\textsf{Ace}+\texttt{cd06}$
+managed to solve the most instances, $\textsf{ADDMC}+\texttt{cw}$ was the
+best-performing algorithm-encoding combination on the largest number of
+instances. The scatter plot on the left-hand side of \cref{fig:scatter} add to
+this by showing that \texttt{cw} is particularly promising on Grid networks and
+tackles all DQMR instances in less than a second. The scatter plot on the
+right-hand side of \cref{fig:scatter} shows that \texttt{cw} is better than
+\texttt{sbk05} \citep{DBLP:conf/aaai/SangBK05} (i.e., the second-best encoding
+for \textsf{ADDMC}) on the majority of instances. Seeing how, e.g., DQMR
+instances are trivial for $\textsf{ADDMC}+\texttt{cw}$ but hard for
+$\textsf{Ace}+\texttt{cd06}$, and vice versa for Mastermind instances, we
+conclude that the best-performing algorithm-encoding combination depends
+significantly on (as-of-yet unknown) properties of the Bayesian networks.
 
 \begin{table}
   \centering
@@ -884,33 +853,26 @@ properties of the Bayesian networks.
   \end{tabular}
 \end{table}
 
-We can explain what makes \textsf{ADDMC} run significantly faster with
-\texttt{cw} than with any other encoding by considering asymptotic upper bounds
-on the numbers of variables and ADDs based on the size and structure of the
-Bayesian network. Let $n = |\mathcal{V}|$ be the number of vertices in the
-Bayesian network, $d = \max_{X \in \mathcal{V}} |\mathrm{pa}(X)|$ the maximum
-in-degree (i.e., the number of parents), and $v = \max_{X \in \mathcal{V}} |\im
-X|$ the maximum number of values per variable. \Cref{tbl:asymptotes} shows how
-\texttt{cw} has fewer variables and fewer ADDs than any other encoding. We
-conjecture that it is primarily the reduced number of variables that makes the
-\textsf{ADDMC} variable ordering heuristics much more effective. Note that these
-are upper bounds and most encodings (including \texttt{cw}) can be smaller in
-certain situations (e.g., with binary random variables or when a CPT has
-repeating probabilities). We equate clauses and ADDs (more specifically, factors
-of the function $\phi$ from \cref{alg:encoding}) here because \textsf{ADDMC}
-interprets each clause of any WMC encoding as a multiplicative factor of the ADD
-that represents the entire WMC instance \citep{DBLP:conf/aaai/DudekPV20}. For
-literal-weight encodings, each weight is also a factor, but that does not affect
-our asymptotic bounds.
+We can explain what makes \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} run
+significantly faster with \texttt{cw} than with any other encoding by
+considering asymptotic upper bounds on the numbers of variables and ADDs based
+on the size and structure of the Bayesian network. Let $n = |\mathcal{V}|$ be
+the number of vertices in the Bayesian network, $d = \max_{X \in \mathcal{V}}
+|\mathrm{pa}(X)|$ the maximum in-degree (i.e., the number of parents), and $v =
+\max_{X \in \mathcal{V}} |\im X|$ the maximum number of values per variable.
+\Cref{tbl:asymptotes} shows how \texttt{cw} has fewer variables and fewer ADDs
+than any other encoding. We conjecture that it is primarily the reduced number
+of variables that makes the \textsf{ADDMC} variable ordering heuristics much
+more effective. Note that these are upper bounds and most encodings (including
+\texttt{cw}) can be smaller in certain situations (e.g., with binary random
+variables or when a CPT has repeating probabilities). We equate clauses and ADDs
+(more specifically, factors of the function $\phi$ from \cref{alg:encoding})
+here because \textsf{ADDMC} interprets each clause of any WMC encoding as a
+multiplicative factor of the ADD that represents the entire WMC instance
+\citep{DBLP:conf/aaai/DudekPV20}. For literal-weight encodings, each weight is
+also a factor, but that does not affect our asymptotic bounds.
 
 \section{Conclusions and Future Work}
-% TODO: maybe: emphasise that BN encodings have never been compared w.r.t. time
-% before
-% TODO: the claim about this being applicable to other algorithms is a bit too
-% optimistic (especially for the abstract)
-% TODO: mention the Chavira & Darwiche "Compiling Bayesian Networks Using
-% Variable Elimination" paper
-% TODO: also mention the Gogate UAI 2010 paper
 
 WMC was originally motivated by an appeal to the success of \SAT{} solvers in
 efficiently tackling an $\NP{}$-complete problem
@@ -925,133 +887,36 @@ still encoded as clauses. As has been noted previously
 or one can be represented as clauses as well. Therefore, our work can be seen as
 proposing a middle ground between $\#\SAT{}$ and probabilistic inference.
 
-While we chose \textsf{ADDMC} as the WMC algorithm and Bayesian networks as a
-canonical example of a probabilistic inference task, these are only examples
-meant to illustrate the broader idea that choosing a more expressive
-representation of weights can outperform increasing the size of the problem to
-keep the weights simple. Indeed, in this work, we have provided a new
-theoretical perspective on the expressive power of WMC and illustrated the
-empirical benefits of that perspective. The same idea can be adapted to other
-inference problem domains such as probabilistic programs
+While we chose \textsf{ADDMC} \citep{DBLP:conf/aaai/DudekPV20} as the WMC
+algorithm and Bayesian networks as a canonical example of a probabilistic
+inference task, these are only examples meant to illustrate the broader idea
+that choosing a more expressive representation of weights can outperform
+increasing the size of the problem to keep the weights simple. Indeed, in this
+work, we have provided a new theoretical perspective on the expressive power of
+WMC and illustrated the empirical benefits of that perspective. The same idea
+can be adapted to other inference problem domains such as probabilistic programs
 \citep{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089} as
 well as to search-based solvers such as \textsf{Cachet}
-\citep{DBLP:conf/sat/SangBBKP04} and \textsf{DPMC}
----an extension to \textsf{ADDMC} that adds support for computations based on
-tensors (rather than ADDs) and planning based on tree decompositions
-\cite{DBLP:conf/cp/DudekPV20}. Another important direction for future work is to
-develop a better understanding of what properties of Bayesian networks make an
-instance easy for some algorithm-encoding combinations more than others.
+\citep{DBLP:conf/sat/SangBBKP04} and \textsf{DPMC} ---an extension to
+\textsf{ADDMC} that adds support for computations based on tensors (rather than
+ADDs) and planning based on tree decompositions \cite{DBLP:conf/cp/DudekPV20}.
+Another important direction for future work is to develop a better understanding
+of what properties of Bayesian networks make an instance easy for some
+algorithm-encoding combinations more than others.
 
-\begin{contributions} % will be removed in pdf for initial submission,
-                      % so you can already fill it to test with the
-                      % ‘accepted’ class option
-    Briefly list author contributions.
-    This is a nice way of making clear who did what and to give proper credit.
-
-    H.~Q.~Bovik conceived the idea and wrote the paper.
-    Coauthor One created the code.
-    Coauthor Two created the figures.
+\begin{contributions}
+    P.~Dilkas conceived the idea, ran the experiments, and wrote the paper.
+    V.~Belle supervised the work.
 \end{contributions}
 
-\begin{acknowledgements} % will be removed in pdf for initial submission,
-                         % so you can already fill it to test with the
-                         % ‘accepted’ class option
-    Briefly acknowledge people and organizations here.
-
-    \emph{All} acknowledgements go in this section.
+\begin{acknowledgements}
+  The first author was supported by the EPSRC Centre for Doctoral Training in
+  Robotics and Autonomous Systems, funded by the UK Engineering and Physical
+  Sciences Research Council (grant EP/L016834/1). The second author was
+  supported by a Royal Society University Research Fellowship. This work has
+  made use of the resources provided by the Edinburgh Compute and Data Facility
+  (ECDF) (\url{http://www.ecdf.ed.ac.uk/}).
 \end{acknowledgements}
 
-\clearpage
 \bibliography{paper}
-
-\clearpage
-\appendix
-\section{Proofs}
-
-\measure*
-\begin{proof}
-  Note that $\mu_\nu(\bot) = 0$ since there are no atoms below $\bot$. Let $a, b
-  \in 2^{2^{U}}$ be such that $a \land b = \bot$. By elementary properties of
-  Boolean algebras, all atoms below $a \lor b$ are either below $a$ or below
-  $b$. Moreover, none of them can be below both $a$ and $b$ because then they
-  would have to be below $a \land b = \bot$. Thus
-  \begin{align*}
-    \mu_\nu(a \lor b) &= \sum_{\{u\} \le a \lor b} \nu(u) = \sum_{\{u\} \le a} \nu(u) + \sum_{\{u\} \le b} \nu(u) \\
-                      &= \mu_\nu(a) + \mu_\nu(b)
-  \end{align*}
-  as required.
-\end{proof}
-
-\extendable*
-\begin{proof}
-  Let $V = U \cup \{ f_m \mid m \in 2^U \}$, and $f = \bigwedge_{m \in 2^U} \{ m
-  \} \leftrightarrow f_m$. We define weight function $\nu\colon 2^V \to
-  \mathbb{R}_{\ge 0}$ as $\nu = \prod_{v \in V} \nu_v$, where $\nu_v(\{v\}) =
-  \mu(\{m\})$ if $v = f_m$ for some $m \in 2^U$ and $\nu_v(x) = 1$ for all other
-  $v \in V$ and $x \in 2^{\{v\}}$. Let $\mu'\colon 2^{2^V} \to \mathbb{R}_{\ge
-    0}$ be the measure induced by $\nu$. It is enough to show that $\mu$ and $x
-  \mapsto \mu'(x \land f)$ agree on the atoms in $2^{2^U}$. For any $\{ a \} \in
-  2^{2^U}$,
-  \begin{align*}
-    \mu'(\{ a \} \land f) &= \sum_{\{ x \} \le \{ a \} \land f} \nu(x) = \nu(a \cup \{ f_a \}) \\
-                          &= \nu_{f_a}(\{ f_a \}) = \mu(\{ a \})
-  \end{align*}
-  as required.
-\end{proof}
-
-\cptlemma*
-\begin{proof}
-  If $X$ is binary, then $\mathrm{CPT}_X$ is a sum of $2\prod_{i=1}^n |\im
-  Y_i|$ terms, one for each possible assignment of values to variables $X, Y_1,
-  \dots, Y_n$. Exactly one of these terms is nonzero when applied to $T$, and
-  it is equal to $\Pr(X = x \mid Y_1 = y_1, \dots, Y_n = y_n)$ by definition.
-
-  If $X$ is not binary, then $\left( \sum_{i=1}^m [\lambda_{X = x_i}]
-  \right)(T) = 1$, and $\left( \prod_{i=1}^m \prod_{j=i+1}^m
-    (\overline{[\lambda_{X = x_i}]} + \overline{[\lambda_{X = x_j}]})
-  \right)(T) = 1$, so $\mathrm{CPT}_X(T) = \Pr(X = x \mid Y_1 = y_1,
-  \dots, Y_n = y_n)$ by a similar argument as before.
-\end{proof}
-
-\fulldistribution*
-\begin{proof}
-  If $T = \{ \lambda_{X=v_X} \mid X \in \mathcal{V} \}$ for some $(v_X)_{X
-    \in \mathcal{V}} \in \prod_{X \in \mathcal{V}} \im X$, then
-  \begin{align*}
-    \phi(T) &= \prod_{X \in \mathcal{V}} \Pr \left( X=v_X \;\middle|\; \bigwedge_{Y \in \mathrm{pa}(X)} Y=v_Y \right) \\
-            &= \Pr \left( \bigwedge_{X \in \mathcal{V}} X=v_X \right)
-  \end{align*}
-  by \cref{lemma:cpt} and the definition of a Bayesian network. Otherwise there
-  must be some non-binary random variable $X \in \mathcal{V}$ such that
-  $|\mathcal{E}(X) \cap T| \ne 1$. If $\mathcal{E}(X) \cap T = \emptyset$, then
-  $\left( \sum_{i=1}^m [\lambda_{X = x_i}] \right)(T) = 0$, and so
-  $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$. If $|\mathcal{E}(X) \cap T| > 1$,
-  then we must have two different values $x_1, x_2 \in \im X$ such that
-  $\{\lambda_{X=x_1}, \lambda_{X=x_2} \} \subseteq T$ which means that
-  $(\overline{[\lambda_{X=x_1}]} + \overline{[\lambda_{X=x_2}]})(T) = 0$, and
-  so, again, $\mathrm{CPT}_X(T) = 0$, and $\phi(T) = 0$.
-\end{proof}
-
-\correctness*
-\begin{proof}
-  Let $\mathcal{V} = \{ X, Y_1, \dots, Y_n \}$. Then
-  \begin{align*}
-    (\exists_U (\phi \cdot [\lambda_{X=x}]))(\emptyset) &= \sum_{T \in 2^U} (\phi \cdot [\lambda_{X=x}])(T) \\
-                                                        &= \sum_{\lambda_{X=x} \in T \in 2^U} \phi(T) \\
-                                                        &= \sum_{\lambda_{X=x} \in T \in 2^U} \left( \prod_{Y \in \mathcal{V}} \mathrm{CPT}_Y \right)(T) \\
-                                                        &= \sum_{(y_i)_{i=1}^n \in \prod_{i=1}^n \im Y_i} \Pr(x, y_1, \dots, y_n) \\
-                                                        &= \Pr(X = x)
-  \end{align*}
-  by:
-  \begin{itemize}
-  \item the proof of Theorem~1 by \citet{DBLP:conf/aaai/DudekPV20};
-  \item if $\lambda_{X=x} \not\in T \in 2^U$, then $(\phi \cdot
-    [\lambda_{X=x}])(T) = \phi(T) \cdot [\lambda_{X=x}](T \cap \{
-    \lambda_{X=x} \}) = \phi(T) \cdot 0 = 0$;
-  \item \cref{lemma:full_distribution};
-  \item marginalisation of a probability distribution.
-  \end{itemize}
-\end{proof}
-
-% TODO: potential appendix: exact arguments to each piece of software
 \end{document}
