@@ -8,7 +8,7 @@ library(ggpubr)
 library(tidyr)
 library(RColorBrewer)
 
-data <- read.csv("../results/old_results.csv", header = TRUE, sep = ",")
+data <- read.csv("../results/UAI_results.csv", header = TRUE, sep = ",")
 data <- data[!(data$encoding == "cd05" & data$novelty == "new"),]
 data <- data[!(data$encoding == "cd06" & data$novelty == "new"),]
 
@@ -100,7 +100,8 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
     labs(color = pretty_column_name, linetype = pretty_column_name)
 }
 
-tikz(file = "../doc/paper2/cumulative.tex", width = 6.5, height = 2.4)
+#tikz(file = "../doc/UAI_paper/cumulative.tex", width = 6.5, height = 2.4)
+tikz(file = "../doc/poster/cumulative.tex", width = 7, height = 2.6, standAlone = TRUE)
 cumulative_plot(data_sum, "encoding", "Algorithm \\& Encoding",
                 sort(unique(data_sum$encoding)),
                 c(2, 2, 2, 1, 1, 1, 1, 2, 2), "time", "Time (s)")
@@ -132,10 +133,10 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
 
 p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsf{Ace} + \\texttt{cd06} time (s)",
                    "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
-
 p2 <- scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsf{ADDMC} + \\texttt{sbk05} time (s)",
                    "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
-tikz(file = "../doc/paper2/scatter.tex", width = 6.5, height = 2.4)
+#tikz(file = "../doc/UAI_paper/scatter.tex", width = 6.5, height = 2.4)
+tikz(file = "../doc/poster/scatter.tex", width = 7, height = 2.6, standAlone = TRUE)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "right")
 dev.off()
 

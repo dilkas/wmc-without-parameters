@@ -36,7 +36,6 @@
 
 \title{Weighted Model Counting with Conditional Weights for Bayesian Networks}
 % TODO: maybe I should rotate the cumulative plot
-
 % TODO: read 'Preparing the submission materials' (code: dilkas_167)
 % TODO: update the abstract during submission
 
@@ -192,8 +191,15 @@ findings outlined in this section while also showing that the performance of
 each encoding depends on the WMC algorithm in use, and smaller encodings are not
 necessarily faster.
 
-% TODO: must reference the SAT paper and explain the differences
-% \cite{my_sat_paper}
+While in this paper we focus on measure-theoretic foundations and propose a
+new encoding for Bayesian networks, a related line of work
+\citep{my_sat_paper}---motivated by the same issue of WMC encodings having both
+more variables and more clauses as a consequence of having to conform to an
+unnecessarily restrictive format---shows how these variables and clauses can be
+removed from (most) already-existing Bayesian network encodings. Although tested
+on Bayesian networks, this variable removal is formulated in a way that applies
+to arbitrary WMC instances.
+% I could also mention DPMC vs ADDMC and pseudo-Boolean functions
 
 \section{Boolean Algebras, Power Sets, and Propositional
   Logic} \label{sec:prelims}
