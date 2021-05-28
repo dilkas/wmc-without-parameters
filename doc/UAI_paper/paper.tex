@@ -46,17 +46,12 @@
 % anonymous submission version of your paper, so you can already add your
 % information below.
 
-\author[1]{\href{mailto:Paulius Dilkas <p.dilkas@sms.ed.ac.uk>?Subject=Your UAI
-    2021 paper}{Paulius~Dilkas}{}}
-\author[1,2]{Vaishak~Belle}
-\affil[1]{%
-    School of Informatics\\
+\author{Paulius~Dilkas}
+\author{Vaishak~Belle}
+\affil{%
     University of Edinburgh\\
-    Edinburgh, UK
-}
-\affil[2]{%
-    Alan Turing Institute\\
-    London, UK
+    Edinburgh, UK \\
+    \texttt{p.dilkas@sms.ed.ac.uk}, \texttt{vaishak@ed.ac.uk}
 }
 
 \begin{document}
@@ -196,9 +191,7 @@ new encoding for Bayesian networks, a related line of work
 \citep{my_sat_paper}---motivated by the same issue of WMC encodings having both
 more variables and more clauses as a consequence of having to conform to an
 unnecessarily restrictive format---shows how these variables and clauses can be
-removed from (most) already-existing Bayesian network encodings. Although tested
-on Bayesian networks, this variable removal is formulated in a way that applies
-to arbitrary WMC instances.
+removed from (most) already-existing Bayesian network encodings.
 % I could also mention DPMC vs ADDMC and pseudo-Boolean functions
 
 \section{Boolean Algebras, Power Sets, and Propositional
@@ -705,7 +698,7 @@ algebra by $0.5$, but the number of atoms under consideration is halved. To
 correct for this, we multiply the final answer by two for every $u \in U
 \setminus V$.
 
-\section{Experimental Comparison} \label{sec:experiments}
+\section{Experimental Results} \label{sec:experiments}
 
 \begin{figure*}[t]
   \centering
@@ -899,16 +892,14 @@ inference task, these are only examples meant to illustrate the broader idea
 that choosing a more expressive representation of weights can outperform
 increasing the size of the problem to keep the weights simple. Indeed, in this
 work, we have provided a new theoretical perspective on the expressive power of
-WMC and illustrated the empirical benefits of that perspective. The same idea
-can be adapted to other inference problem domains such as probabilistic programs
+WMC and illustrated the empirical benefits of that perspective. Perhaps the same
+idea could be adapted to other inference problem domains such as probabilistic
+programs
 \citep{DBLP:journals/tplp/FierensBRSGTJR15,DBLP:journals/corr/abs-2005-09089} as
 well as to search-based solvers such as \textsf{Cachet}
 \citep{DBLP:conf/sat/SangBBKP04} and \textsf{DPMC} ---an extension to
 \textsf{ADDMC} that adds support for computations based on tensors (rather than
 ADDs) and planning based on tree decompositions \cite{DBLP:conf/cp/DudekPV20}.
-Another important direction for future work is to develop a better understanding
-of what properties of Bayesian networks make an instance easy for some
-algorithm-encoding combinations more than others.
 
 \begin{contributions}
     P.~Dilkas conceived the idea, ran the experiments, and wrote the paper.
