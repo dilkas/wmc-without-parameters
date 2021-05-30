@@ -88,16 +88,22 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
   cumulative$time <- as.numeric(cumulative$time)
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < 2 * TIMEOUT, ]
-  ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
-    geom_line(aes(linetype = .data[[column_name]])) +
-    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000), labels = c("0.1", "1", "10", "100", "1000")) +
-    xlab("Time (s)") +
-    ylab("Instances solved") +
-    scale_colour_manual(breaks = column_values, values = colours) +
-    scale_linetype_manual(breaks = column_values, values = linetypes) +
-    annotation_logticks(sides = "b", colour = "#989898") +
-    theme_light() +
-    labs(color = pretty_column_name, linetype = pretty_column_name)
+  max <- max(cumulative$count[cumulative$encoding == "\\textsf{ADDMC} + \\texttt{bklm16}"])
+  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\textsf{ADDMC} + \\texttt{cw}"],
+                          y = cumulative$time[cumulative$encoding ==  "\\textsf{ADDMC} + \\texttt{cw}"],
+                          xout = max)
+  print(interpolation$y)
+  print(1000 / interpolation$y)
+#  ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
+#    geom_line(aes(linetype = .data[[column_name]])) +
+#    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000), labels = c("0.1", "1", "10", "100", "1000")) +
+#    xlab("Time (s)") +
+#    ylab("Instances solved") +
+#    scale_colour_manual(breaks = column_values, values = colours) +
+#    scale_linetype_manual(breaks = column_values, values = linetypes) +
+#    annotation_logticks(sides = "b", colour = "#989898") +
+#    theme_light() +
+#    labs(color = pretty_column_name, linetype = pretty_column_name)
 }
 
 #tikz(file = "../doc/UAI_paper/cumulative.tex", width = 6.5, height = 2.4)
