@@ -94,20 +94,21 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
                           xout = max)
   print(interpolation$y)
   print(1000 / interpolation$y)
-#  ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
-#    geom_line(aes(linetype = .data[[column_name]])) +
-#    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000), labels = c("0.1", "1", "10", "100", "1000")) +
-#    xlab("Time (s)") +
-#    ylab("Instances solved") +
-#    scale_colour_manual(breaks = column_values, values = colours) +
-#    scale_linetype_manual(breaks = column_values, values = linetypes) +
-#    annotation_logticks(sides = "b", colour = "#989898") +
-#    theme_light() +
-#    labs(color = pretty_column_name, linetype = pretty_column_name)
+  ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
+    geom_line(aes(linetype = .data[[column_name]])) +
+    scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000), labels = c("0.1", "1", "10", "100", "1000")) +
+    xlab("Time (s)") +
+    ylab("Instances solved") +
+    scale_colour_manual(breaks = column_values, values = colours) +
+    scale_linetype_manual(breaks = column_values, values = linetypes) +
+    annotation_logticks(sides = "b", colour = "#989898") +
+    theme_light() +
+    labs(color = pretty_column_name, linetype = pretty_column_name)
 }
 
 #tikz(file = "../doc/UAI_paper/cumulative.tex", width = 6.5, height = 2.4)
-tikz(file = "../doc/poster/cumulative.tex", width = 7, height = 2.6, standAlone = TRUE)
+#tikz(file = "../doc/poster/cumulative.tex", width = 7, height = 2.6, standAlone = TRUE)
+tikz(file = "../doc/long_talk/cumulative.tex", width = 4.75, height = 3.2)
 cumulative_plot(data_sum, "encoding", "Algorithm \\& Encoding",
                 sort(unique(data_sum$encoding)),
                 c(2, 2, 2, 1, 1, 1, 1, 2, 2), "time", "Time (s)")
@@ -142,8 +143,17 @@ p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsf{Ace} + \\texttt
 p2 <- scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsf{ADDMC} + \\texttt{sbk05} time (s)",
                    "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
 #tikz(file = "../doc/UAI_paper/scatter.tex", width = 6.5, height = 2.4)
-tikz(file = "../doc/poster/scatter.tex", width = 7, height = 2.6, standAlone = TRUE)
-ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "right")
+#tikz(file = "../doc/poster/scatter.tex", width = 7, height = 2.6, standAlone = TRUE)
+#ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "right")
+#dev.off()
+
+tikz(file = "../doc/long_talk/scatter1.tex", width = 4.75, height = 3.2)
+scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsf{Ace} + \\texttt{cd06} time (s)",
+                   "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
+dev.off()
+tikz(file = "../doc/long_talk/scatter2.tex", width = 4.75, height = 3.2)
+scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsf{ADDMC} + \\texttt{sbk05} time (s)",
+                   "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
 dev.off()
 
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),

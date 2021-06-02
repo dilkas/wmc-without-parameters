@@ -6,6 +6,7 @@
 \usepackage{minibox}
 \usepackage{listings}
 \usepackage{complexity}
+\usepackage{booktabs}
 
 \beamertemplatenavigationsymbolsempty
 \usetheme{Madrid}
@@ -46,14 +47,14 @@
         \begin{lstlisting}[basicstyle=\tiny]
 0.001 :: burglary.
 0.002 :: earthquake.
-0.95 :: alarm :- burglary, earthquake.
-0.94 :: alarm :- burglary, \+ earthquake.
-0.29 :: alarm :- \+ burglary, earthquake.
-0.001 :: alarm :- \+ burglary, \+ earthquake.
-0.9 :: johnCalls :- alarm.
-0.05 :: johnCalls :- \+ alarm.
-0.7 :: maryCalls :- alarm.
-0.01 :: maryCalls :- \+ alarm.
+0.95  :: alarm     :- burglary, earthquake.
+0.94  :: alarm     :- burglary, \+ earthquake.
+0.29  :: alarm     :- \+ burglary, earthquake.
+0.001 :: alarm     :- \+ burglary, \+ earthquake.
+0.9   :: johnCalls :- alarm.
+0.05  :: johnCalls :- \+ alarm.
+0.7   :: maryCalls :- alarm.
+0.01  :: maryCalls :- \+ alarm.
         \end{lstlisting}
         \vspace{-0.2cm}
       \end{block}
@@ -159,93 +160,137 @@ random Boolean MaryCalls (*$\sim$*)
   \end{columns}
 \end{frame}
 
-% BAs, pseudo-Boolean functions, measures, equivalence of definitions
-\begin{frame}{An Alternative Way to Think About It}
+\begin{frame}{An Alternative Way to Think About WMC}
+  \begin{itemize}
+  \item Let \structure{$V$} be the set of variables.
+  \item Then \structure{$2^{2^V}$} is the Boolean algebra of propositional
+    formulas.
+  \end{itemize}
+  \begin{definition}
+    A \alert{measure} is a function \structure{$\mu\colon 2^{2^V} \to
+      \mathbb{R}_{\ge 0}$} such that:
+    \begin{itemize}
+    \item \structure{$\mu(\bot) = 0$};
+    \item \structure{$\mu(x \lor y) = \mu(x) + \mu(y)$} whenever \structure{$x
+        \land y = \bot$}.
+    \end{itemize}
+  \end{definition}
+  \begin{block}{Observation}
+    WMC corresponds to the process of calculating the value of
+    \structure{$\mu(x)$} for some \structure{$x \in 2^{2^V}$}.
+  \end{block}
 \end{frame}
 
-% The theorems: WMC is not expressive enough to cover all measures but can be
-% extended to do so
-\begin{frame}{Some Theoretical Results}
+% \begin{frame}{How  to Define a Measure}
+%   \begin{itemize}
+%   \item A \alert{weight function} is any function \structure{$\nu\colon 2^V \to
+%       \mathbb{R}_{\ge 0}$}.
+%     \begin{itemize}
+%     \item It is \alert{factored} if
+%       \[
+%         \nu = \prod_{x \in V} \nu_x
+%       \]
+%       for some functions \structure{$\nu_x\colon 2^{\{x\}} \to \mathbb{R}_{\ge
+%           0}$}, \structure{$x \in V$}.
+%     \end{itemize}
+%   \item We say that \structure{$\nu$} \alert{induces} \structure{$\mu$} if
+%     \[
+%       \mu(x) = \sum_{\{u\} \le x} \nu(u)
+%     \]
+%     for all \structure{$x \in 2^{2^V}$}.
+%   \item A measure \structure{$\mu$} is \alert{factorable} if there exists a
+%     factored weight function \structure{$\nu$} that induces \structure{$\mu$}.
+%   \end{itemize}
+% \end{frame}
+
+\begin{frame}{The Limitations and Capabilities of Classical WMC}
+  \begin{alertblock}{Observation}
+    Classical WMC is only able to evaluate \structure{factorable} measures
+    (c.f., a collection of mutually independent random variables).
+  \end{alertblock}
+  \begin{theorem}[Informal Version]
+    It is always possible to add more variables to turn a non-factorable measure
+    into a factorable measure.
+  \end{theorem}
+  However, that is not necessarily a good idea!
 \end{frame}
 
-% Things I could mention:
-% The details of the transformation
-% Experimental results
-
-\begin{frame}{The Big Picture}
-  \begin{columns}
-    \begin{column}{0.35\textwidth}
+\begin{frame}{Conditional Probability Tables (CPTs) as Functions}
+  \begin{itemize}
+  \item \alert{One} variable for every random variable with \alert{two} values.
+  \item \alert{$k$} variables for every random variable with \alert{$k > 2$}
+    values.
+  \item Define indicator functions of the form \structure{$[x]\colon 2^{\{x\}}
+      \to \{ 0, 1 \}$}.
+    \begin{itemize}
+    \item \structure{$[x](\emptyset) = 0$};
+    \item \structure{$[x](\{ x \}) = 1$}.
+    \end{itemize}
+  \item Define \structure{$+$}, \structure{$\cdot$}, and scalar multiplication pointwise.
+  \item Then a CPT can be represented as a function.
+  \end{itemize}
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
       \centering
-      \structure{Probabilistic Inference} \\
-      (e.g., a Bayesian network)
-      \fbox{
-        \begin{minipage}{2.5cm}
-          \centering
-          \begin{tikzpicture}[edge from parent/.style={draw,-{Latex}}]
-            \node[draw,circle] at (0, 0) (a) {$A$}
-            child {node[draw,circle] (b) {$B$}};
-          \end{tikzpicture}\\
-          Find \alert{$\Pr(B = 0)$}
-        \end{minipage}
-      }
+      \begin{tabular}[t]{ccc}
+        \toprule
+        $a$ & $b$ & $\Pr(A = a \mid B = b)$ \\
+        \midrule
+        1 & 1 & 0.6 \\
+        1 & 0 & 0.4 \\
+        0 & 1 & 0.1 \\
+        0 & 0 & 0.9 \\
+        \bottomrule
+      \end{tabular}
     \end{column}
-    \begin{column}{0.35\textwidth}
-      \centering
-      \structure{WMC Encoding} \\
-      (CNF with literal weights)
-      \framebox{
-        \scalebox{0.2}{
-          \begin{tabular}{@{}l@{}}
-            p cnf 8 17 \\
-            -2 -1 0 \\
-            1 2 0 \\
-            -3 1 0 \\
-            -1 3 0 \\
-            -5 -1 0 \\
-            -5 -4 0 \\
-            1 4 5 0 \\
-            -6 -1 0 \\
-            -6 4 0 \\
-            -4 1 6 0 \\
-            -7 1 0 \\
-            -7 -4 0 \\
-            -1 4 7 0 \\
-            -8 1 0 \\
-            -8 4 0 \\
-            -4 -1 8 0 \\
-            -4 0 \\
-            c weights 1.0 1.0 0.5 1.0 0.5 1.0 1.0 1.0 0.6 1.0 0.4 1.0 0.1 1.0 0.9 1.0
-          \end{tabular}%
-        }
-      }
-
-      \vspace{1cm}
-      \onslide<2>{
-      \structure{Conditional Weights} \\
-      \framebox{
-        \scalebox{0.2}{%
-          \begin{tabular}{@{}l@{}}
-            p cnf 2 1 \\
-            2 0 \\
-            w 1 0.5 0.5 \\
-            w 2 1 0.6 0.4 \\
-            w 2 -1 0.1 0.9
-          \end{tabular}%
-        }
-      }
-      }
-    \end{column}
-    \begin{column}{0.30\textwidth}
-      \centering
-      \structure{WMC Algorithm}\\
-      \onslide<2>{\alert{$>100\times$} faster}
+    \begin{column}{0.5\textwidth}
+      \begin{align*}
+        \mathsf{CPT_A} &= 0.6[\lambda_{A=1}] \cdot [\lambda_{B=1}] \\
+                       &+ 0.4[\lambda_{A=1}] \cdot \overline{[\lambda_{B=1}]} \\
+                       &+ 0.1\overline{[\lambda_{A=1}]} \cdot [\lambda_{B=1}] \\
+                       &+ 0.9\overline{[\lambda_{A=1}]} \cdot \overline{[\lambda_{B=1}]},
+      \end{align*}
     \end{column}
   \end{columns}
-  \begin{tikzpicture}[remember picture,overlay]
-    \draw[-{Latex}] (3.4, 3) -- (4.9, 4);
-    \draw<2>[-{Latex}] (3.4, 3) to [bend right] (5.8, 0.2);
-    \draw[-{Latex}] (7.7, 4) -- (9, 2.8);
-    \draw<2>[-{Latex}] (6.7, 0.2) to [bend right = 45] (9, 2.8);
-  \end{tikzpicture}
 \end{frame}
+
+\begin{frame}{Experimental Results}
+  \centering
+  \input{cumulative}
+\end{frame}
+
+% \begin{frame}{Compared Against the Second-Best Encoding}
+%   \centering
+%   \input{scatter2}
+% \end{frame}
+
+\begin{frame}{Comparison With the State of the Art}
+  \centering
+  \input{scatter1}
+\end{frame}
+
+\begin{frame}{Summary and Future Work}
+  \begin{itemize}
+  \item Classical WMC can represent any probability distribution by adding more
+    variables.
+  \item But this is not the right approach for WMC algorithms that support
+    working directly with functions.
+  \item Specifically with ADDMC, avoiding redundant variables resulted in
+    \alert{$127$} times faster inference.
+  \item Could this idea be successfully applied to other applications of WMC or,
+    perhaps, other WMC algorithms?
+  \end{itemize}
+  \begin{itemize}
+  \item Potential improvements to the encoding:
+    \begin{itemize}
+    \item Apply ideas from other WMC encodings for Bayesian networks (e.g.,
+      prime implicants, $\log$ encoding).
+    \item Develop encoding tricks that apply to functions but not to conjunctive
+      normal form.
+    \item More on this in our SAT~2021 paper \emph{\structure{Weighted Model
+          Counting Without Parameter Variables}}.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
 \end{document}
