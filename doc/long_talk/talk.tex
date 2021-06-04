@@ -140,12 +140,12 @@ random Boolean MaryCalls (*$\sim$*)
         \item probabilistic programming
         \item neural-symbolic artificial intelligence
         \end{itemize}
-      \item Main types of algorithms:
-        \begin{itemize}
-        \item using knowledge compilation
-        \item using a \SAT{} solver
-        \item manipulating pseudo-Boolean functions
-        \end{itemize}
+%      \item Main types of algorithms:
+%        \begin{itemize}
+%        \item using knowledge compilation
+%        \item using a \SAT{} solver
+%        \item manipulating pseudo-Boolean functions
+%        \end{itemize}
       \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -203,7 +203,7 @@ random Boolean MaryCalls (*$\sim$*)
 %   \end{itemize}
 % \end{frame}
 
-\begin{frame}{The Limitations and Capabilities of Classical WMC}
+\begin{frame}{The Limitations and Capabilities of WMC}
   \begin{alertblock}{Observation}
     Classical WMC is only able to evaluate \structure{factorable} measures
     (c.f., a collection of mutually independent random variables).
@@ -215,11 +215,11 @@ random Boolean MaryCalls (*$\sim$*)
   However, that is not necessarily a good idea!
 \end{frame}
 
-\begin{frame}{Conditional Probability Tables (CPTs) as Functions}
+\begin{frame}{Encoding Bayesian Networks}
   \begin{itemize}
-  \item \alert{One} variable for every random variable with \alert{two} values.
-  \item \alert{$k$} variables for every random variable with \alert{$k > 2$}
-    values.
+%  \item \alert{One} variable for every random variable with \alert{two} values.
+%  \item \alert{$k$} variables for every random variable with \alert{$k > 2$}
+%    values.
   \item Define indicator functions of the form \structure{$[x]\colon 2^{\{x\}}
       \to \{ 0, 1 \}$}.
     \begin{itemize}
@@ -227,7 +227,7 @@ random Boolean MaryCalls (*$\sim$*)
     \item \structure{$[x](\{ x \}) = 1$}.
     \end{itemize}
   \item Define \structure{$+$}, \structure{$\cdot$}, and scalar multiplication pointwise.
-  \item Then a CPT can be represented as a function.
+  \item Then a conditional probability table (CPT) can be represented as a function.
   \end{itemize}
   \begin{columns}[t]
     \begin{column}{0.5\textwidth}
@@ -271,14 +271,14 @@ random Boolean MaryCalls (*$\sim$*)
 
 \begin{frame}{Summary and Future Work}
   \begin{itemize}
-  \item Classical WMC can represent any probability distribution by adding more
-    variables.
+  \item (Classical) WMC can represent any probability distribution by adding
+    more variables.
   \item But this is not the right approach for WMC algorithms that support
     working directly with functions.
   \item Specifically with ADDMC, avoiding redundant variables resulted in
     \alert{$127$} times faster inference.
-  \item Could this idea be successfully applied to other applications of WMC or,
-    perhaps, other WMC algorithms?
+%  \item Could this idea be successfully applied to other applications of WMC or,
+%    perhaps, other WMC algorithms?
   \end{itemize}
   \begin{itemize}
   \item Potential improvements to the encoding:
