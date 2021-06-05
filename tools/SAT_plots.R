@@ -178,7 +178,7 @@ p1 <- scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\
                    "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 p2 <- scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)",
                    "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
-tikz(file = "../doc/paper3/scatter.tex", width = 4.8, height = 2.9, standAlone = TRUE)
+tikz(file = "../doc/SAT_paper/scatter.tex", width = 4.8, height = 2.9, standAlone = TRUE)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()
 
@@ -263,10 +263,11 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
                           y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
                           xout = max)$y
   print(interpolation)
-  return(p)
+  return(p + theme_light())
 }
 
-tikz(file = "../doc/paper3/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
+#tikz(file = "../doc/SAT_paper/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
+tikz(file = "../doc/SAT_talk/cumulative.tex", width = 4.2, height = 3.1)
 cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE, TRUE, "right")
 dev.off()
 

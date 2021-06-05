@@ -109,6 +109,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
 #tikz(file = "../doc/UAI_paper/cumulative.tex", width = 6.5, height = 2.4)
 #tikz(file = "../doc/poster/cumulative.tex", width = 7, height = 2.6, standAlone = TRUE)
 tikz(file = "../doc/long_talk/cumulative.tex", width = 4.75, height = 3.2)
+tikz(file = "../doc/long_talk/cumulative2.tex", width = 4.2, height = 3.1)
 cumulative_plot(data_sum, "encoding", "Algorithm \\& Encoding",
                 sort(unique(data_sum$encoding)),
                 c(2, 2, 2, 1, 1, 1, 1, 2, 2), "time", "Time (s)")
