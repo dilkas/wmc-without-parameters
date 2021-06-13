@@ -174,12 +174,21 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     scale_color_brewer(palette = "Dark2")
 }
 
+# For the paper
 p1 <- scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\texttt{cd06} time (s)",
                    "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 p2 <- scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)",
                    "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 tikz(file = "../doc/SAT_paper/scatter.tex", width = 4.8, height = 2.9, standAlone = TRUE)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
+dev.off()
+
+# For slides
+tikz(file = "../doc/SAT_long_talk/scatter1.tex", width = 4.2, height = 3.1)
+scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\texttt{cd06} time (s)", "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
+dev.off()
+tikz(file = "../doc/SAT_long_talk/scatter2.tex", width = 4.2, height = 3.1)
+scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)", "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 dev.off()
 
 scatter_plot(df, "time_new_d02pp", "time_new_d02", "\\texttt{d02++} time (s)",
@@ -267,7 +276,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
 }
 
 #tikz(file = "../doc/SAT_paper/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
-tikz(file = "../doc/SAT_talk/cumulative.tex", width = 4.2, height = 3.1)
+tikz(file = "../doc/SAT_long_talk/cumulative.tex", width = 4.2, height = 3.1)
 cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE, TRUE, "right")
 dev.off()
 
