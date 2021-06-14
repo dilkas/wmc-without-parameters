@@ -184,10 +184,10 @@ ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()
 
 # For slides
-tikz(file = "../doc/SAT_long_talk/scatter1.tex", width = 4.2, height = 3.1)
+tikz(file = "../doc/SAT_long_talk/scatter1.tex", width = 4.2, height = 3.1, standAlone = TRUE)
 scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\texttt{cd06} time (s)", "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 dev.off()
-tikz(file = "../doc/SAT_long_talk/scatter2.tex", width = 4.2, height = 3.1)
+tikz(file = "../doc/SAT_long_talk/scatter2.tex", width = 4.2, height = 3.1, standAlone = TRUE)
 scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)", "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 dev.off()
 
@@ -276,7 +276,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
 }
 
 #tikz(file = "../doc/SAT_paper/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
-tikz(file = "../doc/SAT_long_talk/cumulative.tex", width = 4.2, height = 3.1)
+tikz(file = "../doc/SAT_long_talk/cumulative.tex", width = 4.2, height = 3.1, standAlone = TRUE)
 cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE, TRUE, "right")
 dev.off()
 

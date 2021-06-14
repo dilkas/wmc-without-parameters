@@ -7,6 +7,7 @@
 \usepackage{complexity}
 \usepackage{mathtools}
 \usepackage{booktabs}
+\usepackage{xcolor}
 
 \beamertemplatenavigationsymbolsempty
 \usetheme{boxes}
@@ -15,6 +16,51 @@
 \usetikzlibrary{arrows}
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{shapes}
+\usetikzlibrary{positioning}
+\usetikzlibrary{tikzmark}
+\usetikzmarklibrary{listings}
+
+\tikzstyle{every picture}+=[remember picture]
+
+\newcounter{tmkcount}
+\tikzset{
+  use tikzmark/.style={
+    remember picture,
+    overlay,
+    execute at end picture={
+      \stepcounter{tmkcount}
+    },
+  },
+  tikzmark suffix={-\thetmkcount}
+}
+
+\definecolor{color1}{HTML}{1b9e77}
+\def\speciallstcolor{\begingroup\color{color1}}
+\def\endspeciallstcolor{\endgroup}
+
+\definecolor{color2}{HTML}{d95f02}
+\def\speciallstcolortwo{\begingroup\color{color2}}
+\def\endspeciallstcolortwo{\endgroup}
+
+\definecolor{color3}{HTML}{7570b3}
+\def\speciallstcolorthree{\begingroup\color{color3}}
+\def\endspeciallstcolorthree{\endgroup}
+
+\definecolor{color4}{HTML}{e7298a}
+\def\speciallstcolorfour{\begingroup\color{color4}}
+\def\endspeciallstcolorfour{\endgroup}
+
+\definecolor{color5}{HTML}{66a61e}
+\def\speciallstcolorfive{\begingroup\color{color5}}
+\def\endspeciallstcolorfive{\endgroup}
+
+\definecolor{color6}{HTML}{e6ab02}
+\def\speciallstcolorsix{\begingroup\color{color6}}
+\def\endspeciallstcolorsix{\endgroup}
+
+\definecolor{color7}{HTML}{a6761d}
+\def\speciallstcolorseven{\begingroup\color{color7}}
+\def\endspeciallstcolorseven{\endgroup}
 
 \author[P. Dilkas, V. Belle]{\textbf{Paulius Dilkas} \and Vaishak Belle}
 \title{Weighted Model Counting Without Parameter Variables}
@@ -42,20 +88,6 @@
   }
   \titlepage
 \end{frame}
-
-% ~15 slides
-% Section: Motivation
-% * the problem of computing probability,
-% * WMC (perhaps with a bigger example of a BN encoding, to emphasise the clutter)
-% Section: An Alternative Formulation
-% * Definition of WMC and MC-WMC
-% * Pseudo-Boolean functions, my notation, PBP instance
-% Section: Correctness
-% Section: Experimental Results
-% * Cactus plot
-% * Scatter plots
-% * Box plots
-% * Summary
 
 \begin{frame}[fragile]{The Problem of Computing Probability}
   \vspace{-0.75cm}
@@ -180,12 +212,72 @@ random Boolean MaryCalls (*$\sim$*)
   \end{columns}
 \end{frame}
 
+\begin{frame}[fragile]{The Problem with Assigning Weights to Literals}
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{A Simple Bayesian Network}
+        \centering
+        \begin{tikzpicture}[edge from parent/.style={draw,-{Latex}}]
+          \node[draw,circle] at (0, 0) (a) {$A$}
+          child {node[draw,circle] (b) {$B$}};
+        \end{tikzpicture}
+      \end{block}
+      \begin{itemize}
+      \item from \structure{2 binary} variables
+      \item to \structure{8} variables and \structure{17} clauses
+      \item with lots of redundancy
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Its WMC Encoding}
+        \vspace{-0.2cm}
+\begin{lstlisting}[basicstyle=\scriptsize,escapeinside={(*}{*)},name=codeL]
+p cnf 8 17
+(*\only<2->{\aftergroup\speciallstcolor}*)-2 -1 0(*\only<2->{\aftergroup\endspeciallstcolor}*)
+(*\only<2->{\aftergroup\speciallstcolor}*)1 2 0(*\only<2->{\aftergroup\endspeciallstcolor}*)
+(*\only<2->{\aftergroup\speciallstcolortwo}*)-3 1 0(*\only<2->{\aftergroup\endspeciallstcolortwo}*)
+(*\only<2->{\aftergroup\speciallstcolortwo}*)-1 3 0(*\only<2->{\aftergroup\endspeciallstcolortwo}*)
+(*\only<2->{\aftergroup\speciallstcolorthree}*)-5 -1 0(*\only<2->{\aftergroup\endspeciallstcolorthree}*)
+(*\only<2->{\aftergroup\speciallstcolorthree}*)-5 -4 0(*\only<2->{\aftergroup\endspeciallstcolorthree}*)
+(*\only<2->{\aftergroup\speciallstcolorthree}*)1 4 5 0(*\only<2->{\aftergroup\endspeciallstcolorthree}*)
+(*\only<2->{\aftergroup\speciallstcolorfour}*)-6 -1 0(*\only<2->{\aftergroup\endspeciallstcolorfour}*)
+(*\only<2->{\aftergroup\speciallstcolorfour}*)-6 4 0(*\only<2->{\aftergroup\endspeciallstcolorfour}*)
+(*\only<2->{\aftergroup\speciallstcolorfour}*)-4 1 6 0(*\only<2->{\aftergroup\endspeciallstcolorfour}*)
+(*\only<2->{\aftergroup\speciallstcolorfive}*)-7 1 0(*\only<2->{\aftergroup\endspeciallstcolorfive}*)
+(*\only<2->{\aftergroup\speciallstcolorfive}*)-7 -4 0(*\only<2->{\aftergroup\endspeciallstcolorfive}*)
+(*\only<2->{\aftergroup\speciallstcolorfive}*)-1 4 7 0(*\only<2->{\aftergroup\endspeciallstcolorfive}*)
+(*\only<2->{\aftergroup\speciallstcolorsix}*)-8 1 0(*\only<2->{\aftergroup\endspeciallstcolorsix}*)
+(*\only<2->{\aftergroup\speciallstcolorsix}*)-8 4 0(*\only<2->{\aftergroup\endspeciallstcolorsix}*)
+(*\only<2->{\aftergroup\speciallstcolorsix}*)-4 -1 8 0(*\only<2->{\aftergroup\endspeciallstcolorsix}*)
+(*\only<2->{\aftergroup\speciallstcolorseven}*)-4 0(*\only<2->{\aftergroup\endspeciallstcolorseven}*)
+c weights 1.0 1.0 0.5 1.0 \
+0.5 1.0 1.0 1.0 0.6 1.0 \
+0.4 1.0 0.1 1.0 0.9 1.0
+\end{lstlisting}
+        \vspace{-0.2cm}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \only<2->{
+    \begin{tikzpicture}[overlay,use tikzmark]
+      \node[above right = 0 and 15 mm of pic cs:line-codeL-3-end] {\color{color1}{$\neg x_1 \Leftrightarrow x_2$}};
+      \node[above right = 0 and 15 mm of pic cs:line-codeL-5-end] {\color{color2}{$x_1 \Leftrightarrow x_3$}};
+      \node[above right = 0.5 ex and 10 mm of pic cs:line-codeL-8-end] {\color{color3}{$\neg x_1 \land \neg x_4 \Leftrightarrow x_5$}};
+      \node[above right = 0.5 ex and 10 mm of pic cs:line-codeL-11-end] {\color{color4}{$\neg x_1 \land x_4 \Leftrightarrow x_6$}};
+      \node[above right = 0.5 ex and 10 mm of pic cs:line-codeL-14-end] {\color{color5}{$x_1 \land \neg x_4 \Leftrightarrow x_7$}};
+      \node[above right = 0.5 ex and 10 mm of pic cs:line-codeL-17-end] {\color{color6}{$x_1 \land x_4 \Leftrightarrow x_8$}};
+      \node[above right = -0.5 ex and 20 mm of pic cs:line-codeL-18-end] {\color{color7}{$\neg x_4$}};
+    \end{tikzpicture}
+  }
+\end{frame}
+
 \begin{frame}
   \frametitle{Outline}
   \tableofcontents
 \end{frame}
 
 \section{An Alternative Formulation}
+% TODO: Definition of WMC and MC-WMC
 
 \begin{frame}{Formalising the Intuition from Before}
   For any propositional formula \structure{$\phi$} over a set of variables
@@ -210,23 +302,26 @@ random Boolean MaryCalls (*$\sim$*)
 \end{frame}
 
 \begin{frame}{From WMC to PBP}
-  The WMC instance has \structure{$x$} as the only \alert{indicator} variable
-  and \structure{$p$}, \structure{$q$} as \alert{parameter} variables with
-  weights \structure{$w(p) = 0.2$}, \structure{$w(q) = 0.8$}, and
-  \structure{$w(\neg p) = w(\neg q) = 1$}.
-  \begin{center}
-    \begin{tabular}{llll}
-      \toprule
-      WMC Clause & \onslide<2->{In CNF} & \onslide<3->{Pseudo-Boolean Function} & \\
-      \midrule
-      $\neg x \Rightarrow p$ & \onslide<2->{$x \lor p$} & \onslide<3->{$[\neg x]_1^{0.2}$} & \\
-      $p \Rightarrow \neg x$ & \onslide<2->{$\neg x \lor \neg p$} & & \onslide<4->{$[x]^{0.8}_{0.2}$} \\
-      $x \Rightarrow q$ & \onslide<2->{$\neg x \lor q$} & \onslide<3->{$[x]_1^{0.8}$} & \\
-      $q \Rightarrow x$ & \onslide<2->{$x \lor \neg q$} & & \\
-      $\neg x$ & \onslide<2->{$\neg x$} & \onslide<3->{$[\neg x]_0^1$} & \onslide<4->{$[\neg x]_0^1$} \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
+  \begin{example}
+    \begin{itemize}
+    \item Indicator variable: \structure{$x$}
+    \item Parameter variables: \structure{$p$}, \structure{$q$}
+    \item Weights: \structure{$w(p) = 0.2$}, \structure{$w(q) = 0.8$}, and \structure{$w(\neg p) = w(\neg q) = 1$}
+    \end{itemize}
+    \begin{center}
+      \begin{tabular}{llll}
+        \toprule
+        WMC Clause & \onslide<2->{In CNF} & \onslide<3->{Pseudo-Boolean Function} & \\
+        \midrule
+        $\neg x \Rightarrow p$ & \onslide<2->{$x \lor p$} & \onslide<3->{$[\neg x]_1^{0.2}$} & \\
+        $p \Rightarrow \neg x$ & \onslide<2->{$\neg x \lor \neg p$} & & \onslide<4->{$[x]^{0.8}_{0.2}$} \\
+        $x \Rightarrow q$ & \onslide<2->{$\neg x \lor q$} & \onslide<3->{$[x]_1^{0.8}$} & \\
+        $q \Rightarrow x$ & \onslide<2->{$x \lor \neg q$} & & \\
+        $\neg x$ & \onslide<2->{$\neg x$} & \onslide<3->{$[\neg x]_0^1$} & \onslide<4->{$[\neg x]_0^1$} \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{example}
 \end{frame}
 
 \section{Correctness}
@@ -235,18 +330,25 @@ random Boolean MaryCalls (*$\sim$*)
 
 \begin{frame}{Experimental Results}
   \centering
-  \input{cumulative}
+  \includegraphics[width=\textwidth]{cumulative}
 \end{frame}
 
 \begin{frame}{Experimental Results}
   \centering
-  \input{scatter1}
+  \includegraphics[width=\textwidth]{scatter1}
 \end{frame}
 
 \begin{frame}{Experimental Results}
   \centering
-  \input{scatter2}
+  \includegraphics[width=\textwidth]{scatter2}
 \end{frame}
+
+\begin{frame}{Experimental Results}
+  \centering
+  \includegraphics[width=\textwidth]{box}
+\end{frame}
+% TODO: fit the plot to the left half of the slide, add observations on the
+% right
 
 \section{Summary}
 
