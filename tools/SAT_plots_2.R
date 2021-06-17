@@ -76,7 +76,7 @@ df2$variable <- factor(df2$variable, levels = rev(levels(df2$variable)))
 df2$encoding <- paste0("\\texttt{", df2$encoding, "}")
 
 tikz(file = "../doc/SAT_paper/box.tex", width = 2.4, height = 2, standAlone = TRUE)
-tikz(file = "../doc/SAT_long_talk/box.tex", width = 4.2, height = 3.1, standAlone = TRUE)
+tikz(file = "../doc/SAT_long_talk/box.tex", width = 2.5, height = 3.1, standAlone = TRUE)
 ggplot(df2, aes(encoding, value, fill = variable)) +
   geom_boxplot(outlier.shape = NA) +
   theme_light() +

@@ -199,9 +199,10 @@ scatter_plot(df, "treewidth", "add_width_new_bklm16", "treewidth",
                    "\\texttt{bklm16} width", max(data$add_width))
 scatter_plot(data, "add_width", "inference_time", "ADD width", "time", 2 * TIMEOUT)
 
-#brewer.pal(12, "Paired")
-cumulative_plot <- function(df, column_name, pretty_column_name, variable, variable_name, show.color.legend, show.linetype.legend, position) {
-  column_values <- sort(unique(df$encoding))
+cumulative_plot <- function(df, column_name, pretty_column_name, variable,
+                            variable_name, show.color.legend,
+                            show.linetype.legend, position, column_values,
+                            to_highlight, colours) {
   times <- vector(mode = "list", length = length(column_values))
   names(times) <- column_values
   for (value in column_values) {
@@ -225,59 +226,103 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable, varia
   cumulative$time <- as.numeric(cumulative$time)
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < 2 * TIMEOUT, ]
-  p <- ggplot(cumulative, aes(x = count, y = time, color = .data[[column_name]])) +
+  alpha_scale <- ifelse(colours == "#989898", 0.15, 1)
+  p <- ggplot(cumulative, aes(x = count, y = time,
+                              color = .data[[column_name]],
+                              alpha = .data[[column_name]])) +
     geom_line(aes(linetype = algorithm)) +
     scale_y_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000),
                        labels = c("0.1", "1", "10", "100", "1000")) +
     ylab("Time (s)") +
     xlab("Instances solved") +
     annotation_logticks(sides = "l", colour = "#989898") +
-    theme_set(theme_light()) +
-    labs(color = pretty_column_name, linetype = "Algorithm") +
-    geom_vline(xintercept = 1466, linetype = "dotted", color = "black")
+    labs(color = pretty_column_name, linetype = "Algorithm",
+         alpha = pretty_column_name) +
+    geom_vline(xintercept = 1466, linetype = "dotted", color = "black") +
+    scale_alpha_manual(values = alpha_scale)
 
   if (show.color.legend) {
     p <- p + scale_colour_manual(breaks = sort(unique(cumulative$encoding)),
-                        values = c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C",
-                                   "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00",
-                                   "#CAB2D6", "#6A3D9A", "#FFFF99")) +
+                        values = colours) +
       guides(color = guide_legend(ncol = 2)) +
-      theme(legend.position = position)
+      theme(legend.position = position, panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
   } else {
     p <- p + scale_colour_manual(breaks = sort(unique(cumulative$encoding)),
-                        values = c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C",
-                                   "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00",
-                                   "#CAB2D6", "#6A3D9A", "#FFFF99"),
-                        guide = show.color.legend)
+                        values = colours, guide = show.color.legend) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
   }
   if (show.linetype.legend) {
     p <- p + scale_linetype_manual(breaks = sort(unique(cumulative$algorithm)),
                           values = c(1, 2)) +
-      theme(legend.position = position) +
+      theme(legend.position = position, panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
       guides(linetype = guide_legend(ncol = 2))
   } else {
      p <- p + scale_linetype_manual(breaks = sort(unique(cumulative$algorithm)),
-                          values = c(1, 2), guide = show.linetype.legend)
+                          values = c(1, 2), guide = show.linetype.legend) +
+       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
   }
   # Calculate how many times my best encoding is faster than others
-  max <- max(cumulative$count[cumulative$algorithm == "other" &
-                                  cumulative$encoding == "\\texttt{cd06}"])
-  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
-                          y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
-                          xout = max)$y
-  print(interpolation)
-  max <- max(cumulative$count[cumulative$algorithm == "\\textsf{DPMC}" &
-                                  cumulative$encoding == "\\texttt{bklm16}"])
-  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
-                          y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
-                          xout = max)$y
-  print(interpolation)
-  return(p + theme_light())
+  #max <- max(cumulative$count[cumulative$algorithm == "other" &
+  #                                cumulative$encoding == "\\texttt{cd06}"])
+  #interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
+  #                        y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
+  #                        xout = max)$y
+  #print(interpolation)
+  #max <- max(cumulative$count[cumulative$algorithm == "\\textsf{DPMC}" &
+  #                                cumulative$encoding == "\\texttt{bklm16}"])
+  #interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
+  #                        y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
+  #                        xout = max)$y
+  #print(interpolation)
+  return(p + theme_classic())
 }
-
+#brewer.pal(12, "Paired")
 #tikz(file = "../doc/SAT_paper/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
-tikz(file = "../doc/SAT_long_talk/cumulative.tex", width = 4.2, height = 3.1, standAlone = TRUE)
-cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE, TRUE, "right")
+
+colours <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99",
+             "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99")
+colours1 <- c("#989898", "#989898", "#989898", "#989898", "#989898",
+              "#989898", "#FDBF6F", "#FF7F00", "#989898", "#989898", "#989898")
+colours2 <- c("#989898", "#989898", "#989898", "#989898", "#989898",
+              "#989898", "#989898", "#989898", "#CAB2D6", "#989898", "#989898")
+colours3 <- c("#989898", "#989898", "#B2DF8A", "#33A02C", "#989898",
+              "#989898", "#989898", "#989898", "#989898", "#989898", "#989898")
+colours4 <- c("#989898", "#989898", "#989898", "#989898", "#FB9A99",
+              "#E31A1C", "#989898", "#989898", "#989898", "#989898", "#989898")
+colours5 <- c("#A6CEE3", "#1F78B4", "#989898", "#989898", "#989898",
+              "#989898", "#989898", "#989898", "#989898", "#989898", "#989898")
+pairs <- sort(unique(data_sum$encoding))
+
+tikz(file = "../doc/SAT_long_talk/cumulative1.tex", width = 4.2, height = 3.1,
+     standAlone = TRUE)
+cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "d02", colours1)
+dev.off()
+
+tikz(file = "../doc/SAT_long_talk/cumulative2.tex", width = 4.2, height = 3.1,
+     standAlone = TRUE)
+cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "sbk05", colours2)
+dev.off()
+
+tikz(file = "../doc/SAT_long_talk/cumulative3.tex", width = 4.2, height = 3.1,
+     standAlone = TRUE)
+cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "cd05", colours3)
+dev.off()
+
+tikz(file = "../doc/SAT_long_talk/cumulative4.tex", width = 4.2, height = 3.1,
+     standAlone = TRUE)
+cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "cd06", colours4)
+dev.off()
+
+tikz(file = "../doc/SAT_long_talk/cumulative5.tex", width = 4.2, height = 3.1,
+     standAlone = TRUE)
+cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "bklm16", colours5)
 dev.off()
 
 # Stacked bar plots comparing encoding and inference time
