@@ -67,14 +67,6 @@
 \date{SAT 2021}
 \institute[University of Edinburgh]{University of Edinburgh, Edinburgh, UK}
 
-\AtBeginSection[]
-{
-  \begin{frame}
-    \frametitle{Outline}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
-
 \begin{document}
 
 \begin{frame}
@@ -270,56 +262,6 @@ c weights 1.0 1.0 0.5 1.0 \
   }
 \end{frame}
 
-\begin{frame}
-  \frametitle{Outline}
-  \tableofcontents
-\end{frame}
-
-\section{A More Expressive Alternative}
-
-\begin{frame}{WMC, Formally}
-  \begin{definition}
-    A \alert{WMC instance} is a tuple \structure{$(\phi, X_I, X_P, w)$}, where
-    \begin{itemize}
-    \item \structure{$X_I$} is the set of \alert{indicator variables},
-    \item \structure{$X_P$} is the set of \alert{parameter variables} (with
-      \structure{$X_I \cap X_P = \emptyset$}),
-    \item \structure{$\phi$} is a propositional formula in CNF over
-      \structure{$X_I \cup X_P$},
-    \item \structure{$w\colon X_I \cup X_P \cup \{\neg x \mid x \in X_I \cup
-        X_P\} \to \mathbb{R}$} is a \alert{weight function}
-      \begin{itemize}
-      \item such that \structure{$w(x) = w(\neg x) = 1$} for all \structure{$x
-          \in X_I$}.
-      \end{itemize}
-    \end{itemize}
-  \end{definition}
-  \begin{definition}
-    Let \structure{$\phi$} be a formula over a set of variables \structure{$X$}.
-    Then \structure{$Y \subseteq X$} is a \alert{minimum-cardinality model} of
-    \structure{$\phi$} if
-    \begin{itemize}
-    \item \structure{$Y \models \phi$},
-    \item and \structure{$|Y| \le |Z|$} for all \structure{$Z \models \phi$}.
-    \end{itemize}
-  \end{definition}
-\end{frame}
-
-\begin{frame}{WMC and Minimum-Cardinality WMC}
-  The goal of \alert{WMC} is to compute
-  \[
-    \sum_{Y \models \phi} \prod_{Y \models l} w(l)
-  \]
-  whereas the goal of \alert{minimum-cardinality WMC} is to compute
-  \[
-    \sum_{Y \models \phi\text{, }\alert{|Y| = k}} \prod_{Y \models l} w(l),
-  \]
-  where
-  \[
-    k = \min_{Y \models \phi} |Y|.
-  \]
-\end{frame}
-
 \begin{frame}{A More Expressive Alternative}
   For any propositional formula \structure{$\phi$} over a set of variables
   \structure{$X$} and \structure{$p, q \in \mathbb{R}$}, let
@@ -365,126 +307,24 @@ c weights 1.0 1.0 0.5 1.0 \
   \end{example}
 \end{frame}
 
-\section{When Does This Transformation Work?}
-
-\begin{frame}{Correctness Conditions for WMC (1/2)}
-  For each parameter variable \structure{$p \in X_P$},
-  \begin{itemize}
-  \item \structure{$w(\neg p) = 1$},
-  \item and the set of clauses that mention \structure{$p$} or \structure{$\neg
-      p$} is
-    \[
-      \left\{p \lor \bigvee_{i=1}^n \neg l_i \right\} \cup \{ l_i \lor \neg p
-      \mid i = 1, \dots, n \}
-    \]
-    for some non-empty family of \alert{indicator} literals
-    \structure{$(l_i)_{i=1}^n$}.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Correctness Conditions for WMC (2/2)}
-  For each parameter variable \structure{$p \in X_P$},
-  \begin{itemize}
-  \item \structure{$w(p) + w(\neg p) = 1$},
-  \item each clause has at most one parameter variable,
-  \item there is no clause \structure{$c \in \phi$} such that \structure{$\neg p
-      \in c$},
-  \item if \structure{$\{ p \} \in \phi$}, then this is the only clause that
-    mentions \structure{$p$},
-  \item and for any \structure{$c, d \in \phi$} such that \structure{$c \ne d$},
-    \structure{$p \in c$} and \structure{$p \in d$},
-    \[
-      \bigwedge_{l \in c \setminus \{ p \}} \neg l \land \bigwedge_{l \in d
-        \setminus \{ p \}} \neg l
-    \]
-    is false.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Additional Conditions for Minimum-Cardinality WMC}
-  \begin{itemize}
-  \item All models of \structure{$\{ c \in \phi \mid c \cap X_P = \emptyset \}$}
-    have the same number of positive indicator literals,
-  \item and
-    \[
-      \min_{Z \subseteq X_P} |Z| \quad \text{s.t. } \quad Y \cup Z \models \phi
-    \]
-    is the same for all \structure{$Y \models \{ c \in \phi \mid c \cap X_P =
-      \emptyset \}$}.
-  \end{itemize}
-\end{frame}
-
-\section{How Good Is It?}
-
-\begin{frame}{WMC/PBP Encodings for Bayesian Networks}
-  \centering
-  \includegraphics[width=\textwidth]{cumulative1}
-\end{frame}
-
-\begin{frame}{WMC/PBP Encodings for Bayesian Networks}
-  \centering
-  \includegraphics[width=\textwidth]{cumulative2}
-\end{frame}
-
-\begin{frame}{WMC/PBP Encodings for Bayesian Networks}
-  \centering
-  \includegraphics[width=\textwidth]{cumulative3}
-\end{frame}
-
-\begin{frame}{WMC/PBP Encodings for Bayesian Networks}
-  \centering
-  \includegraphics[width=\textwidth]{cumulative4}
-\end{frame}
-
-\begin{frame}{WMC/PBP Encodings for Bayesian Networks}
-  \centering
-  \includegraphics[width=\textwidth]{cumulative5}
-\end{frame}
-
-\begin{frame}{Compared to the Previous State of the Art}
-  \centering
-  \includegraphics[width=\textwidth]{scatter1}
-\end{frame}
-
-\begin{frame}{The Best Encoding for DPMC: Before and After}
-  \centering
-  \includegraphics[width=\textwidth]{scatter2}
-\end{frame}
-
-% \begin{frame}{Variable Reduction for Bayesian Network Encodings}
-%   \begin{columns}
-%     \begin{column}{0.4\textwidth}
-%       \begin{itemize}
-%       \item foo
-%       \end{itemize}
-%     \end{column}
-%     \begin{column}{0.6\textwidth}
-%       \centering
-%       \includegraphics[width=\textwidth]{box}
-%     \end{column}
-%   \end{columns}
+% \begin{frame}{Summary and Future Work}
+%   \begin{itemize}
+%   \item PBP is a more expressive alternative to WMC that works with
+%     state-of-the-art WMC algorithms based on pseudo-Boolean function
+%     manipulation.
+%   \item Many WMC encodings can be efficiently transformed into PBP while
+%     removing unnecessary variables and clauses.
+%   \item The identified conditions for this transformation to work help explain
+%     how WMC encodings for Bayesian networks operate.
+%   \item Performance improvements depend on the encoding.
+%     \begin{itemize}
+%     \item The very first encoding was virtually unaffected,
+%     \item whereas the state-of-the-art encoding was significantly improved.
+%     \end{itemize}
+%   \item Can the identified conditions be generalised further?
+%   \item Can the transformation be applied to WMC encodings for other application
+%     domains?
+%   \end{itemize}
 % \end{frame}
-
-\section{Summary and Future Work}
-
-\begin{frame}{Summary and Future Work}
-  \begin{itemize}
-  \item PBP is a more expressive alternative to WMC that works with
-    state-of-the-art WMC algorithms based on pseudo-Boolean function
-    manipulation.
-  \item Many WMC encodings can be efficiently transformed into PBP while
-    removing unnecessary variables and clauses.
-  \item The identified conditions for this transformation to work help explain
-    how WMC encodings for Bayesian networks operate.
-  \item Performance improvements depend on the encoding.
-    \begin{itemize}
-    \item The very first encoding was virtually unaffected,
-    \item whereas the state-of-the-art encoding was significantly improved.
-    \end{itemize}
-  \item Can the identified conditions be generalised further?
-  \item Can the transformation be applied to WMC encodings for other application
-    domains?
-  \end{itemize}
-\end{frame}
 
 \end{document}
