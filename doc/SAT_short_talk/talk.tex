@@ -71,11 +71,11 @@
 
 \begin{frame}
   \tikz[remember picture,overlay]{
-    \node at ([yshift=35pt,xshift=30pt]current page.south)
+    \node at ([yshift=20pt,xshift=30pt]current page.south)
     {\includegraphics[height=40pt]{../poster/logo_inf.png}};
-    \node at ([yshift=35pt,xshift=75pt]current page.south)
+    \node at ([yshift=20pt,xshift=75pt]current page.south)
     {\includegraphics[height=40pt]{../poster/logo_ecr.png}};
-    \node at ([yshift=30pt,xshift=140pt]current page.south)
+    \node at ([yshift=15pt,xshift=140pt]current page.south)
     {\includegraphics[height=20pt]{../poster/logo_ukri.png}};
   }
   \titlepage
@@ -263,6 +263,12 @@ c weights 1.0 1.0 0.5 1.0 \
 \end{frame}
 
 \begin{frame}{A More Expressive Alternative}
+  \begin{definition}[Pseudo-Boolean Projection (PBP)]
+    A \alert{PBP instance} is a tuple \structure{$(F, X, \omega)$}, where
+    \structure{$X$} is the set of variables, \structure{$F$} is a set of
+    two-valued pseudo-Boolean functions \structure{$2^X \to \mathbb{R}$}, and
+    \structure{$\omega \in \mathbb{R}$} is the scaling factor.
+  \end{definition}
   For any propositional formula \structure{$\phi$} over a set of variables
   \structure{$X$} and \structure{$p, q \in \mathbb{R}$}, let
   \structure{$[\phi]^p_q\colon 2^X \to \mathbb{R}$} be the pseudo-Boolean
@@ -275,13 +281,6 @@ c weights 1.0 1.0 0.5 1.0 \
     \end{cases}
   \]
   for any \structure{$Y \subseteq X$}.
-
-  \begin{definition}[Pseudo-Boolean Projection (PBP)]
-    A \alert{PBP instance} is a tuple \structure{$(F, X, \omega)$}, where
-    \structure{$X$} is the set of variables, \structure{$F$} is a set of
-    two-valued pseudo-Boolean functions \structure{$2^X \to \mathbb{R}$}, and
-    \structure{$\omega \in \mathbb{R}$} is the scaling factor.
-  \end{definition}
 \end{frame}
 
 \begin{frame}{From WMC to PBP}
@@ -296,15 +295,21 @@ c weights 1.0 1.0 0.5 1.0 \
         \toprule
         WMC Clause & \onslide<2->{In CNF} & \onslide<3->{Pseudo-Boolean Function} & \\
         \midrule
-        $\neg x \Rightarrow p$ & \onslide<2->{$x \lor p$} & \onslide<3->{$[\neg x]_1^{0.2}$} & \\
-        $p \Rightarrow \neg x$ & \onslide<2->{$\neg x \lor \neg p$} & & \onslide<4->{$[x]^{0.8}_{0.2}$} \\
-        $x \Rightarrow q$ & \onslide<2->{$\neg x \lor q$} & \onslide<3->{$[x]_1^{0.8}$} & \\
+        $\neg x \Rightarrow p$ & \onslide<2->{$x \lor p$} & \onslide<3->{$[\neg x]_1^{0.2}$}\tikz \coordinate (one); & \\
+        $p \Rightarrow \neg x$ & \onslide<2->{$\neg x \lor \neg p$} & & \tikz \coordinate (two); \onslide<4->{$[x]^{0.8}_{0.2}$} \\
+        $x \Rightarrow q$ & \onslide<2->{$\neg x \lor q$} & \onslide<3->{$[x]_1^{0.8}$} \tikz \coordinate (three); & \\
         $q \Rightarrow x$ & \onslide<2->{$x \lor \neg q$} & & \\
         $\neg x$ & \onslide<2->{$\neg x$} & \onslide<3->{$[\neg x]_0^1$} & \onslide<4->{$[\neg x]_0^1$} \\
         \bottomrule
       \end{tabular}
     \end{center}
   \end{example}
+  \onslide<4->{
+    \begin{tikzpicture}[remember picture,overlay]
+      \draw[-Latex,blue] (one) -- (two);
+      \draw[-Latex,blue] (three) -- (two);
+    \end{tikzpicture}
+  }
 \end{frame}
 
 % \begin{frame}{Summary and Future Work}

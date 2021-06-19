@@ -285,44 +285,37 @@ colours <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99",
              "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99")
 colours1 <- c("#989898", "#989898", "#989898", "#989898", "#989898",
               "#989898", "#FDBF6F", "#FF7F00", "#989898", "#989898", "#989898")
-colours2 <- c("#989898", "#989898", "#989898", "#989898", "#989898",
-              "#989898", "#989898", "#989898", "#CAB2D6", "#989898", "#989898")
-colours3 <- c("#989898", "#989898", "#B2DF8A", "#33A02C", "#989898",
+colours2 <- c("#989898", "#989898", "#B2DF8A", "#33A02C", "#989898",
               "#989898", "#989898", "#989898", "#989898", "#989898", "#989898")
-colours4 <- c("#989898", "#989898", "#989898", "#989898", "#FB9A99",
+colours3 <- c("#989898", "#989898", "#989898", "#989898", "#FB9A99",
               "#E31A1C", "#989898", "#989898", "#989898", "#989898", "#989898")
-colours5 <- c("#A6CEE3", "#1F78B4", "#989898", "#989898", "#989898",
+colours4 <- c("#A6CEE3", "#1F78B4", "#989898", "#989898", "#989898",
               "#989898", "#989898", "#989898", "#989898", "#989898", "#989898")
-pairs <- sort(unique(data_sum$encoding))
+data_sum2 <- data_sum[!grepl("sbk05", data_sum$encoding),]
+pairs <- sort(unique(data_sum2$encoding))
 
 tikz(file = "../doc/SAT_long_talk/cumulative1.tex", width = 4.2, height = 3.1,
      standAlone = TRUE)
-cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
+cumulative_plot(data_sum2, "encoding", "Encoding", "time", "Time (s)", TRUE,
                 TRUE, "right", pairs, "d02", colours1)
 dev.off()
 
 tikz(file = "../doc/SAT_long_talk/cumulative2.tex", width = 4.2, height = 3.1,
      standAlone = TRUE)
-cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
-                TRUE, "right", pairs, "sbk05", colours2)
+cumulative_plot(data_sum2, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "cd05", colours2)
 dev.off()
 
 tikz(file = "../doc/SAT_long_talk/cumulative3.tex", width = 4.2, height = 3.1,
      standAlone = TRUE)
-cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
-                TRUE, "right", pairs, "cd05", colours3)
+cumulative_plot(data_sum2, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "cd06", colours3)
 dev.off()
 
 tikz(file = "../doc/SAT_long_talk/cumulative4.tex", width = 4.2, height = 3.1,
      standAlone = TRUE)
-cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
-                TRUE, "right", pairs, "cd06", colours4)
-dev.off()
-
-tikz(file = "../doc/SAT_long_talk/cumulative5.tex", width = 4.2, height = 3.1,
-     standAlone = TRUE)
-cumulative_plot(data_sum, "encoding", "Encoding", "time", "Time (s)", TRUE,
-                TRUE, "right", pairs, "bklm16", colours5)
+cumulative_plot(data_sum2, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, "bklm16", colours4)
 dev.off()
 
 # Stacked bar plots comparing encoding and inference time
