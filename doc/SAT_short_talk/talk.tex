@@ -81,96 +81,96 @@
   \titlepage
 \end{frame}
 
-\begin{frame}[fragile]{The Computational Problem of Probabilistic Inference}
-  \vspace{-0.75cm}
-  \begin{columns}[t]
-    \begin{column}{0.65\textwidth}
-      \centering
-      \begin{block}{ProbLog}
-        \vspace{-0.2cm}
-        \begin{lstlisting}[basicstyle=\tiny]
-0.001 :: burglary.
-0.002 :: earthquake.
-0.95  :: alarm     :- burglary, earthquake.
-0.94  :: alarm     :- burglary, \+ earthquake.
-0.29  :: alarm     :- \+ burglary, earthquake.
-0.001 :: alarm     :- \+ burglary, \+ earthquake.
-0.9   :: johnCalls :- alarm.
-0.05  :: johnCalls :- \+ alarm.
-0.7   :: maryCalls :- alarm.
-0.01  :: maryCalls :- \+ alarm.
-        \end{lstlisting}
-        \vspace{-0.2cm}
-      \end{block}
-      \begin{block}{BLOG}
-        \vspace{-0.2cm}
-        \begin{lstlisting}[escapeinside={(*}{*)},basicstyle=\tiny]
-random Boolean Burglary (*$\sim$*) BooleanDistrib(0.001);
-random Boolean Earthquake (*$\sim$*) BooleanDistrib(0.002);
-random Boolean Alarm (*$\sim$*)
-  if Burglary then
-    if Earthquake then BooleanDistrib(0.95)
-    else BooleanDistrib(0.94)
-  else
-    if Earthquake then BooleanDistrib(0.29)
-    else BooleanDistrib(0.001);
-random Boolean JohnCalls (*$\sim$*)
-  if Alarm then BooleanDistrib(0.9)
-  else BooleanDistrib(0.05);
-random Boolean MaryCalls (*$\sim$*)
-  if Alarm then BooleanDistrib(0.7)
-  else BooleanDistrib(0.01);
-        \end{lstlisting}
-        \vspace{-0.2cm}
-      \end{block}
-    \end{column}
-    \begin{column}{0.35\textwidth}
-      \begin{block}{Bayesian Network}
-        \centering
-        \begin{tikzpicture}[node distance=2cm,scale=0.5,every node/.style={scale=0.5}]
-          \node[draw,ellipse] (alarm) {Alarm};
-          \node[draw,ellipse,above left of=alarm] (burglary) {Burglary};
-          \node[draw,ellipse,above right of=alarm] (earthquake) {Earthquake};
-          \node[draw,ellipse,below left of=alarm] (johnCalls) {JohnCalls};
-          \node[draw,ellipse,below right of=alarm] (maryCalls) {MaryCalls};
-          \draw[-Latex] (burglary) -- (alarm);
-          \draw[-Latex] (earthquake) -- (alarm);
-          \draw[-Latex] (alarm) -- (johnCalls);
-          \draw[-Latex] (alarm) -- (maryCalls);
-        \end{tikzpicture}
-      \end{block}
-      \vspace{1cm}
-      \begin{block}{Markov Random Field}
-        \centering
-        \begin{tikzpicture}[node distance=2cm,scale=0.5,every node/.style={scale=0.5}]
-          \node[draw,ellipse] (alarm) {Alarm};
-          \node[draw,ellipse,above left of=alarm] (burglary) {Burglary};
-          \node[draw,ellipse,above right of=alarm] (earthquake) {Earthquake};
-          \node[draw,ellipse,below left of=alarm] (johnCalls) {JohnCalls};
-          \node[draw,ellipse,below right of=alarm] (maryCalls) {MaryCalls};
-          \draw (burglary) -- (earthquake);
-          \draw (burglary) -- (alarm);
-          \draw (earthquake) -- (alarm);
-          \draw (alarm) -- (johnCalls);
-          \draw (alarm) -- (maryCalls);
-        \end{tikzpicture}
-      \end{block}
-    \end{column}
-  \end{columns}
-  \onslide<2>{
-    \begin{tikzpicture}[remember picture,overlay]
-      \node[draw,star,fill=red!10] (wmc) at (current page.center) {WMC};
-      \coordinate[xshift=-0.25\linewidth,yshift=-0.25\textheight] (p1) at (current page.center);
-      \coordinate[xshift=0.25\linewidth,yshift=-0.25\textheight] (p2) at (current page.center);
-      \coordinate[xshift=-0.25\linewidth,yshift=0.25\textheight] (p3) at (current page.center);
-      \coordinate[xshift=0.25\linewidth,yshift=0.25\textheight] (p4) at (current page.center);
-      \draw[-latex,line width=2pt,color=red!50] (p1) -- (wmc);
-      \draw[-latex,line width=2pt,color=red!50] (p2) -- (wmc);
-      \draw[-latex,line width=2pt,color=red!50] (p3) -- (wmc);
-      \draw[-latex,line width=2pt,color=red!50] (p4) -- (wmc);
-    \end{tikzpicture}
-  }
-\end{frame}
+% \begin{frame}[fragile]{The Computational Problem of Probabilistic Inference}
+%   \vspace{-0.75cm}
+%   \begin{columns}[t]
+%     \begin{column}{0.65\textwidth}
+%       \centering
+%       \begin{block}{ProbLog}
+%         \vspace{-0.2cm}
+%         \begin{lstlisting}[basicstyle=\tiny]
+% 0.001 :: burglary.
+% 0.002 :: earthquake.
+% 0.95  :: alarm     :- burglary, earthquake.
+% 0.94  :: alarm     :- burglary, \+ earthquake.
+% 0.29  :: alarm     :- \+ burglary, earthquake.
+% 0.001 :: alarm     :- \+ burglary, \+ earthquake.
+% 0.9   :: johnCalls :- alarm.
+% 0.05  :: johnCalls :- \+ alarm.
+% 0.7   :: maryCalls :- alarm.
+% 0.01  :: maryCalls :- \+ alarm.
+%         \end{lstlisting}
+%         \vspace{-0.2cm}
+%       \end{block}
+%       \begin{block}{BLOG}
+%         \vspace{-0.2cm}
+%         \begin{lstlisting}[escapeinside={(*}{*)},basicstyle=\tiny]
+% random Boolean Burglary (*$\sim$*) BooleanDistrib(0.001);
+% random Boolean Earthquake (*$\sim$*) BooleanDistrib(0.002);
+% random Boolean Alarm (*$\sim$*)
+%   if Burglary then
+%     if Earthquake then BooleanDistrib(0.95)
+%     else BooleanDistrib(0.94)
+%   else
+%     if Earthquake then BooleanDistrib(0.29)
+%     else BooleanDistrib(0.001);
+% random Boolean JohnCalls (*$\sim$*)
+%   if Alarm then BooleanDistrib(0.9)
+%   else BooleanDistrib(0.05);
+% random Boolean MaryCalls (*$\sim$*)
+%   if Alarm then BooleanDistrib(0.7)
+%   else BooleanDistrib(0.01);
+%         \end{lstlisting}
+%         \vspace{-0.2cm}
+%       \end{block}
+%     \end{column}
+%     \begin{column}{0.35\textwidth}
+%       \begin{block}{Bayesian Network}
+%         \centering
+%         \begin{tikzpicture}[node distance=2cm,scale=0.5,every node/.style={scale=0.5}]
+%           \node[draw,ellipse] (alarm) {Alarm};
+%           \node[draw,ellipse,above left of=alarm] (burglary) {Burglary};
+%           \node[draw,ellipse,above right of=alarm] (earthquake) {Earthquake};
+%           \node[draw,ellipse,below left of=alarm] (johnCalls) {JohnCalls};
+%           \node[draw,ellipse,below right of=alarm] (maryCalls) {MaryCalls};
+%           \draw[-Latex] (burglary) -- (alarm);
+%           \draw[-Latex] (earthquake) -- (alarm);
+%           \draw[-Latex] (alarm) -- (johnCalls);
+%           \draw[-Latex] (alarm) -- (maryCalls);
+%         \end{tikzpicture}
+%       \end{block}
+%       \vspace{1cm}
+%       \begin{block}{Markov Random Field}
+%         \centering
+%         \begin{tikzpicture}[node distance=2cm,scale=0.5,every node/.style={scale=0.5}]
+%           \node[draw,ellipse] (alarm) {Alarm};
+%           \node[draw,ellipse,above left of=alarm] (burglary) {Burglary};
+%           \node[draw,ellipse,above right of=alarm] (earthquake) {Earthquake};
+%           \node[draw,ellipse,below left of=alarm] (johnCalls) {JohnCalls};
+%           \node[draw,ellipse,below right of=alarm] (maryCalls) {MaryCalls};
+%           \draw (burglary) -- (earthquake);
+%           \draw (burglary) -- (alarm);
+%           \draw (earthquake) -- (alarm);
+%           \draw (alarm) -- (johnCalls);
+%           \draw (alarm) -- (maryCalls);
+%         \end{tikzpicture}
+%       \end{block}
+%     \end{column}
+%   \end{columns}
+%   \onslide<2>{
+%     \begin{tikzpicture}[remember picture,overlay]
+%       \node[draw,star,fill=red!10] (wmc) at (current page.center) {WMC};
+%       \coordinate[xshift=-0.25\linewidth,yshift=-0.25\textheight] (p1) at (current page.center);
+%       \coordinate[xshift=0.25\linewidth,yshift=-0.25\textheight] (p2) at (current page.center);
+%       \coordinate[xshift=-0.25\linewidth,yshift=0.25\textheight] (p3) at (current page.center);
+%       \coordinate[xshift=0.25\linewidth,yshift=0.25\textheight] (p4) at (current page.center);
+%       \draw[-latex,line width=2pt,color=red!50] (p1) -- (wmc);
+%       \draw[-latex,line width=2pt,color=red!50] (p2) -- (wmc);
+%       \draw[-latex,line width=2pt,color=red!50] (p3) -- (wmc);
+%       \draw[-latex,line width=2pt,color=red!50] (p4) -- (wmc);
+%     \end{tikzpicture}
+%   }
+% \end{frame}
 
 \begin{frame}[fragile]{Weighted Model Counting (WMC)}
   \begin{columns}
@@ -183,12 +183,12 @@ random Boolean MaryCalls (*$\sim$*)
         \item probabilistic programming
         \item neural-symbolic artificial intelligence
         \end{itemize}
-      \item Main types of algorithms:
-        \begin{itemize}
-        \item using knowledge compilation
-        \item using a \SAT{} solver
-        \item manipulating pseudo-Boolean functions
-        \end{itemize}
+      % \item Main types of algorithms:
+      %   \begin{itemize}
+      %   \item using knowledge compilation
+      %   \item using a \SAT{} solver
+      %   \item manipulating pseudo-Boolean functions
+      %   \end{itemize}
       \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -310,6 +310,19 @@ c weights 1.0 1.0 0.5 1.0 \
       \draw[-Latex,blue] (three) -- (two);
     \end{tikzpicture}
   }
+\end{frame}
+
+\begin{frame}{Brief Summary}
+  \begin{itemize}
+  \item Fewer variables and clauses/functions
+  \item Improved state of the art for Bayesian network inference
+  \item Some conditions need to be satisfied
+  \end{itemize}
+  \pause
+  \vfill
+  \centering
+  \large
+  \emph{Thank You!}
 \end{frame}
 
 % \begin{frame}{Summary and Future Work}

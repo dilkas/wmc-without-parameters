@@ -294,31 +294,31 @@ c weights 1.0 1.0 0.5 1.0 \
       \end{itemize}
     \end{itemize}
   \end{definition}
-  % \begin{definition}
-  %   Let \structure{$\phi$} be a formula over a set of variables \structure{$X$}.
-  %   Then \structure{$Y \subseteq X$} is a \alert{minimum-cardinality model} of
-  %   \structure{$\phi$} if
-  %   \begin{itemize}
-  %   \item \structure{$Y \models \phi$},
-  %   \item and \structure{$|Y| \le |Z|$} for all \structure{$Z \models \phi$}.
-  %   \end{itemize}
-  % \end{definition}
+  \begin{definition}
+    Let \structure{$\phi$} be a formula over a set of variables \structure{$X$}.
+    Then \structure{$Y \subseteq X$} is a \alert{minimum-cardinality model} of
+    \structure{$\phi$} if
+    \begin{itemize}
+    \item \structure{$Y \models \phi$},
+    \item and \structure{$|Y| \le |Z|$} for all \structure{$Z \models \phi$}.
+    \end{itemize}
+  \end{definition}
 \end{frame}
 
-% \begin{frame}{WMC and Minimum-Cardinality WMC}
-%   The goal of \alert{WMC} is to compute
-%   \[
-%     \sum_{Y \models \phi} \prod_{Y \models l} w(l)
-%   \]
-%   whereas the goal of \alert{minimum-cardinality WMC} is to compute
-%   \[
-%     \sum_{Y \models \phi\text{, }\alert{|Y| = k}} \prod_{Y \models l} w(l),
-%   \]
-%   where
-%   \[
-%     k = \min_{Y \models \phi} |Y|.
-%   \]
-% \end{frame}
+\begin{frame}{WMC and Minimum-Cardinality WMC}
+  The goal of \alert{WMC} is to compute
+  \[
+    \sum_{Y \models \phi} \prod_{Y \models l} w(l)
+  \]
+  whereas the goal of \alert{minimum-cardinality WMC} is to compute
+  \[
+    \sum_{Y \models \phi\text{, }\alert{|Y| = k}} \prod_{Y \models l} w(l),
+  \]
+  where
+  \[
+    k = \min_{Y \models \phi} |Y|.
+  \]
+\end{frame}
 
 \begin{frame}{A More Expressive Alternative}
   \begin{definition}[Pseudo-Boolean Projection (PBP)]
@@ -403,18 +403,18 @@ c weights 1.0 1.0 0.5 1.0 \
   \end{itemize}
 \end{frame}
 
-% \begin{frame}{Additional Conditions for Minimum-Cardinality WMC}
-%   \begin{itemize}
-%   \item All models of \structure{$\{ c \in \phi \mid c \cap X_P = \emptyset \}$}
-%     have the same number of positive indicator literals,
-%   \item and
-%     \[
-%       \min_{Z \subseteq X_P} |Z| \quad \text{s.t. } \quad Y \cup Z \models \phi
-%     \]
-%     is the same for all \structure{$Y \models \{ c \in \phi \mid c \cap X_P =
-%       \emptyset \}$}.
-%   \end{itemize}
-% \end{frame}
+\begin{frame}{Additional Conditions for Minimum-Cardinality WMC}
+  \begin{itemize}
+  \item All models of \structure{$\{ c \in \phi \mid c \cap X_P = \emptyset \}$}
+    have the same number of positive indicator literals,
+  \item and
+    \[
+      \min_{Z \subseteq X_P} |Z| \quad \text{s.t. } \quad Y \cup Z \models \phi
+    \]
+    is the same for all \structure{$Y \models \{ c \in \phi \mid c \cap X_P =
+      \emptyset \}$}.
+  \end{itemize}
+\end{frame}
 
 \section{How Good Is It?}
 
