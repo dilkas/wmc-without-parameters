@@ -37,7 +37,7 @@ df <- dcast(data = data_sum, formula = instance + dataset ~ encoding,
             fun.aggregate = min,
             value.var = c("answer", "time"))
 time_columns <- Filter(function(x) startsWith(x, "time_"), names(df))
-df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
+df$time_min <- as.numeric(apply(df, 1, function(row) min(row[time_columns])))
 for (column in time_columns) {
   df[is.na(df[[column]]), column] <- 2 * TIMEOUT
 }
@@ -52,20 +52,21 @@ df$major.dataset[grepl("Plan_Recognition", df$instance, fixed = TRUE)] <- "Other
 df$major.dataset[grepl("students", df$instance, fixed = TRUE)] <- "Other binary"
 df$major.dataset[grepl("tcc4f", df$instance, fixed = TRUE)] <- "Other binary"
 
-data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsf{ADDMC} + \\texttt{bklm16}"
-data_sum$encoding[data_sum$encoding == "new_cw"] <- "\\textsf{ADDMC} + \\texttt{cw}"
-data_sum$encoding[data_sum$encoding == "new_d02"] <- "\\textsf{ADDMC} + \\texttt{d02}"
-data_sum$encoding[data_sum$encoding == "new_sbk05"] <- "\\textsf{ADDMC} + \\texttt{sbk05}"
-data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsf{c2d} + \\texttt{bklm16}"
-data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{cd05}"
-data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
-data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
-data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\texttt{sbk05}"
+data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsc{ADDMC} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "new_cw"] <- "\\textsc{ADDMC} + \\texttt{cw}"
+data_sum$encoding[data_sum$encoding == "new_d02"] <- "\\textsc{ADDMC} + \\texttt{d02}"
+data_sum$encoding[data_sum$encoding == "new_sbk05"] <- "\\textsc{ADDMC} + \\texttt{sbk05}"
+data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsc{c2d} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsc{Ace} + \\texttt{cd05}"
+data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsc{Ace} + \\texttt{cd06}"
+data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsc{Ace} + \\texttt{d02}"
+data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsc{Cachet} + \\texttt{sbk05}"
 
 # ==================== Plots ====================
 
 # brewer.pal(12, "Paired")
-colours <- c("#FDBF6F", "#FB9A99", "#B2DF8A", "#1F78B4", "#B15928", "#33A02C", "#6A3D9A", "#CAB2D6", "#A6CEE3")
+colours <- c("#FDBF6F", "#FB9A99", "#B2DF8A", "#1F78B4", "#B15928", "#33A02C",
+             "#6A3D9A", "#CAB2D6", "#A6CEE3")
 cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
                             linetypes, variable, variable_name) {
   times <- vector(mode = "list", length = length(column_values))
@@ -88,9 +89,9 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
   cumulative$time <- as.numeric(cumulative$time)
   cumulative$count <- as.numeric(cumulative$count)
   cumulative <- cumulative[cumulative$time < 2 * TIMEOUT, ]
-  max <- max(cumulative$count[cumulative$encoding == "\\textsf{ADDMC} + \\texttt{bklm16}"])
-  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\textsf{ADDMC} + \\texttt{cw}"],
-                          y = cumulative$time[cumulative$encoding ==  "\\textsf{ADDMC} + \\texttt{cw}"],
+  max <- max(cumulative$count[cumulative$encoding == "\\textsc{ADDMC} + \\texttt{bklm16}"])
+  interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\textsc{ADDMC} + \\texttt{cw}"],
+                          y = cumulative$time[cumulative$encoding ==  "\\textsc{ADDMC} + \\texttt{cw}"],
                           xout = max)
   print(interpolation$y)
   print(1000 / interpolation$y)
@@ -102,14 +103,16 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
     scale_colour_manual(breaks = column_values, values = colours) +
     scale_linetype_manual(breaks = column_values, values = linetypes) +
     annotation_logticks(sides = "b", colour = "#989898") +
-    theme_light() +
+    theme_light(base_size = 9) +
     labs(color = pretty_column_name, linetype = pretty_column_name)
 }
 
 #tikz(file = "../doc/UAI_paper/cumulative.tex", width = 6.5, height = 2.4)
 #tikz(file = "../doc/poster/cumulative.tex", width = 7, height = 2.6, standAlone = TRUE)
-tikz(file = "../doc/long_talk/cumulative.tex", width = 4.75, height = 3.2)
-tikz(file = "../doc/long_talk/cumulative2.tex", width = 4.2, height = 3.1)
+#tikz(file = "../doc/long_talk/cumulative.tex", width = 4.75, height = 3.2)
+#tikz(file = "../doc/long_talk/cumulative2.tex", width = 4.2, height = 3.1)
+tikz(file = "../../../annual-report/thesis/chapters/wmc_for_bns/cumulative.tex",
+     width = 5.7, height = 3.1)
 cumulative_plot(data_sum, "encoding", "Algorithm \\& Encoding",
                 sort(unique(data_sum$encoding)),
                 c(2, 2, 2, 1, 1, 1, 1, 2, 2), "time", "Time (s)")
@@ -133,29 +136,34 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     xlab(x_name) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
-    theme_light() +
+    theme_light(base_size = 9) +
     labs(shape = "Data set", colour = "Data set") +
     scale_color_brewer(palette = "Dark2") +
     scale_shape("Data set")
 }
 
-p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsf{Ace} + \\texttt{cd06} time (s)",
-                   "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
-p2 <- scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsf{ADDMC} + \\texttt{sbk05} time (s)",
-                   "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
+p1 <- scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsc{Ace} + \\texttt{cd06} time (s)",
+                   "\\textsc{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
+p2 <- scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsc{ADDMC} + \\texttt{sbk05} time (s)",
+                   "\\textsc{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
 #tikz(file = "../doc/UAI_paper/scatter.tex", width = 6.5, height = 2.4)
 #tikz(file = "../doc/poster/scatter.tex", width = 7, height = 2.6, standAlone = TRUE)
 #ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "right")
 #dev.off()
 
-tikz(file = "../doc/long_talk/scatter1.tex", width = 4.75, height = 3.2)
-scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsf{Ace} + \\texttt{cd06} time (s)",
-                   "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
+tikz(file = "../../../annual-report/thesis/chapters/wmc_for_bns/scatter.tex",
+     width = 5.7, height = 3.1)
+ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()
-tikz(file = "../doc/long_talk/scatter2.tex", width = 4.75, height = 3.2)
-scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsf{ADDMC} + \\texttt{sbk05} time (s)",
-                   "\\textsf{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
-dev.off()
+
+#tikz(file = "../doc/long_talk/scatter1.tex", width = 4.75, height = 3.2)
+#scatter_plot(df, "time_old_cd06", "time_new_cw", "\\textsc{Ace} + \\texttt{cd06} time (s)",
+#                   "\\textsc{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
+#dev.off()
+#tikz(file = "../doc/long_talk/scatter2.tex", width = 4.75, height = 3.2)
+#scatter_plot(df, "time_new_sbk05", "time_new_cw", "\\textsc{ADDMC} + \\texttt{sbk05} time (s)",
+#                   "\\textsc{ADDMC} + \\texttt{cw} time (s)", 2 * TIMEOUT)
+#dev.off()
 
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
                     measure = c("encoding_time", "inference_time")) %>%
@@ -163,15 +171,15 @@ data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
   summarize(time = mean(value), lower = mean(value) - 0.1 * sd(value),
             upper = mean(value) + 0.1 * sd(value))
 data_melted$encoding <- paste0("\\texttt{", data_melted$encoding, "}", sep = "")
-data_melted$lower[data_melted$variable =="inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
-data_melted$upper[data_melted$variable =="inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
+data_melted$lower[data_melted$variable == "inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
+data_melted$upper[data_melted$variable == "inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
 data_melted$novelty <- factor(data_melted$novelty, levels = c("old", "new"))
-novelties <- c("Originally", "With \\textsf{ADDMC}")
+novelties <- c("Originally", "With \\textsc{ADDMC}")
 names(novelties) <- c("old", "new")
 
 tikz(file = "../doc/paper2/melt.tex", width = 6.5, height = 2.4)
 ggplot(data_melted, aes(encoding, time, fill = variable)) +
-  geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
+  geom_bar(stat = "identity", position = position_stack(reverse = TRUE)) +
   facet_grid(cols = vars(novelty), labeller = labeller(novelty = novelties)) +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.3, position = "identity") +
   theme_light() +

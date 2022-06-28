@@ -46,8 +46,8 @@ for (column in time_columns) {
 # df <- df %>% select(!starts_with("treewidth_"))
 # df$treewidth <- df$treewidth - 1
 
-df$time_min <- as.numeric(apply(df, 1, function (row) min(row[time_columns])))
-df$time_min0 <- as.numeric(apply(df, 1, function (row) min(row[time_columns0])))
+df$time_min <- as.numeric(apply(df, 1, function(row) min(row[time_columns])))
+df$time_min0 <- as.numeric(apply(df, 1, function(row) min(row[time_columns0])))
 df$major.dataset <- "Non-binary"
 df$major.dataset[grepl("DQMR", df$instance, fixed = TRUE)] <- "DQMR"
 df$major.dataset[grepl("Grid", df$instance, fixed = TRUE)] <- "Grid"
@@ -65,22 +65,22 @@ instance_to_min_time0 <- df$time_min0
 names(instance_to_min_time0) <- df$instance
 rownames(data_sum) <- c()
 
-data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsf{DPMC} + \\texttt{bklm16}"
-data_sum$encoding[data_sum$encoding == "new_bklm16pp"] <- "\\textsf{DPMC} + \\texttt{bklm16++}"
-data_sum$encoding[data_sum$encoding == "new_cd05pp"] <- "\\textsf{DPMC} + \\texttt{cd05++}"
-data_sum$encoding[data_sum$encoding == "new_cd06pp"] <- "\\textsf{DPMC} + \\texttt{cd06++}"
-data_sum$encoding[data_sum$encoding == "new_d02"] <- "\\textsf{DPMC} + \\texttt{d02}"
-data_sum$encoding[data_sum$encoding == "new_d02pp"] <- "\\textsf{DPMC} + \\texttt{d02++}"
-data_sum$encoding[data_sum$encoding == "new_sbk05"] <- "\\textsf{DPMC} + \\texttt{sbk05}"
-data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsf{c2d} + \\texttt{bklm16}"
-data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsf{Ace} + \\texttt{cd05}"
-data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsf{Ace} + \\texttt{cd06}"
-data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsf{Ace} + \\texttt{d02}"
-data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsf{Cachet} + \\texttt{sbk05}"
+data_sum$encoding[data_sum$encoding == "new_bklm16"] <- "\\textsc{DPMC} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "new_bklm16pp"] <- "\\textsc{DPMC} + \\texttt{bklm16++}"
+data_sum$encoding[data_sum$encoding == "new_cd05pp"] <- "\\textsc{DPMC} + \\texttt{cd05++}"
+data_sum$encoding[data_sum$encoding == "new_cd06pp"] <- "\\textsc{DPMC} + \\texttt{cd06++}"
+data_sum$encoding[data_sum$encoding == "new_d02"] <- "\\textsc{DPMC} + \\texttt{d02}"
+data_sum$encoding[data_sum$encoding == "new_d02pp"] <- "\\textsc{DPMC} + \\texttt{d02++}"
+data_sum$encoding[data_sum$encoding == "new_sbk05"] <- "\\textsc{DPMC} + \\texttt{sbk05}"
+data_sum$encoding[data_sum$encoding == "old_bklm16"] <- "\\textsc{c2d} + \\texttt{bklm16}"
+data_sum$encoding[data_sum$encoding == "old_cd05"] <- "\\textsc{Ace} + \\texttt{cd05}"
+data_sum$encoding[data_sum$encoding == "old_cd06"] <- "\\textsc{Ace} + \\texttt{cd06}"
+data_sum$encoding[data_sum$encoding == "old_d02"] <- "\\textsc{Ace} + \\texttt{d02}"
+data_sum$encoding[data_sum$encoding == "old_sbk05"] <- "\\textsc{Cachet} + \\texttt{sbk05}"
 
 # ============ Numerical investigations ================
 
-df$diff <-df$time_new_bklm16pp - df$time_new_bklm16
+df$diff <- df$time_new_bklm16pp - df$time_new_bklm16
 summary(df$diff)
 
 # Total time per data set (for job scheduling)
@@ -169,28 +169,31 @@ scatter_plot <- function(df, x_column, y_column, x_name, y_name,
     xlab(x_name) +
     coord_fixed() +
     annotation_logticks(colour = "#b3b3b3") +
-    theme_light() +
+    theme_light(base_size = 9) +
     labs(shape = "", colour = "") +
     scale_color_brewer(palette = "Dark2")
 }
 
 # For the paper
-p1 <- scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\texttt{cd06} time (s)",
-                   "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
-p2 <- scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)",
-                   "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
-tikz(file = "../doc/SAT_paper/scatter.tex", width = 4.8, height = 2.9, standAlone = TRUE)
+p1 <- scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsc{Ace} + \\texttt{cd06} time (s)",
+                   "\\textsc{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
+p2 <- scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsc{DPMC} + \\texttt{bklm16} time (s)",
+                   "\\textsc{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
+#tikz(file = "../doc/SAT_paper/scatter.tex", width = 4.8, height = 2.9, standAlone = TRUE)
+tikz(file = "../../../annual-report/thesis/chapters/wmc_without_parameters/scatter.tex",
+     width = 5.7, height = 3.1, standAlone = TRUE)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()
 
 # For slides
 tikz(file = "../doc/SAT_long_talk/scatter1.tex", width = 4.2, height = 3.1, standAlone = TRUE)
-scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsf{Ace} + \\texttt{cd06} time (s)", "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "time_old_cd06", "time_new_bklm16pp", "\\textsc{Ace} + \\texttt{cd06} time (s)", "\\textsc{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 dev.off()
 tikz(file = "../doc/SAT_long_talk/scatter2.tex", width = 4.2, height = 3.1, standAlone = TRUE)
-scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsf{DPMC} + \\texttt{bklm16} time (s)", "\\textsf{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
+scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsc{DPMC} + \\texttt{bklm16} time (s)", "\\textsc{DPMC} + \\texttt{bklm16++} time (s)", 2 * TIMEOUT)
 dev.off()
 
+# Just for fun
 scatter_plot(df, "time_new_d02pp", "time_new_d02", "\\texttt{d02++} time (s)",
                    "\\texttt{d02} time (s)", max(data$add_width))
 scatter_plot(df, "add_width_new_bklm16pp", "add_width_new_sbk05", "\\texttt{bklm16++} width",
@@ -219,7 +222,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable,
   }
   cumulative <- as.data.frame(do.call(rbind, as.list(chunks)))
   names(cumulative) <- c("time", column_name, "count")
-  cumulative$algorithm <- ifelse(grepl("DPMC", cumulative$encoding, fixed = TRUE), "\\textsf{DPMC}", "other")
+  cumulative$algorithm <- ifelse(grepl("DPMC", cumulative$encoding, fixed = TRUE), "\\textsc{DPMC}", "other")
   cumulative$encoding <- sub(".*\\+ ", "", cumulative$encoding)
   cumulative[[column_name]] <- as.factor(cumulative[[column_name]])
   cumulative$algorithm <- as.factor(cumulative$algorithm)
@@ -270,13 +273,13 @@ cumulative_plot <- function(df, column_name, pretty_column_name, variable,
   #                        y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
   #                        xout = max)$y
   #print(interpolation)
-  #max <- max(cumulative$count[cumulative$algorithm == "\\textsf{DPMC}" &
+  #max <- max(cumulative$count[cumulative$algorithm == "\\textsc{DPMC}" &
   #                                cumulative$encoding == "\\texttt{bklm16}"])
   #interpolation <- approx(x = cumulative$count[cumulative$encoding == "\\texttt{bklm16++}"],
   #                        y = cumulative$time[cumulative$encoding == "\\texttt{bklm16++}"],
   #                        xout = max)$y
   #print(interpolation)
-  return(p + theme_classic())
+  return(p + theme_light(base_size = 9))
 }
 #brewer.pal(12, "Paired")
 #tikz(file = "../doc/SAT_paper/cumulative.tex", width = 4.8, height = 2.3, standAlone = TRUE)
@@ -318,20 +321,28 @@ cumulative_plot(data_sum2, "encoding", "Encoding", "time", "Time (s)", TRUE,
                 TRUE, "right", pairs, "bklm16", colours4)
 dev.off()
 
+tikz(file = "../../../annual-report/thesis/chapters/wmc_without_parameters/cumulative.tex",
+     width = 5.7, height = 3.1, standAlone = TRUE)
+cumulative_plot(data_sum2, "encoding", "Encoding", "time", "Time (s)", TRUE,
+                TRUE, "right", pairs, NULL, colours)
+dev.off()
+
+# ======================== UNUSED =======================================
+
 # Stacked bar plots comparing encoding and inference time
 data_melted <- melt(data[!is.na(data$answer),], id = c("encoding", "novelty"),
                     measure = c("encoding_time", "inference_time")) %>%
   group_by(encoding, novelty, variable) %>%
   summarize(time = mean(value), lower = mean(value) - 0.1 * sd(value),
             upper = mean(value) + 0.1 * sd(value))
-data_melted$lower[data_melted$variable =="inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
-data_melted$upper[data_melted$variable =="inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
+data_melted$lower[data_melted$variable == "inference_time"] <- with(data_melted, lower[variable == "encoding_time"] + lower[variable == "inference_time"])
+data_melted$upper[data_melted$variable == "inference_time"] <- with(data_melted, upper[variable == "encoding_time"] + upper[variable == "inference_time"])
 data_melted$novelty <- factor(data_melted$novelty, levels = c("old", "new"))
 novelties <- c("Originally", "With DPMC")
 names(novelties) <- c("old", "new")
 
 ggplot(data_melted, aes(encoding, time, fill = variable)) +
-  geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
+  geom_bar(stat = "identity", position = position_stack(reverse = TRUE)) +
   facet_grid(cols = vars(novelty), labeller = labeller(novelty = novelties)) +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.3, position = "identity") +
   theme_light() +

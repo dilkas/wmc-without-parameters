@@ -69,23 +69,26 @@ scatter(changes.df, "before_variables_bklm16", "before_variables_sbk05")
 scatter(changes.df, "before_clauses_bklm16", "before_clauses_sbk05")
 
 # grouped box plots
-df2 <- melt(changes, id.vars = c("instance", "dataset", "encoding"), measure.vars = c("before_variables", "after_variables"))
+df2 <- melt(changes, id.vars = c("instance", "dataset", "encoding"),
+            measure.vars = c("before_variables", "after_variables"))
 df2$variable <- ifelse(df2$variabl == "before_variables", "before", "after")
 df2$variable <- as.factor(df2$variable)
 df2$variable <- factor(df2$variable, levels = rev(levels(df2$variable)))
 df2$encoding <- paste0("\\texttt{", df2$encoding, "}")
 
-tikz(file = "../doc/SAT_paper/box.tex", width = 2.4, height = 2, standAlone = TRUE)
-tikz(file = "../doc/SAT_long_talk/box.tex", width = 2.5, height = 3.1, standAlone = TRUE)
+#tikz(file = "../doc/SAT_paper/box.tex", width = 2.4, height = 2, standAlone = TRUE)
+#tikz(file = "../doc/SAT_long_talk/box.tex", width = 2.5, height = 3.1, standAlone = TRUE)
+tikz(file = "../../../annual-report/thesis/chapters/wmc_without_parameters/box.tex",
+     width = 5.7, height = 3.1, standAlone = TRUE)
 ggplot(df2, aes(encoding, value, fill = variable)) +
   geom_boxplot(outlier.shape = NA) +
-  theme_light() +
+  theme_light(base_size = 9) +
   scale_fill_brewer(palette = "Dark2") +
   xlab("") +
   ylab("Variables") +
   labs(fill = "") +
   coord_cartesian(ylim = quantile(df2$value, c(0, 0.8), na.rm = TRUE)) +
-  theme(legend.position = "bottom", legend.margin=margin(t = -0.8, unit = 'cm'))
+  theme(legend.position = "bottom", legend.margin = margin(t = -0.8, unit = 'cm'))
 dev.off()
 
 tikz(file = "../doc/SAT_paper/variable_scatter.tex", width = 3.2, height = 2.9)
