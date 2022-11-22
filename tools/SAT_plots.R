@@ -152,17 +152,17 @@ sum(!is.na(df$answer_old_sbk05))
 
 # Scatter plot
 scatter_plot <- function(df, x_column, y_column, x_name, y_name,
-                         max.time) {
+                         max.time, k = 1) {
   ggplot(df[df[[x_column]] > 0,], aes(x = .data[[x_column]],
                                       y = .data[[y_column]],
                                       col = major.dataset,
                                       shape = major.dataset)) +
     geom_point(alpha = 0.5, size = 1) +
     geom_abline(slope = 1, intercept = 0, colour = "#989898") +
-    scale_x_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+    scale_x_continuous(trans = log10_trans(), limits = c(k * min.time, max.time),
                        breaks = c(0.1, 10, 1000),
                        labels = c("0.1", "10", "1000")) +
-    scale_y_continuous(trans = log10_trans(), limits = c(min.time, max.time),
+    scale_y_continuous(trans = log10_trans(), limits = c(k * min.time, max.time),
                        breaks = c(0.1, 10, 1000),
                        labels = c("0.1", "10", "1000")) +
     ylab(y_name) +
@@ -183,6 +183,14 @@ p2 <- scatter_plot(df, "time_new_bklm16", "time_new_bklm16pp", "\\textsc{DPMC} +
 tikz(file = "../../../annual-report/thesis/chapters/wmc_without_parameters/scatter.tex",
      width = 5.7, height = 3.1, standAlone = TRUE)
 ggarrange(p1, p2, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom")
+dev.off()
+
+# For the workshop
+tikz(file = "../../../wmc-comparison/doc/talk/scatter.tex", width = 5.7,
+     height = 3.1, standAlone = TRUE)
+scatter_plot(df, "time_old_d02", "time_new_d02",
+             "\\textsc{c2d} runtime (s)",
+             "\\textsc{DPMC} runtime (s)", 2 * TIMEOUT, 78)
 dev.off()
 
 # For slides
