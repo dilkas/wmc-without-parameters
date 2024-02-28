@@ -96,7 +96,7 @@ cumulative_plot <- function(df, column_name, pretty_column_name, column_values,
   print(interpolation$y)
   print(1000 / interpolation$y)
   ggplot(cumulative, aes(x = time, y = count, color = .data[[column_name]])) +
-    geom_line(aes(linetype = .data[[column_name]])) +
+    geom_line(aes(linetype = .data[[column_name]]), linewidth = 2) +
     scale_x_continuous(trans = log10_trans(), breaks = c(0.1, 1, 10, 100, 1000), labels = c("0.1", "1", "10", "100", "1000")) +
     xlab("Time (s)") +
     ylab("Instances solved") +
